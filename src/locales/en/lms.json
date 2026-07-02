@@ -1,0 +1,35 @@
+{
+  "title": "Digital Learning",
+  "titleShort": "LMS – Digital Learning",
+  "breadcrumb": { "list": "Digital Learning" },
+  "course": {
+    "title": "Courses", "add": "Create Course", "export": "Export Excel",
+    "stt": "No.", "maKhoa": "Course Code", "tenKhoa": "Course Name",
+    "giangVien": "Instructor", "soTc": "Credits",
+    "slSv": "Students", "tyLeHt": "Completion", "trangThai": "Status",
+    "thaoTac": "Actions",
+    "status": { "draft": "Draft", "published": "Published", "archived": "Archived", "closed": "Closed" }
+  },
+  "assignment": {
+    "title": "Assignments", "add": "Create Assignment",
+    "myTitle": "My Assignments",
+    "stt": "No.", "tenBt": "Assignment Name", "khoaHoc": "Course",
+    "hanNop": "Due Date", "slNop": "Submitted", "trangThai": "Status",
+    "thaoTac": "Actions",
+    "status": { "open": "Open", "closed": "Closed", "graded": "Graded" }
+  },
+  "resource": {
+    "title": "Learning Resources", "add": "Add Resource",
+    "stt": "No.", "tenHl": "Resource Name", "loai": "Type",
+    "khoaHoc": "Course", "tacGia": "Author", "trangThai": "Status",
+    "thaoTac": "Actions",
+    "type": { "document": "Document", "video": "Video", "slide": "Slide", "link": "Link" }
+  },
+  "gradebook": {
+    "title": "Gradebook", "export": "Export Grades",
+    "stt": "No.", "maSv": "Student ID", "hoTen": "Full Name",
+    "diemQuaTrinh": "Process Score", "diemCuoiKy": "Final Exam",
+    "diemTong": "Total Score", "xepLoai": "Grade", "thaoTac": "Actions"
+  },
+  "empty": { "title": "No courses available", "description": "Get started by creating your first course." }
+}

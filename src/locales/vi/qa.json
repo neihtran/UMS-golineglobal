@@ -1,0 +1,221 @@
+{
+  "title": "Kiểm định Chất lượng",
+  "titleShort": "QA – Kiểm định Chất lượng",
+  "breadcrumb": { "list": "Kiểm định Chất lượng" },
+  "description": "Kiểm định AUN-QA 8 tiêu chuẩn, quản lý minh chứng, tự đánh giá",
+  "export": "Xuất báo cáo",
+  "upload": "Upload minh chứng",
+  "table": {
+    "code": "Mã",
+    "date": "Ngày",
+    "status": "Trạng thái",
+    "detail": "Chi tiết",
+    "actions": "Thao tác",
+    "view": "Xem"
+  },
+  "filter": {
+    "all": "Tất cả",
+    "allStatus": "Tất cả trạng thái",
+    "filter": "Bộ lọc"
+  },
+  "priority": {
+    "high": "Cao",
+    "medium": "Trung bình",
+    "low": "Thấp"
+  },
+  "accreditation": {
+    "title": "Kiểm định",
+    "add": "Tạo đợt kiểm định",
+    "stt": "STT", "maKiemDinh": "Mã KD", "tenCs": "Cơ sở",
+    "tieuChuan": "Tiêu chuẩn", "ngayBd": "Ngày bắt đầu", "ngayKt": "Ngày kết thúc",
+    "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "status": {
+      "not_started": "Chưa bắt đầu",
+      "in_progress": "Đang thực hiện",
+      "self_assessed": "Tự đánh giá",
+      "external_assessed": "Đánh giá ngoài",
+      "submitted": "Đã nộp"
+    }
+  },
+  "complaint": {
+    "title": "Quản lý Khiếu nại",
+    "description": "Tiếp nhận, xử lý và theo dõi khiếu nại của sinh viên",
+    "breadcrumb": "Khiếu nại",
+    "add": "Tạo khiếu nại",
+    "create": "Tạo khiếu nại",
+    "export": "Xuất báo cáo",
+    "stt": "STT", "maKn": "Mã KN", "nguoiKn": "Người khiếu nại",
+    "noiDung": "Nội dung", "loai": "Loại", "ngayNhan": "Ngày nhận",
+    "linhVuc": "Lĩnh vực", "mucDo": "Mức độ", "nguoiXuLy": "Người xử lý",
+    "phanHoi": "Phản hồi", "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "detail": "Chi tiết",
+    "table": {
+      "complainant": "Người khiếu nại",
+      "category": "Lĩnh vực",
+      "content": "Nội dung",
+      "priority": "Mức độ",
+      "handler": "Phụ trách"
+    },
+    "cat": {
+      "teaching": "Giảng dạy",
+      "tuition": "Học phí",
+      "facility": "Cơ sở vật chất",
+      "admission": "Tuyển sinh",
+      "dormitory": "Ký túc xá",
+      "other": "Khác"
+    },
+    "empty": "Không có khiếu nại",
+    "status": {
+      "received": "Đã tiếp nhận",
+      "investigating": "Đang xác minh",
+      "resolved": "Đã giải quyết",
+      "rejected": "Từ chối",
+      "pending": "Chờ tiếp nhận",
+      "processing": "Đang xử lý"
+    },
+    "priority": {
+      "high": "Cao",
+      "medium": "Trung bình",
+      "low": "Thấp"
+    },
+    "advancedFilter": "Lọc nâng cao",
+    "display": "Hiển thị",
+    "complaints": "khiếu nại",
+    "receive": "Tiếp nhận",
+    "searchPlaceholder": "Tìm theo nội dung, tên sinh viên..."
+  },
+  "report": {
+    "title": "Báo cáo Chất lượng",
+    "description": "QA-01 — Quản lý báo cáo kiểm định AUN-QA, ISO, minh chứng theo tiêu chuẩn",
+    "breadcrumb": "Báo cáo chất lượng",
+    "add": "Tạo báo cáo",
+    "create": "Tạo báo cáo mới",
+    "export": "Xuất báo cáo",
+    "search": "Tìm theo tên, mã báo cáo...",
+    "searchPlaceholder": "Tìm theo tên, mã báo cáo...",
+    "stt": "STT", "maBc": "Mã báo cáo", "tenBc": "Tên báo cáo",
+    "chuongTrinh": "Chương trình / Đơn vị", "tieuChuan": "Tiêu chuẩn",
+    "nguoiPhuTrach": "Người phụ trách", "tienDo": "Tiến độ",
+    "minhChung": "Minh chứng", "capNhatCuoi": "Cập nhật cuối",
+    "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "evidence": "Minh chứng",
+    "view": "Xem",
+    "table": {
+      "code": "Mã báo cáo",
+      "name": "Tên báo cáo",
+      "programUnit": "Chương trình / Đơn vị",
+      "standard": "Tiêu chuẩn",
+      "assignedTo": "Người phụ trách",
+      "progress": "Tiến độ",
+      "evidence": "Minh chứng",
+      "lastUpdate": "Cập nhật cuối"
+    },
+    "empty": "Không tìm thấy báo cáo nào",
+    "status": {
+      "submitted": "Đã nộp",
+      "in_progress": "Đang thực hiện",
+      "not_started": "Chưa bắt đầu",
+      "external_assessed": "Đã kiểm định ngoài"
+    },
+    "statTotal": "Tổng báo cáo",
+    "statInProgress": "Đang thực hiện",
+    "statSubmitted": "Đã nộp",
+    "statEvidence": "Tổng minh chứng"
+  },
+  "asset": {
+    "title": "Quản lý Tài sản",
+    "description": "QA-02 — Theo dõi tài sản, khấu hao, bảo trì và thanh lý",
+    "breadcrumb": "Quản lý Tài sản",
+    "add": "Thêm tài sản",
+    "create": "Thêm tài sản",
+    "search": "Tìm theo mã, tên tài sản...",
+    "searchPlaceholder": "Tìm theo mã, tên tài sản...",
+    "filter": "Bộ lọc",
+    "stt": "STT", "maTs": "Mã TS", "tenTs": "Tên tài sản",
+    "loai": "Loại", "donViSd": "Đơn vị sử dụng", "soLuong": "Số lượng",
+    "giaTri": "Giá trị", "khauHao": "Khấu hao", "viTri": "Vị trí",
+    "trangThai": "Trạng thái", "thaoTac": "Thao tác", "detail": "Chi tiết",
+    "table": {
+      "code": "Mã TS",
+      "name": "Tên tài sản",
+      "category": "Loại",
+      "dept": "Đơn vị sử dụng",
+      "quantity": "Số lượng",
+      "value": "Giá trị",
+      "depreciation": "Khấu hao",
+      "location": "Vị trí"
+    },
+    "empty": "Không tìm thấy tài sản nào",
+    "status": {
+      "active": "Đang sử dụng",
+      "maintenance": "Đang bảo trì",
+      "broken": "Hỏng",
+      "disposed": "Đã thanh lý"
+    },
+    "statTotal": "Tổng tài sản",
+    "statActive": "Đang sử dụng",
+    "statMaintenance": "Đang bảo trì",
+    "statValue": "Tổng giá trị"
+  },
+  "facility": {
+    "title": "CSVC",
+    "add": "Thêm CSVC",
+    "stt": "STT", "maCsvc": "Mã CSVC", "tenCsvc": "Tên CSVC",
+    "loai": "Loại", "viTri": "Vị trí", "soLuong": "Số lượng",
+    "tinhTrang": "Tình trạng", "trangThai": "Trạng thái", "thaoTac": "Thao tác"
+  },
+  "evidence": {
+    "title": "Quản lý minh chứng",
+    "upload": "Upload minh chứng",
+    "stt": "STT", "tenMc": "Tên minh chứng", "tieuChuan": "Tiêu chuẩn",
+    "loai": "Loại", "dungLuong": "Dung lượng", "nguoiTai": "Người tải lên",
+    "ngayTai": "Ngày tải", "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "view": "Xem",
+    "status": {
+      "approved": "Đã duyệt",
+      "review": "Đang rà soát",
+      "uploaded": "Đã tải lên",
+      "draft": "Nháp"
+    }
+  },
+  "dashboard": {
+    "statAUN": "Tiêu chuẩn AUN",
+    "statSelfAssess": "Đã tự đánh giá",
+    "statEvidence": "Minh chứng",
+    "statEvidenceWeek": "+12 tuần này",
+    "statDaysLeft": "Ngày đến đánh giá",
+    "statDaysRemaining": "còn {{days}} ngày",
+    "overview": "Tổng quan tiêu chuẩn",
+    "evidenceMgmt": "Quản lý minh chứng",
+    "timeline": "Lịch trình kiểm định",
+    "complaints": "Khiếu nại & Phản ánh",
+    "reviewActivities": "Hoạt động kiểm định",
+    "scoreChart": "Điểm tự đánh giá theo tiêu chuẩn AUN",
+    "scale": "Thang điểm 1–5",
+    "selfAssess": "Tự đánh giá",
+    "externalAssess": "Đánh giá ngoài",
+    "weight": "Trọng số",
+    "evidenceCount": "minh chứng",
+    "selfScore": "Tự đánh giá",
+    "extScore": "Đánh giá ngoài",
+    "timelineTitle": "Lịch trình kiểm định AUN-QA 2026",
+    "done": "Đã hoàn thành",
+    "inProgress": "Đang thực hiện",
+    "upcoming": "Sắp tới",
+    "display": "Hiển thị",
+    "activities": "hoạt động kiểm định",
+    "viewStandards": "Xem tiêu chuẩn"
+  },
+  "review": {
+    "title": "Hoạt động kiểm định",
+    "stt": "STT", "maKd": "Mã KD", "tenKd": "Tên kiểm định",
+    "loai": "Loại", "tieuChuan": "Tiêu chuẩn", "hanChot": "Hạn chót",
+    "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "status": {
+      "completed": "Hoàn thành",
+      "in_progress": "Đang thực hiện",
+      "pending": "Chưa bắt đầu"
+    }
+  },
+  "empty": { "title": "Không có dữ liệu", "description": "Bắt đầu bằng việc tạo bản ghi đầu tiên." }
+}

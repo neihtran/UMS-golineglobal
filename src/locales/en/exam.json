@@ -1,0 +1,465 @@
+{
+  "title": "Online Examination",
+  "titleShort": "EXAM – Online Examination",
+  "breadcrumb": {
+    "list": "Online Examination",
+    "dashboard": "EXAM",
+    "questionBank": "Question Bank",
+    "questionBankFull": "Question Bank",
+    "questionCreate": "Add Question",
+    "questionDetail": "Question Detail",
+    "questionEdit": "Edit Question",
+    "createExam": "Create Exam",
+    "examSession": "Exam Sessions & Invigilation",
+    "examMonitor": "Exam Monitoring",
+    "examMonitorList": "Monitoring",
+    "gradebook": "Gradebook"
+  },
+  "common": {
+    "stt": "No.",
+    "thaoTac": "Actions",
+    "trangThai": "Status",
+    "search": "Search...",
+    "searchPlaceholder": "Search question content...",
+    "filter": "Filter",
+    "all": "All",
+    "allType": "All Types",
+    "allDifficulty": "All Levels",
+    "allStatus": "All",
+    "export": "Export Excel",
+    "exportReport": "Export Report",
+    "add": "Add",
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "back": "Back",
+    "view": "View",
+    "monitor": "Monitor",
+    "monitorNow": "Monitor Now",
+    "monitorAll": "Monitor All",
+    "online": "Online Monitoring",
+    "save": "Save",
+    "saveDraft": "Save Draft",
+    "submit": "Create Question",
+    "saveChanges": "Save Changes",
+    "continue": "Continue",
+    "publish": "Publish Exam",
+    "import": "Import from File",
+    "copy": "Copy",
+    "confirm": "Confirm",
+    "process": "Process",
+    "record": "Record",
+    "print": "Print Gradebook",
+    "live": "Live",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "close": "Close",
+    "reset": "Reset",
+    "apply": "Apply",
+    "noData": "No data",
+    "loading": "Loading...",
+    "optional": "(optional)"
+  },
+  "dashboard": {
+    "title": "Online Examination — EXAM",
+    "description": "EXAM-01 — Organize exams, AI proctoring, grading, anti-cheating",
+    "createNew": "Create New Exam",
+    "stats": {
+      "totalExam": "Total Exams",
+      "ongoing": "In Progress",
+      "ongoingSub": "live proctoring",
+      "completed": "Completed",
+      "completedThisWeek": "this week",
+      "passRate": "Pass Rate",
+      "newSemester": "new semesters"
+    },
+    "activeExam": {
+      "title": "Exams In Progress",
+      "submitted": "submitted",
+      "warning": "warnings",
+      "room": "Room",
+      "duration": "min",
+      "students": "Students"
+    },
+    "cheatingAlert": {
+      "title": "Recent Cheating Alerts"
+    },
+    "gradeDist": {
+      "title": "Grade Distribution — Recent Exam"
+    },
+    "scoreTrend": {
+      "title": "Average Scores — Recent Exams"
+    },
+    "tooltip": {
+      "student": "students"
+    }
+  },
+  "questionBank": {
+    "title": "Question Bank",
+    "description": "EXAM-01 · Manage exam questions, classified by difficulty, subject, tags",
+    "addQuestion": "Add Question",
+    "stats": {
+      "total": "Total Questions",
+      "multipleChoice": "Multiple Choice",
+      "essay": "Essay",
+      "unused": "Unused"
+    },
+    "filter": {
+      "course": "Subject",
+      "difficulty": "Difficulty",
+      "type": "Question Type"
+    },
+    "table": {
+      "question": "Question",
+      "course": "Subject",
+      "type": "Type",
+      "difficulty": "Difficulty",
+      "score": "Score",
+      "usageCount": "Usage",
+      "tags": "Tags"
+    },
+    "empty": {
+      "title": "No questions found",
+      "description": "Get started by adding your first question."
+    }
+  },
+  "questionBankFull": {
+    "title": "Question Bank",
+    "description": "EXAM-01 — Manage questions for multiple choice, essay, fill-in-the-blank exams",
+    "addQuestion": "Add Question",
+    "stats": {
+      "total": "Total Questions",
+      "multipleChoice": "Multiple Choice",
+      "essay": "Essay",
+      "fillBlank": "Fill in the Blank",
+      "trueFalse": "True/False"
+    },
+    "table": {
+      "content": "Question Content",
+      "subject": "Subject",
+      "type": "Type",
+      "difficulty": "Difficulty",
+      "usage": "Used",
+      "createdBy": "Created By",
+      "createdAt": "Created At",
+      "correctAnswer": "Answer"
+    },
+    "filter": {
+      "type": "Question Type",
+      "difficulty": "Level",
+      "status": "Status"
+    },
+    "empty": {
+      "title": "No questions found",
+      "description": "Try changing the filters or add a new question."
+    }
+  },
+  "questionCreate": {
+    "title": "Add New Question",
+    "description": "EXAM-01 · Create questions for the exam bank",
+    "section": {
+      "questionType": "Question Type",
+      "questionInfo": "Question Information"
+    },
+    "form": {
+      "course": "Subject",
+      "difficulty": "Difficulty",
+      "content": "Question Content",
+      "contentPlaceholder": "Enter question content...",
+      "answers": "Answers",
+      "answerPlaceholder": "Answer {{id}}",
+      "score": "Score",
+      "tags": "Tags",
+      "tagsPlaceholder": "Enter tag, press Enter...",
+      "explanation": "Hint / Sample Answer",
+      "explanationPlaceholder": "Enter hint or sample answer...",
+      "addAnswer": "Add Answer",
+      "markCorrect": "Press ✓ to mark the correct answer"
+    },
+    "validation": {
+      "contentRequired": "Question content is required",
+      "answersRequired": "Please fill in all answer options",
+      "atLeastOneCorrect": "At least one correct answer is required"
+    }
+  },
+  "questionDetail": {
+    "title": "Question {{id}}",
+    "section": {
+      "content": "Question Content",
+      "info": "Question Information"
+    },
+    "info": {
+      "course": "Subject",
+      "type": "Question Type",
+      "difficulty": "Difficulty",
+      "score": "Score",
+      "usageCount": "Usage Count",
+      "status": "Status",
+      "author": "Created By",
+      "createdAt": "Created At",
+      "updatedAt": "Last Updated",
+      "tags": "Tags",
+      "point": "point",
+      "times": "times"
+    },
+    "answer": {
+      "sampleAnswer": "Sample Answer"
+    },
+    "explanation": "Explanation",
+    "notFound": {
+      "title": "Question Not Found",
+      "back": "Back to Question Bank"
+    }
+  },
+  "questionEdit": {
+    "title": "Edit Question {{id}}",
+    "section": {
+      "questionInfo": "Question Information"
+    },
+    "form": {
+      "course": "Subject",
+      "difficulty": "Difficulty",
+      "content": "Question Content",
+      "answers": "Answers",
+      "score": "Score",
+      "tags": "Tags",
+      "tagsPlaceholder": "Enter tag, press Enter...",
+      "explanation": "Explanation / Hint",
+      "explanationPlaceholder": "Enter explanation or hint...",
+      "addAnswer": "Add Answer"
+    },
+    "validation": {
+      "contentRequired": "Question content is required",
+      "answersRequired": "Please fill in all answer options",
+      "atLeastOneCorrect": "At least one correct answer is required"
+    },
+    "notFound": {
+      "title": "Question Not Found",
+      "back": "Go Back"
+    }
+  },
+  "exam": {
+    "title": "Create New Exam",
+    "description": "EXAM-01 · Create exam, select questions from bank",
+    "steps": {
+      "examInfo": "Exam Information",
+      "selectQuestions": "Select Questions",
+      "settings": "Settings"
+    },
+    "form": {
+      "examName": "Exam Name",
+      "examNamePlaceholder": "e.g., CS101 Midterm Exam - 2026",
+      "course": "Subject",
+      "examType": "Exam Type",
+      "duration": "Duration (minutes)",
+      "startTime": "Start Date & Time",
+      "room": "Exam Room",
+      "roomPlaceholder": "e.g., R.301-302",
+      "selectFromBank": "Select Questions from Bank"
+    },
+    "examTypes": {
+      "midterm": "Midterm",
+      "final": "Final",
+      "quiz": "Quiz",
+      "practice": "Practice"
+    },
+    "settings": {
+      "enableWebcam": "Enable webcam proctoring",
+      "preventTabSwitch": "Prevent tab switching",
+      "preventCopyPaste": "Prevent copy-paste",
+      "allowReview": "Allow review after submission"
+    },
+    "summary": {
+      "title": "Summary",
+      "examName": "Exam Name",
+      "course": "Subject",
+      "duration": "Duration",
+      "questionCount": "Questions",
+      "totalScore": "Total Score",
+      "points": "pts",
+      "questions": "questions"
+    }
+  },
+  "examSession": {
+    "title": "Exam Sessions & Invigilation",
+    "description": "EXAM-01 — Manage exam sessions, rooms, and online proctoring",
+    "monitorOnline": "Online Monitoring",
+    "activeSessions": {
+      "title": "Active Exam Sessions",
+      "count": "{{count}} sessions"
+    },
+    "allSessions": {
+      "title": "All Exam Sessions"
+    },
+    "table": {
+      "session": "Session",
+      "course": "Subject",
+      "type": "Type",
+      "room": "Room",
+      "time": "Time",
+      "students": "Students",
+      "proctor": "Proctor",
+      "status": "Status"
+    },
+    "status": {
+      "all": "All",
+      "active": "In Progress",
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "activeLabel": "In Progress",
+      "scheduledLabel": "Scheduled",
+      "completedLabel": "Completed",
+      "cancelledLabel": "Cancelled"
+    },
+    "type": {
+      "midterm": "Midterm",
+      "final": "Final",
+      "quiz": "Quiz",
+      "practice": "Practice"
+    },
+    "card": {
+      "present": "absent",
+      "minutes": "min"
+    },
+    "empty": {
+      "title": "No exam sessions found",
+      "description": "Get started by creating your first exam session."
+    }
+  },
+  "examMonitor": {
+    "title": "Online Exam Monitoring",
+    "description": "EXAM-01 · AI proctoring, cheating alerts, progress tracking",
+    "exportReport": "Export Report",
+    "endAll": "End All",
+    "progress": {
+      "title": "Submission Progress",
+      "total": "Total Students",
+      "submitted": "Submitted",
+      "ongoing": "In Exam",
+      "timeoutNotSubmitted": "Timed Out",
+      "completed": "completed",
+      "notSubmitted": "students not submitted"
+    },
+    "warnings": {
+      "title": "System Alerts",
+      "cheatingHigh": "Cheating (high)",
+      "abnormalMedium": "Abnormal (medium)",
+      "suspectLow": "Suspected (low)"
+    },
+    "aiAlert": {
+      "title": "AI Alerts",
+      "count": "({{count}})"
+    },
+    "noAlert": {
+      "message": "No alerts"
+    },
+    "severity": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "actions": {
+      "record": "Record",
+      "process": "Process"
+    }
+  },
+  "examMonitorList": {
+    "title": "Exam Monitoring",
+    "description": "EXAM-01 — Real-time online exam session monitoring",
+    "report": "Reports",
+    "createSession": "Create Session",
+    "liveBanner": {
+      "count": "{{count}} exams in progress",
+      "realtime": "Real-time updates"
+    },
+    "stats": {
+      "monitoring": "Monitoring",
+      "scheduled": "Scheduled",
+      "totalStudents": "Total Students",
+      "cheatingCases": "Cheating Cases"
+    },
+    "table": {
+      "examCode": "Session Code",
+      "examName": "Exam Name",
+      "roomTime": "Room / Time",
+      "supervisor": "Supervisor",
+      "registered": "Registered",
+      "present": "Present",
+      "absent": "Absent",
+      "cheating": "Cheating",
+      "status": "Status"
+    },
+    "status": {
+      "active": "Monitoring",
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "empty": {
+      "title": "No exam sessions found",
+      "description": "Try changing the filters or create a new session."
+    }
+  },
+  "gradebook": {
+    "title": "Gradebook",
+    "description": "EXAM-01 / SIS-01 — Manage gradebook by course section",
+    "exportExcel": "Export Excel",
+    "printGrade": "Print Gradebook",
+    "courseList": {
+      "gradedOf": "{{graded}}/{{total}} graded"
+    },
+    "classAvg": "Class Avg",
+    "table": {
+      "stt": "No.",
+      "studentId": "Student ID",
+      "fullName": "Full Name",
+      "theory": "Theory",
+      "practice": "Practice",
+      "final": "Final",
+      "avgScore": "Avg Score",
+      "letterGrade": "Grade",
+      "status": "Status"
+    },
+    "status": {
+      "completed": "Completed",
+      "grading": "Grading",
+      "pending": "Pending",
+      "graded": "Graded",
+      "waiting": "Waiting"
+    },
+    "avgClass": "Class Average"
+  },
+  "type": {
+    "multiple_choice": "Multiple Choice",
+    "essay": "Essay",
+    "true_false": "True/False",
+    "fill_blank": "Fill in the Blank"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "all": "All Levels"
+  },
+  "status": {
+    "active": "Active",
+    "draft": "Draft",
+    "archived": "Archived",
+    "inactive": "Inactive",
+    "scheduled": "Scheduled",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled"
+  },
+  "statusExam": {
+    "draft": "Draft",
+    "scheduled": "Scheduled",
+    "active": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  }
+}

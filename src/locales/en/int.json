@@ -1,0 +1,63 @@
+{
+  "title": "Integration",
+  "titleShort": "INT – Integration",
+  "description": "INT-01 — Manage HEMIS, LMS, EXAM, PORTAL, LIB, and Ministry system connections",
+  "export": "Export Logs",
+  "syncAll": "Sync all",
+  "addIntegration": "Add Integration",
+  "breadcrumb": { "list": "Integration" },
+  "list": {
+    "title": "Integration List",
+    "add": "Add Integration",
+    "stt": "No.",
+    "maTichHop": "Integration ID",
+    "tenHt": "System",
+    "loai": "Type",
+    "ngayKt": "Connected Date",
+    "trangThai": "Status",
+    "thaoTac": "Actions",
+    "sync": "Sync",
+    "eventsToday": "events today",
+    "uptime": "uptime",
+    "integrationList": "Integration List",
+    "direction": {
+      "push": "Push Data",
+      "pull": "Pull Data",
+      "bidirectional": "Bidirectional"
+    },
+    "status": {
+      "active": "Active",
+      "warning": "Warning",
+      "inactive": "Inactive"
+    }
+  },
+  "log": {
+    "title": "API Logs",
+    "searchPlaceholder": "Search API...",
+    "stt": "No.",
+    "maApi": "API ID",
+    "tenApi": "API Name",
+    "phuongThuc": "Method",
+    "ngayGoi": "Called Date",
+    "trangThai": "Status",
+    "thoiGian": "Duration",
+    "thaoTac": "Actions",
+    "status": {
+      "success": "Success",
+      "failed": "Failed"
+    }
+  },
+  "dashboard": {
+    "totalIntegrations": "Total Integrations",
+    "newIntegrations": "+{{count}} new",
+    "active": "Active",
+    "uptimePercent": "{{percent}} uptime",
+    "warnings": "Warnings",
+    "needCheck": "need check",
+    "eventsToday": "Events Today",
+    "vsYesterday": "+{{percent}}% vs yesterday",
+    "uptimeTrend": "Weekly Uptime",
+    "avgUptime": "Avg. Uptime This Week"
+  },
+  "empty": { "title": "No integrations found", "description": "Get started by adding your first integration." }
+}

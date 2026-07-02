@@ -1,0 +1,773 @@
+{
+  "title": "Students & Education",
+  "titleShort": "SIS – Students & Education",
+  "breadcrumb": { "list": "Students & Education" },
+
+  "dashboard": {
+    "title": "Student & Education Management",
+    "description": "SIS-01 — Training backbone, connecting HEMIS, LMS, EXAM, PORTAL",
+    "stats": {
+      "totalStudents": "Total Students",
+      "regular": "Regular",
+      "continuing": "Continuing",
+      "onTimeGraduation": "On-time Graduation"
+    },
+    "chart": {
+      "studentsByDept": "Students by Faculty",
+      "admissionTrend": "Admission Trend (5 years)",
+      "gradeDistribution": "Academic Performance Distribution",
+      "avgGpa": "Avg GPA"
+    },
+    "gradeDistribution": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "average": "Average",
+      "fair": "Fair",
+      "poor": "Poor"
+    },
+    "report": "Report",
+    "studentsEnrolled": "students enrolled"
+  },
+
+  "student": {
+    "title": "Student Management",
+    "description": "{{count}} students in the system",
+    "breadcrumb": { "list": "Students", "create": "Add Student", "edit": "Edit" },
+    "add": "Add Student",
+    "import": "Import Excel",
+    "export": "Export Excel",
+    "table": {
+      "stt": "No.",
+      "sinhVien": "Student",
+      "maSV": "Student ID",
+      "lop": "Class",
+      "nganhKhoa": "Major / Faculty",
+      "gpa": "GPA",
+      "tinChi": "Credits",
+      "thaoTac": "Actions"
+    },
+    "filter": {
+      "searchPlaceholder": "Search name or student ID...",
+      "allDepts": "All",
+      "allStatuses": "All statuses"
+    },
+    "action": {
+      "chiTiet": "Details",
+      "sua": "Edit"
+    },
+    "status": {
+      "studying": "Enrolled",
+      "reserved": "On Hold",
+      "suspended": "Suspended",
+      "graduated": "Graduated",
+      "quit": "Withdrawn"
+    },
+    "form": {
+      "title": "Edit Student",
+      "titleCreate": "Add New Student",
+      "msv": "Student ID",
+      "hoTen": "Full Name",
+      "ngaySinh": "Date of Birth",
+      "gioiTinh": "Gender",
+      "gioiTinhMale": "Male",
+      "gioiTinhFemale": "Female",
+      "gioiTinhOther": "Other",
+      "email": "Email",
+      "emailPlaceholder": "email@university.edu.vn",
+      "soDienThoai": "Phone Number",
+      "phonePlaceholder": "0912 345 678",
+      "diaChi": "Address",
+      "addressPlaceholder": "Street, Ward, District, City",
+      "lop": "Class",
+      "classPlaceholder": "CS-K60A",
+      "nganh": "Major",
+      "khoa": "Faculty",
+      "khoaHoc": "Cohort",
+      "cohortPlaceholder": "2022",
+      "bacDaoTao": "Education Level",
+      "degreeOptions": {
+        "highSchool": "High School Graduate",
+        "vocational": "Vocational Graduate",
+        "college": "College Graduate"
+      },
+      "trangThai": "Status",
+      "ngayNhapHoc": "Enrollment Date",
+      "duKienTotNghiep": "Expected Graduation",
+      "personalInfo": "Personal Information",
+      "academicInfo": "Academic Information"
+    },
+    "detail": {
+      "profile": "Profile",
+      "grades": "Transcripts",
+      "ctdt": "Curriculum",
+      "schedule": "Schedule",
+      "certificates": "Certificates",
+      "gpaTichLuy": "Cumulative GPA",
+      "tinChiDat": "Credits Earned",
+      "xeploai": "Ranking",
+      "xuatBangDiem": "Export Transcript",
+      "bangDiem": {
+        "maMon": "Code",
+        "tenMon": "Subject",
+        "ky": "Sem",
+        "lt": "Th",
+        "th": "Pr",
+        "diemGK": "Midterm"
+      },
+      "xemLichHoc": "View Detailed Schedule",
+      "lichHocNote": "Schedule is managed through LMS",
+      "moLMS": "Open LMS",
+      "ctdtTitle": "Computer Science Curriculum 2022",
+      "ctdtNote": "Version 2.0 · {{credits}} credits · Cohort {{cohort}}",
+      "xuatCTDT": "Export Curriculum",
+      "bangDiemCTDT": {
+        "maMon": "Code",
+        "tenMon": "Subject",
+        "tc": "Cr",
+        "ky": "Sem",
+        "loai": "Type",
+        "gio": "Hours"
+      },
+      "certificateStatus": {
+        "issued": "Issued",
+        "pending": "Pending"
+      },
+      "profileFields": {
+        "hoVaTen": "Full Name",
+        "maSinhVien": "Student ID",
+        "ngaySinh": "Date of Birth",
+        "gioiTinh": "Gender",
+        "diaChi": "Address",
+        "dienThoai": "Phone"
+      },
+      "exportProfile": "Export Profile",
+      "back": "Back",
+      "edit": "Edit",
+      "treEm": "–"
+    },
+    "validation": {
+      "msvRequired": "Student ID is required",
+      "hoTenRequired": "Full name is required",
+      "ngaySinhRequired": "Date of birth is required"
+    },
+    "empty": {
+      "title": "No students found",
+      "description": "Try adjusting the filters or add a new student."
+    }
+  },
+
+  "subject": {
+    "title": "Subject Directory",
+    "description": "SIS-04 — Manage subjects in the training program",
+    "titleList": "Subject List",
+    "descriptionList": "{{count}} subjects in the training program",
+    "breadcrumb": { "list": "Subjects", "create": "Add Subject", "edit": "Edit", "detail": "Details" },
+    "add": "Add Subject",
+    "export": "Export Excel",
+    "table": {
+      "maMon": "Subject Code",
+      "tenMon": "Subject Name",
+      "tinChi": "Credits",
+      "hocKy": "Semester",
+      "loai": "Type",
+      "khoaPhuTrach": "Faculty",
+      "khoa": "Faculty",
+      "trangThai": "Status",
+      "thaoTac": "Actions",
+      "maMH": "Code",
+      "lt": "Th",
+      "th": "Pr",
+      "giangVien": "Instructor"
+    },
+    "filter": {
+      "searchPlaceholder": "Search code or subject name...",
+      "allDepts": "All",
+      "allTypes": "All types"
+    },
+    "type": {
+      "all": "All",
+      "lyThuyet": "Theory",
+      "thucHanh": "Practice",
+      "doAn": "Project",
+      "thucTap": "Internship",
+      "luanVan": "Thesis",
+      "batBuoc": "Required",
+      "tuChon": "Elective",
+      "tuChon2": "Elective 2"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "action": {
+      "xem": "View",
+      "sua": "Edit"
+    },
+    "detail": {
+      "info": "Subject Information",
+      "loaiMonHoc": "Subject Type",
+      "khoaPhuTrach": "Faculty",
+      "hinhThucThi": "Exam Type",
+      "trangThai": "Status",
+      "moTa": "Description",
+      "ctdtApDung": "Applied Curriculum",
+      "monTienQuyet": "Prerequisites",
+      "khongCo": "None",
+      "back": "Back",
+      "edit": "Edit",
+      "maMon": "Subject Code",
+      "soTinChi": "Credits",
+      "soTiet": "Hours",
+      "hocKy": "Semester"
+    },
+    "form": {
+      "titleCreate": "Add New Subject",
+      "titleEdit": "Edit: {{name}}",
+      "description": "SIS-03 — Initialize subjects in the training program",
+      "descriptionEdit": "{{code}} — Update subject information",
+      "info": "Subject Information",
+      "maMon": "Subject Code",
+      "tenMon": "Subject Name",
+      "soTinChi": "Credits",
+      "soTietHoc": "Hours",
+      "hocKy": "Semester",
+      "loaiMonHoc": "Subject Type",
+      "khoaPhuTrach": "Faculty",
+      "chuanKhoa": "-- Select faculty --",
+      "hinhThucThi": "Exam Type",
+      "examPlaceholder": "Written exam (90 minutes)",
+      "trangThai": "Status",
+      "moTa": "Description",
+      "descriptionPlaceholder": "Describe content, objectives, and scope...",
+      "monTienQuyet": "Prerequisites",
+      "monTienQuyetNote": "List of subjects that must be completed before registering this subject",
+      "addPrerequisite": "Add",
+      "prerequisitePlaceholder": "e.g. INT1005 (Enter prerequisite code)",
+      "back": "Cancel",
+      "save": "Save Subject",
+      "saveChanges": "Save Changes"
+    },
+    "validation": {
+      "maMonRequired": "Subject code is required",
+      "tenMonRequired": "Subject name is required",
+      "soTinChiRequired": "Credits are required",
+      "hocKyRequired": "Semester is required",
+      "khoaRequired": "Faculty is required"
+    },
+    "empty": {
+      "title": "No subjects found"
+    }
+  },
+
+  "curriculum": {
+    "title": "Training Program (Curriculum)",
+    "description": "SIS-01 — List of training programs and subjects by major",
+    "titleList": "Training Program",
+    "descriptionList": "{{count}} curricula in the system",
+    "breadcrumb": { "list": "Curriculum", "create": "Create Curriculum", "detail": "Details" },
+    "add": "Create New Curriculum",
+    "export": "Export Curriculum",
+    "listTitle": "Training Program List",
+    "subjectListTitle": "Subject List",
+    "subjectListNote": "Subject structure of {{name}} ({{version}})",
+    "viewSelect": "View:",
+    "searchPlaceholder": "Search code, name...",
+    "nienKhoa": "Year",
+    "tinChi": "Credits",
+    "tongMonHoc": "Subjects",
+    "subjectListLink": "Subject List",
+    "soMon": "Courses",
+    "chiTiet": "Details",
+    "table": {
+      "maCTDT": "Curriculum Code",
+      "tenCTDT": "Program Name",
+      "phienBan": "Version",
+      "nam": "Year",
+      "tongTc": "Total Credits",
+      "monHoc": "Subjects",
+      "gpaToiThieu": "Min GPA",
+      "trangThai": "Status",
+      "thaoTac": "Actions",
+      "chiTiet": "Details"
+    },
+    "tableDetail": {
+      "maMon": "Code",
+      "tenMon": "Subject",
+      "tongTc": "Credits",
+      "hocKy": "Semester",
+      "loai": "Type",
+      "khoa": "Faculty",
+      "maMonHoc": "Subject Code",
+      "tenMonHoc": "Subject Name",
+      "soTiet": "Hours",
+      "thi": "Exam"
+    },
+    "status": {
+      "active": "In Effect",
+      "inactive": "Archived",
+      "effect": "Active",
+      "notEffect": "Inactive",
+      "draft": "Draft"
+    },
+    "form": {
+      "titleCreate": "Create New Curriculum",
+      "description": "SIS-02 — Initialize a new training program for the major",
+      "basicInfo": "Basic Information",
+      "maCTDT": "Curriculum Code",
+      "codePlaceholder": "CURR-CS-2026",
+      "tenChuongTrinh": "Program Name",
+      "namePlaceholder": "Computer Science Program",
+      "nganhDaoTao": "Major",
+      "chuanNganh": "-- Select major --",
+      "bacDaoTao": "Degree Level",
+      "phienBan": "Version",
+      "versionPlaceholder": "V1.0",
+      "namBanHanh": "Issuance Year",
+      "yearPlaceholder": "2026",
+      "moTa": "Program Description",
+      "descriptionPlaceholder": "Describe overview, objectives, and scope...",
+      "params": "Training Parameters",
+      "tongTinChi": "Total Credits",
+      "totalCreditsPlaceholder": "120",
+      "gpaToiThieu": "Minimum GPA",
+      "gpaPlaceholder": "2.0",
+      "thoiGianDaoTao": "Duration (years)",
+      "durationPlaceholder": "4",
+      "chuanDauRa": "Expected Outcomes",
+      "chuanPlaceholder": "CDR0, CDR1, CDR2...",
+      "back": "Cancel",
+      "save": "Save Curriculum"
+    },
+    "detail": {
+      "intro": "Program Introduction",
+      "nganh": "Major",
+      "bac": "Degree",
+      "nam": "Year",
+      "phienBan": "Version",
+      "tongTinChi": "Total Credits",
+      "soMon": "Subjects",
+      "thoiGian": "Duration",
+      "gpaToiThieu": "Min GPA",
+      "nienKhoa": "Year",
+      "back": "Back",
+      "export": "Export Curriculum",
+      "edit": "Edit",
+      "kiHieu": "Semester"
+    },
+    "validation": {
+      "maRequired": "Curriculum code is required",
+      "tenRequired": "Curriculum name is required",
+      "nganhRequired": "Major is required",
+      "tongTcRequired": "Total credits are required"
+    },
+    "empty": {
+      "noSubjects": "No subjects found for this program."
+    }
+  },
+
+  "enrollment": {
+    "title": "Course Registration",
+    "titleList": "Registration List",
+    "description": "SIS-03 — Register courses for students by semester",
+    "descriptionList": "{{count}} registrations for {{semester}}",
+    "breadcrumb": { "list": "Registration", "create": "Create Registration", "edit": "Edit", "detail": "Details" },
+    "add": "Create Registration",
+    "create": "Create Course Registration",
+    "export": "Export Excel",
+    "print": "Print Form",
+    "openSession": "Open Registration Session",
+    "table": {
+      "maSV": "Student ID",
+      "hoTen": "Name",
+      "lop": "Class",
+      "monHoc": "Subject",
+      "hocKy": "Semester",
+      "trangThai": "Status",
+      "ngayDK": "Date",
+      "sinhVien": "Student",
+      "nganh": "Major",
+      "ngayDangKy": "Reg. Date",
+      "thaoTac": "Actions",
+      "chiTiet": "Details",
+      "sua": "Edit",
+      "soHP": "Courses",
+      "tinChi": "Credits",
+      "gpa": "GPA",
+      "mssv": "ID"
+    },
+    "filter": {
+      "searchPlaceholder": "Search name, student ID...",
+      "searchStudent": "Search student or ID...",
+      "allStatuses": "All"
+    },
+    "status": {
+      "registered": "Registered",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "approved": "Approved",
+      "in_progress": "In Progress",
+      "passed": "Passed",
+      "failed": "Failed",
+      "withdrawn": "Withdrawn",
+      "completed": "Completed"
+    },
+    "action": {
+      "duyet": "Approve",
+      "tuChoi": "Reject",
+      "chiTiet": "Details"
+    },
+    "detail": {
+      "studentInfo": "Student Information",
+      "courseList": "Registered Courses",
+      "courseNote": "{{count}} courses · {{credits}} credits",
+      "summary": {
+        "tongTinChi": "Total Registered Credits",
+        "tinChiDaDat": "Credits Earned",
+        "diemTB": "Avg Score (passed)"
+      },
+      "stt": "No.",
+      "maHocPhan": "Course Code",
+      "tenHocPhan": "Course Name",
+      "tinChi": "Credits",
+      "loai": "Type",
+      "khoa": "Faculty",
+      "ketQua": "Result",
+      "diem": "Score",
+      "mssv": "Student ID",
+      "ngayDangKy": "Reg. Date",
+      "nguoiDuyet": "Approved By",
+      "back": "Back",
+      "print": "Print Form",
+      "edit": "Edit",
+      "nguoiDuyetThoiGian": "{{name}} · {{time}}"
+    },
+    "form": {
+      "titleCreate": "Create Course Registration",
+      "titleEdit": "Edit Course Registration",
+      "description": "SIS-03 — Register courses for students by semester",
+      "enrollmentInfo": "Registration Information",
+      "studentInfo": "Student Information",
+      "selectStudent": "Select Student",
+      "findStudent": "Search name or student ID...",
+      "doi": "Change",
+      "hocKy": "Semester",
+      "ngayDangKy": "Registration Date",
+      "selectCourse": "Select Courses",
+      "selectedCount": "{{count}} courses · {{credits}} credits",
+      "selected": "Selected",
+      "addCourse": "Add Courses",
+      "findCourse": "Search code or course name...",
+      "noMoreCourses": "No more courses available",
+      "enrolledCourses": "Registered Courses",
+      "validation": {
+        "selectStudent": "Please select a student",
+        "selectCourse": "Please select at least one course"
+      },
+      "back": "Cancel",
+      "save": "Save Registration",
+      "saveChanges": "Save Changes"
+    },
+    "stats": {
+      "totalEnrollments": "Total Registrations",
+      "approved": "Approved",
+      "pending": "Pending",
+      "rejected": "Rejected"
+    },
+    "empty": {
+      "title": "No registrations found"
+    }
+  },
+
+  "internship": {
+    "title": "Graduation Internship",
+    "description": "SIS-05 — Manage internships, host companies, reports and internship grades",
+    "breadcrumb": { "list": "Internship", "create": "Register Internship", "detail": "Details", "tn": "Internship" },
+    "add": "Register Internship",
+    "register": "Register Internship",
+    "filter": "Filter",
+    "export": "Export Report",
+    "stats": {
+      "totalRegistrations": "Total Registrations",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "avgGrade": "Avg Grade"
+    },
+    "table": {
+      "stt": "No.",
+      "sinhVien": "Student",
+      "nganh": "Major",
+      "congTy": "Company",
+      "viTri": "Position",
+      "diaDiem": "Location",
+      "thoiGian": "Duration",
+      "trangThai": "Status",
+      "tienDo": "Progress",
+      "diem": "Grade",
+      "thaoTac": "Actions",
+      "chiTiet": "Details"
+    },
+    "filter": {
+      "searchPlaceholder": "Search student, ID, company...",
+      "allMajors": "All",
+      "allStatuses": "All statuses"
+    },
+    "status": {
+      "registered": "Registered",
+      "in_progress": "In Progress",
+      "pending_report": "Pending Report",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "detail": {
+      "student": "Student",
+      "company": "Host Company",
+      "progress": "Progress",
+      "supervisor": "Supervisor",
+      "phone": "Phone",
+      "tasks": "Internship Tasks",
+      "reports": "Internship Reports",
+      "evaluation": "Evaluation",
+      "submitReport": "Submit Report",
+      "fields": {
+        "hoTen": "Full Name",
+        "maSinhVien": "Student ID",
+        "lopNganh": "Class / Major",
+        "khoa": "Faculty",
+        "congTy": "Company",
+        "viTri": "Position",
+        "diaDiem": "Location",
+        "thoiGian": "Duration"
+      },
+      "task": {
+        "deadline": "Deadline",
+        "completed": "Completed",
+        "inProgress": "In Progress",
+        "pending": "Not Started"
+      },
+      "report": {
+        "submitted": "Submitted",
+        "pending": "Pending",
+        "notSubmitted": "Not Submitted"
+      },
+      "evaluationNote": {
+        "score": "points"
+      },
+      "noEvaluation": "No evaluation yet",
+      "back": "Back",
+      "edit": "Edit",
+      "export": "Export Report"
+    },
+    "form": {
+      "title": "Register New Internship",
+      "description": "SIS-05 — Enter student internship information",
+      "studentInfo": "Student Information",
+      "internshipInfo": "Internship Information",
+      "supervisorInfo": "Supervisor",
+      "maSinhVien": "Student ID",
+      "maPlaceholder": "e.g. SV2022001",
+      "hoTenSinhVien": "Student Full Name",
+      "namePlaceholder": "e.g. Nguyen Thi Lan Anh",
+      "lop": "Class",
+      "classPlaceholder": "e.g. CS-K24",
+      "nganh": "Major",
+      "khoaQuanLy": "Managing Faculty",
+      "congTy": "Host Company",
+      "companyPlaceholder": "e.g. FPT Software Da Nang",
+      "viTri": "Internship Position",
+      "positionPlaceholder": "e.g. Backend Intern",
+      "diaDiem": "Location",
+      "locationPlaceholder": "e.g. Da Nang",
+      "ngayBatDau": "Start Date",
+      "ngayKetThuc": "End Date",
+      "hoTenNguoiHuongDan": "Supervisor Name",
+      "supervisorPlaceholder": "e.g. Nguyen Van Minh",
+      "soDienThoai": "Phone",
+      "phonePlaceholder": "e.g. 0901234567",
+      "email": "Email",
+      "emailPlaceholder": "e.g. minh.nv@company.com",
+      "ghiChu": "Notes / Description",
+      "notePlaceholder": "Describe tasks, special requirements, notes...",
+      "back": "Back",
+      "save": "Save Registration"
+    },
+    "empty": {
+      "title": "No records found"
+    }
+  },
+
+  "graduation": {
+    "title": "Graduation Review",
+    "description": "SIS-01 — Manage eligible students and issue electronic diplomas",
+    "breadcrumb": { "list": "Graduation", "detail": "Details", "openSession": "Open New Session" },
+    "add": "Open Graduation Session",
+    "export": "Export List",
+    "print": "Print Temporary Certificate",
+    "stats": {
+      "eligible": "Eligible",
+      "pending": "Pending Review",
+      "notMet": "Not Met",
+      "issued": "Diplomas Issued"
+    },
+    "table": {
+      "mssv": "Student ID",
+      "sinhVien": "Student",
+      "nganhLop": "Major / Class",
+      "khoa": "Cohort",
+      "gpa": "GPA",
+      "detai": "Thesis Topic",
+      "diemLV": "Thesis Score",
+      "xeploai": "Ranking",
+      "trangThai": "Status",
+      "thaoTac": "Actions",
+      "xem": "View",
+      "capBang": "Issue Diploma"
+    },
+    "filter": {
+      "searchPlaceholder": "Search name, student ID...",
+      "allMajors": "All",
+      "allStatuses": "All"
+    },
+    "status": {
+      "graduated": "Graduated",
+      "pending_review": "Pending Review",
+      "not_met": "Not Met"
+    },
+    "detail": {
+      "summary": {
+        "gpaTichLuy": "Cumulative GPA",
+        "tongTinChi": "Total Credits",
+        "diemLuanVan": "Thesis Score",
+        "xeploai": "Ranking"
+      },
+      "studentInfo": "Student Information",
+      "fields": {
+        "hoTen": "Full Name",
+        "maSinhVien": "Student ID",
+        "lop": "Class",
+        "nganh": "Major",
+        "khoa": "Faculty",
+        "khoaHoc": "Cohort",
+        "ngayNhapHoc": "Enrollment Date",
+        "hocKyXet": "Review Semester",
+        "namTotNghiep": "Graduation Year"
+      },
+      "requirements": "Graduation Requirements",
+      "requirementNote": "{{count}}/{{total}} requirements met",
+      "requirementFields": {
+        "tongTinChi": "Total Credits",
+        "gpaTichLuy": "Cumulative GPA",
+        "diemLuanVan": "Thesis Score",
+        "chungChiGDTC": "PE Certificate",
+        "chungChiGDP": "DEF Certificate",
+        "ngoaiNgu": "Foreign Language",
+        "ctdt": "CS Curriculum 2021"
+      },
+      "requirementsDetail": {
+        "required": "Required"
+      },
+      "thesis": "Graduation Thesis",
+      "thesisFields": {
+        "tenDetai": "Topic",
+        "nguoiHuongDan": "Advisor",
+        "ngayBaoVe": "Defense Date",
+        "diemLuanVan": "Thesis Score"
+      },
+      "diploma": "Graduation Diploma",
+      "diplomaFields": {
+        "soHieu": "Diploma Number",
+        "ngayCap": "Issue Date",
+        "loaiBang": "Degree Type",
+        "chuyenNganh": "Major",
+        "hinhThucDaoTao": "Training Type",
+        "xeploaiTotNghiep": "Graduation Ranking"
+      },
+      "bangTam": "Temporary Certificate",
+      "back": "Back",
+      "export": "Export Profile"
+    },
+    "openSession": {
+      "title": "Open Graduation Session",
+      "description": "SIS-05 — Create graduation session and select eligible students",
+      "sessionInfo": "Graduation Session Information",
+      "eligibleStudents": "Eligible Students",
+      "eligibleNote": "{{count}} eligible students · Selected {{selected}}",
+      "hocKyXet": "Review Semester",
+      "tenDot": "Session Name",
+      "dotPlaceholder": "Graduation Review HK2/2025-2026",
+      "ngayMoDon": "Open Date",
+      "ngayDongDon": "Close Date",
+      "ngayXetDuyet": "Review Date",
+      "ghiChu": "Notes",
+      "notePlaceholder": "Notes for graduation session (if any)",
+      "selectAll": "Select All",
+      "eligible": "Eligible",
+      "notEligible": "Not Eligible",
+      "notMet": "Not Met",
+      "noEligible": "No eligible students",
+      "gpa": "GPA",
+      "tc": "CR",
+      "validation": {
+        "tenDotRequired": "Session name is required",
+        "ngayMoRequired": "Open date is required",
+        "ngayDongRequired": "Close date is required",
+        "selectStudent": "Please select at least one student"
+      },
+      "back": "Cancel",
+      "open": "Open Session ({{count}} students)"
+    },
+    "empty": {
+      "title": "No students found"
+    }
+  },
+
+  "common": {
+    "loading": "Loading...",
+    "noData": "No data",
+    "save": "Save",
+    "cancel": "Cancel",
+    "cancelShort": "Cancel",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "actions": "Actions",
+    "required": "Required",
+    "optional": "Optional",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "create": "Create",
+    "update": "Update",
+    "export": "Export",
+    "import": "Import",
+    "print": "Print",
+    "download": "Download",
+    "upload": "Upload",
+    "refresh": "Refresh",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "success": "Success",
+      "error": "Error",
+      "warning": "Warning"
+    },
+    "result": {
+      "pass": "Pass",
+      "fail": "Fail"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "entries": "entries",
+      "perPage": "Per page"
+    }
+  }
+}

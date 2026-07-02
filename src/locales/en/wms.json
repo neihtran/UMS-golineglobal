@@ -1,0 +1,75 @@
+{
+  "title": "Task Management",
+  "titleShort": "WMS – Task Management",
+  "breadcrumb": { "list": "Task Management" },
+  "description": "Assign tasks, track progress, deadline reminders, performance reports",
+  "export": "Export Report",
+  "kanban": { "title": "Kanban Board", "subtitle": "Visual workflow Kanban with 4 status columns", "filter": "Filter", "addTask": "Add Task", "dropHere": "Drop here", "noTask": "No tasks", "addNew": "Add Task" },
+  "task": {
+    "title": "Task List",
+    "subtitle": "WMS-01 — Track and manage system-wide tasks",
+    "add": "Create New Task",
+    "export": "Export Report",
+    "search": "Search tasks...",
+    "stt": "No.", "tenCv": "Task", "duAn": "Project",
+    "nguoiGiao": "Assigned By", "nguoiNhan": "Assigned To",
+    "donVi": "Unit", "hanChot": "Deadline", "doUuTien": "Priority",
+    "tienDo": "Progress", "trangThai": "Status", "thaoTac": "Actions",
+    "viewDetail": "Detail",
+    "priority": { "low": "Low", "medium": "Medium", "high": "High", "urgent": "Urgent" },
+    "status": { "todo": "To Do", "in_progress": "In Progress", "review": "Pending Review", "pending_approval": "Pending Approval", "done": "Done" },
+    "filterAll": "All",
+    "filterMine": "Mine",
+    "overdue": "Overdue",
+    "noResult": "No tasks match the current filter"
+  },
+  "createTask": {
+    "title": "Create New Task",
+    "subtitle": "WMS-02 — Assign and track tasks",
+    "basicInfo": "Basic Information",
+    "assignment": "Assignment",
+    "subtasks": "Subtasks (optional)",
+    "subtasksDesc": "Add subtasks to track detailed progress",
+    "form": {
+      "title": "Task Title",
+      "description": "Detailed Description",
+      "descriptionPlaceholder": "Describe task content, objectives and requirements...",
+      "module": "Module",
+      "selectModule": "Select module...",
+      "priority": "Priority Level",
+      "status": "Status",
+      "progress": "Progress (%)",
+      "assignee": "Assignee",
+      "assigneePlaceholder": "Full name...",
+      "dept": "Unit",
+      "deptPlaceholder": "Faculty / Department...",
+      "dueDate": "Deadline",
+      "subtaskPlaceholder": "Enter subtask..."
+    },
+    "cancel": "Cancel",
+    "createBtn": "Create Task",
+    "addSubtask": "Add"
+  },
+  "dashboard": {
+    "statTotal": "Total Tasks",
+    "statInProgress": "In Progress",
+    "statInProgressSub": "7 overdue",
+    "statPending": "Pending Review",
+    "statPendingSub": "need attention",
+    "statCompleted": "Completed This Month",
+    "taskList": "Task List",
+    "distribution": "Task Distribution",
+    "distributionItems": {
+      "done": "Completed",
+      "inProgress": "In Progress",
+      "pending": "Pending",
+      "overdue": "Overdue"
+    }
+  },
+  "menu": {
+    "view": "View Details",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "empty": { "title": "No tasks found", "description": "Get started by creating your first task." }
+}

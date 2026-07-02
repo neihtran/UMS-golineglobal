@@ -1,0 +1,67 @@
+{
+  "title": "Party Affairs",
+  "titleShort": "PMS – Party Affairs",
+  "description": "PMS-01 — Manage party members, cells, activities, rewards and discipline",
+  "export": "Export Report",
+  "addMember": "Add Party Member",
+  "breadcrumb": { "list": "Party Affairs" },
+  "member": {
+    "title": "Party Members",
+    "add": "Add Member",
+    "stt": "No.",
+    "maDv": "Member ID",
+    "hoTen": "Full Name",
+    "ngayVaoDang": "Party Join Date",
+    "chiBo": "Party Cell",
+    "chucVu": "Party Position",
+    "trangThai": "Status",
+    "thaoTac": "Actions",
+    "profile": "Profile",
+    "status": {
+      "active": "Official",
+      "probation": "Probationary",
+      "suspended": "Suspended"
+    }
+  },
+  "report": {
+    "title": "Party Reports",
+    "add": "Create Report",
+    "stt": "No.",
+    "maBc": "Report ID",
+    "tenBc": "Report Title",
+    "loaiBc": "Type",
+    "ngayTao": "Created Date",
+    "nguoiTao": "Created By",
+    "trangThai": "Status",
+    "thaoTac": "Actions"
+  },
+  "dashboard": {
+    "totalMembers": "Party Members",
+    "newMembers": "+{{count}}",
+    "partyCells": "Party Cells",
+    "cellUnits": "{{khoa}} faculties, {{phong}} departments",
+    "probationary": "Probationary Members",
+    "probationaryDesc": "in probation period",
+    "centralCells": "Central Cells",
+    "centralCellsDesc": "University Party Committee",
+    "memberList": "Party Member List",
+    "activity6months": "6-Month Activity",
+    "activities": {
+      "meetings": "Meetings",
+      "studies": "Studies",
+      "campaigns": "Campaigns"
+    },
+    "birthDate": "Born",
+    "education": "Education",
+    "achievements": "Achievements"
+  },
+  "table": {
+    "name": "Full Name",
+    "joinDate": "Join Date",
+    "branch": "Party Cell",
+    "position": "Position",
+    "status": "Status",
+    "action": ""
+  },
+  "empty": { "title": "No party members found", "description": "Get started by adding your first party member." }
+}

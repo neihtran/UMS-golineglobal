@@ -1,0 +1,68 @@
+{
+  "title": "Danh sách viên chức",
+  "add": "Thêm viên chức",
+  "importExcel": "Nhập từ Excel",
+  "exportExcel": "Xuất Excel",
+  "description": "{{count}} viên chức trong hệ thống",
+  "breadcrumb": {
+    "list": "Viên chức"
+  },
+  "filter": {
+    "searchPlaceholder": "Tìm tên, mã VC, đơn vị...",
+    "department": "Khoa / Đơn vị",
+    "departmentAll": "Tất cả",
+    "statusAll": "Tất cả trạng thái",
+    "contractAll": "Tất cả loại HĐ"
+  },
+  "table": {
+    "stt": "STT",
+    "hoTen": "Họ tên",
+    "maVC": "Mã VC",
+    "chucDanh": "Chức danh / Vị trí",
+    "khoaDonVi": "Khoa / Đơn vị",
+    "loaiHD": "Loại HĐ",
+    "luongCoBan": "Lương cơ bản",
+    "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác"
+  },
+  "status": {
+    "active": "Đang công tác",
+    "trial": "Thử việc",
+    "leave": "Nghỉ phép",
+    "inactive": "Đã nghỉ việc"
+  },
+  "contract": {
+    "permanent": "Cơ hữu",
+    "visiting": "Thỉnh giảng",
+    "probation": "Thử việc"
+  },
+  "action": {
+    "detail": "Chi tiết",
+    "edit": "Sửa",
+    "delete": "Xóa"
+  },
+  "empty": {
+    "title": "Không tìm thấy viên chức nào",
+    "description": "Hãy thử thay đổi bộ lọc hoặc thêm viên chức mới."
+  },
+  "import": {
+    "title": "Nhập viên chức từ Excel",
+    "description": "Tải lên file Excel (.xlsx, .csv) chứa danh sách viên chức cần thêm vào hệ thống",
+    "dropzone": "Kéo thả file vào đây",
+    "dropzoneOr": "hoặc nhấn để chọn file",
+    "dropzoneHint": "Hỗ trợ .xlsx, .csv (tối đa 5MB)",
+    "fileStructure": "Cấu trúc file cần có các cột:",
+    "fileStructureCols": ["Mã VC", "Họ tên", "Ngày sinh", "Chức danh", "Đơn vị", "Loại HĐ", "Lương CB"],
+    "template": "Tải file mẫu: Danh sách viên chức — 2026.xlsx",
+    "downloadTemplate": "Tải mẫu",
+    "uploadImport": "Tải lên & Nhập"
+  },
+  "detail": {
+    "title": "Chi tiết viên chức",
+    "breadcrumb": "Chi tiết"
+  },
+  "form": {
+    "title": "Tạo viên chức",
+    "editTitle": "Sửa viên chức"
+  }
+}

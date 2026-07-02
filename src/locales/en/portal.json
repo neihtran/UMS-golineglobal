@@ -1,0 +1,301 @@
+{
+  "title": "Information Portal",
+  "titleShort": "PORTAL – Information Portal",
+  "breadcrumb": { "list": "Information Portal" },
+  "description": "PORTAL-01 — News, announcements, events, content management for students & lecturers",
+  "export": "Export Report",
+  "quickLinks": {
+    "courseReg": "Course Registration",
+    "examSchedule": "Exam Schedule",
+    "gradeLookup": "Grade Lookup",
+    "ktxReg": "Dorm Registration"
+  },
+  "announcement": {
+    "title": "Announcements",
+    "add": "Create Announcement",
+    "create": "Post Announcement",
+    "all": "All",
+    "pinned": "Pinned",
+    "detail": "Detail",
+    "category": {
+      "academic": "Academic",
+      "scholarship": "Scholarship",
+      "admission": "Admission",
+      "event": "Event",
+      "notice": "Notice",
+      "research": "Research"
+    },
+    "statTotal": "Total Announcements",
+    "statPinned": "Pinned",
+    "statViewsWeek": "Views this week",
+    "statCommentsWeek": "Comments this week",
+    "views": "views",
+    "comments": "comments",
+    "stt": "No.",
+    "maTb": "Announcement ID",
+    "tieuDe": "Title",
+    "loai": "Type",
+    "ngayDang": "Posted Date",
+    "nguoiDang": "Posted By",
+    "trangThai": "Status",
+    "thaoTac": "Actions",
+    "type": {
+      "system": "System",
+      "academic": "Academic",
+      "event": "Event",
+      "announcement": "Announcement"
+    },
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    }
+  },
+  "category": {
+    "title": "Categories"
+  },
+  "statistics": {
+    "title": "Statistics"
+  },
+  "profile": {
+    "title": "Personal Profile",
+    "description": "Student Information",
+    "breadcrumb": "Profile",
+    "backToHome": "Back to Home",
+    "changeAvatar": "Change Avatar",
+    "academicInfo": "Academic Information",
+    "personalInfo": "Personal Information",
+    "documents": "Attached Documents",
+    "download": "Download",
+    "field": {
+      "class": "Class",
+      "major": "Major",
+      "faculty": "Faculty",
+      "gpa": "Cumulative GPA",
+      "credits": "Credits",
+      "admissionDate": "Admission Date",
+      "fullName": "Full Name",
+      "studentCode": "Student ID",
+      "dob": "Date of Birth",
+      "gender": "Gender",
+      "ethnicity": "Ethnicity",
+      "religion": "Religion",
+      "cccd": "ID Card",
+      "birthplace": "Birthplace",
+      "address": "Permanent Address"
+    },
+    "status": {
+      "studying": "Studying"
+    }
+  },
+  "schedule": {
+    "title": "Weekly Schedule",
+    "description": "Semester 2, 2025–2026 Timetable",
+    "breadcrumb": "Schedule",
+    "backToHome": "Back to Home",
+    "weekPrev": "Previous Week",
+    "weekNext": "Next Week",
+    "week": "Week",
+    "todaySchedule": "Today's Schedule",
+    "noClassToday": "No classes today",
+    "theory": "Theory",
+    "practice": "Practice",
+    "type": {
+      "LT": "Theory",
+      "TH": "Practice"
+    },
+    "day": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    }
+  },
+  "grades": {
+    "title": "Academic Results",
+    "description": "Transcripts and GPA by semester",
+    "breadcrumb": "Grades",
+    "backToHome": "Back to Home",
+    "gpaCumulative": "Cumulative GPA",
+    "creditsCumulative": "Cumulative Credits",
+    "creditsNeeded": "120 credits required",
+    "prevGPA": "Previous GPA",
+    "improved": "improved",
+    "ranking": "Ranking",
+    "topPercent": "Top 15% of class",
+    "creditProgress": "Credit Progress",
+    "creditsShort": "TC",
+    "gpaTrend": "GPA Trend by Semester",
+    "scoreTable": "Detailed Score Table",
+    "semester": "Semester",
+    "grade": {
+      "passed": "Passed"
+    },
+    "table": {
+      "courseCode": "Course Code",
+      "courseName": "Course Name",
+      "credits": "Credits",
+      "processScore": "Process Score",
+      "finalScore": "Final Score",
+      "subjectScore": "Subject Score",
+      "letterGrade": "Letter Grade",
+      "result": "Result"
+    }
+  },
+  "examResult": {
+    "title": "Academic Results",
+    "description": "SIS-01 — View exam scores, academic results and personal transcripts",
+    "breadcrumb": "Academic Results",
+    "exportTranscript": "Export Transcript",
+    "printTranscript": "Print Transcript",
+    "currentGPA": "Current GPA",
+    "maxGPA": "max",
+    "totalCredits": "Total Credits",
+    "requiredCredits": "120 credits required",
+    "thisSemester": "This Semester",
+    "semesterAvg": "Semester Average",
+    "resultDetail": "Detailed Academic Results",
+    "semester2": "Semester 2, 2025–2026",
+    "table": {
+      "courseCode": "Course Code",
+      "courseName": "Course Name",
+      "credits": "Credits",
+      "theory": "Theory",
+      "practice": "Practice",
+      "finalExam": "Final Exam",
+      "avgScore": "Subject Avg",
+      "letterGrade": "Letter Grade",
+      "gpaScore": "GPA Score"
+    }
+  },
+  "tuition": {
+    "title": "My Tuition",
+    "description": "View and pay tuition by semester",
+    "breadcrumb": "Tuition",
+    "exportInvoice": "Export Invoice",
+    "payNow": "Pay Now",
+    "debtAlert": "You have outstanding tuition",
+    "debtReminder": "Please pay before the deadline to avoid penalties",
+    "totalTuition": "Total Tuition",
+    "paid": "Paid",
+    "remaining": "Remaining",
+    "paymentHistory": "Payment History",
+    "semesterDetail": "Details by Semester",
+    "table": {
+      "semester": "Semester",
+      "totalDebt": "Total",
+      "paidAmount": "Paid",
+      "remainingAmount": "Remaining",
+      "dueDate": "Due Date",
+      "status": "Status"
+    },
+    "status": {
+      "paid": "Paid",
+      "unpaid": "Unpaid",
+      "partial": "Partial",
+      "exempted": "Exempted",
+      "deferred": "Deferred"
+    },
+    "method": {
+      "transfer": "Bank Transfer",
+      "cash": "Cash"
+    }
+  },
+  "table": {
+    "code": "Code",
+    "date": "Date",
+    "status": "Status",
+    "detail": "Detail",
+    "actions": "Actions",
+    "view": "View"
+  },
+  "filter": {
+    "all": "All",
+    "allTypes": "All Types",
+    "onlyUnread": "Unread Only"
+  },
+  "notification": {
+    "title": "Notification Center",
+    "description": "PORTAL-01 — All notifications, alerts and system news",
+    "breadcrumb": "Notifications",
+    "markAllRead": "Mark All as Read",
+    "deleteOld": "Delete Old Notifications",
+    "markRead": "Mark as Read",
+    "delete": "Delete",
+    "important": "Important",
+    "noNotifications": "No notifications found",
+    "statTotal": "Total Notifications",
+    "statUnread": "Unread",
+    "statRead": "Read",
+    "searchPlaceholder": "Search notifications...",
+    "type": {
+      "all": "All Types",
+      "info": "Notification",
+      "success": "Success",
+      "warning": "Warning",
+      "event": "Event"
+    },
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "add": "Create Notification",
+    "stt": "No.",
+    "maTb": "Notification ID",
+    "tieuDe": "Title",
+    "loai": "Type",
+    "ngayDang": "Posted Date",
+    "nguoiDang": "Posted By",
+    "trangThai": "Status",
+    "thaoTac": "Actions"
+  },
+  "examSchedule": {
+    "title": "Exam Schedule",
+    "description": "Semester 2, 2025-2026 · Exam dates: 15-25/07/2026",
+    "breadcrumb": "Exam Schedule",
+    "back": "Back",
+    "downloadSchedule": "Download Schedule",
+    "examNotice": "Exam Notice",
+    "examNoticeText": "Bring student ID card and CCCD. Arrive 15 minutes before exam. Phones must be off.",
+    "searchPlaceholder": "Search course...",
+    "noExams": "No matching exams found",
+    "examCount": "exams",
+    "done": "Done",
+    "students": "students"
+  },
+  "courseReg": {
+    "title": "Course Registration",
+    "description": "Semester 3, 2025-2026 · Registration period: 01/07 - 10/07/2026",
+    "breadcrumb": "Course Registration",
+    "back": "Back",
+    "statRegistered": "Registered",
+    "statCredits": "Credits Selected",
+    "statMax": "Max for S3",
+    "registeredCourses": "Registered Courses",
+    "availableCourses": "Available Courses",
+    "searchPlaceholder": "Search by code or name...",
+    "noCourses": "No courses found",
+    "prerequisite": "Prereq",
+    "hasMidterm": "Has Midterm",
+    "full": "Full",
+    "courseCount": "courses",
+    "selected": "Selected",
+    "credits": "credits",
+    "cancelAll": "Cancel All",
+    "submitReg": "Submit Registration",
+    "table": {
+      "code": "Code",
+      "courseName": "Course Name",
+      "teacher": "Teacher",
+      "schedule": "Schedule",
+      "room": "Room"
+    }
+  },
+  "empty": {
+    "title": "No announcements found",
+    "description": "Get started by posting your first announcement."
+  }
+}

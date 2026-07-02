@@ -1,0 +1,138 @@
+{
+  "validation": {
+    "required": "This field is required",
+    "emailInvalid": "Invalid email address",
+    "passwordMinLength": "Password must be at least {{min}} characters",
+    "minLength": "Minimum {{min}} characters",
+    "maxLength": "Maximum {{max}} characters",
+    "positive": "Value must be greater than 0",
+    "number": "Must be a number",
+    "dateInvalid": "Invalid date",
+    "phoneInvalid": "Invalid phone number",
+    "confirmPassword": "Password confirmation does not match"
+  },
+  "roles": {
+    "SUPER_ADMIN": "Super Administrator",
+    "ADMIN": "Administrator",
+    "HIEU_TRUONG": "Rector",
+    "PHO_HIEU_TRUONG": "Vice Rector",
+    "TRUONG_KHOA": "Dean",
+    "PHO_TRUONG_KHOA": "Vice Dean",
+    "GIAO_VIEN": "Lecturer",
+    "CAN_BO_PHAN_CONG": "Assignment Officer",
+    "CHUYEN_VIEN": "Specialist",
+    "NHAN_VIEN": "Staff",
+    "SINH_VIEN": "Student",
+    "KHAI_THA": "Data Analyst"
+  },
+  "notification": {
+    "title": "Notifications",
+    "all": "All",
+    "unread": "Unread",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications",
+    "viewAll": "View all notifications",
+    "new": "New",
+    "minutesAgo": "minutes ago",
+    "hourAgo": "1 hour ago",
+    "hoursAgo": "hours ago",
+    "contractExpiring": "3 contracts expiring this week",
+    "ktxApproval": "New KTX registration — 5 pending approvals",
+    "examStarting": "Exam KTTT-101 starts in 1 hour",
+    "hemisSynced": "HEMIS sync complete — 1,247 records",
+    "tuitionPending": "Tuition payment: 234 students unpaid for Semester 2/2026",
+    "viewDetail": "View details"
+  },
+  "header": {
+    "openNav": "Open navigation",
+    "quickActions": "Quick actions"
+  },
+  "user": {
+    "profile": "My Profile",
+    "settings": "Settings",
+    "account": "User Account"
+  },
+  "theme": {
+    "light": "Light mode",
+    "dark": "Dark mode"
+  },
+  "cancel": "Cancel",
+  "empty": {
+    "title": "No Data Yet",
+    "description": "Get started by adding your first record.",
+    "searchTitle": "No Results Found",
+    "searchDescription": "Try changing your search keywords or filters."
+  },
+  "language": {
+    "switch": "Switch Language",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "header": {
+    "openNav": "Open navigation",
+    "quickActions": "Quick actions",
+    "notification": {
+      "title": "Notifications",
+      "all": "All",
+      "unread": "Unread",
+      "markAllRead": "Mark all as read",
+      "noNotifications": "No notifications",
+      "viewAll": "View all notifications",
+      "new": "New",
+      "minutesAgo": "minutes ago",
+      "hourAgo": "1 hour ago",
+      "hoursAgo": "hours ago",
+      "contractExpiring": "3 contracts expiring this week",
+      "ktxApproval": "New KTX registration — 5 pending approvals",
+      "examStarting": "Exam KTTT-101 starts in 1 hour",
+      "hemisSynced": "HEMIS sync complete — 1,247 records",
+      "tuitionPending": "Tuition payment: 234 students unpaid for Semester 2/2026"
+    }
+  },
+  "searchPlaceholder": "Search...",
+  "globalSearch": {
+    "placeholder": "Search pages, documents, students, courses...",
+    "resultCount": "Results ({{count}})",
+    "noResults": "No results found",
+    "noResultsHint": "Try a different keyword or use the menu",
+    "recentSearches": "Recent searches",
+    "quickAccess": "Quick access"
+  },
+  "pagination": {
+    "noData": "No data",
+    "in": "of",
+    "rows": "Rows",
+    "page": "Page",
+    "firstPage": "First page",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "lastPage": "Last page"
+  },
+  "common": {
+    "breadcrumb": "Breadcrumb",
+    "home": "Home",
+    "loading": "Loading..."
+  },
+  "login": {
+    "title": "Sign In",
+    "subtitle": "Use your account to access the system",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name.school@edu.vn",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "submit": "Sign In",
+    "or": "Or",
+    "ssoButton": "Sign in with VNeID",
+    "contactHint": "Contact phong-cong-nghe@truong.edu.vn if you have login issues",
+    "brandName": "HUTECH",
+    "brandSubtitle": "University Management System",
+    "heroTitle1": "Comprehensive Management",
+    "heroTitle2": "for Universities",
+    "heroDescription": "The system integrates 18 modules on a single platform — from HR, student management, education, and finance to scientific research.",
+    "statModules": "Modules",
+    "statStudents": "Students",
+    "statLecturers": "Lecturers"
+  }
+}

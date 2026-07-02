@@ -1,0 +1,134 @@
+{
+  "validation": {
+    "required": "Trường này không được để trống",
+    "emailInvalid": "Email không hợp lệ",
+    "passwordMinLength": "Mật khẩu phải có ít nhất {{min}} ký tự",
+    "minLength": "Tối thiểu {{min}} ký tự",
+    "maxLength": "Tối đa {{max}} ký tự",
+    "positive": "Giá trị phải lớn hơn 0",
+    "number": "Phải là số",
+    "dateInvalid": "Ngày không hợp lệ",
+    "phoneInvalid": "Số điện thoại không hợp lệ",
+    "confirmPassword": "Mật khẩu xác nhận không khớp"
+  },
+  "roles": {
+    "SUPER_ADMIN": "Quản trị viên hệ thống",
+    "ADMIN": "Quản trị viên",
+    "HIEU_TRUONG": "Hiệu trưởng",
+    "PHO_HIEU_TRUONG": "Phó Hiệu trưởng",
+    "TRUONG_KHOA": "Trưởng khoa",
+    "PHO_TRUONG_KHOA": "Phó trưởng khoa",
+    "GIAO_VIEN": "Giảng viên",
+    "CAN_BO_PHAN_CONG": "Cán bộ phân công",
+    "CHUYEN_VIEN": "Chuyên viên",
+    "NHAN_VIEN": "Nhân viên",
+    "SINH_VIEN": "Sinh viên",
+    "KHAI_THA": "Khai thác"
+  },
+  "notification": {
+    "title": "Thông báo",
+    "all": "Tất cả",
+    "unread": "Chưa đọc",
+    "markAllRead": "Đánh dấu tất cả đã đọc",
+    "noNotifications": "Không có thông báo nào",
+    "viewAll": "Xem tất cả thông báo",
+    "new": "Mới",
+    "minutesAgo": "phút trước",
+    "hourAgo": "1 giờ trước",
+    "hoursAgo": "giờ trước",
+    "contractExpiring": "Có 3 hợp đồng sắp hết hạn trong tuần này",
+    "ktxApproval": "Phê duyệt đăng ký KTX mới — 5 hồ sơ chờ duyệt",
+    "examStarting": "Kỳ thi KTTT-101 bắt đầu trong 1 giờ",
+    "hemisSynced": "Đồng bộ HEMIS hoàn tất — 1,247 bản ghi",
+    "tuitionPending": "Thanh toán học phí: 234 sinh viên chưa đóng kỳ 2/2026",
+    "viewDetail": "Xem chi tiết"
+  },
+  "header": {
+    "openNav": "Mở điều hướng",
+    "quickActions": "Thao tác nhanh",
+    "notification": {
+      "title": "Thông báo",
+      "all": "Tất cả",
+      "unread": "Chưa đọc",
+      "markAllRead": "Đánh dấu tất cả đã đọc",
+      "noNotifications": "Không có thông báo nào",
+      "viewAll": "Xem tất cả thông báo",
+      "new": "Mới",
+      "minutesAgo": "phút trước",
+      "hourAgo": "1 giờ trước",
+      "hoursAgo": "giờ trước",
+      "contractExpiring": "Có 3 hợp đồng sắp hết hạn trong tuần này",
+      "ktxApproval": "Phê duyệt đăng ký KTX mới — 5 hồ sơ chờ duyệt",
+      "examStarting": "Kỳ thi KTTT-101 bắt đầu trong 1 giờ",
+      "hemisSynced": "Đồng bộ HEMIS hoàn tất — 1,247 bản ghi",
+      "tuitionPending": "Thanh toán học phí: 234 sinh viên chưa đóng kỳ 2/2026"
+    }
+  },
+  "user": {
+    "profile": "Hồ sơ cá nhân",
+    "settings": "Cài đặt",
+    "account": "Tài khoản người dùng"
+  },
+  "theme": {
+    "light": "Chế độ sáng",
+    "dark": "Chế độ tối"
+  },
+  "cancel": "Hủy",
+  "empty": {
+    "title": "Chưa có dữ liệu",
+    "description": "Bắt đầu bằng việc thêm mới bản ghi đầu tiên.",
+    "searchTitle": "Không tìm thấy kết quả",
+    "searchDescription": "Hãy thử thay đổi từ khóa tìm kiếm hoặc bộ lọc."
+  },
+  "language": {
+    "switch": "Chuyển ngôn ngữ",
+    "vi": "Tiếng Việt",
+    "en": "English"
+  },
+  "searchPlaceholder": "Tìm kiếm...",
+  "globalSearch": {
+    "placeholder": "Tìm kiếm trang, tài liệu, sinh viên, khóa học...",
+    "resultCount": "Kết quả ({{count}})",
+    "noResults": "Không tìm thấy kết quả",
+    "noResultsHint": "Thử từ khóa khác hoặc truy cập menu",
+    "recentSearches": "Tìm kiếm gần đây",
+    "quickAccess": "Truy cập nhanh"
+  },
+  "pagination": {
+    "noData": "Không có dữ liệu",
+    "in": "trong",
+    "rows": "Dòng",
+    "page": "Trang",
+    "firstPage": "Trang đầu",
+    "prevPage": "Trang trước",
+    "nextPage": "Trang sau",
+    "lastPage": "Trang cuối"
+  },
+  "common": {
+    "breadcrumb": "Đường dẫn",
+    "home": "Trang chủ",
+    "loading": "Đang tải..."
+  },
+  "login": {
+    "title": "Đăng nhập",
+    "subtitle": "Sử dụng tài khoản của bạn để truy cập hệ thống",
+    "emailLabel": "Email",
+    "emailPlaceholder": "ten.nguyen@truong.edu.vn",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "forgotPassword": "Quên mật khẩu?",
+    "submit": "Đăng nhập",
+    "or": "Hoặc",
+    "ssoButton": "Đăng nhập với VNeID",
+    "contactHint": "Liên hệ phong-cong-nghe@truong.edu.vn nếu gặp sự cố đăng nhập",
+    "brandName": "HUTECH",
+    "brandSubtitle": "University Management System",
+    "heroTitle1": "Quản lý toàn diện",
+    "heroTitle2": "cho Trường đại học",
+    "heroDescription": "Hệ thống tích hợp 18 phân hệ trên một nền tảng duy nhất — từ quản lý nhân sự, sinh viên, đào tạo, tài chính đến nghiên cứu khoa học.",
+    "statModules": "Phân hệ",
+    "statStudents": "Sinh viên",
+    "statLecturers": "Giảng viên"
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "title": "Staff Directory",
+  "add": "Add Staff",
+  "importExcel": "Import from Excel",
+  "exportExcel": "Export Excel",
+  "description": "{{count}} staff members in the system",
+  "breadcrumb": {
+    "list": "Staff"
+  },
+  "filter": {
+    "searchPlaceholder": "Search name, code, department...",
+    "department": "Department",
+    "departmentAll": "All",
+    "statusAll": "All statuses",
+    "contractAll": "All contract types"
+  },
+  "table": {
+    "stt": "No.",
+    "hoTen": "Full Name",
+    "maVC": "Staff ID",
+    "chucDanh": "Title / Position",
+    "khoaDonVi": "Faculty / Unit",
+    "loaiHD": "Contract",
+    "luongCoBan": "Base Salary",
+    "trangThai": "Status",
+    "thaoTac": "Actions"
+  },
+  "status": {
+    "active": "Active",
+    "trial": "Probationary",
+    "leave": "On Leave",
+    "inactive": "Inactive"
+  },
+  "contract": {
+    "permanent": "Permanent",
+    "visiting": "Visiting",
+    "probation": "Probationary"
+  },
+  "action": {
+    "detail": "Details",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "empty": {
+    "title": "No staff members found",
+    "description": "Try adjusting the filters or add a new staff member."
+  },
+  "import": {
+    "title": "Import Staff from Excel",
+    "description": "Upload an Excel file (.xlsx, .csv) containing the staff list to add to the system",
+    "dropzone": "Drag and drop file here",
+    "dropzoneOr": "or click to browse",
+    "dropzoneHint": "Supports .xlsx, .csv (max 5MB)",
+    "fileStructure": "Required file columns:",
+    "fileStructureCols": ["Staff ID", "Full Name", "Date of Birth", "Title", "Unit", "Contract", "Base Salary"],
+    "template": "Download template: Staff List — 2026.xlsx",
+    "downloadTemplate": "Download Template",
+    "uploadImport": "Upload & Import"
+  },
+  "detail": {
+    "title": "Staff Details",
+    "breadcrumb": "Details"
+  },
+  "form": {
+    "title": "Create Staff",
+    "editTitle": "Edit Staff"
+  }
+}

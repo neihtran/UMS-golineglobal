@@ -1,0 +1,35 @@
+{
+  "title": "Dạy học Số",
+  "titleShort": "LMS – Dạy học Số",
+  "breadcrumb": { "list": "Dạy học Số" },
+  "course": {
+    "title": "Khóa học", "add": "Tạo khóa học", "export": "Xuất Excel",
+    "stt": "STT", "maKhoa": "Mã KH", "tenKhoa": "Tên khóa học",
+    "giangVien": "Giảng viên", "soTc": "Số TC",
+    "slSv": "SL SV", "tyLeHt": "Tỷ lệ HT", "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác",
+    "status": { "draft": "Bản nháp", "published": "Đã xuất bản", "archived": "Lưu trữ", "closed": "Đóng" }
+  },
+  "assignment": {
+    "title": "Bài tập", "add": "Tạo bài tập",
+    "myTitle": "Bài tập của tôi",
+    "stt": "STT", "tenBt": "Tên bài tập", "khoaHoc": "Khóa học",
+    "hanNop": "Hạn nộp", "slNop": "SL nộp", "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác",
+    "status": { "open": "Mở", "closed": "Đóng", "graded": "Đã chấm" }
+  },
+  "resource": {
+    "title": "Thư viện học liệu", "add": "Thêm học liệu",
+    "stt": "STT", "tenHl": "Tên học liệu", "loai": "Loại",
+    "khoaHoc": "Khóa học", "tacGia": "Tác giả", "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác",
+    "type": { "document": "Tài liệu", "video": "Video", "slide": "Slide", "link": "Liên kết" }
+  },
+  "gradebook": {
+    "title": "Bảng điểm", "export": "Xuất điểm",
+    "stt": "STT", "maSv": "Mã SV", "hoTen": "Họ tên",
+    "diemQuaTrinh": "Điểm quá trình", "diemCuoiKy": "Điểm cuối kỳ",
+    "diemTong": "Điểm tổng", "xepLoai": "Xếp loại", "thaoTac": "Thao tác"
+  },
+  "empty": { "title": "Không có khóa học nào", "description": "Bắt đầu bằng việc tạo khóa học đầu tiên." }
+}

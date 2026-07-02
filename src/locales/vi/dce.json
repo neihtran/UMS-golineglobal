@@ -1,0 +1,37 @@
+{
+  "title": "Năng lực Số", "titleShort": "DCE – Năng lực Số",
+  "description": "DCE-01 — Chuẩn đầu ra CDIO, đánh giá năng lực sinh viên, framework năng lực số",
+  "export": "Xuất báo cáo",
+  "addCompetency": "Thêm chuẩn đầu ra",
+  "breadcrumb": { "list": "Năng lực Số" },
+  "course": {
+    "title": "Khóa đào tạo", "add": "Tạo khóa", "stt": "STT", "maKhoa": "Mã khóa", "tenKhoa": "Tên khóa", "mucTieu": "Mục tiêu", "hinhThuc": "Hình thức", "thoiLuong": "Thời lượng", "doiTuong": "Đối tượng", "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "status": { "draft": "Bản nháp", "published": "Đã xuất bản", "archived": "Lưu trữ" }
+  },
+  "competency": {
+    "title": "Chuẩn đầu ra", "add": "Thêm chuẩn",
+    "stt": "STT", "maCdr": "Mã CĐR", "tenCdr": "Tên chuẩn đầu ra", "mucDo": "Mức độ", "linhVuc": "Lĩnh vực", "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "domain": { "chuyen_mon": "Chuyên môn", "ngoai_ngu": "Ngoại ngữ", "cntt": "CNTT", "ky_nang_mem": "Kỹ năng mềm", "nghien_cuu": "Nghiên cứu", "giao_tiep": "Giao tiếp" },
+    "level": { "basic": "Cơ bản", "intermediate": "Trung bình", "advanced": "Nâng cao" }
+  },
+  "dashboard": {
+    "totalCompetencies": "Chuẩn đầu ra",
+    "competencyAchieved": "Đạt chuẩn",
+    "studentsEvaluated": "Sinh viên đánh giá",
+    "currentSemester": "HK 2/2025-2026",
+    "avgCompetencyScore": "Chỉ số năng lực TB",
+    "competencyRadar": "Radar năng lực",
+    "score": "Điểm",
+    "benchmark": "Chuẩn",
+    "assessmentByProgram": "Phân bố mức đánh giá theo ngành",
+    "level4": "Mức 4",
+    "level3": "Mức 3",
+    "level2": "Mức 2",
+    "level1": "Mức 1",
+    "domain": "Lĩnh vực",
+    "competencyTrend": "Xu hướng năng lực theo khoá",
+    "semester": "Học kỳ",
+    "avgScore": "Điểm TB"
+  },
+  "empty": { "title": "Không có khóa đào tạo nào", "description": "Bắt đầu bằng việc tạo khóa đào tạo đầu tiên." }
+}

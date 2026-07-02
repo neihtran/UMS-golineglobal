@@ -1,0 +1,73 @@
+{
+  "title": "Library",
+  "titleShort": "LIB – Library",
+  "description": "LIB-01 — Manage documents, loans, e-books, search",
+  "export": "Export Report",
+  "addDocument": "Add Document",
+  "breadcrumb": { "list": "Library" },
+  "document": {
+    "title": "Documents",
+    "add": "Add Document",
+    "stt": "No.",
+    "maTl": "Doc ID",
+    "tenTl": "Document Title",
+    "loai": "Type",
+    "tacGia": "Author",
+    "nhaXb": "Publisher",
+    "namXb": "Year",
+    "soLuong": "Quantity",
+    "trangThai": "Status",
+    "thaoTac": "Actions",
+    "type": {
+      "sach": "Book",
+      "tapChi": "Journal",
+      "luanVan": "Thesis",
+      "baoCao": "Report"
+    }
+  },
+  "loan": {
+    "title": "Loan & Return",
+    "add": "Create Loan",
+    "stt": "No.",
+    "maPhieu": "Loan ID",
+    "maSv": "Student ID / Staff ID",
+    "hoTen": "Full Name",
+    "tenTl": "Document",
+    "ngayMuon": "Borrow Date",
+    "hanTra": "Due Date",
+    "ngayTra": "Return Date",
+    "trangThai": "Status",
+    "thaoTac": "Actions",
+    "status": {
+      "borrowed": "Borrowed",
+      "returned": "Returned",
+      "overdue": "Overdue"
+    }
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search book title, author, ISBN..."
+  },
+  "dashboard": {
+    "totalDocuments": "Total Documents",
+    "borrowed": "Borrowed",
+    "returnRate": "Return Rate",
+    "digitalDocuments": "Digital Documents",
+    "percentOfTotal": "% of total",
+    "overdue": "Overdue",
+    "needReminder": "need reminder",
+    "topBooks": "Most Borrowed Books",
+    "borrowReturn": "Borrow-Return by Month",
+    "borrows": "Borrows",
+    "returns": "Returns",
+    "overdueBooks": "Overdue Books",
+    "borrower": "Borrower",
+    "book": "Book",
+    "dueDate": "Due Date",
+    "days": "days"
+  },
+  "empty": {
+    "title": "No documents found",
+    "description": "Get started by adding your first document."
+  }
+}

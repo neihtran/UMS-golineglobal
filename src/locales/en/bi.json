@@ -1,0 +1,63 @@
+{
+  "title": "Data Analytics",
+  "titleShort": "BI – Data Analytics",
+  "description": "BI-01 — Dashboard overview, automated reports, KPIs for whole institution",
+  "export": "Export Report",
+  "refresh": "Refresh Data",
+  "breadcrumb": { "list": "Data Analytics" },
+  "report": {
+    "title": "Reports",
+    "add": "Create Report",
+    "export": "Export Report",
+    "stt": "No.",
+    "maBc": "Report ID",
+    "tenBc": "Report Name",
+    "loaiBc": "Type",
+    "ngayTao": "Created Date",
+    "nguoiTao": "Created By",
+    "trangThai": "Status",
+    "thaoTac": "Actions"
+  },
+  "kpi": {
+    "title": "KPIs",
+    "add": "Add KPI",
+    "stt": "No.",
+    "chiSo": "Metric",
+    "donVi": "Unit",
+    "hienTai": "Current",
+    "mucTieu": "Target",
+    "tyLe": "Rate",
+    "trangThai": "Status",
+    "thaoTac": "Actions"
+  },
+  "dashboard": {
+    "totalReports": "Reports Created",
+    "dataSources": "Data Sources",
+    "liveConnections": "live connections",
+    "dashboards": "Dashboards",
+    "biUsers": "BI Users",
+    "lecturers": "Lecturers",
+    "staff": "Staff",
+    "enrollmentTrend": "Enrollment Trend",
+    "year": "Year",
+    "total": "Total Admissions",
+    "admitted": "Admitted",
+    "graduated": "Graduated",
+    "facultyPerformance": "Faculty Performance",
+    "revenue": "Revenue",
+    "students": "Students",
+    "research": "Research",
+    "employment": "Employment",
+    "recentReports": "Recent Reports",
+    "reportName": "Report Name",
+    "reportType": "Type",
+    "lastUpdated": "Last Updated",
+    "frequency": "Frequency",
+    "format": "Format",
+    "views": "Views"
+  },
+  "empty": {
+    "title": "No reports found",
+    "description": "Get started by creating your first report."
+  }
+}

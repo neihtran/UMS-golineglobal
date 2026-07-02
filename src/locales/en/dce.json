@@ -1,0 +1,73 @@
+{
+  "title": "Digital Competency",
+  "titleShort": "DCE – Digital Competency",
+  "description": "DCE-01 — CDIO learning outcomes, student competency assessment, digital competency framework",
+  "export": "Export Report",
+  "addCompetency": "Add Learning Outcome",
+  "breadcrumb": { "list": "Digital Competency" },
+  "course": {
+    "title": "Training Courses",
+    "add": "Create Course",
+    "stt": "No.",
+    "maKhoa": "Course Code",
+    "tenKhoa": "Course Name",
+    "mucTieu": "Objectives",
+    "hinhThuc": "Format",
+    "thoiLuong": "Duration",
+    "doiTuong": "Target Group",
+    "trangThai": "Status",
+    "thaoTac": "Actions",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    }
+  },
+  "competency": {
+    "title": "Learning Outcomes",
+    "add": "Add Outcome",
+    "stt": "No.",
+    "maCdr": "LO Code",
+    "tenCdr": "Learning Outcome Name",
+    "mucDo": "Level",
+    "linhVuc": "Domain",
+    "trangThai": "Status",
+    "thaoTac": "Actions",
+    "domain": {
+      "chuyen_mon": "Professional",
+      "ngoai_ngu": "Foreign Language",
+      "cntt": "IT",
+      "ky_nang_mem": "Soft Skills",
+      "nghien_cuu": "Research",
+      "giao_tiep": "Communication"
+    },
+    "level": {
+      "basic": "Basic",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
+  },
+  "dashboard": {
+    "totalCompetencies": "Learning Outcomes",
+    "competencyAchieved": "Achieved",
+    "studentsEvaluated": "Students Evaluated",
+    "currentSemester": "S2/2025-2026",
+    "avgCompetencyScore": "Avg. Competency Score",
+    "competencyRadar": "Competency Radar",
+    "score": "Score",
+    "benchmark": "Benchmark",
+    "assessmentByProgram": "Assessment Distribution by Program",
+    "level4": "Level 4",
+    "level3": "Level 3",
+    "level2": "Level 2",
+    "level1": "Level 1",
+    "domain": "Domain",
+    "competencyTrend": "Competency Trend by Cohort",
+    "semester": "Semester",
+    "avgScore": "Avg Score"
+  },
+  "empty": {
+    "title": "No training courses available",
+    "description": "Get started by creating your first training course."
+  }
+}

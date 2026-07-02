@@ -1,0 +1,206 @@
+{
+  "title": "Tài chính & Kế toán",
+  "titleShort": "FIN – Tài chính & Kế toán",
+  "breadcrumb": { "list": "Tài chính & Kế toán" },
+  "description": "Quản lý thu chi, học phí, lương và ngân sách",
+  "export": "Xuất báo cáo",
+  "tuitionManagement": "Quản lý học phí",
+  "expenditure": {
+    "title": "Chi tiêu",
+    "description": "Quản lý chi phí và giải ngân",
+    "add": "Tạo phiếu chi",
+    "export": "Xuất Excel",
+    "search": "Tìm mô tả, mã phiếu...",
+    "stt": "STT", "maPhieu": "Mã", "noiDung": "Mô tả",
+    "loai": "Loại", "phong": "Phòng", "soTien": "Số tiền",
+    "ngay": "Ngày", "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "detail": "Chi tiết",
+    "total": "Tổng cộng:",
+    "statTotal": "Tổng chi Q1-Q2",
+    "statApproved": "Đã duyệt",
+    "statPending": "Chờ duyệt",
+    "statRejected": "Từ chối",
+    "status": { "pending": "Chờ duyệt", "approved": "Đã duyệt", "paid": "Đã chi", "rejected": "Từ chối" },
+    "method": { "cash": "Tiền mặt", "transfer": "Chuyển khoản", "card": "Thẻ" }
+  },
+  "tuition": {
+    "title": "Học phí",
+    "description": "Quản lý thu học phí sinh viên",
+    "add": "Tạo phiếu thu",
+    "exportDebt": "Xuất DS nợ",
+    "search": "Tìm tên, mã SV...",
+    "stt": "STT", "maSv": "Mã SV", "hoTen": "Họ tên",
+    "lop": "Lớp", "hocPhi": "Học phí", "daDong": "Đã đóng",
+    "conNo": "Còn nợ", "trangThai": "Trạng thái", "ngayDong": "Ngày đóng",
+    "thaoTac": "Thao tác", "detail": "Chi tiết",
+    "filterAll": "Tất cả",
+    "statTotal": "Tổng phải thu",
+    "statCollected": "Đã thu",
+    "statRemaining": "Còn phải thu",
+    "statRate": "Tỷ lệ thu",
+    "status": { "paid": "Đã đóng", "unpaid": "Chưa đóng", "partial": "Đóng một phần", "exempted": "Miễn giảm", "deferred": "Gia hạn", "overdue": "Quá hạn" }
+  },
+  "create": {
+    "title": "Tạo phiếu chi",
+    "subtitle": "FIN-03 — Tạo phiếu chi tiêu mới",
+    "back": "Quay lại",
+    "form": {
+      "maPhieu": "Mã phiếu",
+      "ngayChi": "Ngày chi",
+      "moTa": "Mô tả chi phí",
+      "loaiChiPhi": "Loại chi phí",
+      "donViYeuCau": "Đơn vị yêu cầu",
+      "soTien": "Số tiền (VNĐ)",
+      "ghiChu": "Ghi chú",
+      "selectCategory": "Chọn loại chi phí",
+      "selectDept": "Chọn đơn vị yêu cầu"
+    },
+    "cancel": "Hủy",
+    "createBtn": "Tạo phiếu chi"
+  },
+  "dashboard": {
+    "statTuition": "Thu học phí HK này",
+    "statSalary": "Chi lương T6/2026",
+    "statSalarySub": "100% đã chi ✓",
+    "statBudget": "Ngân sách còn lại"
+  },
+  "detail": {
+    "expenditure": {
+      "title": "Chi tiết phiếu chi",
+      "info": "Thông tin phiếu chi",
+      "payment": "Thông tin thanh toán",
+      "approval": "Thông tin phê duyệt",
+      "actions": "Hành động",
+      "history": "Lịch sử",
+      "infoCard": "Thông tin",
+      "print": "In phiếu",
+      "download": "Tải file đính kèm",
+      "approve": "Duyệt phiếu chi",
+      "reject": "Từ chối",
+      "rejectTitle": "Từ chối phiếu chi?",
+      "rejectMsg": "Hành động này sẽ từ chối phiếu chi. Người lập sẽ được thông báo.",
+      "back": "Quay lại",
+      "cancel": "Hủy",
+      "confirm": "Từ chối",
+      "fields": {
+        "soPhieu": "Số phiếu",
+        "danhMuc": "Danh mục",
+        "donVi": "Đơn vị",
+        "nguoiLap": "Người lập",
+        "doiTuongNhan": "Đối tượng nhận",
+        "ngayLap": "Ngày lập",
+        "ngayDuyet": "Ngày duyệt",
+        "soTien": "Số tiền",
+        "phuongThuc": "Phương thức",
+        "nguoiNhan": "Người/Tổ chức nhận",
+        "soTaiKhoan": "Số tài khoản",
+        "ghiChu": "Ghi chú",
+        "nguoiDuyet": "Người phê duyệt",
+        "chucVu": "Chức vụ",
+        "ngayDuyet": "Ngày duyệt"
+      },
+      "urgency": {
+        "label": "Độ khẩn:",
+        "urgent": "Khẩn",
+        "normal": "Thường"
+      },
+      "createdAt": "Ngày tạo:",
+      "approvedLabel": "Đã phê duyệt",
+      "approvedDate": "Ngày:"
+    },
+    "tuition": {
+      "title": "Chi tiết học phí",
+      "student": "Thông tin sinh viên",
+      "breakdown": "Chi tiết học phí",
+      "payment": "Thông tin thanh toán",
+      "progress": "Tiến độ thanh toán",
+      "actions": "Hành động",
+      "history": "Lịch sử",
+      "infoCard": "Thông tin",
+      "print": "In biên nhận",
+      "download": "Tải file đính kèm",
+      "sendRemind": "Gửi nhắc đóng",
+      "remindTitle": "Gửi nhắc đóng học phí",
+      "remindMsg": "Hệ thống sẽ gửi email và SMS nhắc nhở sinh viên đóng học phí còn nợ.",
+      "back": "Quay lại",
+      "cancel": "Hủy",
+      "confirm": "Gửi nhắc",
+      "fields": {
+        "maPhieu": "Mã phiếu",
+        "maSv": "Mã SV",
+        "hoTen": "Họ tên",
+        "lop": "Lớp",
+        "hocKy": "Học kỳ",
+        "hanDong": "Hạn đóng",
+        "ngayDong": "Ngày đóng",
+        "khoa": "Khoa",
+        "khoaHoc": "Khóa",
+        "ngayTao": "Ngày tạo",
+        "tongNo": "Tổng nợ",
+        "daDong": "Đã đóng",
+        "conNo": "Còn nợ",
+        "maBienNhan": "Mã biên nhận",
+        "ngayThanhToan": "Ngày thanh toán",
+        "phuongThuc": "Phương thức",
+        "maThamChieu": "Mã tham chiếu"
+      },
+      "dueDate": "Hạn đóng:",
+      "semester": "Học kỳ:"
+    }
+  },
+  "createTuition": {
+    "title": "Tạo phiếu thu học phí",
+    "subtitle": "FIN-01 — Lập phiếu thu học phí cho sinh viên",
+    "back": "Quay lại",
+    "student": {
+      "title": "Thông tin sinh viên",
+      "label": "Sinh viên",
+      "search": "Tìm theo tên hoặc mã sinh viên...",
+      "notFound": "Không tìm thấy sinh viên"
+    },
+    "breakdown": {
+      "title": "Chi tiết khoản thu",
+      "add": "Thêm khoản",
+      "itemLabel": "Tên khoản thu",
+      "total": "Tổng cộng"
+    },
+    "payment": {
+      "title": "Thông tin thanh toán",
+      "method": "Phương thức",
+      "paidDate": "Ngày thanh toán",
+      "note": "Ghi chú",
+      "notePlaceholder": "Ghi chú thêm (không bắt buộc)..."
+    },
+    "preview": {
+      "title": "Phiếu thu học phí",
+      "subtitle": "Xem trước trước khi in",
+      "receiptNo": "Số:",
+      "studentName": "Họ tên SV:",
+      "studentCode": "Mã SV:",
+      "class": "Lớp:",
+      "semester": "Học kỳ:",
+      "paidDate": "Ngày thu:",
+      "total": "TỔNG CỘNG:",
+      "receiptNote": "đã đóng học phí",
+      "payer": "Người nộp tiền",
+      "cashier": "Thủ quỹ",
+      "signature": "Ký & Ghi rõ họ tên"
+    },
+    "actions": {
+      "save": "Lưu phiếu thu",
+      "saved": "Đã lưu",
+      "print": "Lưu & In phiếu"
+    }
+  },
+  "chart": {
+    "cashflow": "Dòng tiền thu-chi 6 tháng",
+    "income": "Thu",
+    "expense": "Chi",
+    "tuitionByMajor": "Thu học phí theo ngành"
+  },
+  "topExpense": {
+    "title": "Top khoản chi tháng này",
+    "period": "T6/2026"
+  },
+  "empty": { "title": "Không có phiếu chi nào", "description": "Bắt đầu bằng việc tạo phiếu chi đầu tiên." }
+}

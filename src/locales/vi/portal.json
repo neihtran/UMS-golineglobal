@@ -1,0 +1,301 @@
+{
+  "title": "Cổng thông tin",
+  "titleShort": "PORTAL – Cổng thông tin",
+  "breadcrumb": { "list": "Cổng thông tin" },
+  "description": "PORTAL-01 — Tin tức, thông báo, sự kiện, quản lý nội dung cho sinh viên & giảng viên",
+  "export": "Xuất báo cáo",
+  "quickLinks": {
+    "courseReg": "Đăng ký học phần",
+    "examSchedule": "Xem lịch thi",
+    "gradeLookup": "Tra cứu điểm",
+    "ktxReg": "Đăng ký KTX"
+  },
+  "announcement": {
+    "title": "Thông báo",
+    "add": "Tạo thông báo",
+    "create": "Đăng thông báo",
+    "all": "Tất cả",
+    "pinned": "Tin ghim",
+    "detail": "Chi tiết",
+    "category": {
+      "academic": "Học vụ",
+      "scholarship": "Học bổng",
+      "admission": "Tuyển sinh",
+      "event": "Sự kiện",
+      "notice": "Thông báo",
+      "research": "NCKH"
+    },
+    "statTotal": "Tổng thông báo",
+    "statPinned": "Tin nổi bật",
+    "statViewsWeek": "Lượt xem tuần này",
+    "statCommentsWeek": "Bình luận tuần này",
+    "views": "lượt xem",
+    "comments": "bình luận",
+    "stt": "STT",
+    "maTb": "Mã TB",
+    "tieuDe": "Tiêu đề",
+    "loai": "Loại",
+    "ngayDang": "Ngày đăng",
+    "nguoiDang": "Người đăng",
+    "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác",
+    "type": {
+      "system": "Hệ thống",
+      "academic": "Học thuật",
+      "event": "Sự kiện",
+      "announcement": "Thông báo"
+    },
+    "status": {
+      "draft": "Bản nháp",
+      "published": "Đã đăng",
+      "archived": "Lưu trữ"
+    }
+  },
+  "category": {
+    "title": "Danh mục"
+  },
+  "statistics": {
+    "title": "Thống kê"
+  },
+  "profile": {
+    "title": "Hồ sơ cá nhân",
+    "description": "Thông tin sinh viên",
+    "breadcrumb": "Hồ sơ",
+    "backToHome": "Về trang chủ",
+    "changeAvatar": "Thay đổi ảnh đại diện",
+    "academicInfo": "Thông tin học tập",
+    "personalInfo": "Thông tin cá nhân",
+    "documents": "Tài liệu đính kèm",
+    "download": "Tải xuống",
+    "field": {
+      "class": "Lớp",
+      "major": "Ngành",
+      "faculty": "Khoa",
+      "gpa": "GPA tích lũy",
+      "credits": "Tín chỉ",
+      "admissionDate": "Ngày nhập học",
+      "fullName": "Họ và tên",
+      "studentCode": "Mã sinh viên",
+      "dob": "Ngày sinh",
+      "gender": "Giới tính",
+      "ethnicity": "Dân tộc",
+      "religion": "Tôn giáo",
+      "cccd": "CCCD/CMND",
+      "birthplace": "Nơi sinh",
+      "address": "Địa chỉ thường trú"
+    },
+    "status": {
+      "studying": "Đang học"
+    }
+  },
+  "schedule": {
+    "title": "Lịch học tuần",
+    "description": "Thời khóa biểu học kỳ 2, 2025–2026",
+    "breadcrumb": "Lịch học",
+    "backToHome": "Về trang chủ",
+    "weekPrev": "Tuần trước",
+    "weekNext": "Tuần sau",
+    "week": "Tuần",
+    "todaySchedule": "Lịch học hôm nay",
+    "noClassToday": "Hôm nay không có lịch học",
+    "theory": "Lý thuyết",
+    "practice": "Thực hành",
+    "type": {
+      "LT": "Lý thuyết",
+      "TH": "Thực hành"
+    },
+    "day": {
+      "mon": "Thứ 2",
+      "tue": "Thứ 3",
+      "wed": "Thứ 4",
+      "thu": "Thứ 5",
+      "fri": "Thứ 6",
+      "sat": "Thứ 7"
+    }
+  },
+  "grades": {
+    "title": "Kết quả học tập",
+    "description": "Bảng điểm và GPA theo từng học kỳ",
+    "breadcrumb": "Điểm số",
+    "backToHome": "Về trang chủ",
+    "gpaCumulative": "GPA tích lũy",
+    "creditsCumulative": "Tín chỉ tích lũy",
+    "creditsNeeded": "120 TC cần đạt",
+    "prevGPA": "GPA kỳ trước",
+    "improved": "cải thiện",
+    "ranking": "Xếp loại",
+    "topPercent": "Top 15% lớp",
+    "creditProgress": "Tiến độ tín chỉ",
+    "creditsShort": "TC",
+    "gpaTrend": "Xu hướng GPA theo học kỳ",
+    "scoreTable": "Bảng điểm chi tiết",
+    "semester": "Học kỳ",
+    "grade": {
+      "passed": "Đạt"
+    },
+    "table": {
+      "courseCode": "Mã MH",
+      "courseName": "Tên môn học",
+      "credits": "TC",
+      "processScore": "Điểm QT",
+      "finalScore": "Điểm CK",
+      "subjectScore": "Điểm HP",
+      "letterGrade": "Điểm Chữ",
+      "result": "Kết quả"
+    }
+  },
+  "examResult": {
+    "title": "Kết quả học tập",
+    "description": "SIS-01 — Xem điểm thi, kết quả học tập và bảng điểm cá nhân",
+    "breadcrumb": "Kết quả học tập",
+    "exportTranscript": "Xuất Transcript",
+    "printTranscript": "In bảng điểm",
+    "currentGPA": "GPA hiện tại",
+    "maxGPA": "tối đa",
+    "totalCredits": "Tổng tín chỉ",
+    "requiredCredits": "120 tín chỉ yêu cầu",
+    "thisSemester": "Học kỳ này",
+    "semesterAvg": "Điểm TB học kỳ",
+    "resultDetail": "Chi tiết kết quả học tập",
+    "semester2": "Học kỳ 2, 2025–2026",
+    "table": {
+      "courseCode": "Mã môn",
+      "courseName": "Tên môn học",
+      "credits": "Tín chỉ",
+      "theory": "Lý thuyết",
+      "practice": "Thực hành",
+      "finalExam": "Cuối kỳ",
+      "avgScore": "TB môn",
+      "letterGrade": "Điểm chữ",
+      "gpaScore": "GPA điểm"
+    }
+  },
+  "tuition": {
+    "title": "Học phí của tôi",
+    "description": "Xem và thanh toán học phí theo học kỳ",
+    "breadcrumb": "Học phí",
+    "exportInvoice": "Xuất hóa đơn",
+    "payNow": "Thanh toán ngay",
+    "debtAlert": "Bạn có khoản nợ học phí",
+    "debtReminder": "Vui lòng thanh toán trước hạn để tránh phạt",
+    "totalTuition": "Tổng học phí",
+    "paid": "Đã thanh toán",
+    "remaining": "Còn nợ",
+    "paymentHistory": "Lịch sử thanh toán",
+    "semesterDetail": "Chi tiết theo học kỳ",
+    "table": {
+      "semester": "Học kỳ",
+      "totalDebt": "Tổng nợ",
+      "paidAmount": "Đã đóng",
+      "remainingAmount": "Còn lại",
+      "dueDate": "Hạn đóng",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "paid": "Đã đóng",
+      "unpaid": "Chưa đóng",
+      "partial": "Đóng một phần",
+      "exempted": "Miễn giảm",
+      "deferred": "Hoãn"
+    },
+    "method": {
+      "transfer": "Chuyển khoản",
+      "cash": "Tiền mặt"
+    }
+  },
+  "table": {
+    "code": "Mã",
+    "date": "Ngày",
+    "status": "Trạng thái",
+    "detail": "Chi tiết",
+    "actions": "Thao tác",
+    "view": "Xem"
+  },
+  "filter": {
+    "all": "Tất cả",
+    "allTypes": "Tất cả loại",
+    "onlyUnread": "Chỉ chưa đọc"
+  },
+  "notification": {
+    "title": "Trung tâm Thông báo",
+    "description": "PORTAL-01 — Toàn bộ thông báo, cảnh báo và tin tức của hệ thống",
+    "breadcrumb": "Thông báo",
+    "markAllRead": "Đánh dấu đã đọc tất cả",
+    "deleteOld": "Xóa thông báo cũ",
+    "markRead": "Đánh dấu đã đọc",
+    "delete": "Xóa",
+    "important": "Quan trọng",
+    "noNotifications": "Không có thông báo nào",
+    "statTotal": "Tổng thông báo",
+    "statUnread": "Chưa đọc",
+    "statRead": "Đã đọc",
+    "searchPlaceholder": "Tìm thông báo...",
+    "type": {
+      "all": "Tất cả loại",
+      "info": "Thông báo",
+      "success": "Thành công",
+      "warning": "Cảnh báo",
+      "event": "Sự kiện"
+    },
+    "status": {
+      "draft": "Bản nháp",
+      "published": "Đã đăng",
+      "archived": "Lưu trữ"
+    },
+    "add": "Tạo thông báo",
+    "stt": "STT",
+    "maTb": "Mã TB",
+    "tieuDe": "Tiêu đề",
+    "loai": "Loại",
+    "ngayDang": "Ngày đăng",
+    "nguoiDang": "Người đăng",
+    "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác"
+  },
+  "examSchedule": {
+    "title": "Lịch thi",
+    "description": "Kỳ thi học kỳ 2, năm học 2025-2026 · Ngày thi: 15-25/07/2026",
+    "breadcrumb": "Lịch thi",
+    "back": "Quay lại",
+    "downloadSchedule": "Tải lịch thi",
+    "examNotice": "Lưu ý khi thi",
+    "examNoticeText": "Sinh viên mang theo thẻ sinh viên và CCCD. Có mặt tại phòng thi 15 phút trước giờ thi. Điện thoại phải tắt máy.",
+    "searchPlaceholder": "Tìm môn thi...",
+    "noExams": "Không có lịch thi phù hợp",
+    "examCount": "môn thi",
+    "done": "Đã thi",
+    "students": "sinh viên"
+  },
+  "courseReg": {
+    "title": "Đăng ký học phần",
+    "description": "Học kỳ 3, năm học 2025-2026 · Đợt đăng ký: 01/07 - 10/07/2026",
+    "breadcrumb": "Đăng ký học phần",
+    "back": "Quay lại",
+    "statRegistered": "Đã đăng ký",
+    "statCredits": "Tín chỉ đã chọn",
+    "statMax": "Tối đa HK3",
+    "registeredCourses": "Học phần đã đăng ký",
+    "availableCourses": "Học phần khả dụng",
+    "searchPlaceholder": "Tìm mã hoặc tên môn học...",
+    "noCourses": "Không tìm thấy học phần nào",
+    "prerequisite": "TK",
+    "hasMidterm": "Có GK",
+    "full": "Đã đầy",
+    "courseCount": "môn",
+    "selected": "Đã chọn",
+    "credits": "tín chỉ",
+    "cancelAll": "Hủy tất cả",
+    "submitReg": "Gửi đăng ký",
+    "table": {
+      "code": "Mã",
+      "courseName": "Tên môn",
+      "teacher": "GV",
+      "schedule": "Lịch",
+      "room": "Phòng"
+    }
+  },
+  "empty": {
+    "title": "Không có thông báo nào",
+    "description": "Bắt đầu bằng việc đăng thông báo đầu tiên."
+  }
+}

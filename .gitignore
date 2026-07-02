@@ -1,0 +1,15 @@
+node_modules
+dist
+.cursor
+*.pyc
+__pycache__/
+*.log
+.env
+.env.local
+.vscode
+.DS_Store
+Thumbs.db
+extract_todos.py
+extract_todos_output.txt
+UMS_MOCKUP_PROMPT.md
+index.html

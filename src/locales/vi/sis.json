@@ -1,0 +1,773 @@
+{
+  "title": "Đào tạo & Sinh viên",
+  "titleShort": "SIS – Sinh viên & Đào tạo",
+  "breadcrumb": { "list": "Sinh viên & Đào tạo" },
+
+  "dashboard": {
+    "title": "Quản lý Sinh viên & Đào tạo",
+    "description": "SIS-01 — Xương sống đào tạo, kết nối HEMIS, LMS, EXAM, PORTAL",
+    "stats": {
+      "totalStudents": "Tổng sinh viên",
+      "regular": "Chính quy",
+      "continuing": "Liên thông",
+      "onTimeGraduation": "Tốt nghiệp đúng hạn"
+    },
+    "chart": {
+      "studentsByDept": "Phân bổ sinh viên theo khoa",
+      "admissionTrend": "Xu hướng tuyển sinh (5 năm)",
+      "gradeDistribution": "Phân bổ kết quả học tập",
+      "avgGpa": "GPA TB"
+    },
+    "gradeDistribution": {
+      "excellent": "Xuất sắc",
+      "good": "Giỏi",
+      "average": "Khá",
+      "fair": "Trung bình",
+      "poor": "Yếu"
+    },
+    "report": "Báo cáo",
+    "studentsEnrolled": "sinh viên đang học"
+  },
+
+  "student": {
+    "title": "Quản lý sinh viên",
+    "description": "{{count}} sinh viên trong hệ thống",
+    "breadcrumb": { "list": "Sinh viên", "create": "Thêm sinh viên", "edit": "Chỉnh sửa" },
+    "add": "Thêm sinh viên",
+    "import": "Import Excel",
+    "export": "Xuất Excel",
+    "table": {
+      "stt": "STT",
+      "sinhVien": "Sinh viên",
+      "maSV": "Mã SV",
+      "lop": "Lớp",
+      "nganhKhoa": "Ngành / Khoa",
+      "gpa": "GPA",
+      "tinChi": "Tín chỉ",
+      "thaoTac": "Thao tác"
+    },
+    "filter": {
+      "searchPlaceholder": "Tìm tên hoặc mã SV...",
+      "allDepts": "Tất cả",
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "action": {
+      "chiTiet": "Chi tiết",
+      "sua": "Sửa"
+    },
+    "status": {
+      "studying": "Đang học",
+      "reserved": "Bảo lưu",
+      "suspended": "Đình chỉ",
+      "graduated": "Tốt nghiệp",
+      "quit": "Thôi học"
+    },
+    "form": {
+      "title": "Chỉnh sửa sinh viên",
+      "titleCreate": "Thêm sinh viên mới",
+      "msv": "Mã sinh viên",
+      "hoTen": "Họ và tên",
+      "ngaySinh": "Ngày sinh",
+      "gioiTinh": "Giới tính",
+      "gioiTinhMale": "Nam",
+      "gioiTinhFemale": "Nữ",
+      "gioiTinhOther": "Khác",
+      "email": "Email",
+      "emailPlaceholder": "email@truong.edu.vn",
+      "soDienThoai": "Số điện thoại",
+      "phonePlaceholder": "0912 345 678",
+      "diaChi": "Địa chỉ",
+      "addressPlaceholder": "Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành",
+      "lop": "Lớp",
+      "classPlaceholder": "CNTT-K60A",
+      "nganh": "Ngành",
+      "khoa": "Khoa",
+      "khoaHoc": "Khóa",
+      "cohortPlaceholder": "2022",
+      "bacDaoTao": "Bậc đào tạo",
+      "degreeOptions": {
+        "highSchool": "Tốt nghiệp THPT",
+        "vocational": "Tốt nghiệp Trung cấp",
+        "college": "Tốt nghiệp Cao đẳng"
+      },
+      "trangThai": "Trạng thái",
+      "ngayNhapHoc": "Ngày nhập học",
+      "duKienTotNghiep": "Dự kiến tốt nghiệp",
+      "personalInfo": "Thông tin cá nhân",
+      "academicInfo": "Thông tin học tập"
+    },
+    "detail": {
+      "profile": "Hồ sơ",
+      "grades": "Bảng điểm",
+      "ctdt": "CTĐT",
+      "schedule": "Lịch học",
+      "certificates": "Văn bằng",
+      "gpaTichLuy": "GPA tích lũy",
+      "tinChiDat": "Tín chỉ đạt",
+      "xeploai": "Xếp loại",
+      "xuatBangDiem": "Xuất bảng điểm",
+      "bangDiem": {
+        "maMon": "Mã môn",
+        "tenMon": "Tên môn",
+        "ky": "Kỳ",
+        "lt": "LT",
+        "th": "TH",
+        "diemGK": "Điểm GK"
+      },
+      "xemLichHoc": "Xem lịch học chi tiết",
+      "lichHocNote": "Lịch học được quản lý qua LMS",
+      "moLMS": "Mở LMS",
+      "ctdtTitle": "CTĐT Công nghệ Thông tin 2022",
+      "ctdtNote": "Phiên bản 2.0 · {{credits}} tín chỉ · Khóa {{cohort}}",
+      "xuatCTDT": "Xuất CTĐT",
+      "bangDiemCTDT": {
+        "maMon": "Mã môn",
+        "tenMon": "Tên môn",
+        "tc": "TC",
+        "ky": "Kỳ",
+        "loai": "Loại",
+        "gio": "Giờ"
+      },
+      "certificateStatus": {
+        "issued": "Đã cấp",
+        "pending": "Chưa cấp"
+      },
+      "profileFields": {
+        "hoVaTen": "Họ và tên",
+        "maSinhVien": "Mã sinh viên",
+        "ngaySinh": "Ngày sinh",
+        "gioiTinh": "Giới tính",
+        "diaChi": "Địa chỉ",
+        "dienThoai": "Điện thoại"
+      },
+      "exportProfile": "Xuất hồ sơ",
+      "back": "Quay lại",
+      "edit": "Chỉnh sửa",
+      "treEm": "–"
+    },
+    "validation": {
+      "msvRequired": "Mã sinh viên không được để trống",
+      "hoTenRequired": "Họ tên không được để trống",
+      "ngaySinhRequired": "Ngày sinh không được để trống"
+    },
+    "empty": {
+      "title": "Không tìm thấy sinh viên nào",
+      "description": "Hãy thử thay đổi bộ lọc hoặc thêm sinh viên mới."
+    }
+  },
+
+  "subject": {
+    "title": "Danh mục môn học",
+    "description": "SIS-04 — Quản lý danh sách môn học trong chương trình đào tạo",
+    "titleList": "Danh sách môn học",
+    "descriptionList": "{{count}} môn học trong chương trình đào tạo",
+    "breadcrumb": { "list": "Môn học", "create": "Thêm môn học", "edit": "Chỉnh sửa", "detail": "Chi tiết" },
+    "add": "Thêm môn học",
+    "export": "Xuất Excel",
+    "table": {
+      "maMon": "Mã môn",
+      "tenMon": "Tên môn học",
+      "tinChi": "Tín chỉ",
+      "hocKy": "Học kỳ",
+      "loai": "Loại",
+      "khoaPhuTrach": "Khoa phụ trách",
+      "khoa": "Khoa",
+      "trangThai": "Trạng thái",
+      "thaoTac": "Thao tác",
+      "maMH": "Mã MH",
+      "lt": "LT",
+      "th": "TH",
+      "giangVien": "Giảng viên"
+    },
+    "filter": {
+      "searchPlaceholder": "Tìm mã, tên môn học...",
+      "allDepts": "Tất cả",
+      "allTypes": "Tất cả loại"
+    },
+    "type": {
+      "all": "Tất cả",
+      "lyThuyet": "Lý thuyết",
+      "thucHanh": "Thực hành",
+      "doAn": "Đồ án",
+      "thucTap": "Thực tập",
+      "luanVan": "Luận văn",
+      "batBuoc": "Bắt buộc",
+      "tuChon": "Tự chọn",
+      "tuChon2": "Tự chọn 2"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động"
+    },
+    "action": {
+      "xem": "Xem",
+      "sua": "Sửa"
+    },
+    "detail": {
+      "info": "Thông tin môn học",
+      "loaiMonHoc": "Loại môn học",
+      "khoaPhuTrach": "Khoa phụ trách",
+      "hinhThucThi": "Hình thức thi",
+      "trangThai": "Trạng thái",
+      "moTa": "Mô tả môn học",
+      "ctdtApDung": "CTĐT áp dụng",
+      "monTienQuyet": "Môn tiên quyết",
+      "khongCo": "Không có",
+      "back": "Quay lại",
+      "edit": "Chỉnh sửa",
+      "maMon": "Mã môn",
+      "soTinChi": "Số tín chỉ",
+      "soTiet": "Số tiết",
+      "hocKy": "Học kỳ"
+    },
+    "form": {
+      "titleCreate": "Thêm môn học mới",
+      "titleEdit": "Chỉnh sửa: {{name}}",
+      "description": "SIS-03 — Khởi tạo môn học trong chương trình đào tạo",
+      "descriptionEdit": "{{code}} — Cập nhật thông tin môn học",
+      "info": "Thông tin môn học",
+      "maMon": "Mã môn học",
+      "tenMon": "Tên môn học",
+      "soTinChi": "Số tín chỉ",
+      "soTietHoc": "Số tiết học",
+      "hocKy": "Học kỳ",
+      "loaiMonHoc": "Loại môn học",
+      "khoaPhuTrach": "Khoa phụ trách",
+      "chuanKhoa": "-- Chọn khoa --",
+      "hinhThucThi": "Hình thức thi",
+      "examPlaceholder": "Thi viết (90 phút)",
+      "trangThai": "Trạng thái",
+      "moTa": "Mô tả môn học",
+      "descriptionPlaceholder": "Mô tả nội dung, mục tiêu và phạm vi của môn học...",
+      "monTienQuyet": "Môn học tiên quyết",
+      "monTienQuyetNote": "Danh sách môn học cần hoàn thành trước khi đăng ký môn này",
+      "addPrerequisite": "Thêm",
+      "prerequisitePlaceholder": "VD: INT1005 (Nhập mã môn tiên quyết)",
+      "back": "Hủy bỏ",
+      "save": "Lưu môn học",
+      "saveChanges": "Lưu thay đổi"
+    },
+    "validation": {
+      "maMonRequired": "Mã môn học không được để trống",
+      "tenMonRequired": "Tên môn học không được để trống",
+      "soTinChiRequired": "Số tín chỉ không được để trống",
+      "hocKyRequired": "Học kỳ không được để trống",
+      "khoaRequired": "Khoa phụ trách không được để trống"
+    },
+    "empty": {
+      "title": "Không tìm thấy môn học nào"
+    }
+  },
+
+  "curriculum": {
+    "title": "Chương trình đào tạo (CTĐT)",
+    "description": "SIS-01 — Danh mục chương trình đào tạo và môn học theo ngành",
+    "titleList": "Chương trình đào tạo",
+    "descriptionList": "{{count}} CTĐT trong hệ thống",
+    "breadcrumb": { "list": "CTĐT", "create": "Tạo CTĐT", "detail": "Chi tiết" },
+    "add": "Tạo CTĐT mới",
+    "export": "Xuất CTĐT",
+    "listTitle": "Danh sách chương trình đào tạo",
+    "subjectListTitle": "Danh mục môn học",
+    "subjectListNote": "Cấu trúc môn học của {{name}} ({{version}})",
+    "viewSelect": "Xem:",
+    "searchPlaceholder": "Tìm mã, tên CTĐT...",
+    "nienKhoa": "Năm",
+    "tinChi": "Tín chỉ",
+    "tongMonHoc": "Môn học",
+    "subjectListLink": "Danh sách môn học",
+    "soMon": "Số môn",
+    "chiTiet": "Chi tiết",
+    "table": {
+      "maCTDT": "Mã CTĐT",
+      "tenCTDT": "Tên chương trình",
+      "phienBan": "Phiên bản",
+      "nam": "Năm",
+      "tongTc": "Tổng tín chỉ",
+      "monHoc": "Môn học",
+      "gpaToiThieu": "GPA tối thiểu",
+      "trangThai": "Trạng thái",
+      "thaoTac": "Thao tác",
+      "chiTiet": "Chi tiết"
+    },
+    "tableDetail": {
+      "maMon": "Mã môn",
+      "tenMon": "Tên môn học",
+      "tongTc": "Tín chỉ",
+      "hocKy": "Học kỳ",
+      "loai": "Loại",
+      "khoa": "Khoa",
+      "maMonHoc": "Mã môn",
+      "tenMonHoc": "Tên môn học",
+      "soTiet": "Số tiết",
+      "thi": "Thi"
+    },
+    "status": {
+      "active": "Đang áp dụng",
+      "inactive": "Lưu trữ",
+      "effect": "Hiệu lực",
+      "notEffect": "Hết hiệu lực",
+      "draft": "Bản nháp"
+    },
+    "form": {
+      "titleCreate": "Tạo CTĐT mới",
+      "description": "SIS-02 — Khởi tạo chương trình đào tạo mới cho ngành học",
+      "basicInfo": "Thông tin cơ bản",
+      "maCTDT": "Mã CTĐT",
+      "codePlaceholder": "CTDT-CNTT-2026",
+      "tenChuongTrinh": "Tên chương trình",
+      "namePlaceholder": "Chương trình đào tạo CNTT",
+      "nganhDaoTao": "Ngành đào tạo",
+      "chuanNganh": "-- Chọn ngành --",
+      "bacDaoTao": "Bậc đào tạo",
+      "phienBan": "Phiên bản",
+      "versionPlaceholder": "V1.0",
+      "namBanHanh": "Năm ban hành",
+      "yearPlaceholder": "2026",
+      "moTa": "Mô tả chương trình",
+      "descriptionPlaceholder": "Mô tả tổng quan về chương trình đào tạo, mục tiêu và phạm vi...",
+      "params": "Thông số đào tạo",
+      "tongTinChi": "Tổng tín chỉ",
+      "totalCreditsPlaceholder": "120",
+      "gpaToiThieu": "GPA tối thiểu",
+      "gpaPlaceholder": "2.0",
+      "thoiGianDaoTao": "Thời gian đào tạo (năm)",
+      "durationPlaceholder": "4",
+      "chuanDauRa": "Chuẩn đầu ra",
+      "chuanPlaceholder": "CDR0, CDR1, CDR2...",
+      "back": "Hủy bỏ",
+      "save": "Lưu CTĐT"
+    },
+    "detail": {
+      "intro": "Giới thiệu chương trình",
+      "nganh": "Ngành",
+      "bac": "Bậc",
+      "nam": "Năm",
+      "phienBan": "Phiên bản",
+      "tongTinChi": "Tổng tín chỉ",
+      "soMon": "Số môn học",
+      "thoiGian": "Thời gian",
+      "gpaToiThieu": "GPA tối thiểu",
+      "nienKhoa": "Năm",
+      "back": "Quay lại",
+      "export": "Xuất CTĐT",
+      "edit": "Chỉnh sửa",
+      "kiHieu": "Học kỳ"
+    },
+    "validation": {
+      "maRequired": "Mã CTĐT không được để trống",
+      "tenRequired": "Tên CTĐT không được để trống",
+      "nganhRequired": "Ngành đào tạo không được để trống",
+      "tongTcRequired": "Tổng tín chỉ không được để trống"
+    },
+    "empty": {
+      "noSubjects": "Chưa có môn học nào cho chương trình này."
+    }
+  },
+
+  "enrollment": {
+    "title": "Đăng ký học phần",
+    "titleList": "Danh sách đăng ký học phần",
+    "description": "SIS-03 — Đăng ký học phần cho sinh viên theo học kỳ",
+    "descriptionList": "{{count}} đăng ký {{semester}}",
+    "breadcrumb": { "list": "Đăng ký HP", "create": "Tạo đăng ký", "edit": "Chỉnh sửa", "detail": "Chi tiết" },
+    "add": "Tạo đăng ký",
+    "create": "Tạo đăng ký học phần",
+    "export": "Xuất Excel",
+    "print": "In phiếu ĐK",
+    "openSession": "Mở đợt đăng ký",
+    "table": {
+      "maSV": "Mã SV",
+      "hoTen": "Họ tên",
+      "lop": "Lớp",
+      "monHoc": "Môn học",
+      "hocKy": "Học kỳ",
+      "trangThai": "Trạng thái",
+      "ngayDK": "Ngày ĐK",
+      "sinhVien": "Sinh viên",
+      "nganh": "Ngành",
+      "ngayDangKy": "Ngày đăng ký",
+      "thaoTac": "Thao tác",
+      "chiTiet": "Chi tiết",
+      "sua": "Sửa",
+      "soHP": "Số HP",
+      "tinChi": "Tín chỉ",
+      "gpa": "GPA",
+      "mssv": "MSSV"
+    },
+    "filter": {
+      "searchPlaceholder": "Tìm tên, mã SV...",
+      "searchStudent": "Tìm sinh viên hoặc mã SV...",
+      "allStatuses": "Tất cả"
+    },
+    "status": {
+      "registered": "Đã đăng ký",
+      "pending": "Chờ duyệt",
+      "rejected": "Từ chối",
+      "approved": "Đã duyệt",
+      "in_progress": "Đang học",
+      "passed": "Đạt",
+      "failed": "Không đạt",
+      "withdrawn": "Đã rút",
+      "completed": "Hoàn thành"
+    },
+    "action": {
+      "duyet": "Duyệt",
+      "tuChoi": "Từ chối",
+      "chiTiet": "Chi tiết"
+    },
+    "detail": {
+      "studentInfo": "Thông tin sinh viên",
+      "courseList": "Danh sách học phần đã đăng ký",
+      "courseNote": "{{count}} học phần · {{credits}} tín chỉ",
+      "summary": {
+        "tongTinChi": "Tổng tín chỉ đăng ký",
+        "tinChiDaDat": "Tín chỉ đã đạt",
+        "diemTB": "Điểm TB (học phần đạt)"
+      },
+      "stt": "STT",
+      "maHocPhan": "Mã học phần",
+      "tenHocPhan": "Tên học phần",
+      "tinChi": "Tín chỉ",
+      "loai": "Loại",
+      "khoa": "Khoa",
+      "ketQua": "Kết quả",
+      "diem": "Điểm",
+      "mssv": "MSSV",
+      "ngayDangKy": "Ngày đăng ký",
+      "nguoiDuyet": "Người duyệt",
+      "back": "Quay lại",
+      "print": "In phiếu ĐK",
+      "edit": "Chỉnh sửa",
+      "nguoiDuyetThoiGian": "{{name}} · {{time}}"
+    },
+    "form": {
+      "titleCreate": "Tạo đăng ký học phần",
+      "titleEdit": "Chỉnh sửa đăng ký học phần",
+      "description": "SIS-03 — Đăng ký học phần cho sinh viên theo học kỳ",
+      "enrollmentInfo": "Thông tin đăng ký",
+      "studentInfo": "Thông tin sinh viên",
+      "selectStudent": "Chọn sinh viên",
+      "findStudent": "Tìm tên hoặc mã SV...",
+      "doi": "Đổi",
+      "hocKy": "Học kỳ",
+      "ngayDangKy": "Ngày đăng ký",
+      "selectCourse": "Chọn học phần",
+      "selectedCount": "{{count}} môn · {{credits}} tín chỉ",
+      "selected": "Đã chọn",
+      "addCourse": "Thêm học phần",
+      "findCourse": "Tìm mã hoặc tên học phần...",
+      "noMoreCourses": "Không còn học phần nào để thêm",
+      "enrolledCourses": "Học phần đăng ký",
+      "validation": {
+        "selectStudent": "Vui lòng chọn sinh viên",
+        "selectCourse": "Vui lòng chọn ít nhất một học phần"
+      },
+      "back": "Hủy bỏ",
+      "save": "Lưu đăng ký",
+      "saveChanges": "Lưu thay đổi"
+    },
+    "stats": {
+      "totalEnrollments": "Tổng đơn đăng ký",
+      "approved": "Đã duyệt",
+      "pending": "Chờ duyệt",
+      "rejected": "Từ chối"
+    },
+    "empty": {
+      "title": "Không tìm thấy đăng ký nào"
+    }
+  },
+
+  "internship": {
+    "title": "Thực tập Tốt nghiệp",
+    "description": "SIS-05 — Quản lý thực tập, công ty tiếp nhận, báo cáo và điểm thực tập",
+    "breadcrumb": { "list": "Thực tập tốt nghiệp", "create": "Đăng ký thực tập", "detail": "Chi tiết", "tn": "Thực tập TN" },
+    "add": "Đăng ký thực tập",
+    "register": "Đăng ký thực tập",
+    "filter": "Bộ lọc",
+    "export": "Xuất báo cáo",
+    "stats": {
+      "totalRegistrations": "Tổng đăng ký",
+      "inProgress": "Đang thực tập",
+      "completed": "Hoàn thành",
+      "avgGrade": "Điểm TB"
+    },
+    "table": {
+      "stt": "STT",
+      "sinhVien": "Sinh viên",
+      "nganh": "Ngành",
+      "congTy": "Công ty",
+      "viTri": "Vị trí",
+      "diaDiem": "Địa điểm",
+      "thoiGian": "Thời gian",
+      "trangThai": "Trạng thái",
+      "tienDo": "Tiến độ",
+      "diem": "Điểm",
+      "thaoTac": "Thao tác",
+      "chiTiet": "Chi tiết"
+    },
+    "filter": {
+      "searchPlaceholder": "Tìm sinh viên, mã SV, công ty...",
+      "allMajors": "Tất cả",
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "status": {
+      "registered": "Đã đăng ký",
+      "in_progress": "Đang thực tập",
+      "pending_report": "Chờ nộp báo cáo",
+      "completed": "Hoàn thành",
+      "rejected": "Từ chỗi"
+    },
+    "detail": {
+      "student": "Sinh viên",
+      "company": "Đơn vị tiếp nhận",
+      "progress": "Tiến độ",
+      "supervisor": "Người hướng dẫn",
+      "phone": "Điện thoại",
+      "tasks": "Công việc thực tập",
+      "reports": "Báo cáo thực tập",
+      "evaluation": "Đánh giá",
+      "submitReport": "Nộp báo cáo",
+      "fields": {
+        "hoTen": "Họ tên",
+        "maSinhVien": "Mã sinh viên",
+        "lopNganh": "Lớp / Ngành",
+        "khoa": "Khoa",
+        "congTy": "Công ty",
+        "viTri": "Vị trí",
+        "diaDiem": "Địa điểm",
+        "thoiGian": "Thời gian"
+      },
+      "task": {
+        "deadline": "Hạn",
+        "completed": "Hoàn thành",
+        "inProgress": "Đang làm",
+        "pending": "Chưa bắt đầu"
+      },
+      "report": {
+        "submitted": "Đã nộp",
+        "pending": "Chưa nộp",
+        "notSubmitted": "Chưa nộp"
+      },
+      "evaluationNote": {
+        "score": "điểm"
+      },
+      "noEvaluation": "Chưa có đánh giá",
+      "back": "Quay lại",
+      "edit": "Chỉnh sửa",
+      "export": "Xuất báo cáo"
+    },
+    "form": {
+      "title": "Đăng ký thực tập mới",
+      "description": "SIS-05 — Nhập thông tin sinh viên thực tập",
+      "studentInfo": "Thông tin sinh viên",
+      "internshipInfo": "Thông tin thực tập",
+      "supervisorInfo": "Người hướng dẫn",
+      "maSinhVien": "Mã sinh viên",
+      "maPlaceholder": "VD: SV2022001",
+      "hoTenSinhVien": "Họ tên sinh viên",
+      "namePlaceholder": "VD: Nguyễn Thị Lan Anh",
+      "lop": "Lớp",
+      "classPlaceholder": "VD: CNTT-K24",
+      "nganh": "Ngành",
+      "khoaQuanLy": "Khoa quản lý",
+      "congTy": "Công ty tiếp nhận",
+      "companyPlaceholder": "VD: FPT Software Đà Nẵng",
+      "viTri": "Vị trí thực tập",
+      "positionPlaceholder": "VD: Thực tập sinh Backend",
+      "diaDiem": "Địa điểm",
+      "locationPlaceholder": "VD: Đà Nẵng",
+      "ngayBatDau": "Ngày bắt đầu",
+      "ngayKetThuc": "Ngày kết thúc",
+      "hoTenNguoiHuongDan": "Họ tên người hướng dẫn",
+      "supervisorPlaceholder": "VD: Nguyễn Văn Minh",
+      "soDienThoai": "Số điện thoại",
+      "phonePlaceholder": "VD: 0901234567",
+      "email": "Email",
+      "emailPlaceholder": "VD: minh.nv@company.com",
+      "ghiChu": "Ghi chú / Mô tả",
+      "notePlaceholder": "Mô tả công việc, yêu cầu đặc biệt, ghi chú...",
+      "back": "Quay lại",
+      "save": "Lưu đăng ký"
+    },
+    "empty": {
+      "title": "Không tìm thấy bản ghi nào"
+    }
+  },
+
+  "graduation": {
+    "title": "Xét Tốt nghiệp",
+    "description": "SIS-01 — Quản lý danh sách sinh viên đủ điều kiện tốt nghiệp và cấp văn bằng điện tử",
+    "breadcrumb": { "list": "Tốt nghiệp", "detail": "Chi tiết", "openSession": "Mở đợt mới" },
+    "add": "Mở đợt xét tốt nghiệp",
+    "export": "Xuất danh sách",
+    "print": "In bằng tạm",
+    "stats": {
+      "eligible": "Đủ điều kiện",
+      "pending": "Chờ xét duyệt",
+      "notMet": "Chưa đạt",
+      "issued": "Đã cấp bằng"
+    },
+    "table": {
+      "mssv": "MSSV",
+      "sinhVien": "Sinh viên",
+      "nganhLop": "Ngành / Lớp",
+      "khoa": "Khóa",
+      "gpa": "GPA",
+      "detai": "Đề tài luận văn",
+      "diemLV": "Điểm LV",
+      "xeploai": "Xếp loại",
+      "trangThai": "Trạng thái",
+      "thaoTac": "Thao tác",
+      "xem": "Xem",
+      "capBang": "Cấp bằng"
+    },
+    "filter": {
+      "searchPlaceholder": "Tìm theo tên, MSSV...",
+      "allMajors": "Tất cả",
+      "allStatuses": "Tất cả"
+    },
+    "status": {
+      "graduated": "Đã tốt nghiệp",
+      "pending_review": "Chờ xét duyệt",
+      "not_met": "Chưa đạt"
+    },
+    "detail": {
+      "summary": {
+        "gpaTichLuy": "GPA tích lũy",
+        "tongTinChi": "Tổng tín chỉ",
+        "diemLuanVan": "Điểm luận văn",
+        "xeploai": "Xếp loại"
+      },
+      "studentInfo": "Thông tin sinh viên",
+      "fields": {
+        "hoTen": "Họ tên",
+        "maSinhVien": "Mã sinh viên",
+        "lop": "Lớp",
+        "nganh": "Ngành",
+        "khoa": "Khoa",
+        "khoaHoc": "Khóa học",
+        "ngayNhapHoc": "Ngày nhập học",
+        "hocKyXet": "Học kỳ xét",
+        "namTotNghiep": "Năm tốt nghiệp"
+      },
+      "requirements": "Điều kiện tốt nghiệp",
+      "requirementNote": "{{count}}/{{total}} điều kiện đã đạt",
+      "requirementFields": {
+        "tongTinChi": "Tổng tín chỉ",
+        "gpaTichLuy": "GPA tích lũy",
+        "diemLuanVan": "Điểm luận văn",
+        "chungChiGDTC": "Chứng chỉ GDTC",
+        "chungChiGDP": "Chứng chỉ GDQP",
+        "ngoaiNgu": "Ngoại ngữ",
+        "ctdt": "CTĐT CNTT 2021"
+      },
+      "requirementsDetail": {
+        "required": "Yêu cầu"
+      },
+      "thesis": "Luận văn tốt nghiệp",
+      "thesisFields": {
+        "tenDetai": "Tên đề tài",
+        "nguoiHuongDan": "Người hướng dẫn",
+        "ngayBaoVe": "Ngày bảo vệ",
+        "diemLuanVan": "Điểm luận văn"
+      },
+      "diploma": "Văn bằng tốt nghiệp",
+      "diplomaFields": {
+        "soHieu": "Số hiệu văn bằng",
+        "ngayCap": "Ngày cấp",
+        "loaiBang": "Loại bằng",
+        "chuyenNganh": "Chuyên ngành",
+        "hinhThucDaoTao": "Hình thức đào tạo",
+        "xeploaiTotNghiep": "Xếp loại tốt nghiệp"
+      },
+      "bangTam": "Bằng tạm",
+      "back": "Quay lại",
+      "export": "Xuất hồ sơ"
+    },
+    "openSession": {
+      "title": "Mở đợt xét tốt nghiệp",
+      "description": "SIS-05 — Tạo đợt xét tốt nghiệp và chọn sinh viên đủ điều kiện",
+      "sessionInfo": "Thông tin đợt xét tốt nghiệp",
+      "eligibleStudents": "Sinh viên đủ điều kiện",
+      "eligibleNote": "{{count}} sinh viên đủ điều kiện · Đã chọn {{selected}}",
+      "hocKyXet": "Học kỳ xét",
+      "tenDot": "Tên đợt xét",
+      "dotPlaceholder": "Đợt xét tốt nghiệp HK2/2025-2026",
+      "ngayMoDon": "Ngày mở đơn",
+      "ngayDongDon": "Ngày đóng đơn",
+      "ngayXetDuyet": "Ngày xét duyệt",
+      "ghiChu": "Ghi chú",
+      "notePlaceholder": "Ghi chú cho đợt xét tốt nghiệp (nếu có)",
+      "selectAll": "Chọn tất cả",
+      "eligible": "Đủ điều kiện",
+      "notEligible": "Chưa đủ điều kiện",
+      "notMet": "Chưa đạt",
+      "noEligible": "Không có sinh viên đủ điều kiện",
+      "gpa": "GPA",
+      "tc": "TC",
+      "validation": {
+        "tenDotRequired": "Tên đợt xét không được để trống",
+        "ngayMoRequired": "Ngày mở không được để trống",
+        "ngayDongRequired": "Ngày đóng không được để trống",
+        "selectStudent": "Vui lòng chọn ít nhất một sinh viên"
+      },
+      "back": "Hủy bỏ",
+      "open": "Mở đợt xét ({{count}} sinh viên)"
+    },
+    "empty": {
+      "title": "Không tìm thấy sinh viên nào"
+    }
+  },
+
+  "common": {
+    "loading": "Đang tải...",
+    "noData": "Không có dữ liệu",
+    "save": "Lưu",
+    "cancel": "Hủy bỏ",
+    "cancelShort": "Hủy",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "reset": "Đặt lại",
+    "actions": "Hành động",
+    "required": "Bắt buộc",
+    "optional": "Tùy chọn",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "view": "Xem",
+    "create": "Tạo mới",
+    "update": "Cập nhật",
+    "export": "Xuất",
+    "import": "Nhập",
+    "print": "In",
+    "download": "Tải xuống",
+    "upload": "Tải lên",
+    "refresh": "Làm mới",
+    "yes": "Có",
+    "no": "Không",
+    "all": "Tất cả",
+    "status": {
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động",
+      "pending": "Đang chờ",
+      "success": "Thành công",
+      "error": "Lỗi",
+      "warning": "Cảnh báo"
+    },
+    "result": {
+      "pass": "Đạt",
+      "fail": "Không đạt"
+    },
+    "pagination": {
+      "showing": "Hiển thị",
+      "of": "của",
+      "entries": "mục",
+      "perPage": "Mỗi trang"
+    }
+  }
+}

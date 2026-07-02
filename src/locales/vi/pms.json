@@ -1,0 +1,67 @@
+{
+  "title": "Công tác Đảng",
+  "titleShort": "PMS – Công tác Đảng",
+  "description": "PMS-01 — Quản lý đảng viên, chi bộ, sinh hoạt đảng, khen thưởng kỷ luật",
+  "export": "Xuất báo cáo",
+  "addMember": "Thêm đảng viên",
+  "breadcrumb": { "list": "Công tác Đảng" },
+  "member": {
+    "title": "Đảng viên",
+    "add": "Thêm đảng viên",
+    "stt": "STT",
+    "maDv": "Mã ĐV",
+    "hoTen": "Họ tên",
+    "ngayVaoDang": "Ngày vào Đảng",
+    "chiBo": "Chi bộ",
+    "chucVu": "Chức vụ Đảng",
+    "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác",
+    "profile": "Hồ sơ",
+    "status": {
+      "active": "Chính thức",
+      "probation": "Dự bị",
+      "suspended": "Tạm đình chỉ"
+    }
+  },
+  "report": {
+    "title": "Báo cáo Đảng",
+    "add": "Tạo báo cáo",
+    "stt": "STT",
+    "maBc": "Mã BC",
+    "tenBc": "Tên báo cáo",
+    "loaiBc": "Loại",
+    "ngayTao": "Ngày tạo",
+    "nguoiTao": "Người tạo",
+    "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác"
+  },
+  "dashboard": {
+    "totalMembers": "Đảng viên",
+    "newMembers": "+{{count}}",
+    "partyCells": "Chi bộ",
+    "cellUnits": "{{khoa}} khoa, {{phong}} phòng ban",
+    "probationary": "Đảng viên dự bị",
+    "probationaryDesc": "đang trong thời gian dự bị",
+    "centralCells": "Chi bộ trực thuộc TW",
+    "centralCellsDesc": "Đảng ủy trường",
+    "memberList": "Danh sách đảng viên",
+    "activity6months": "Hoạt động 6 tháng",
+    "activities": {
+      "meetings": "Sinh hoạt",
+      "studies": "Học tập",
+      "campaigns": "Phong trào"
+    },
+    "birthDate": "Sinh",
+    "education": "Trình độ",
+    "achievements": "Thành tích"
+  },
+  "table": {
+    "name": "Họ tên",
+    "joinDate": "Ngày vào Đảng",
+    "branch": "Chi bộ",
+    "position": "Chức vụ",
+    "status": "Tình trạng",
+    "action": ""
+  },
+  "empty": { "title": "Không có đảng viên nào", "description": "Bắt đầu bằng việc thêm đảng viên đầu tiên." }
+}

@@ -1,0 +1,465 @@
+{
+  "title": "Thi trực tuyến",
+  "titleShort": "EXAM – Thi trực tuyến",
+  "breadcrumb": {
+    "list": "Thi trực tuyến",
+    "dashboard": "EXAM",
+    "questionBank": "Ngân hàng câu hỏi",
+    "questionBankFull": "Ngân hàng Câu hỏi",
+    "questionCreate": "Thêm câu hỏi",
+    "questionDetail": "Chi tiết câu hỏi",
+    "questionEdit": "Chỉnh sửa câu hỏi",
+    "createExam": "Tạo kỳ thi",
+    "examSession": "Ca thi & Giám sát",
+    "examMonitor": "Giám sát thi",
+    "examMonitorList": "Giám sát",
+    "gradebook": "Bảng điểm"
+  },
+  "common": {
+    "stt": "STT",
+    "thaoTac": "Thao tác",
+    "trangThai": "Trạng thái",
+    "search": "Tìm kiếm...",
+    "searchPlaceholder": "Tìm nội dung câu hỏi...",
+    "filter": "Bộ lọc",
+    "all": "Tất cả",
+    "allType": "Tất cả loại",
+    "allDifficulty": "Tất cả mức độ",
+    "allStatus": "Tất cả",
+    "export": "Xuất Excel",
+    "exportReport": "Xuất báo cáo",
+    "add": "Thêm",
+    "create": "Tạo",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "cancel": "Hủy bỏ",
+    "back": "Quay lại",
+    "view": "Xem",
+    "monitor": "Giám sát",
+    "monitorNow": "Giám sát ngay",
+    "monitorAll": "Giám sát tất cả",
+    "online": "Giám sát trực tuyến",
+    "save": "Lưu",
+    "saveDraft": "Lưu nháp",
+    "submit": "Tạo câu hỏi",
+    "saveChanges": "Lưu thay đổi",
+    "continue": "Tiếp tục",
+    "publish": "Xuất bản kỳ thi",
+    "import": "Nhập từ file",
+    "copy": "Sao chép",
+    "confirm": "Xác nhận",
+    "process": "Xử lý",
+    "record": "Ghi nhận",
+    "print": "In bảng điểm",
+    "live": "Live",
+    "yes": "Có",
+    "no": "Không",
+    "or": "hoặc",
+    "close": "Đóng",
+    "reset": "Đặt lại",
+    "apply": "Áp dụng",
+    "noData": "Không có dữ liệu",
+    "loading": "Đang tải...",
+    "optional": "(tùy chọn)"
+  },
+  "dashboard": {
+    "title": "Thi trực tuyến — EXAM",
+    "description": "EXAM-01 — Tổ chức thi, giám sát AI, chấm điểm, chống gian lận",
+    "createNew": "Tạo kỳ thi mới",
+    "stats": {
+      "totalExam": "Tổng kỳ thi",
+      "ongoing": "Đang diễn ra",
+      "ongoingSub": "giám sát live",
+      "completed": "Đã hoàn thành",
+      "completedThisWeek": "tuần này",
+      "passRate": "Tỷ lệ đạt",
+      "newSemester": "HK mới"
+    },
+    "activeExam": {
+      "title": "Kỳ thi đang diễn ra",
+      "submitted": "đã nộp",
+      "warning": "cảnh báo",
+      "room": "Phòng",
+      "duration": "phút",
+      "students": "SV"
+    },
+    "cheatingAlert": {
+      "title": "Cảnh báo gian lận gần đây"
+    },
+    "gradeDist": {
+      "title": "Phân bổ điểm — kỳ vừa qua"
+    },
+    "scoreTrend": {
+      "title": "Điểm TB các môn thi gần đây"
+    },
+    "tooltip": {
+      "student": "SV"
+    }
+  },
+  "questionBank": {
+    "title": "Ngân hàng câu hỏi",
+    "description": "EXAM-01 · Quản lý câu hỏi thi, phân loại theo độ khó, môn học, tags",
+    "addQuestion": "Thêm câu hỏi",
+    "stats": {
+      "total": "Tổng câu hỏi",
+      "multipleChoice": "Trắc nghiệm",
+      "essay": "Tự luận",
+      "unused": "Chưa sử dụng"
+    },
+    "filter": {
+      "course": "Môn học",
+      "difficulty": "Độ khó",
+      "type": "Loại câu hỏi"
+    },
+    "table": {
+      "question": "Câu hỏi",
+      "course": "Môn",
+      "type": "Loại",
+      "difficulty": "Độ khó",
+      "score": "Điểm",
+      "usageCount": "Lần dùng",
+      "tags": "Tags"
+    },
+    "empty": {
+      "title": "Không tìm thấy câu hỏi nào",
+      "description": "Bắt đầu bằng việc thêm câu hỏi đầu tiên."
+    }
+  },
+  "questionBankFull": {
+    "title": "Ngân hàng Câu hỏi",
+    "description": "EXAM-01 — Quản lý câu hỏi cho các bài thi trắc nghiệm, tự luận, điền khuyết",
+    "addQuestion": "Thêm câu hỏi",
+    "stats": {
+      "total": "Tổng câu hỏi",
+      "multipleChoice": "Trắc nghiệm",
+      "essay": "Tự luận",
+      "fillBlank": "Điền khuyết",
+      "trueFalse": "Đúng/Sai"
+    },
+    "table": {
+      "content": "Nội dung câu hỏi",
+      "subject": "Môn học",
+      "type": "Loại",
+      "difficulty": "Độ khó",
+      "usage": "Sử dụng",
+      "createdBy": "Người tạo",
+      "createdAt": "Ngày tạo",
+      "correctAnswer": "Đáp án"
+    },
+    "filter": {
+      "type": "Loại câu hỏi",
+      "difficulty": "Mức độ",
+      "status": "Trạng thái"
+    },
+    "empty": {
+      "title": "Không tìm thấy câu hỏi nào",
+      "description": "Hãy thử thay đổi bộ lọc hoặc thêm câu hỏi mới."
+    }
+  },
+  "questionCreate": {
+    "title": "Thêm câu hỏi mới",
+    "description": "EXAM-01 · Tạo câu hỏi cho ngân hàng đề thi",
+    "section": {
+      "questionType": "Loại câu hỏi",
+      "questionInfo": "Thông tin câu hỏi"
+    },
+    "form": {
+      "course": "Môn học",
+      "difficulty": "Độ khó",
+      "content": "Nội dung câu hỏi",
+      "contentPlaceholder": "Nhập nội dung câu hỏi...",
+      "answers": "Đáp án",
+      "answerPlaceholder": "Đáp án {{id}}",
+      "score": "Điểm số",
+      "tags": "Tags",
+      "tagsPlaceholder": "Nhập tag, nhấn Enter...",
+      "explanation": "Gợi ý / Đáp án mẫu",
+      "explanationPlaceholder": "Nhập gợi ý hoặc đáp án mẫu...",
+      "addAnswer": "Thêm đáp án",
+      "markCorrect": "Nhấn ✓ để đánh dấu đáp án đúng"
+    },
+    "validation": {
+      "contentRequired": "Nội dung câu hỏi không được để trống",
+      "answersRequired": "Vui lòng nhập đầy đủ nội dung các đáp án",
+      "atLeastOneCorrect": "Phải có ít nhất một đáp án đúng"
+    }
+  },
+  "questionDetail": {
+    "title": "Câu hỏi {{id}}",
+    "section": {
+      "content": "Nội dung câu hỏi",
+      "info": "Thông tin câu hỏi"
+    },
+    "info": {
+      "course": "Môn học",
+      "type": "Loại câu hỏi",
+      "difficulty": "Độ khó",
+      "score": "Điểm số",
+      "usageCount": "Lần sử dụng",
+      "status": "Trạng thái",
+      "author": "Người tạo",
+      "createdAt": "Ngày tạo",
+      "updatedAt": "Cập nhật lần cuối",
+      "tags": "Tags",
+      "point": "điểm",
+      "times": "lần"
+    },
+    "answer": {
+      "sampleAnswer": "Đáp án mẫu"
+    },
+    "explanation": "Giải thích",
+    "notFound": {
+      "title": "Không tìm thấy câu hỏi",
+      "back": "Quay lại ngân hàng câu hỏi"
+    }
+  },
+  "questionEdit": {
+    "title": "Chỉnh sửa câu hỏi {{id}}",
+    "section": {
+      "questionInfo": "Thông tin câu hỏi"
+    },
+    "form": {
+      "course": "Môn học",
+      "difficulty": "Độ khó",
+      "content": "Nội dung câu hỏi",
+      "answers": "Đáp án",
+      "score": "Điểm số",
+      "tags": "Tags",
+      "tagsPlaceholder": "Nhập tag, nhấn Enter...",
+      "explanation": "Giải thích / Gợi ý",
+      "explanationPlaceholder": "Nhập giải thích hoặc gợi ý...",
+      "addAnswer": "Thêm đáp án"
+    },
+    "validation": {
+      "contentRequired": "Nội dung câu hỏi không được để trống",
+      "answersRequired": "Vui lòng nhập đầy đủ nội dung các đáp án",
+      "atLeastOneCorrect": "Phải có ít nhất một đáp án đúng"
+    },
+    "notFound": {
+      "title": "Không tìm thấy câu hỏi",
+      "back": "Quay lại"
+    }
+  },
+  "exam": {
+    "title": "Tạo kỳ thi mới",
+    "description": "EXAM-01 · Tạo kỳ thi, chọn câu hỏi từ ngân hàng",
+    "steps": {
+      "examInfo": "Thông tin kỳ thi",
+      "selectQuestions": "Chọn câu hỏi",
+      "settings": "Cài đặt"
+    },
+    "form": {
+      "examName": "Tên kỳ thi",
+      "examNamePlaceholder": "VD: Thi giữa kỳ CS101 - 2026",
+      "course": "Môn học",
+      "examType": "Loại thi",
+      "duration": "Thời gian thi (phút)",
+      "startTime": "Ngày giờ bắt đầu",
+      "room": "Phòng thi",
+      "roomPlaceholder": "VD: P.301-302",
+      "selectFromBank": "Chọn câu hỏi từ ngân hàng"
+    },
+    "examTypes": {
+      "midterm": "Giữa kỳ",
+      "final": "Cuối kỳ",
+      "quiz": "Bài kiểm tra",
+      "practice": "Thực hành"
+    },
+    "settings": {
+      "enableWebcam": "Bật giám sát webcam",
+      "preventTabSwitch": "Chống chuyển tab",
+      "preventCopyPaste": "Chống copy-paste",
+      "allowReview": "Cho phép xem lại sau khi nộp"
+    },
+    "summary": {
+      "title": "Tóm tắt",
+      "examName": "Tên kỳ thi",
+      "course": "Môn học",
+      "duration": "Thời gian",
+      "questionCount": "Số câu hỏi",
+      "totalScore": "Tổng điểm",
+      "points": "điểm",
+      "questions": "câu"
+    }
+  },
+  "examSession": {
+    "title": "Ca thi & Giám sát",
+    "description": "EXAM-01 — Quản lý ca thi, phòng thi và giám sát thi trực tuyến",
+    "monitorOnline": "Giám sát trực tuyến",
+    "activeSessions": {
+      "title": "Ca thi đang diễn ra",
+      "count": "{{count}} ca thi"
+    },
+    "allSessions": {
+      "title": "Tất cả ca thi"
+    },
+    "table": {
+      "session": "Ca thi",
+      "course": "Môn học",
+      "type": "Loại",
+      "room": "Phòng",
+      "time": "Thời gian",
+      "students": "Thí sinh",
+      "proctor": "Cán bộ coi thi",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "all": "Tất cả",
+      "active": "Đang diễn ra",
+      "scheduled": "Đã lên lịch",
+      "completed": "Đã kết thúc",
+      "cancelled": "Đã hủy",
+      "activeLabel": "Đang diễn ra",
+      "scheduledLabel": "Đã lên lịch",
+      "completedLabel": "Đã kết thúc",
+      "cancelledLabel": "Đã hủy"
+    },
+    "type": {
+      "midterm": "Giữa kỳ",
+      "final": "Cuối kỳ",
+      "quiz": "Kiểm tra",
+      "practice": "Thực hành"
+    },
+    "card": {
+      "present": "vắng",
+      "minutes": "phút"
+    },
+    "empty": {
+      "title": "Không có ca thi nào",
+      "description": "Bắt đầu bằng việc tạo ca thi đầu tiên."
+    }
+  },
+  "examMonitor": {
+    "title": "Giám sát thi trực tuyến",
+    "description": "EXAM-01 · Giám sát AI, cảnh báo gian lận, theo dõi tiến độ",
+    "exportReport": "Xuất báo cáo",
+    "endAll": "Kết thúc tất cả",
+    "progress": {
+      "title": "Tiến độ nộp bài",
+      "total": "Tổng SV",
+      "submitted": "Đã nộp",
+      "ongoing": "Đang thi",
+      "timeoutNotSubmitted": "Hết giờ chưa nộp",
+      "completed": "hoàn thành",
+      "notSubmitted": "SV chưa nộp"
+    },
+    "warnings": {
+      "title": "Cảnh báo hệ thống",
+      "cheatingHigh": "Gian lận (cao)",
+      "abnormalMedium": "Bất thường (trung bình)",
+      "suspectLow": "Nghi ngờ (thấp)"
+    },
+    "aiAlert": {
+      "title": "Cảnh báo AI",
+      "count": "({{count}})"
+    },
+    "noAlert": {
+      "message": "Không có cảnh báo nào"
+    },
+    "severity": {
+      "low": "Thấp",
+      "medium": "Trung bình",
+      "high": "Cao"
+    },
+    "actions": {
+      "record": "Ghi nhận",
+      "process": "Xử lý"
+    }
+  },
+  "examMonitorList": {
+    "title": "Giám sát Thi",
+    "description": "EXAM-01 — Giám sát ca thi trực tuyến theo thời gian thực",
+    "report": "Báo cáo",
+    "createSession": "Tạo ca thi",
+    "liveBanner": {
+      "count": "{{count}} ca thi đang diễn ra",
+      "realtime": "Cập nhật theo thời gian thực"
+    },
+    "stats": {
+      "monitoring": "Đang giám sát",
+      "scheduled": "Đã lên lịch",
+      "totalStudents": "Tổng thí sinh",
+      "cheatingCases": "Số vụ gian lận"
+    },
+    "table": {
+      "examCode": "Mã ca thi",
+      "examName": "Tên bài thi",
+      "roomTime": "Phòng / Giờ thi",
+      "supervisor": "Giám thị",
+      "registered": "TS đăng ký",
+      "present": "Có mặt",
+      "absent": "Vắng",
+      "cheating": "Gian lận",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "active": "Đang giám sát",
+      "scheduled": "Đã lên lịch",
+      "completed": "Đã kết thúc",
+      "cancelled": "Đã hủy"
+    },
+    "empty": {
+      "title": "Không tìm thấy ca thi nào",
+      "description": "Hãy thử thay đổi bộ lọc hoặc tạo ca thi mới."
+    }
+  },
+  "gradebook": {
+    "title": "Bảng điểm",
+    "description": "EXAM-01 / SIS-01 — Quản lý bảng điểm theo lớp học phần",
+    "exportExcel": "Xuất Excel",
+    "printGrade": "In bảng điểm",
+    "courseList": {
+      "gradedOf": "{{graded}}/{{total}} đã chấy"
+    },
+    "classAvg": "TB lớp",
+    "table": {
+      "stt": "STT",
+      "studentId": "Mã SV",
+      "fullName": "Họ tên",
+      "theory": "Lý thuyết",
+      "practice": "Thực hành",
+      "final": "Cuối kỳ",
+      "avgScore": "TB môn",
+      "letterGrade": "Điểm chữ",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "completed": "Hoàn thành",
+      "grading": "Đang chấm",
+      "pending": "Chưa chấm",
+      "graded": "Đã chấm",
+      "waiting": "Chờ chấm"
+    },
+    "avgClass": "Điểm TB lớp"
+  },
+  "type": {
+    "multiple_choice": "Trắc nghiệm",
+    "essay": "Tự luận",
+    "true_false": "Đúng/Sai",
+    "fill_blank": "Điền khuyết"
+  },
+  "difficulty": {
+    "easy": "Dễ",
+    "medium": "Trung bình",
+    "hard": "Khó",
+    "all": "Tất cả độ khó"
+  },
+  "status": {
+    "active": "Đang dùng",
+    "draft": "Nháp",
+    "archived": "Lưu trữ",
+    "inactive": "Tạm ngưng",
+    "scheduled": "Đã lên lịch",
+    "pending": "Chờ duyệt",
+    "approved": "Đã duyệt",
+    "rejected": "Từ chối",
+    "cancelled": "Đã hủy"
+  },
+  "statusExam": {
+    "draft": "Nháp",
+    "scheduled": "Đã lên lịch",
+    "active": "Đang thi",
+    "completed": "Hoàn thành",
+    "cancelled": "Đã hủy"
+  }
+}

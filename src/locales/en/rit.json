@@ -1,0 +1,72 @@
+{
+  "title": "Research & Intl. Cooperation",
+  "titleShort": "RIT – Research & Cooperation",
+  "description": "RIT-01 — Manage projects, scientific publications, international cooperation, budget approval",
+  "export": "Export Report",
+  "addProject": "Register New Project",
+  "breadcrumb": { "list": "Research & Cooperation" },
+  "project": {
+    "title": "Research Projects",
+    "add": "Create Project",
+    "stt": "No.",
+    "maDt": "Project Code",
+    "tenDt": "Project Title",
+    "chuNhiem": "PI",
+    "donVi": "Unit",
+    "namTh": "Year",
+    "kinhPhi": "Budget",
+    "trangThai": "Status",
+    "thaoTac": "Actions",
+    "status": {
+      "proposing": "Proposing",
+      "approved": "Approved",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    }
+  },
+  "member": {
+    "title": "Researchers",
+    "add": "Add Researcher",
+    "stt": "No.",
+    "maNcv": "Researcher ID",
+    "hoTen": "Full Name",
+    "hocHam": "Academic Title",
+    "hocVi": "Degree",
+    "donVi": "Unit",
+    "chuyenMon": "Expertise",
+    "trangThai": "Status",
+    "thaoTac": "Actions"
+  },
+  "cooperation": {
+    "title": "International Cooperation",
+    "add": "Create Cooperation"
+  },
+  "dashboard": {
+    "totalProjects": "Research Projects",
+    "thisYear": "this year",
+    "inProgress": "In Progress",
+    "schoolLevel": "school level",
+    "ministryLevel": "ministry level",
+    "yearlyBudget": "Yearly Budget",
+    "scopusPapers": "SCOPUS Papers",
+    "activeProjects": "Active Projects",
+    "publications": "Scientific Publications",
+    "budgetByFaculty": "Budget by Faculty",
+    "researchProjects": "Research Projects",
+    "projectCode": "Project Code",
+    "projectName": "Project Title",
+    "leader": "Leader",
+    "department": "Department",
+    "level": "Level",
+    "budget": "Budget",
+    "progress": "Progress",
+    "deadline": "Deadline",
+    "field": "Field",
+    "status": "Status"
+  },
+  "empty": {
+    "title": "No research projects found",
+    "description": "Get started by creating your first research project."
+  }
+}

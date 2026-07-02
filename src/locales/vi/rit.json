@@ -1,0 +1,45 @@
+{
+  "title": "NCKH & HTQT", "titleShort": "RIT – NCKH & HTQT",
+  "description": "RIT-01 — Quản lý đề tài, công bố khoa học, hợp tác quốc tế, phê duyệt kinh phí",
+  "export": "Xuất báo cáo",
+  "addProject": "Đăng ký đề tài mới",
+  "breadcrumb": { "list": "NCKH & HTQT" },
+  "project": {
+    "title": "Đề tài NCKH", "add": "Tạo đề tài",
+    "stt": "STT", "maDt": "Mã đề tài", "tenDt": "Tên đề tài",
+    "chuNhiem": "Chủ nhiệm", "donVi": "Đơn vị", "namTh": "Năm thực hiện",
+    "kinhPhi": "Kinh phí", "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "status": { "proposing": "Đề xuất", "approved": "Đã duyệt", "in_progress": "Đang thực hiện", "completed": "Hoàn tất", "rejected": "Từ chối" }
+  },
+  "member": {
+    "title": "Nghiên cứu viên", "add": "Thêm thành viên",
+    "stt": "STT", "maNcv": "Mã NCV", "hoTen": "Họ tên",
+    "hocHam": "Học hàm", "hocVi": "Học vị", "donVi": "Đơn vị",
+    "chuyenMon": "Chuyên môn", "trangThai": "Trạng thái", "thaoTac": "Thao tác"
+  },
+  "cooperation": { "title": "Hợp tác quốc tế", "add": "Tạo hợp tác" },
+  "dashboard": {
+    "totalProjects": "Đề tài NCKH",
+    "thisYear": "năm nay",
+    "inProgress": "Đang thực hiện",
+    "schoolLevel": "cấp trường",
+    "ministryLevel": "cấp Bộ",
+    "yearlyBudget": "Kinh phí năm nay",
+    "scopusPapers": "Bài báo SCOPUS",
+    "activeProjects": "Dự án đang thực hiện",
+    "publications": "Công bố khoa học",
+    "budgetByFaculty": "Kinh phí theo khoa",
+    "researchProjects": "Đề tài nghiên cứu",
+    "projectCode": "Mã ĐT",
+    "projectName": "Tên đề tài",
+    "leader": "Chủ nhiệm",
+    "department": "Khoa",
+    "level": "Cấp",
+    "budget": "Kinh phí",
+    "progress": "Tiến độ",
+    "deadline": "Hạn chót",
+    "field": "Lĩnh vực",
+    "status": "Trạng thái"
+  },
+  "empty": { "title": "Không có đề tài nào", "description": "Bắt đầu bằng việc tạo đề tài NCKH đầu tiên." }
+}

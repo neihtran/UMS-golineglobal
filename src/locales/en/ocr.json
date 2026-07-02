@@ -1,0 +1,50 @@
+{
+  "title": "Document Digitization",
+  "titleShort": "OCR – Document Digitization",
+  "description": "OCR-01 — OCR documents, handwriting recognition, convert paper to digital",
+  "export": "Export Data",
+  "upload": "Upload Document",
+  "breadcrumb": { "list": "Document Digitization" },
+  "scanList": {
+    "title": "Scanned Documents",
+    "add": "Create Scan",
+    "stt": "No.",
+    "maScan": "Scan ID",
+    "tenTaiLieu": "Document Name",
+    "loai": "Type",
+    "ngayScan": "Scanned Date",
+    "nguoiScan": "Scanned By",
+    "trangThai": "Status",
+    "thaoTac": "Actions",
+    "documentsScanned": "Documents Scanned",
+    "all": "All",
+    "needsReview": "Needs Review",
+    "view": "View",
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  },
+  "dashboard": {
+    "totalScanned": "Documents Scanned",
+    "newScanned": "+{{count}}",
+    "success": "Success",
+    "accuracy": "{{percent}} accuracy",
+    "needsReview": "Needs Review",
+    "needsHumanReview": "{{percent}} need human review",
+    "ocrErrors": "OCR Errors",
+    "allDocuments": "All Documents"
+  },
+  "table": {
+    "document": "Document",
+    "type": "Type",
+    "pages": "Pages",
+    "processedDate": "Processed Date",
+    "accuracy": "Accuracy",
+    "size": "Size",
+    "status": "Status"
+  },
+  "empty": { "title": "No scanned documents found", "description": "Get started by digitizing your first document." }
+}

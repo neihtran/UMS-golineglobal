@@ -1,0 +1,211 @@
+{
+  "title": "Finance & Accounting",
+  "titleShort": "FIN – Finance & Accounting",
+  "breadcrumb": { "list": "Finance & Accounting" },
+  "description": "Manage revenue, expenses, tuition, payroll and budget",
+  "export": "Export Report",
+  "tuitionManagement": "Manage Tuition",
+  "expenditure": {
+    "title": "Expenditure",
+    "description": "Manage expenses and disbursements",
+    "add": "Create Expenditure",
+    "export": "Export Excel",
+    "search": "Search description, voucher no...",
+    "stt": "No.", "maPhieu": "Code", "noiDung": "Description",
+    "loai": "Type", "phong": "Department", "soTien": "Amount",
+    "ngay": "Date", "trangThai": "Status", "thaoTac": "Actions",
+    "detail": "Detail",
+    "total": "Total:",
+    "statTotal": "Total Expenses Q1-Q2",
+    "statApproved": "Approved",
+    "statPending": "Pending",
+    "statRejected": "Rejected",
+    "status": { "pending": "Pending", "approved": "Approved", "paid": "Paid", "rejected": "Rejected" },
+    "method": { "cash": "Cash", "transfer": "Bank Transfer", "card": "Card" }
+  },
+  "tuition": {
+    "title": "Tuition",
+    "description": "Manage student tuition collection",
+    "add": "Create Receipt",
+    "exportDebt": "Export Debt List",
+    "search": "Search name, student ID...",
+    "stt": "No.", "maSv": "Student ID", "hoTen": "Full Name",
+    "lop": "Class", "hocPhi": "Tuition", "daDong": "Paid",
+    "conNo": "Remaining", "trangThai": "Status", "ngayDong": "Paid Date",
+    "thaoTac": "Actions", "detail": "Detail",
+    "filterAll": "All",
+    "statTotal": "Total Receivable",
+    "statCollected": "Collected",
+    "statRemaining": "Outstanding",
+    "statRate": "Collection Rate",
+    "status": { "paid": "Paid", "unpaid": "Unpaid", "partial": "Partial", "exempted": "Exempted", "deferred": "Deferred", "overdue": "Overdue" }
+  },
+  "create": {
+    "title": "Create Expenditure",
+    "subtitle": "FIN-03 — Create new expenditure voucher",
+    "back": "Back",
+    "form": {
+      "maPhieu": "Voucher No.",
+      "ngayChi": "Date",
+      "moTa": "Expense Description",
+      "loaiChiPhi": "Expense Type",
+      "donViYeuCau": "Requesting Unit",
+      "soTien": "Amount (VND)",
+      "ghiChu": "Notes",
+      "selectCategory": "Select expense type",
+      "selectDept": "Select requesting unit"
+    },
+    "cancel": "Cancel",
+    "createBtn": "Create Expenditure"
+  },
+  "dashboard": {
+    "statTuition": "Tuition Collected This Semester",
+    "statSalary": "Salary Payment Jun 2026",
+    "statSalarySub": "100% disbursed ✓",
+    "statBudget": "Remaining Budget"
+  },
+  "alert": {
+    "title": "234 students have not paid tuition for semester 2/2026",
+    "debt": "— total debt: ~2.8 billion VND",
+    "remind": "Send Bulk Reminder"
+  },
+  "detail": {
+    "expenditure": {
+      "title": "Expenditure Detail",
+      "info": "Expenditure Information",
+      "payment": "Payment Information",
+      "approval": "Approval Information",
+      "actions": "Actions",
+      "history": "History",
+      "infoCard": "Information",
+      "print": "Print Voucher",
+      "download": "Download Attachment",
+      "approve": "Approve Voucher",
+      "reject": "Reject",
+      "rejectTitle": "Reject this expenditure voucher?",
+      "rejectMsg": "This action will reject the voucher. The creator will be notified.",
+      "back": "Back",
+      "cancel": "Cancel",
+      "confirm": "Reject",
+      "fields": {
+        "soPhieu": "Voucher No.",
+        "danhMuc": "Category",
+        "donVi": "Unit",
+        "nguoiLap": "Created By",
+        "doiTuongNhan": "Recipient",
+        "ngayLap": "Created Date",
+        "ngayDuyet": "Approved Date",
+        "soTien": "Amount",
+        "phuongThuc": "Method",
+        "nguoiNhan": "Recipient",
+        "soTaiKhoan": "Bank Account",
+        "ghiChu": "Notes",
+        "nguoiDuyet": "Approver",
+        "chucVu": "Position",
+        "ngayDuyet": "Approved Date"
+      },
+      "urgency": {
+        "label": "Urgency:",
+        "urgent": "Urgent",
+        "normal": "Normal"
+      },
+      "createdAt": "Created:",
+      "approvedLabel": "Approved",
+      "approvedDate": "Date:"
+    },
+    "tuition": {
+      "title": "Tuition Detail",
+      "student": "Student Information",
+      "breakdown": "Tuition Breakdown",
+      "payment": "Payment Information",
+      "progress": "Payment Progress",
+      "actions": "Actions",
+      "history": "History",
+      "infoCard": "Information",
+      "print": "Print Receipt",
+      "download": "Download Attachment",
+      "sendRemind": "Send Reminder",
+      "remindTitle": "Send Tuition Reminder",
+      "remindMsg": "The system will send email and SMS to remind the student about outstanding tuition.",
+      "back": "Back",
+      "cancel": "Cancel",
+      "confirm": "Send Reminder",
+      "fields": {
+        "maPhieu": "Receipt No.",
+        "maSv": "Student ID",
+        "hoTen": "Full Name",
+        "lop": "Class",
+        "hocKy": "Semester",
+        "hanDong": "Due Date",
+        "ngayDong": "Paid Date",
+        "khoa": "Faculty",
+        "khoaHoc": "Cohort",
+        "ngayTao": "Created Date",
+        "tongNo": "Total Debt",
+        "daDong": "Paid",
+        "conNo": "Remaining",
+        "maBienNhan": "Receipt No.",
+        "ngayThanhToan": "Payment Date",
+        "phuongThuc": "Method",
+        "maThamChieu": "Reference No."
+      },
+      "dueDate": "Due:",
+      "semester": "Semester:"
+    }
+  },
+  "createTuition": {
+    "title": "Create Tuition Receipt",
+    "subtitle": "FIN-01 — Create tuition receipt for student",
+    "back": "Back",
+    "student": {
+      "title": "Student Information",
+      "label": "Student",
+      "search": "Search by name or student ID...",
+      "notFound": "No student found"
+    },
+    "breakdown": {
+      "title": "Fee Breakdown",
+      "add": "Add Item",
+      "itemLabel": "Item Name",
+      "total": "Total"
+    },
+    "payment": {
+      "title": "Payment Information",
+      "method": "Payment Method",
+      "paidDate": "Payment Date",
+      "note": "Notes",
+      "notePlaceholder": "Additional notes (optional)..."
+    },
+    "preview": {
+      "title": "Tuition Receipt",
+      "subtitle": "Preview before printing",
+      "receiptNo": "No.:",
+      "studentName": "Student Name:",
+      "studentCode": "Student ID:",
+      "class": "Class:",
+      "semester": "Semester:",
+      "paidDate": "Date:",
+      "total": "TOTAL:",
+      "receiptNote": "has paid tuition for",
+      "payer": "Payer",
+      "cashier": "Cashier",
+      "signature": "Sign & Print Name"
+    },
+    "actions": {
+      "save": "Save Receipt",
+      "saved": "Saved",
+      "print": "Save & Print"
+    }
+  },
+  "chart": {
+    "cashflow": "Cash Flow (Income-Expense) 6 Months",
+    "income": "Income",
+    "expense": "Expense",
+    "tuitionByMajor": "Tuition by Major"
+  },
+  "topExpense": {
+    "title": "Top Expenses This Month",
+    "period": "Jun 2026"
+  },
+  "empty": { "title": "No expenditure records found", "description": "Get started by creating your first expenditure record." }
+}

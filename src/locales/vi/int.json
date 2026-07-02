@@ -1,0 +1,63 @@
+{
+  "title": "Tích hợp",
+  "titleShort": "INT – Tích hợp",
+  "description": "INT-01 — Quản lý kết nối HEMIS, LMS, EXAM, PORTAL, LIB, hệ thống Bộ",
+  "export": "Xuất log",
+  "syncAll": "Sync all",
+  "addIntegration": "Thêm tích hợp",
+  "breadcrumb": { "list": "Tích hợp" },
+  "list": {
+    "title": "DS Tích hợp",
+    "add": "Thêm tích hợp",
+    "stt": "STT",
+    "maTichHop": "Mã tích hợp",
+    "tenHt": "Hệ thống",
+    "loai": "Loại",
+    "ngayKt": "Ngày kết nối",
+    "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác",
+    "sync": "Sync",
+    "eventsToday": "sự kiện hôm nay",
+    "uptime": "uptime",
+    "integrationList": "Danh sách tích hợp",
+    "direction": {
+      "push": "Đẩy dữ liệu",
+      "pull": "Kéo dữ liệu",
+      "bidirectional": "Hai chiều"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "warning": "Cảnh báo",
+      "inactive": "Không hoạt động"
+    }
+  },
+  "log": {
+    "title": "Nhật ký API",
+    "searchPlaceholder": "Tìm API...",
+    "stt": "STT",
+    "maApi": "Mã API",
+    "tenApi": "Tên API",
+    "phuongThuc": "Phương thức",
+    "ngayGoi": "Ngày gọi",
+    "trangThai": "Trạng thái",
+    "thoiGian": "Thời gian",
+    "thaoTac": "Thao tác",
+    "status": {
+      "success": "Thành công",
+      "failed": "Thất bại"
+    }
+  },
+  "dashboard": {
+    "totalIntegrations": "Tổng tích hợp",
+    "newIntegrations": "+{{count}} mới",
+    "active": "Đang hoạt động",
+    "uptimePercent": "{{percent}} uptime",
+    "warnings": "Cảnh báo",
+    "needCheck": "cần kiểm tra",
+    "eventsToday": "Sự kiện hôm nay",
+    "vsYesterday": "+{{percent}}% vs hôm qua",
+    "uptimeTrend": "Uptime tuần này",
+    "avgUptime": "Uptime trung bình tuần này"
+  },
+  "empty": { "title": "Không có tích hợp nào", "description": "Bắt đầu bằng việc thêm tích hợp đầu tiên." }
+}

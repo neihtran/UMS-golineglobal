@@ -1,0 +1,41 @@
+{
+  "title": "Thư viện", "titleShort": "LIB – Thư viện",
+  "description": "LIB-01 — Quản lý tài liệu, mượn trả, đọc sách điện tử, tra cứu",
+  "export": "Xuất báo cáo",
+  "addDocument": "Thêm tài liệu",
+  "breadcrumb": { "list": "Thư viện" },
+  "document": {
+    "title": "Tài liệu", "add": "Thêm tài liệu",
+    "stt": "STT", "maTl": "Mã TL", "tenTl": "Tên tài liệu",
+    "loai": "Loại", "tacGia": "Tác giả", "nhaXb": "Nhà xuất bản",
+    "namXb": "Năm XB", "soLuong": "Số lượng", "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "type": { "sach": "Sách", "tapChi": "Tạp chí", "luanVan": "Luận văn", "baoCao": "Báo cáo" }
+  },
+  "loan": {
+    "title": "Mượn trả", "add": "Tạo phiếu mượn",
+    "stt": "STT", "maPhieu": "Mã phiếu", "maSv": "Mã SV / Mã VC",
+    "hoTen": "Họ tên", "tenTl": "Tài liệu", "ngayMuon": "Ngày mượn",
+    "hanTra": "Hạn trả", "ngayTra": "Ngày trả", "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "status": { "borrowed": "Đang mượn", "returned": "Đã trả", "overdue": "Quá hạn" }
+  },
+  "search": { "title": "Tìm kiếm", "placeholder": "Tìm tên sách, tác giả, ISBN..." },
+  "dashboard": {
+    "totalDocuments": "Tổng tài liệu",
+    "borrowed": "Đang mượn",
+    "returnRate": "Tỷ lệ trả",
+    "digitalDocuments": "Tài liệu số",
+    "percentOfTotal": "% kho",
+    "overdue": "Overdue",
+    "needReminder": "cần nhắc nợ",
+    "topBooks": "Sách được mượn nhiều nhất",
+    "borrowReturn": "Mượn - Trả theo tháng",
+    "borrows": "Mượn",
+    "returns": "Trả",
+    "overdueBooks": "Sách quá hạn",
+    "borrower": "Người mượn",
+    "book": "Tài liệu",
+    "dueDate": "Hạn trả",
+    "days": "ngày"
+  },
+  "empty": { "title": "Không có tài liệu nào", "description": "Bắt đầu bằng việc thêm tài liệu đầu tiên." }
+}

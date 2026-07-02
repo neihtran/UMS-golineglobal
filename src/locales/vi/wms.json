@@ -1,0 +1,75 @@
+{
+  "title": "Quản lý Công việc",
+  "titleShort": "WMS – Giao việc",
+  "breadcrumb": { "list": "Giao việc" },
+  "description": "Giao việc, theo dõi tiến độ, nhắc deadline, báo cáo hiệu suất",
+  "export": "Xuất báo cáo",
+  "kanban": { "title": "Kanban Công việc", "subtitle": "Trực quan hóa workflow dạng Kanban với 4 cột trạng thái", "filter": "Bộ lọc", "addTask": "Thêm công việc", "dropHere": "Thả vào đây", "noTask": "Không có công việc", "addNew": "Thêm công việc" },
+  "task": {
+    "title": "Danh sách công việc",
+    "subtitle": "WMS-01 — Theo dõi và quản lý công việc toàn hệ thống",
+    "add": "Tạo công việc mới",
+    "export": "Xuất báo cáo",
+    "search": "Tìm công việc...",
+    "stt": "STT", "tenCv": "Công việc", "duAn": "Dự án",
+    "nguoiGiao": "Người giao", "nguoiNhan": "Người thực hiện",
+    "donVi": "Đơn vị", "hanChot": "Hạn", "doUuTien": "Mức ưu tiên",
+    "tienDo": "Tiến độ", "trangThai": "Trạng thái", "thaoTac": "Thao tác",
+    "viewDetail": "Chi tiết",
+    "priority": { "low": "Thấp", "medium": "Trung bình", "high": "Cao", "urgent": "Khẩn cấp" },
+    "status": { "todo": "Việc mới", "in_progress": "Đang thực hiện", "review": "Chờ duyệt", "pending_approval": "Chờ duyệt", "done": "Hoàn thành" },
+    "filterAll": "Tất cả",
+    "filterMine": "Của tôi",
+    "overdue": "Quá hạn",
+    "noResult": "Không có công việc nào phù hợp với bộ lọc"
+  },
+  "createTask": {
+    "title": "Tạo công việc mới",
+    "subtitle": "WMS-02 — Phân công và theo dõi công việc",
+    "basicInfo": "Thông tin cơ bản",
+    "assignment": "Phân công",
+    "subtasks": "Công việc con (tuỳ chọn)",
+    "subtasksDesc": "Thêm các công việc nhỏ để theo dõi chi tiết tiến độ",
+    "form": {
+      "title": "Tiêu đề công việc",
+      "description": "Mô tả chi tiết",
+      "descriptionPlaceholder": "Mô tả nội dung công việc, mục tiêu và yêu cầu...",
+      "module": "Phân hệ",
+      "selectModule": "Chọn phân hệ...",
+      "priority": "Mức độ ưu tiên",
+      "status": "Trạng thái",
+      "progress": "Tiến độ (%)",
+      "assignee": "Người phụ trách",
+      "assigneePlaceholder": "Họ và tên...",
+      "dept": "Đơn vị",
+      "deptPlaceholder": "Khoa / Phòng...",
+      "dueDate": "Hạn chót",
+      "subtaskPlaceholder": "Nhập công việc con..."
+    },
+    "cancel": "Hủy",
+    "createBtn": "Tạo công việc",
+    "addSubtask": "Thêm"
+  },
+  "dashboard": {
+    "statTotal": "Tổng công việc",
+    "statInProgress": "Đang thực hiện",
+    "statInProgressSub": "7 quá hạn",
+    "statPending": "Chờ duyệt",
+    "statPendingSub": "cần xử lý",
+    "statCompleted": "Hoàn thành tháng",
+    "taskList": "Danh sách công việc",
+    "distribution": "Phân bổ công việc",
+    "distributionItems": {
+      "done": "Hoàn thành",
+      "inProgress": "Đang thực hiện",
+      "pending": "Chờ xử lý",
+      "overdue": "Quá hạn"
+    }
+  },
+  "menu": {
+    "view": "Xem chi tiết",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa"
+  },
+  "empty": { "title": "Không có công việc nào", "description": "Bắt đầu bằng việc tạo công việc đầu tiên." }
+}

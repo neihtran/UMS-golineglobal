@@ -1,0 +1,221 @@
+{
+  "title": "Quality Assurance",
+  "titleShort": "QA – Quality Assurance",
+  "breadcrumb": { "list": "Quality Assurance" },
+  "description": "AUN-QA 8 standards, evidence management, self-assessment",
+  "export": "Export Report",
+  "upload": "Upload Evidence",
+  "table": {
+    "code": "Code",
+    "date": "Date",
+    "status": "Status",
+    "detail": "Detail",
+    "actions": "Actions",
+    "view": "View"
+  },
+  "filter": {
+    "all": "All",
+    "allStatus": "All Status",
+    "filter": "Filter"
+  },
+  "priority": {
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "accreditation": {
+    "title": "Accreditation",
+    "add": "Create Session",
+    "stt": "No.", "maKiemDinh": "Accred. ID", "tenCs": "Institution",
+    "tieuChuan": "Standard", "ngayBd": "Start Date", "ngayKt": "End Date",
+    "trangThai": "Status", "thaoTac": "Actions",
+    "status": {
+      "not_started": "Not Started",
+      "in_progress": "In Progress",
+      "self_assessed": "Self-Assessed",
+      "external_assessed": "External Assessed",
+      "submitted": "Submitted"
+    }
+  },
+  "complaint": {
+    "title": "Complaint Management",
+    "description": "Receive, process and track student complaints",
+    "breadcrumb": "Complaints",
+    "add": "Create Complaint",
+    "create": "Create Complaint",
+    "export": "Export Report",
+    "stt": "No.", "maKn": "Complaint ID", "nguoiKn": "Complainant",
+    "noiDung": "Content", "loai": "Type", "ngayNhan": "Received Date",
+    "linhVuc": "Field", "mucDo": "Priority", "nguoiXuLy": "Handler",
+    "phanHoi": "Response", "trangThai": "Status", "thaoTac": "Actions",
+    "detail": "Detail",
+    "table": {
+      "complainant": "Complainant",
+      "category": "Category",
+      "content": "Content",
+      "priority": "Priority",
+      "handler": "Handler"
+    },
+    "cat": {
+      "teaching": "Teaching",
+      "tuition": "Tuition",
+      "facility": "Facilities",
+      "admission": "Admission",
+      "dormitory": "Dormitory",
+      "other": "Other"
+    },
+    "empty": "No complaints found",
+    "status": {
+      "received": "Received",
+      "investigating": "Investigating",
+      "resolved": "Resolved",
+      "rejected": "Rejected",
+      "pending": "Pending",
+      "processing": "Processing"
+    },
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "advancedFilter": "Advanced Filter",
+    "display": "Display",
+    "complaints": "complaints",
+    "receive": "Receive",
+    "searchPlaceholder": "Search by content, student name..."
+  },
+  "report": {
+    "title": "Quality Reports",
+    "description": "QA-01 — Manage AUN-QA, ISO reports, evidence by standard",
+    "breadcrumb": "Quality Reports",
+    "add": "Create Report",
+    "create": "Create New Report",
+    "export": "Export Report",
+    "search": "Search by name, report ID...",
+    "searchPlaceholder": "Search by name, report ID...",
+    "stt": "No.", "maBc": "Report ID", "tenBc": "Report Name",
+    "chuongTrinh": "Program / Unit", "tieuChuan": "Standard",
+    "nguoiPhuTrach": "Assigned To", "tienDo": "Progress",
+    "minhChung": "Evidence", "capNhatCuoi": "Last Update",
+    "trangThai": "Status", "thaoTac": "Actions",
+    "evidence": "Evidence",
+    "view": "View",
+    "table": {
+      "code": "Report ID",
+      "name": "Report Name",
+      "programUnit": "Program / Unit",
+      "standard": "Standard",
+      "assignedTo": "Assigned To",
+      "progress": "Progress",
+      "evidence": "Evidence",
+      "lastUpdate": "Last Update"
+    },
+    "empty": "No reports found",
+    "status": {
+      "submitted": "Submitted",
+      "in_progress": "In Progress",
+      "not_started": "Not Started",
+      "external_assessed": "External Assessed"
+    },
+    "statTotal": "Total Reports",
+    "statInProgress": "In Progress",
+    "statSubmitted": "Submitted",
+    "statEvidence": "Total Evidence"
+  },
+  "asset": {
+    "title": "Asset Management",
+    "description": "QA-02 — Track assets, depreciation, maintenance and disposal",
+    "breadcrumb": "Asset Management",
+    "add": "Add Asset",
+    "create": "Add Asset",
+    "search": "Search by code, asset name...",
+    "searchPlaceholder": "Search by code, asset name...",
+    "filter": "Filter",
+    "stt": "No.", "maTs": "Asset ID", "tenTs": "Asset Name",
+    "loai": "Type", "donViSd": "Unit", "soLuong": "Quantity",
+    "giaTri": "Value", "khauHao": "Depreciation", "viTri": "Location",
+    "trangThai": "Status", "thaoTac": "Actions", "detail": "Detail",
+    "table": {
+      "code": "Asset ID",
+      "name": "Asset Name",
+      "category": "Category",
+      "dept": "Department",
+      "quantity": "Quantity",
+      "value": "Value",
+      "depreciation": "Depreciation",
+      "location": "Location"
+    },
+    "empty": "No assets found",
+    "status": {
+      "active": "In Use",
+      "maintenance": "Under Maintenance",
+      "broken": "Broken",
+      "disposed": "Disposed"
+    },
+    "statTotal": "Total Assets",
+    "statActive": "In Use",
+    "statMaintenance": "Under Maintenance",
+    "statValue": "Total Value"
+  },
+  "facility": {
+    "title": "Facilities",
+    "add": "Add Facility",
+    "stt": "No.", "maCsvc": "Facility ID", "tenCsvc": "Facility Name",
+    "loai": "Type", "viTri": "Location", "soLuong": "Quantity",
+    "tinhTrang": "Condition", "trangThai": "Status", "thaoTac": "Actions"
+  },
+  "evidence": {
+    "title": "Evidence Management",
+    "upload": "Upload Evidence",
+    "stt": "No.", "tenMc": "Evidence Name", "tieuChuan": "Standard",
+    "loai": "Type", "dungLuong": "Size", "nguoiTai": "Uploaded By",
+    "ngayTai": "Uploaded Date", "trangThai": "Status", "thaoTac": "Actions",
+    "view": "View",
+    "status": {
+      "approved": "Approved",
+      "review": "Under Review",
+      "uploaded": "Uploaded",
+      "draft": "Draft"
+    }
+  },
+  "dashboard": {
+    "statAUN": "AUN Standards",
+    "statSelfAssess": "Self-Assessed",
+    "statEvidence": "Evidence",
+    "statEvidenceWeek": "+12 this week",
+    "statDaysLeft": "Days Until Visit",
+    "statDaysRemaining": "{{days}} days remaining",
+    "overview": "Standards Overview",
+    "evidenceMgmt": "Evidence Management",
+    "timeline": "Accreditation Timeline",
+    "complaints": "Complaints & Feedback",
+    "reviewActivities": "Review Activities",
+    "scoreChart": "Self-Assessment Scores by AUN Standard",
+    "scale": "Scale 1–5",
+    "selfAssess": "Self-Assessment",
+    "externalAssess": "External Assessment",
+    "weight": "Weight",
+    "evidenceCount": "evidence",
+    "selfScore": "Self Score",
+    "extScore": "External Score",
+    "timelineTitle": "AUN-QA 2026 Accreditation Timeline",
+    "done": "Completed",
+    "inProgress": "In Progress",
+    "upcoming": "Upcoming",
+    "display": "Display",
+    "activities": "review activities",
+    "viewStandards": "View Standards"
+  },
+  "review": {
+    "title": "Review Activities",
+    "stt": "No.", "maKd": "Review ID", "tenKd": "Review Name",
+    "loai": "Type", "tieuChuan": "Standard", "hanChot": "Deadline",
+    "trangThai": "Status", "thaoTac": "Actions",
+    "status": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "pending": "Pending"
+    }
+  },
+  "empty": { "title": "No data found", "description": "Get started by creating your first record." }
+}

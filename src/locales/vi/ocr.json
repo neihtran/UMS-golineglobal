@@ -1,0 +1,50 @@
+{
+  "title": "Số hóa Tài liệu",
+  "titleShort": "OCR – Số hóa Tài liệu",
+  "description": "OCR-01 — OCR tài liệu, nhận dạng chữ viết, chuyển đổi văn bản giấy sang số",
+  "export": "Xuất dữ liệu",
+  "upload": "Tải lên tài liệu",
+  "breadcrumb": { "list": "Số hóa Tài liệu" },
+  "scanList": {
+    "title": "Danh sách scan",
+    "add": "Tạo scan",
+    "stt": "STT",
+    "maScan": "Mã scan",
+    "tenTaiLieu": "Tên tài liệu",
+    "loai": "Loại",
+    "ngayScan": "Ngày scan",
+    "nguoiScan": "Người scan",
+    "trangThai": "Trạng thái",
+    "thaoTac": "Thao tác",
+    "documentsScanned": "Tài liệu đã số hóa",
+    "all": "Tất cả",
+    "needsReview": "Cần rà soát",
+    "view": "Xem",
+    "status": {
+      "pending": "Chờ xử lý",
+      "processing": "Đang xử lý",
+      "completed": "Hoàn thành",
+      "failed": "Thất bại"
+    }
+  },
+  "dashboard": {
+    "totalScanned": "Tài liệu đã số hóa",
+    "newScanned": "+{{count}}",
+    "success": "Thành công",
+    "accuracy": "{{percent}} accuracy",
+    "needsReview": "Cần rà soát",
+    "needsHumanReview": "{{percent}} cần human review",
+    "ocrErrors": "Lỗi OCR",
+    "allDocuments": "Tất cả tài liệu"
+  },
+  "table": {
+    "document": "Tài liệu",
+    "type": "Loại",
+    "pages": "Trang",
+    "processedDate": "Ngày xử lý",
+    "accuracy": "Độ chính xác",
+    "size": "Kích thước",
+    "status": "Tình trạng"
+  },
+  "empty": { "title": "Không có tài liệu nào", "description": "Bắt đầu bằng việc số hóa tài liệu đầu tiên." }
+}
