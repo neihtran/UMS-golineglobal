@@ -1,15 +1,40 @@
-node_modules
-dist
-.cursor
-*.pyc
-__pycache__/
-*.log
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-ssr/
+
+# Environment variables
 .env
 .env.local
-.vscode
+.env.*.local
+
+# Cursor IDE files
+.cursor/
+
+# Logs & scripts
+*.log
+extract_todos_output.txt
+extract_todos.py
+
+# Prompt / documentation (not part of the app)
+UMS_MOCKUP_PROMPT.md
+
+# Vercel
+.vercel
+
+# Turborepo cache
+.turbo/
+
+# OS
 .DS_Store
 Thumbs.db
-extract_todos.py
-extract_todos_output.txt
-UMS_MOCKUP_PROMPT.md
-index.html
+
+# Editor
+.vscode/settings.json
+*.swp
+*.swo
+
+# Testing
+coverage/
