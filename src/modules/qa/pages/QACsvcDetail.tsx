@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { Download, Edit2, Wrench } from 'lucide-react';
 import { Card, CardContent, Button, Badge } from '@/components/ui';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 interface QACsvcDetailProps {
   id?: string;

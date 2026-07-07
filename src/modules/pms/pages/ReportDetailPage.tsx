@@ -84,7 +84,7 @@ export default function ReportDetailPage({ id }: ReportDetailPageProps) {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
           { label: 'Đảng viên', value: `${r.stats.totalMembers}`, icon: <Users className="h-5 w-5" />, color: 'primary' },
-          { label: 'Chi bộ', value: `${r.stats.branches}`, icon: <BarChart3 className="h-5 w-5"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />, color: 'accent' },
+          { label: 'Chi bộ', value: `${r.stats.branches}`, icon: <BarChart3 className="h-5 w-5" />, color: 'accent' },
           { label: 'Hoạt động', value: `${r.stats.meetings + r.stats.studies + r.stats.campaigns}`, icon: <Calendar className="h-5 w-5" />, color: 'info' },
           { label: 'Điểm KPI', value: `${r.stats.kpiScore}`, icon: <Award className="h-5 w-5" />, color: 'success' },
         ].map((s) => (
@@ -107,7 +107,7 @@ export default function ReportDetailPage({ id }: ReportDetailPageProps) {
           <Card>
             <div className="px-5 pt-5 pb-4 border-b border-[rgb(var(--border)/0.6)]">
               <div className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-[rgb(var(--primary))]"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />
+                <BarChart3 className="h-4 w-4 text-[rgb(var(--primary))]" />
                 <h3 className="font-semibold text-[rgb(var(--text-primary))]">Hoạt động theo chi bộ</h3>
               </div>
             </div>
