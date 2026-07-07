@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Search,
   Plus,
   Briefcase,
   MapPin,
@@ -82,6 +81,11 @@ const gradeLabel = (g: number) => {
   return 'F';
 };
 
+const formatDate = (iso: string) => {
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+};
+
 export default function InternshipList() {
   const { t } = useTranslation('sis');
   const navigate = useNavigate();
@@ -135,7 +139,6 @@ export default function InternshipList() {
         ]}
         actions={
           <>
-            <Button variant="outline" leftIcon={<Search className="h-4 w-4" />}>{t('internship.filter')}</Button>
             <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => navigate('/sis/thuc-tap/tao')}>{t('internship.add')}</Button>
           </>
         }
@@ -228,8 +231,8 @@ export default function InternshipList() {
                 </TableCell>
                 <TableCell>
                   <div className="text-xs text-[rgb(var(--text-secondary))]">
-                    <p>{i.startDate}</p>
-                    <p>→ {i.endDate}</p>
+                    <p>{formatDate(i.startDate)}</p>
+                    <p>→ {formatDate(i.endDate)}</p>
                   </div>
                 </TableCell>
                 <TableCell>

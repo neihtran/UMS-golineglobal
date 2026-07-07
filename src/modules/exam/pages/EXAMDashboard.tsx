@@ -10,7 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 
 // ─── Mock ────────────────────────────────────────────────────────────────────
 
@@ -174,7 +174,7 @@ export default function EXAMDashboard() {
                 <Tooltip formatter={(v: number) => `${v} ${t('dashboard.tooltip.student')}`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={40}>
                   {GRADE_DIST.map((entry, i) => (
-                    <Bar key={i} dataKey="count" fill={entry.color} />
+                    <Bar key={i} dataKey="count" fill={entry.color}  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -191,10 +191,12 @@ export default function EXAMDashboard() {
         <CardContent className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={SCORE_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <XAxis dataKey="exam" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <YAxis domain={[5, 9]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <Tooltip formatter={(v: number) => `${t('examMonitor.progress.submitted')}: ${v.toFixed(1)}`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-              <Line type="monotone" dataKey="avg" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 5, fill: 'rgb(var(--primary))' }} />
+              <Line type="monotone" dataKey="avg" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 5, fill: 'rgb(var(--primary))' }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

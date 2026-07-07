@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, Edit2, Wrench } from 'lucide-react';
 import { Card, CardContent, Button, Badge } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from 'recharts';
 
 const FACILITY = {
   id: 'f001',
@@ -133,8 +133,9 @@ export default function QACsvcDetail() {
               </div>
               <CardContent className="h-48 flex items-center">
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={OCCUPANCY_DATA} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
+                  <PieChart animationDuration={1500} animationEasing="ease-out">
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                    <Pie data={OCCUPANCY_DATA} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value" animationDuration={1500} animationEasing="ease-out">
                       {OCCUPANCY_DATA.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}

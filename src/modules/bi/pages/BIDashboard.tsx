@@ -9,12 +9,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, Legend } from 'recharts';
 
 const BI_STATS = [
   { label: 'Báo cáo đã tạo', value: '156', change: '+24', icon: <FileText className="h-5 w-5" />, color: 'primary' },
   { label: 'Nguồn dữ liệu', value: '38', sub: '14 kết nối live', icon: <Database className="h-5 w-5" />, color: 'info' },
-  { label: 'Dashboard', value: '12', change: '+2', icon: <BarChart3 className="h-5 w-5" />, color: 'accent' },
+  { label: 'Dashboard', value: '12', change: '+2', icon: <BarChart3 className="h-5 w-5"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />, color: 'accent' },
   { label: 'Người dùng BI', value: '84', sub: 'GV: 42, CBQL: 42', icon: <TrendingUp className="h-5 w-5" />, color: 'success' },
 ];
 
@@ -86,12 +86,14 @@ export default function BIDashboard() {
         <CardContent className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={ENROLLMENT_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <Tooltip formatter={(v: number) => [`${v.toLocaleString()} SV`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-              <Line type="monotone" dataKey="total" stroke="rgb(var(--primary))" strokeWidth={2.5} name={t('dashboard.total')} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="admitted" stroke="rgb(var(--info))" strokeWidth={2} name={t('dashboard.admitted')} dot={{ r: 3 }} />
-              <Line type="monotone" dataKey="graduated" stroke="rgb(var(--success))" strokeWidth={2} name={t('dashboard.graduated')} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="total" stroke="rgb(var(--primary))" strokeWidth={2.5} name={t('dashboard.total')} dot={{ r: 4 }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="admitted" stroke="rgb(var(--info))" strokeWidth={2} name={t('dashboard.admitted')} dot={{ r: 3 }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="graduated" stroke="rgb(var(--success))" strokeWidth={2} name={t('dashboard.graduated')} dot={{ r: 3 }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -109,7 +111,7 @@ export default function BIDashboard() {
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <Tooltip formatter={(v: number) => [`${v} tỷ đồng`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="revenue" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.revenue')} />
+                <Bar dataKey="revenue" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.revenue')}  animationDuration={1500} animationEasing="ease-out" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

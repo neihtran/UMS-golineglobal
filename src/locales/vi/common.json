@@ -12,18 +12,13 @@
     "confirmPassword": "Mật khẩu xác nhận không khớp"
   },
   "roles": {
-    "SUPER_ADMIN": "Quản trị viên hệ thống",
     "ADMIN": "Quản trị viên",
     "HIEU_TRUONG": "Hiệu trưởng",
     "PHO_HIEU_TRUONG": "Phó Hiệu trưởng",
     "TRUONG_KHOA": "Trưởng khoa",
-    "PHO_TRUONG_KHOA": "Phó trưởng khoa",
     "GIAO_VIEN": "Giảng viên",
-    "CAN_BO_PHAN_CONG": "Cán bộ phân công",
-    "CHUYEN_VIEN": "Chuyên viên",
     "NHAN_VIEN": "Nhân viên",
-    "SINH_VIEN": "Sinh viên",
-    "KHAI_THA": "Khai thác"
+    "SINH_VIEN": "Sinh viên"
   },
   "notification": {
     "title": "Thông báo",

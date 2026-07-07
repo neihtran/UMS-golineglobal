@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Search, TrendingUp, TrendingDown, Minus, BarChart3, Activity } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid, Legend } from 'recharts';
 
 const KPI_GROUPS = [
   { group: 'Đào tạo', items: [
@@ -55,7 +55,7 @@ export default function KPIsPage() {
       {/* Summary cards */}
       <div className="grid grid-cols-3 gap-4 lg:grid-cols-6">
         {[
-          { label: 'Tổng KPIs', value: '10', icon: <BarChart3 className="h-4 w-4" />, color: 'primary' },
+          { label: 'Tổng KPIs', value: '10', icon: <BarChart3 className="h-4 w-4"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />, color: 'primary' },
           { label: 'Đạt', value: '5', icon: <TrendingUp className="h-4 w-4" />, color: 'success' },
           { label: 'Gần đạt', value: '3', icon: <Activity className="h-4 w-4" />, color: 'warning' },
           { label: 'Chưa đạt', value: '2', icon: <TrendingDown className="h-4 w-4" />, color: 'error' },
@@ -122,8 +122,9 @@ export default function KPIsPage() {
           </div>
           <CardContent className="flex flex-col items-center">
             <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie data={PIE_DATA} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={3}>
+              <PieChart animationDuration={1500} animationEasing="ease-out">
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                <Pie data={PIE_DATA} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={3} animationDuration={1500} animationEasing="ease-out">
                   {PIE_DATA.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                 </Pie>
                 <Tooltip formatter={(v: number) => [`${v} KPIs`, '']} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />

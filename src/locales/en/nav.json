@@ -7,16 +7,8 @@
   "brandShort": "UoE UD",
   "group": {
     "systemAdmin": "System Administration",
-    "personnel": "Human Resources",
-    "training": "Education",
-    "digitalLearning": "Digital Learning",
-    "exam": "Online Examination",
-    "portal": "Information Portal",
-    "operations": "Operations",
-    "research": "Research & Intl. Cooperation",
-    "system": "System",
-    "partyAffairs": "Party Affairs",
-    "library": "Library"
+    "trainingManagement": "Training Management",
+    "adminManagement": "Administrative Management"
   },
   "module": {
     "iam": "IAM – Security & Accounts",

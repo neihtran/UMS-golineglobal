@@ -12,7 +12,7 @@ import {
   Badge,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, CartesianGrid, Legend } from 'recharts';
 
 const DEPT_BARS = [
   { name: 'CNTT', count: 1240 }, { name: 'Kinh tế', count: 980 },
@@ -92,8 +92,8 @@ export default function SISDashboard() {
               <BarChart data={DEPT_BARS} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <XAxis type="number" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} width={80} />
-                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="count" fill="rgb(var(--primary))" radius={[0, 4, 4, 0]} maxBarSize={20} />
+                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                <Bar dataKey="count" fill="rgb(var(--primary))" radius={[0, 4, 4, 0]} maxBarSize={20}  animationDuration={1500} animationEasing="ease-out" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -107,10 +107,12 @@ export default function SISDashboard() {
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={ADMISSION_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Line type="monotone" dataKey="count" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 4, fill: 'rgb(var(--primary))' }} />
+                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                <Line type="monotone" dataKey="count" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 4, fill: 'rgb(var(--primary))' }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
@@ -124,8 +126,8 @@ export default function SISDashboard() {
           </div>
           <CardContent className="h-64 flex items-center gap-8">
             <ResponsiveContainer width="60%" height="100%">
-              <PieChart>
-                <Pie data={GRADE_DIST} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value">
+              <PieChart animationDuration={1500} animationEasing="ease-out">
+                <Pie data={GRADE_DIST} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value" animationDuration={1500} animationEasing="ease-out">
                   {GRADE_DIST.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
                 </Pie>
                 <Tooltip formatter={(v: number) => `${v}%`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />

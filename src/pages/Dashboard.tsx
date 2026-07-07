@@ -5,10 +5,12 @@ import { ROLES } from '@/constants/modules';
 
 /**
  * Dashboard chuyển hướng — mỗi role sẽ được điều hướng đến trang dashboard riêng.
- * SUPER_ADMIN / ADMIN         → /dashboard/admin
+ * ADMIN              → /dashboard/admin
  * HIEU_TRUONG / PHO_HIEU_TRUONG → /dashboard/bgh
- * TRUONG_KHOA               → /dashboard/truong-khoa
- * Các role còn lại (GIAO_VIEN, NHAN_VIEN, SINH_VIEN, …) → /dashboard/gv
+ * TRUONG_KHOA        → /dashboard/truong-khoa
+ * GIAO_VIEN          → /dashboard/giao-vien
+ * NHAN_VIEN          → /dashboard/nhan-vien
+ * SINH_VIEN          → /dashboard/sinh-vien
  */
 export default function Dashboard() {
   const { user } = useAuth();
@@ -17,15 +19,18 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
 
-    if (user.role === ROLES.SUPER_ADMIN || user.role === ROLES.ADMIN) {
+    if (user.role === ROLES.ADMIN) {
       navigate('/dashboard/admin', { replace: true });
     } else if (user.role === ROLES.HIEU_TRUONG || user.role === ROLES.PHO_HIEU_TRUONG) {
       navigate('/dashboard/bgh', { replace: true });
     } else if (user.role === ROLES.TRUONG_KHOA) {
       navigate('/dashboard/truong-khoa', { replace: true });
-    } else {
-      // Giảng viên, nhân viên, sinh viên → dùng dashboard giảng viên
-      navigate('/dashboard/gv', { replace: true });
+    } else if (user.role === ROLES.GIAO_VIEN) {
+      navigate('/dashboard/giao-vien', { replace: true });
+    } else if (user.role === ROLES.NHAN_VIEN) {
+      navigate('/dashboard/nhan-vien', { replace: true });
+    } else if (user.role === ROLES.SINH_VIEN) {
+      navigate('/dashboard/sinh-vien', { replace: true });
     }
   }, [user, navigate]);
 

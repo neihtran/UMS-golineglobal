@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from 'recharts';
 
 const TASKS = [
   { id: 't1', title: 'Soạn thảo báo cáo công tác tuyển sinh 2026', assignee: 'Nguyễn Văn Long', dept: 'Phòng Tuyển sinh', priority: 'high', status: 'in-progress', due: '2026-06-28', progress: 65, module: 'SIS' },
@@ -143,7 +143,8 @@ export default function WMSDashboard() {
           </div>
           <CardContent className="h-52 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
+              <PieChart animationDuration={1500} animationEasing="ease-out">
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <Pie
                   data={DISTRIBUTION}
                   cx="50%"
@@ -152,7 +153,7 @@ export default function WMSDashboard() {
                   outerRadius={70}
                   paddingAngle={4}
                   dataKey="value"
-                >
+                 animationDuration={1500} animationEasing="ease-out">
                   {DISTRIBUTION.map((entry, i) => (
                     <Cell key={i} fill={entry.color} />
                   ))}

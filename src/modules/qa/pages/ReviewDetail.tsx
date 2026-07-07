@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Download, Plus, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, Button, Badge } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const REVIEWS = [
   { id: 'r1', code: 'KD2026001', name: 'Kiểm định chương trình CNTT', type: 'Kiểm định CTĐT', standard: 'AUN-QA', status: 'in-progress', deadline: '2026-09-30', progress: 65, description: 'Kiểm định chương trình đào tạo CNTT theo tiêu chuẩn AUN-QA gồm 11 tiêu chuẩn.' },
@@ -91,10 +91,12 @@ export default function ReviewDetail() {
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={PROGRESS_DATA} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <XAxis dataKey="tieu_chuan" tick={{ fontSize: 10, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <Tooltip formatter={(v: number) => [`${v}%`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                  <Bar dataKey="score" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name="Hoàn thành %" />
+                  <Bar dataKey="score" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name="Hoàn thành %"  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const TEACHING_STATS = [
   { label: 'Môn đang dạy', value: '8', sub: 'HK 2/2025-2026', icon: <BookOpen className="h-5 w-5" />, color: 'primary' },
@@ -175,7 +175,8 @@ export default function LecturerDashboard() {
             </div>
             <CardContent className="h-44">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+                <PieChart animationDuration={1500} animationEasing="ease-out">
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <Pie
                     data={SCORE_DIST}
                     cx="50%"
@@ -184,7 +185,7 @@ export default function LecturerDashboard() {
                     outerRadius={65}
                     paddingAngle={3}
                     dataKey="value"
-                  >
+                   animationDuration={1500} animationEasing="ease-out">
                     {SCORE_DIST.map((entry, index) => (
                       <Cell key={index} fill={entry.color} />
                     ))}

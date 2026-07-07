@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const ROOMS = [
   { id: 'A101', block: 'Khu A', floor: 1, capacity: 6, occupied: 6, gender: 'Nam', status: 'full', issues: 0 },
@@ -193,14 +193,16 @@ export default function KTXDashboard() {
         <CardContent className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={OCCUPANCY} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} domain={[0, 120]} />
               <Tooltip
                 contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }}
                 formatter={(v: number, name: string) => [`${v} ${t('dashboard.occupancy')}`, name === 'used' ? t('dashboard.used') : t('dashboard.total')]}
               />
-              <Bar dataKey="total" fill="rgb(var(--border))" radius={[4, 4, 0, 0]} name={t('dashboard.total')} />
-              <Bar dataKey="used" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.used')} />
+              <Bar dataKey="total" fill="rgb(var(--border))" radius={[4, 4, 0, 0]} name={t('dashboard.total')}  animationDuration={1500} animationEasing="ease-out" />
+              <Bar dataKey="used" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.used')}  animationDuration={1500} animationEasing="ease-out" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

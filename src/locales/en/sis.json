@@ -484,7 +484,6 @@
     "breadcrumb": { "list": "Internship", "create": "Register Internship", "detail": "Details", "tn": "Internship" },
     "add": "Register Internship",
     "register": "Register Internship",
-    "filter": "Filter",
     "export": "Export Report",
     "stats": {
       "totalRegistrations": "Total Registrations",

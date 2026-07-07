@@ -6,7 +6,7 @@ import {
   TableBody, TableRow, TableHeadCell, TableCell,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const STATS = [
   { labelKey: 'department.stats.total', value: '456', change: '+8 tuần này', icon: <Users className="h-5 w-5" />, color: 'primary' },
@@ -118,10 +118,12 @@ export default function DepartmentList() {
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={DEPT_BARS} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="count" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                <Bar dataKey="count" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

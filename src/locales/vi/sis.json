@@ -484,7 +484,6 @@
     "breadcrumb": { "list": "Thực tập tốt nghiệp", "create": "Đăng ký thực tập", "detail": "Chi tiết", "tn": "Thực tập TN" },
     "add": "Đăng ký thực tập",
     "register": "Đăng ký thực tập",
-    "filter": "Bộ lọc",
     "export": "Xuất báo cáo",
     "stats": {
       "totalRegistrations": "Tổng đăng ký",

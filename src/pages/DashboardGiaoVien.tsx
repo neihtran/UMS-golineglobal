@@ -78,8 +78,8 @@ const UPCOMING_CLASSES = [
   { time: '13:30', subject: 'Mạng máy tính', lop: 'KHMT-K63', room: 'C303', today: false },
 ];
 
-// ─── DashboardGV ──────────────────────────────────────────────────────────
-export default function DashboardGV() {
+// ─── DashboardGiaoVien ──────────────────────────────────────────────────────────
+export default function DashboardGiaoVien() {
   const { user } = useAuth();
   const navigate = useNavigate();
   if (!user) return null;

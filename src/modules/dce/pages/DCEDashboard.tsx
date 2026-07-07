@@ -10,7 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, CartesianGrid, Legend } from 'recharts';
 
 const DCE_STATS = [
   { label: 'Chuẩn đầu ra', value: '248', change: '+18', icon: <Target className="h-5 w-5" />, color: 'primary' },
@@ -113,13 +113,15 @@ export default function DCEDashboard() {
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={PROGRAM_ASSESSMENT} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <XAxis dataKey="program" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} unit="%" />
                 <Tooltip formatter={(v: number) => [`${v}%`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="level4" stackId="a" fill="rgb(var(--success))" name={t('dashboard.level4')} />
-                <Bar dataKey="level3" stackId="a" fill="rgb(var(--primary))" name={t('dashboard.level3')} />
-                <Bar dataKey="level2" stackId="a" fill="rgb(var(--warning))" name={t('dashboard.level2')} />
-                <Bar dataKey="level1" stackId="a" fill="rgb(var(--border))" name={t('dashboard.level1')} radius={[0, 0, 0, 0]} />
+                <Bar dataKey="level4" stackId="a" fill="rgb(var(--success))" name={t('dashboard.level4')}  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="level3" stackId="a" fill="rgb(var(--primary))" name={t('dashboard.level3')}  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="level2" stackId="a" fill="rgb(var(--warning))" name={t('dashboard.level2')}  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="level1" stackId="a" fill="rgb(var(--border))" name={t('dashboard.level1')} radius={[0, 0, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -166,7 +168,7 @@ export default function DCEDashboard() {
                   </td>
                   <td className="px-4 py-2.5"><Badge variant={row.rank === 1 ? 'success' : 'neutral'} size="sm">#{row.rank}</Badge></td>
                   <td className="px-4 py-2.5">
-                    <Button variant="ghost" size="sm" leftIcon={<BarChart3 className="h-3.5 w-3.5" />}>{t('competency.thaoTac')}</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<BarChart3 className="h-3.5 w-3.5"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />}>{t('competency.thaoTac')}</Button>
                   </td>
                 </tr>
               ))}

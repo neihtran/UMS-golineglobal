@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, Button, Select } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid, Legend } from 'recharts';
 
 const YEARS = [2026, 2025, 2024];
 
@@ -109,11 +109,11 @@ export default function QAReportList() {
                 <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4">Khiếu nại theo lĩnh vực</h3>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={BY_CATEGORY} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                    <PieChart animationDuration={1500} animationEasing="ease-out">
+                      <Pie data={BY_CATEGORY} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label animationDuration={1500} animationEasing="ease-out">
                         {BY_CATEGORY.map((entry, idx) => <Cell key={idx} fill={entry.color} />)}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip  contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
@@ -153,11 +153,13 @@ export default function QAReportList() {
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={MONTHLY_TREND}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Bar dataKey="received" fill="rgb(var(--primary))" name="Tiếp nhận" radius={[3,3,0,0]} />
-                  <Bar dataKey="resolved" fill="rgb(var(--success))" name="Giải quyết" radius={[3,3,0,0]} />
+                  <Tooltip  contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                  <Bar dataKey="received" fill="rgb(var(--primary))" name="Tiếp nhận" radius={[3,3,0,0]}  animationDuration={1500} animationEasing="ease-out" />
+                  <Bar dataKey="resolved" fill="rgb(var(--success))" name="Giải quyết" radius={[3,3,0,0]}  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -172,11 +174,11 @@ export default function QAReportList() {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={SATISFACTION} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                  <PieChart animationDuration={1500} animationEasing="ease-out">
+                    <Pie data={SATISFACTION} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label animationDuration={1500} animationEasing="ease-out">
                       {SATISFACTION.map((entry, idx) => <Cell key={idx} fill={entry.color} />)}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip  contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>

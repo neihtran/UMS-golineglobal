@@ -10,11 +10,7 @@ import {
   ClipboardCheck, CalendarDays,
   BookUser,
 } from 'lucide-react';
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, CartesianGrid,
-  AreaChart, Area,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid, AreaChart, Area, Legend } from 'recharts';
 import { ROLE_LABELS } from '@/constants/modules';
 
 // ─── Shared chart styles ────────────────────────────────────────────────────
@@ -41,7 +37,7 @@ const TK_QUICK_ACTIONS = [
   { label: 'DS Sinh viên', route: '/sis/sinh-vien', icon: <GraduationCap className="h-5 w-5" />, color: 'primary', sub: 'Xem danh sách SV' },
   { label: 'Tạo đề thi', route: '/exam/tao-thi', icon: <ClipboardCheck className="h-5 w-5" />, color: 'accent', sub: 'Tạo & quản lý đề thi' },
   { label: 'Bài tập SV', route: '/lms/bai-tap-sinh-vien', icon: <BookOpen className="h-5 w-5" />, color: 'info', sub: 'Giao bài & chấm điểm' },
-  { label: 'CTĐT', route: '/sis/chuong-trinh-dao-tao', icon: <BarChart3 className="h-5 w-5" />, color: 'primary', sub: 'Chương trình đào tạo' },
+  { label: 'CTĐT', route: '/sis/chuong-trinh-dao-tao', icon: <BarChart3 className="h-5 w-5"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />, color: 'primary', sub: 'Chương trình đào tạo' },
   { label: 'Đề tài NCKH', route: '/rit/de-tai', icon: <FlaskConical className="h-5 w-5" />, color: 'accent', sub: 'Đề tài khoa' },
   { label: 'Thực tập TN', route: '/sis/thuc-tap', icon: <BookUser className="h-5 w-5" />, color: 'warning', sub: 'Quản lý thực tập' },
 ];
@@ -206,9 +202,9 @@ export default function DashboardTruongKhoa() {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--border))" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
-                  <Area type="monotone" dataKey="sv" name="SV đăng ký" stroke="rgb(var(--primary))" strokeWidth={2} fill="url(#gradTkSv)" dot={false} />
-                  <Area type="monotone" dataKey="gv" name="Môn học mới" stroke="rgb(var(--accent))" strokeWidth={2} fill="url(#gradTkGv)" dot={false} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                  <Area type="monotone" dataKey="sv" name="SV đăng ký" stroke="rgb(var(--primary))" strokeWidth={2} fill="url(#gradTkSv)" dot={false}  animationDuration={1500} animationEasing="ease-out" />
+                  <Area type="monotone" dataKey="gv" name="Môn học mới" stroke="rgb(var(--accent))" strokeWidth={2} fill="url(#gradTkGv)" dot={false}  animationDuration={1500} animationEasing="ease-out" />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -226,6 +222,7 @@ export default function DashboardTruongKhoa() {
             <CardContent className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={GPA_BY_CLASS} layout="vertical" margin={{ top: 0, right: 60, left: 60, bottom: 0 }}>
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--border))" horizontal={false} />
                   <XAxis type="number" domain={[2.5, 3.5]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} width={60} />
@@ -252,11 +249,12 @@ export default function DashboardTruongKhoa() {
             <CardContent className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={ATTENDANCE_TK} layout="vertical" margin={{ top: 0, right: 60, left: 60, bottom: 0 }}>
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--border))" horizontal={false} />
                   <XAxis type="number" domain={[90, 100]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} unit="%" />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} width={40} />
                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number) => [`${v}%`]} />
-                  <Bar dataKey="di" name="Đi học" fill="rgb(var(--success))" radius={[0, 4, 4, 0]} barSize={20} />
+                  <Bar dataKey="di" name="Đi học" fill="rgb(var(--success))" radius={[0, 4, 4, 0]} barSize={20}  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -363,8 +361,8 @@ export default function DashboardTruongKhoa() {
             <CardContent className="flex items-center gap-4">
               <div className="h-36 w-36 shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={GRADUATION_CHECK} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" paddingAngle={3}>
+                  <PieChart animationDuration={1500} animationEasing="ease-out">
+                    <Pie data={GRADUATION_CHECK} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" paddingAngle={3} animationDuration={1500} animationEasing="ease-out">
                       {GRADUATION_CHECK.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}

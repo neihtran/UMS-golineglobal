@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const AUN_STANDARDS = [
   { id: '1', code: 'AUN 1', name: 'Mục tiêu và chuẩn đầu ra', weight: 10, selfScore: 4.2, extScore: 4.0, status: 'submitted', evidence: 18 },
@@ -197,10 +197,12 @@ export default function QADashboard() {
             <CardContent className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={SCORE_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <XAxis dataKey="standard" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis domain={[0, 5]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <Tooltip formatter={(v: number) => [`${v?.toFixed(1) ?? '—'}/5`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                  <Bar dataKey="self" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.selfAssess')} />
+                  <Bar dataKey="self" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.selfAssess')}  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>

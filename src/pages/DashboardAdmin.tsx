@@ -9,11 +9,7 @@ import {
   Activity, Database, CreditCard,
   Eye, PieChart as PieChartIcon, BookMarked,
 } from 'lucide-react';
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, CartesianGrid,
-  AreaChart, Area,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid, AreaChart, Area, Legend } from 'recharts';
 import { ROLE_LABELS } from '@/constants/modules';
 
 // ─── Shared chart styles ────────────────────────────────────────────────────
@@ -39,7 +35,7 @@ const ADMIN_STATS = [
 const ADMIN_QUICK_ACTIONS = [
   { label: 'Danh sách SV', route: '/sis/sinh-vien', icon: <GraduationCap className="h-5 w-5" />, color: 'primary', sub: 'Quản lý sinh viên' },
   { label: 'Văn bản điện tử', route: '/dms/soan-thao', icon: <FileText className="h-5 w-5" />, color: 'warning', sub: 'Soạn & phát hành' },
-  { label: 'Báo cáo BI', route: '/bi/bao-cao/tao', icon: <BarChart3 className="h-5 w-5" />, color: 'info', sub: 'Phân tích dữ liệu' },
+  { label: 'Báo cáo BI', route: '/bi/bao-cao/tao', icon: <BarChart3 className="h-5 w-5"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />, color: 'info', sub: 'Phân tích dữ liệu' },
   { label: 'Quản lý công việc', route: '/wms/tao-cv', icon: <ClipboardList className="h-5 w-5" />, color: 'accent', sub: 'Tạo & phân công' },
   { label: 'Ký túc xá', route: '/ktx', icon: <Building2 className="h-5 w-5" />, color: 'primary', sub: 'Quản lý KTX' },
   { label: 'Tài chính', route: '/fin', icon: <CreditCard className="h-5 w-5" />, color: 'success', sub: 'Thu chi & kế toán' },
@@ -231,10 +227,10 @@ export default function DashboardAdmin() {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--border))" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE} />
-                  <Area type="monotone" dataKey="sv" name="Sinh viên" stroke="rgb(var(--primary))" strokeWidth={2} fill="url(#gradSv)" dot={false} />
-                  <Area type="monotone" dataKey="vc" name="Viên chức" stroke="rgb(var(--accent))" strokeWidth={2} fill="url(#gradVc)" dot={false} />
-                  <Area type="monotone" dataKey="gv" name="Giảng viên" stroke="rgb(var(--info))" strokeWidth={2} fill="url(#gradGv)" dot={false} />
+                  <Tooltip contentStyle={CHART_TOOLTIP_STYLE}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                  <Area type="monotone" dataKey="sv" name="Sinh viên" stroke="rgb(var(--primary))" strokeWidth={2} fill="url(#gradSv)" dot={false}  animationDuration={1500} animationEasing="ease-out" />
+                  <Area type="monotone" dataKey="vc" name="Viên chức" stroke="rgb(var(--accent))" strokeWidth={2} fill="url(#gradVc)" dot={false}  animationDuration={1500} animationEasing="ease-out" />
+                  <Area type="monotone" dataKey="gv" name="Giảng viên" stroke="rgb(var(--info))" strokeWidth={2} fill="url(#gradGv)" dot={false}  animationDuration={1500} animationEasing="ease-out" />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -252,12 +248,13 @@ export default function DashboardAdmin() {
             <CardContent className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={ATTENDANCE_DATA} margin={{ top: 5, right: 20, left: 0, bottom: 5 }} barCategoryGap="30%">
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--border))" vertical={false} />
                   <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis domain={[90, 100]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} unit="%" />
                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number) => [`${v}%`]} />
-                  <Bar dataKey="di" name="Đi học" fill="rgb(var(--success))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="nghi" name="Nghỉ" fill="rgb(var(--error))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="di" name="Đi học" fill="rgb(var(--success))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
+                  <Bar dataKey="nghi" name="Nghỉ" fill="rgb(var(--error))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -275,11 +272,12 @@ export default function DashboardAdmin() {
             <CardContent className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={MODULE_USAGE} layout="vertical" margin={{ top: 0, right: 60, left: 0, bottom: 0 }}>
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--border))" horizontal={false} />
                   <XAxis type="number" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} width={50} />
                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number) => [`${v.toLocaleString()} requests`]} />
-                  <Bar dataKey="requests" name="Requests" fill="rgb(var(--accent))" radius={[0, 4, 4, 0]} barSize={16} />
+                  <Bar dataKey="requests" name="Requests" fill="rgb(var(--accent))" radius={[0, 4, 4, 0]} barSize={16}  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -297,12 +295,13 @@ export default function DashboardAdmin() {
             <CardContent className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={REVENUE_TREND} margin={{ top: 5, right: 20, left: 0, bottom: 5 }} barGap={4}>
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--border))" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number) => [`₫${v}M`]} />
-                  <Bar dataKey="hocPhi" name="Học phí" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="kyLuat" name="Kỷ luật" fill="rgb(var(--error))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="hocPhi" name="Học phí" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
+                  <Bar dataKey="kyLuat" name="Kỷ luật" fill="rgb(var(--error))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -375,8 +374,8 @@ export default function DashboardAdmin() {
             <CardContent className="flex items-center gap-4">
               <div className="h-44 w-44 shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={USER_BY_ROLE} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="value" paddingAngle={3}>
+                  <PieChart animationDuration={1500} animationEasing="ease-out">
+                    <Pie data={USER_BY_ROLE} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="value" paddingAngle={3} animationDuration={1500} animationEasing="ease-out">
                       {USER_BY_ROLE.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}

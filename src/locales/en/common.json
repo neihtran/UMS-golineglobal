@@ -12,18 +12,13 @@
     "confirmPassword": "Password confirmation does not match"
   },
   "roles": {
-    "SUPER_ADMIN": "Super Administrator",
     "ADMIN": "Administrator",
     "HIEU_TRUONG": "Rector",
     "PHO_HIEU_TRUONG": "Vice Rector",
     "TRUONG_KHOA": "Dean",
-    "PHO_TRUONG_KHOA": "Vice Dean",
     "GIAO_VIEN": "Lecturer",
-    "CAN_BO_PHAN_CONG": "Assignment Officer",
-    "CHUYEN_VIEN": "Specialist",
     "NHAN_VIEN": "Staff",
-    "SINH_VIEN": "Student",
-    "KHAI_THA": "Data Analyst"
+    "SINH_VIEN": "Student"
   },
   "notification": {
     "title": "Notifications",

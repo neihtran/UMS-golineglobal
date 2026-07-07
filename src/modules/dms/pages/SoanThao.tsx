@@ -29,8 +29,8 @@ const DOC_TYPES = [
 ];
 
 const FLOW_ROLES = [
-  { id: 'r1', label: 'Người soạn thảo', role: 'CAN_BO_PHAN_CONG', assignee: 'TS. Nguyễn Văn A', dept: 'Văn phòng' },
-  { id: 'r2', label: 'Trưởng phòng phụ trách', role: 'TRUONG_PHONG', assignee: 'PGS.TS. Trần Văn B', dept: 'Văn phòng' },
+  { id: 'r1', label: 'Người soạn thảo', role: 'NHAN_VIEN', assignee: 'TS. Nguyễn Văn A', dept: 'Văn phòng' },
+  { id: 'r2', label: 'Trưởng phòng phụ trách', role: 'TRUONG_KHOA', assignee: 'PGS.TS. Trần Văn B', dept: 'Văn phòng' },
   { id: 'r3', label: 'Phó Hiệu trưởng phụ trách', role: 'PHO_HIEU_TRUONG', assignee: 'PGS.TS. Lê Thị C', dept: 'Ban Giám hiệu' },
   { id: 'r4', label: 'Hiệu trưởng ký', role: 'HIEU_TRUONG', assignee: 'PGS.TS. Nguyễn H. D', dept: 'Ban Giám hiệu' },
 ];

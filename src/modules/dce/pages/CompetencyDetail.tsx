@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Download, Trash2, Edit3 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const STANDARDS = [
   { id: 's1', code: 'CDIO-1.1', name: 'Thiết kế hệ thống phần mềm', dept: 'Khoa CNTT', level: 'Cấp 4', target: 3.8, avgScore: 3.72, n: 124, lastAssess: '2026-05-15', status: 'active' },
@@ -97,10 +97,12 @@ export default function CompetencyDetail() {
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={SCORE_HISTORY} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <XAxis dataKey="ky" tick={{ fontSize: 10, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis domain={[0, 5]} tick={{ fontSize: 10, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <Tooltip formatter={(v: number) => [`${v.toFixed(2)}/5`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                  <Bar dataKey="score" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name="Điểm TB" />
+                  <Bar dataKey="score" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name="Điểm TB"  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

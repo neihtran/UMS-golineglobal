@@ -2,7 +2,7 @@ import { CalendarPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from 'recharts';
 
 const BALANCES = [
   { type: 'annual', label: 'Nghỉ phép năm', total: 12, used: 6, remaining: 6, color: '#16A34A' },
@@ -57,8 +57,9 @@ export default function LeaveBalance() {
           <CardContent className="flex flex-col items-center">
             <div className="h-52 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={4} dataKey="value">
+                <PieChart animationDuration={1500} animationEasing="ease-out">
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
+                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={4} dataKey="value" animationDuration={1500} animationEasing="ease-out">
                     {pieData.map((_, i) => <Cell key={i} fill={pieData[i].color} />)}
                   </Pie>
                   <Tooltip formatter={(v: number) => `${v} ngày`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />

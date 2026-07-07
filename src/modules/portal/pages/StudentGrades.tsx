@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const SEMESTERS = [
   {
@@ -145,10 +145,12 @@ export default function StudentGrades() {
         <CardContent className="h-56">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={GPA_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <XAxis dataKey="hk" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <YAxis domain={[2.5, 4.0]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-              <Line type="monotone" dataKey="gpa" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 5, fill: 'rgb(var(--primary))' }} />
+              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+              <Line type="monotone" dataKey="gpa" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 5, fill: 'rgb(var(--primary))' }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

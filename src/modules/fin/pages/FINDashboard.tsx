@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid, Legend } from 'recharts';
 
 const CASHFLOW = [
   { month: 'T1', income: 14.2, expense: 3.1 },
@@ -125,8 +125,8 @@ export default function FINDashboard() {
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}t`} />
                 <Tooltip formatter={(v: number) => `${v} tỷ`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Area type="monotone" dataKey="income" stroke="rgb(var(--success))" fill="rgb(var(--success)/0.1)" strokeWidth={2} />
-                <Area type="monotone" dataKey="expense" stroke="rgb(var(--error))" fill="rgb(var(--error)/0.1)" strokeWidth={2} />
+                <Area type="monotone" dataKey="income" stroke="rgb(var(--success))" fill="rgb(var(--success)/0.1)" strokeWidth={2}  animationDuration={1500} animationEasing="ease-out" />
+                <Area type="monotone" dataKey="expense" stroke="rgb(var(--error))" fill="rgb(var(--error)/0.1)" strokeWidth={2}  animationDuration={1500} animationEasing="ease-out" />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>
@@ -139,10 +139,12 @@ export default function FINDashboard() {
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={TUITION_BARS} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}t`} />
                 <Tooltip formatter={(v: number) => `${v} tỷ`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="amount" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="amount" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

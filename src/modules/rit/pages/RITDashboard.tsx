@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const RIT_STATS = [
   { label: 'Đề tài NCKH', value: '47', change: '+8 năm nay', icon: <FileText className="h-5 w-5" />, color: 'primary' },
@@ -171,10 +171,12 @@ export default function RITDashboard() {
         <CardContent className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={BUDGET_BARS} margin={{ top: 5, right: 30, left: 10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <Tooltip formatter={(v: number) => [`${v} tỷ đồng`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-              <Bar dataKey="budget" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.budget')} />
+              <Bar dataKey="budget" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.budget')}  animationDuration={1500} animationEasing="ease-out" />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>

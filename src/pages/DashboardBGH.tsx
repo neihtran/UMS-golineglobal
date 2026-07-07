@@ -9,11 +9,7 @@ import {
   Activity, CreditCard, BookMarked, AlertTriangle,
   ClipboardCheck,
 } from 'lucide-react';
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, CartesianGrid,
-  AreaChart, Area,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid, AreaChart, Area, Legend } from 'recharts';
 import { ROLE_LABELS } from '@/constants/modules';
 
 // ─── Shared chart styles ────────────────────────────────────────────────────
@@ -38,7 +34,7 @@ const BGH_STATS = [
 // ─── BGH Quick Actions ──────────────────────────────────────────────────────
 const BGH_QUICK_ACTIONS = [
   { label: 'Văn bản chờ duyệt', route: '/dms/phe-duyet', icon: <FileText className="h-5 w-5" />, color: 'warning', sub: 'Xem & ký duyệt', count: '23' },
-  { label: 'Báo cáo BI', route: '/bi', icon: <BarChart3 className="h-5 w-5" />, color: 'info', sub: 'Phân tích toàn trường', count: '' },
+  { label: 'Báo cáo BI', route: '/bi', icon: <BarChart3 className="h-5 w-5"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />, color: 'info', sub: 'Phân tích toàn trường', count: '' },
   { label: 'NCKH', route: '/rit', icon: <FlaskConical className="h-5 w-5" />, color: 'accent', sub: 'Đề tài & công bố', count: '47' },
   { label: 'Kiểm định AUN-QA', route: '/qa/kiem-dinh', icon: <ClipboardCheck className="h-5 w-5" />, color: 'success', sub: 'Tiến độ kiểm định', count: '3' },
   { label: 'Tài chính', route: '/fin', icon: <DollarSign className="h-5 w-5" />, color: 'primary', sub: 'Thu chi toàn trường', count: '' },
@@ -199,8 +195,8 @@ export default function DashboardBGH() {
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number) => [v != null ? `${v.toLocaleString()} sinh viên` : '—']} />
-                  <Area type="monotone" dataKey="admitted" name="Tuyển sinh" stroke="rgb(var(--primary))" strokeWidth={2} fill="url(#gradAdm)" dot={false} />
-                  <Area type="monotone" dataKey="graduated" name="Tốt nghiệp" stroke="rgb(var(--accent))" strokeWidth={2} fill="url(#gradGrad)" dot={false} />
+                  <Area type="monotone" dataKey="admitted" name="Tuyển sinh" stroke="rgb(var(--primary))" strokeWidth={2} fill="url(#gradAdm)" dot={false}  animationDuration={1500} animationEasing="ease-out" />
+                  <Area type="monotone" dataKey="graduated" name="Tốt nghiệp" stroke="rgb(var(--accent))" strokeWidth={2} fill="url(#gradGrad)" dot={false}  animationDuration={1500} animationEasing="ease-out" />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -218,12 +214,13 @@ export default function DashboardBGH() {
             <CardContent className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={DEPARTMENT_ATTENDANCE} margin={{ top: 5, right: 20, left: 0, bottom: 5 }} barCategoryGap="30%">
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--border))" vertical={false} />
                   <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis domain={[90, 100]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} unit="%" />
                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={(v: number) => [`${v}%`]} />
-                  <Bar dataKey="di" name="Đi học" fill="rgb(var(--success))" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="nghi" name="Nghỉ" fill="rgb(var(--error))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="di" name="Đi học" fill="rgb(var(--success))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
+                  <Bar dataKey="nghi" name="Nghỉ" fill="rgb(var(--error))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -241,6 +238,7 @@ export default function DashboardBGH() {
             <CardContent className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={GPA_TREND} layout="vertical" margin={{ top: 0, right: 60, left: 60, bottom: 0 }}>
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--border))" horizontal={false} />
                   <XAxis type="number" domain={[2.5, 3.5]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis type="category" dataKey="khoa" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} width={60} />
@@ -365,8 +363,8 @@ export default function DashboardBGH() {
             <CardContent className="flex items-center gap-4">
               <div className="h-36 w-36 shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={TUITION_STATUS} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" paddingAngle={3}>
+                  <PieChart animationDuration={1500} animationEasing="ease-out">
+                    <Pie data={TUITION_STATUS} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" paddingAngle={3} animationDuration={1500} animationEasing="ease-out">
                       {TUITION_STATUS.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}

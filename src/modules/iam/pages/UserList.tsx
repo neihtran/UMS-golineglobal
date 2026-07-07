@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { UserPlus, Download, Upload } from 'lucide-react';
+import { UserPlus, Download, Upload, Lock, Unlock } from 'lucide-react';
 import {
   Button,
   Input,
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { toast } from '@/components/ui/Toast';
 
 const MOCK_USERS = [
   { id: 'u001', name: 'Nguyễn Văn Admin', email: 'admin@truong.edu.vn', role: 'admin', unit: 'Phòng CNTT', status: 'active', lastLogin: '2026-06-25 09:15' },
@@ -64,6 +65,18 @@ export default function UserList() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const handleToggleLock = async (user: typeof MOCK_USERS[0]) => {
+    setActionLoading(user.id);
+    await new Promise(r => setTimeout(r, 600));
+    setActionLoading(null);
+    if (user.status === 'locked') {
+      toast.success(`Đã mở khóa tài khoản "${user.name}"`);
+    } else {
+      toast.warning(`Đã khóa tài khoản "${user.name}"`);
+    }
+  };
 
   const filtered = MOCK_USERS.filter((u) => {
     const matchSearch = !search || u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
@@ -173,7 +186,7 @@ export default function UserList() {
                       <Link to={`/iam/tai-khoan/${u.id}`}>
                         <Button variant="ghost" size="sm">Chi tiết</Button>
                       </Link>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" leftIcon={u.status === 'locked' ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />} loading={actionLoading === u.id} onClick={() => handleToggleLock(u)}>
                         {u.status === 'locked' ? 'Mở khóa' : 'Khóa'}
                       </Button>
                     </div>

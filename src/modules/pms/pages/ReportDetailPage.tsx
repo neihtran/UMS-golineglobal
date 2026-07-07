@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 
 const REPORT = {
   id: 'r2026',
@@ -88,7 +88,7 @@ export default function ReportDetailPage() {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
           { label: 'Đảng viên', value: `${r.stats.totalMembers}`, icon: <Users className="h-5 w-5" />, color: 'primary' },
-          { label: 'Chi bộ', value: `${r.stats.branches}`, icon: <BarChart3 className="h-5 w-5" />, color: 'accent' },
+          { label: 'Chi bộ', value: `${r.stats.branches}`, icon: <BarChart3 className="h-5 w-5"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />, color: 'accent' },
           { label: 'Hoạt động', value: `${r.stats.meetings + r.stats.studies + r.stats.campaigns}`, icon: <Calendar className="h-5 w-5" />, color: 'info' },
           { label: 'Điểm KPI', value: `${r.stats.kpiScore}`, icon: <Award className="h-5 w-5" />, color: 'success' },
         ].map((s) => (
@@ -111,7 +111,7 @@ export default function ReportDetailPage() {
           <Card>
             <div className="px-5 pt-5 pb-4 border-b border-[rgb(var(--border)/0.6)]">
               <div className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-[rgb(var(--primary))]" />
+                <BarChart3 className="h-4 w-4 text-[rgb(var(--primary))]"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />
                 <h3 className="font-semibold text-[rgb(var(--text-primary))]">Hoạt động theo chi bộ</h3>
               </div>
             </div>
@@ -121,10 +121,10 @@ export default function ReportDetailPage() {
                   <BarChart data={r.branchPerformance}>
                     <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                    <Bar dataKey="meetings" fill="rgb(var(--error))" name="Sinh hoạt" radius={[3, 3, 0, 0]} />
-                    <Bar dataKey="studies" fill="rgb(var(--primary))" name="Học tập" radius={[3, 3, 0, 0]} />
-                    <Bar dataKey="campaigns" fill="rgb(var(--success))" name="Phong trào" radius={[3, 3, 0, 0]} />
+                    <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                    <Bar dataKey="meetings" fill="rgb(var(--error))" name="Sinh hoạt" radius={[3, 3, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
+                    <Bar dataKey="studies" fill="rgb(var(--primary))" name="Học tập" radius={[3, 3, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
+                    <Bar dataKey="campaigns" fill="rgb(var(--success))" name="Phong trào" radius={[3, 3, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -204,10 +204,12 @@ export default function ReportDetailPage() {
             <CardContent className="p-4 h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={r.kpiHistory}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
                   <YAxis domain={[80, 100]} tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                  <Line type="monotone" dataKey="score" stroke="rgb(var(--success))" strokeWidth={2} dot={{ r: 3 }} />
+                  <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                  <Line type="monotone" dataKey="score" stroke="rgb(var(--success))" strokeWidth={2} dot={{ r: 3 }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>

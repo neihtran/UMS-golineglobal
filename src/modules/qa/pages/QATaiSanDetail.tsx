@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, Edit2, Wrench } from 'lucide-react';
 import { Card, CardContent, Button, Badge } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const ASSET = {
   id: 'ts001',
@@ -140,11 +140,13 @@ export default function QATaiSanDetail() {
             <CardContent className="h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={DEPRECIATION_DATA} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                   <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                   <Tooltip formatter={(v: number) => [`${v} triệu`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                  <Bar dataKey="bookValue" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name="Giá trị còn lại" />
-                  <Bar dataKey="depreciation" fill="rgb(var(--warning))" radius={[4, 4, 0, 0]} name="Khấu hao năm" />
+                  <Bar dataKey="bookValue" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name="Giá trị còn lại"  animationDuration={1500} animationEasing="ease-out" />
+                  <Bar dataKey="depreciation" fill="rgb(var(--warning))" radius={[4, 4, 0, 0]} name="Khấu hao năm"  animationDuration={1500} animationEasing="ease-out" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>

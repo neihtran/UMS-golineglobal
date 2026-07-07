@@ -46,50 +46,35 @@ export const MODULE_COLORS: Record<string, string> = {
 
 // ─── Role definitions ──────────────────────────────────────────────────────────
 export const ROLES = {
-  SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN: 'ADMIN',
   HIEU_TRUONG: 'HIEU_TRUONG',
   PHO_HIEU_TRUONG: 'PHO_HIEU_TRUONG',
   TRUONG_KHOA: 'TRUONG_KHOA',
-  PHO_TRUONG_KHOA: 'PHO_TRUONG_KHOA',
   GIAO_VIEN: 'GIAO_VIEN',
-  CAN_BO_PHAN_CONG: 'CAN_BO_PHAN_CONG',
-  CHUYEN_VIEN: 'CHUYEN_VIEN',
   NHAN_VIEN: 'NHAN_VIEN',
   SINH_VIEN: 'SINH_VIEN',
-  KHAI_THA: 'KHAI_THA',
 } as const;
 
 export type Role = typeof ROLES[keyof typeof ROLES];
 
 export const ROLE_LABELS: Record<Role, string> = {
-  [ROLES.SUPER_ADMIN]: 'Quản trị viên hệ thống',
   [ROLES.ADMIN]: 'Quản trị viên',
   [ROLES.HIEU_TRUONG]: 'Hiệu trưởng',
   [ROLES.PHO_HIEU_TRUONG]: 'Phó Hiệu trưởng',
   [ROLES.TRUONG_KHOA]: 'Trưởng khoa',
-  [ROLES.PHO_TRUONG_KHOA]: 'Phó trưởng khoa',
   [ROLES.GIAO_VIEN]: 'Giảng viên',
-  [ROLES.CAN_BO_PHAN_CONG]: 'Cán bộ phân công',
-  [ROLES.CHUYEN_VIEN]: 'Chuyên viên',
   [ROLES.NHAN_VIEN]: 'Nhân viên',
   [ROLES.SINH_VIEN]: 'Sinh viên',
-  [ROLES.KHAI_THA]: 'Khải thác',
 };
 
 export const ROLE_HIERARCHY: Record<Role, number> = {
-  [ROLES.SUPER_ADMIN]: 100,
-  [ROLES.ADMIN]: 90,
+  [ROLES.ADMIN]: 100,
   [ROLES.HIEU_TRUONG]: 80,
   [ROLES.PHO_HIEU_TRUONG]: 70,
   [ROLES.TRUONG_KHOA]: 60,
-  [ROLES.PHO_TRUONG_KHOA]: 50,
   [ROLES.GIAO_VIEN]: 40,
-  [ROLES.CAN_BO_PHAN_CONG]: 35,
-  [ROLES.CHUYEN_VIEN]: 30,
   [ROLES.NHAN_VIEN]: 20,
   [ROLES.SINH_VIEN]: 10,
-  [ROLES.KHAI_THA]: 5,
 };
 
 // ─── Permission constants ─────────────────────────────────────────────────────
@@ -150,6 +135,21 @@ export const GRADE_THRESHOLDS = [
   { min: 4.0, max: 4.9, grade: 'D', point: 1.0, label: 'Yếu', color: '#DC2626' },
   { min: 0, max: 3.9, grade: 'F', point: 0, label: 'Kém', color: '#DC2626' },
 ];
+
+// ─── Module groups (3 major categories) ───────────────────────────────────────
+export const MODULE_GROUPS = {
+  QUAN_TRI: 'quan-tri-he-thong',
+  DAO_TAO: 'quan-ly-dao-tao',
+  HANH_CHINH: 'quan-ly-hanh-chinh',
+} as const;
+
+export type ModuleGroup = typeof MODULE_GROUPS[keyof typeof MODULE_GROUPS];
+
+export const MODULE_GROUP_MEMBERS: Record<ModuleGroup, string[]> = {
+  [MODULE_GROUPS.QUAN_TRI]: ['iam', 'hrm', 'pms', 'int'],
+  [MODULE_GROUPS.DAO_TAO]: ['sis', 'lms', 'exam', 'portal', 'lib', 'dce'],
+  [MODULE_GROUPS.HANH_CHINH]: ['dms', 'fin', 'wms', 'ktx', 'rit', 'bi', 'qa', 'ocr'],
+};
 
 // ─── Common date formats ──────────────────────────────────────────────────────
 export const DATE_FORMAT = 'dd/MM/yyyy';

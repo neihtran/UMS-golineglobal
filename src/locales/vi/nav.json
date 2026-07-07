@@ -7,16 +7,8 @@
   "brandShort": "SP UDN",
   "group": {
     "systemAdmin": "Quản trị Hệ thống",
-    "personnel": "Nhân sự",
-    "training": "Đào tạo",
-    "digitalLearning": "Dạy học Số",
-    "exam": "Thi trực tuyến",
-    "portal": "Cổng thông tin",
-    "operations": "Vận hành",
-    "research": "NCKH & HTQT",
-    "system": "Hệ thống",
-    "partyAffairs": "Công tác Đảng",
-    "library": "Thư viện"
+    "trainingManagement": "Quản lý Đào tạo",
+    "adminManagement": "Quản lý Hành chính"
   },
   "module": {
     "iam": "IAM – Bảo mật & Tài khoản",

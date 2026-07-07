@@ -15,31 +15,25 @@ type Perms = Record<PermKey, boolean>;
 type PermMatrix = Record<string, Record<string, Perms>>;
 
 const ROLES = [
-  { id: 'r01', code: 'SUPER_ADMIN', name: 'Quản trị hệ thống', description: 'Toàn quyền trên mọi phân hệ, không giới hạn', userCount: 1, permissions: 100, status: 'active', createdAt: '2024-01-01' },
-  { id: 'r02', code: 'ADMIN', name: 'Quản trị', description: 'Quản lý tài khoản, vai trò, cấu hình hệ thống', userCount: 3, permissions: 78, status: 'active', createdAt: '2024-01-15' },
-  { id: 'r03', code: 'HIEU_TRUONG', name: 'Hiệu trưởng', description: 'Toàn quyền xem báo cáo và phê duyệt cấp cao', userCount: 1, permissions: 45, status: 'active', createdAt: '2024-01-15' },
+  { id: 'r01', code: 'ADMIN', name: 'Quản trị viên', description: 'Toàn quyền trên mọi phân hệ, không giới hạn', userCount: 1, permissions: 78, status: 'active', createdAt: '2024-01-15' },
+  { id: 'r02', code: 'HIEU_TRUONG', name: 'Hiệu trưởng', description: 'Toàn quyền xem báo cáo và phê duyệt cấp cao', userCount: 1, permissions: 45, status: 'active', createdAt: '2024-01-15' },
+  { id: 'r03', code: 'PHO_HIEU_TRUONG', name: 'Phó Hiệu trưởng', description: 'Hỗ trợ Hiệu trưởng, phê duyệt thay khi vắng mặt', userCount: 1, permissions: 40, status: 'active', createdAt: '2024-01-15' },
   { id: 'r04', code: 'TRUONG_KHOA', name: 'Trưởng khoa', description: 'Quản lý nhân sự và đào tạo cấp khoa', userCount: 12, permissions: 38, status: 'active', createdAt: '2024-02-01' },
-  { id: 'r05', code: 'GIANG_VIEN', name: 'Giảng viên', description: 'Truy cập LMS, EXAM, SIS (giảng dạy), điểm danh', userCount: 310, permissions: 28, status: 'active', createdAt: '2024-01-20' },
-  { id: 'r06', code: 'SINH_VIEN', name: 'Sinh viên', description: 'Đăng ký HP, xem điểm, nộp bài, tra cứu thư viện', userCount: 7240, permissions: 15, status: 'active', createdAt: '2024-01-20' },
-  { id: 'r07', code: 'NHAN_VIEN', name: 'Nhân viên HC', description: 'Truy cập HRM, DMS, FIN, WMS cấp phòng ban', userCount: 89, permissions: 32, status: 'active', createdAt: '2024-02-10' },
-  { id: 'r08', code: 'KE_TOAN', name: 'Kế toán', description: 'Truy cập FIN, quản lý thu chi, lương, học phí', userCount: 8, permissions: 22, status: 'active', createdAt: '2024-02-15' },
-  { id: 'r09', code: 'THU_KHO', name: 'Thủ kho', description: 'Quản lý thư viện, mượn trả sách, e-book', userCount: 4, permissions: 18, status: 'active', createdAt: '2024-03-01' },
-  { id: 'r10', code: 'CAN_BO_THI', name: 'Cán bộ thi', description: 'Giám sát thi, quản lý phòng thi, chấm điểm', userCount: 15, permissions: 12, status: 'active', createdAt: '2024-03-10' },
+  { id: 'r05', code: 'GIAO_VIEN', name: 'Giảng viên', description: 'Truy cập LMS, EXAM, SIS (giảng dạy), điểm danh', userCount: 310, permissions: 28, status: 'active', createdAt: '2024-01-20' },
+  { id: 'r06', code: 'NHAN_VIEN', name: 'Nhân viên HC', description: 'Truy cập HRM, DMS, FIN, WMS cấp phòng ban', userCount: 89, permissions: 32, status: 'active', createdAt: '2024-02-10' },
+  { id: 'r07', code: 'SINH_VIEN', name: 'Sinh viên', description: 'Đăng ký HP, xem điểm, nộp bài, tra cứu thư viện', userCount: 7240, permissions: 15, status: 'active', createdAt: '2024-01-20' },
 ];
 
 const MODULES = ['IAM', 'HRM', 'SIS', 'LMS', 'EXAM', 'DMS', 'FIN', 'WMS', 'PORTAL', 'LIB', 'KTX', 'OCR', 'BI', 'DCE', 'QA', 'RIT', 'INT', 'PMS'];
 
 const DEFAULT_PERMISSIONS: PermMatrix = {
-  SUPER_ADMIN: Object.fromEntries(MODULES.map(m => [m, { read: true, write: true, approve: true }])),
   ADMIN: Object.fromEntries(MODULES.map(m => [m, { read: true, write: true, approve: true }])),
   HIEU_TRUONG: Object.fromEntries(MODULES.map(m => [m, { read: true, write: false, approve: true }])),
+  PHO_HIEU_TRUONG: Object.fromEntries(MODULES.map(m => [m, { read: true, write: false, approve: true }])),
   TRUONG_KHOA: Object.fromEntries(MODULES.filter(m => !['INT', 'OCR', 'PMS'].includes(m)).map(m => [m, { read: true, write: true, approve: true }])),
-  GIANG_VIEN: Object.fromEntries(['SIS', 'LMS', 'EXAM', 'DMS', 'WMS', 'PORTAL', 'LIB'].map(m => [m, { read: true, write: true, approve: false }])),
-  SINH_VIEN: Object.fromEntries(['SIS', 'LMS', 'EXAM', 'PORTAL', 'LIB'].map(m => [m, { read: true, write: true, approve: false }])),
-  NHAN_VIEN: Object.fromEntries(['HRM', 'DMS', 'FIN', 'WMS', 'PORTAL', 'KTX'].map(m => [m, { read: true, write: true, approve: false }])),
-  KE_TOAN: Object.fromEntries(['FIN', 'WMS', 'PORTAL'].map(m => [m, { read: true, write: true, approve: true }])),
-  THU_KHO: Object.fromEntries(['LIB', 'PORTAL'].map(m => [m, { read: true, write: true, approve: false }])),
-  CAN_BO_THI: Object.fromEntries(['EXAM', 'SIS'].map(m => [m, { read: true, write: true, approve: true }])),
+  GIAO_VIEN: Object.fromEntries(['SIS', 'LMS', 'EXAM', 'DMS', 'WMS', 'PORTAL', 'LIB', 'DCE', 'QA', 'RIT'].map(m => [m, { read: true, write: true, approve: false }])),
+  SINH_VIEN: Object.fromEntries(['SIS', 'LMS', 'EXAM', 'PORTAL', 'LIB', 'DCE'].map(m => [m, { read: true, write: true, approve: false }])),
+  NHAN_VIEN: Object.fromEntries(['HRM', 'DMS', 'FIN', 'WMS', 'PORTAL', 'KTX', 'BI', 'QA'].map(m => [m, { read: true, write: true, approve: false }])),
 };
 
 export default function RoleList() {
@@ -117,7 +111,7 @@ export default function RoleList() {
                 }`}
               >
                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                  r.code === 'SUPER_ADMIN' || r.code === 'ADMIN' ? 'bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]' :
+                  r.code === 'ADMIN' ? 'bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]' :
                   r.code === 'SINH_VIEN' ? 'bg-[rgb(var(--info)/0.1)] text-[rgb(var(--info))]' :
                   r.code === 'GIANG_VIEN' ? 'bg-[rgb(var(--accent)/0.1)] text-[rgb(var(--accent))]' :
                   'bg-[rgb(var(--border))] text-[rgb(var(--text-secondary))]'

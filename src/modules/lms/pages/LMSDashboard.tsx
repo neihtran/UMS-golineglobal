@@ -4,7 +4,7 @@ import {
   Star, ArrowRight, BarChart3, CheckCircle2,
 } from 'lucide-react';
 import { Button, Card, CardContent } from '@/components/ui';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 
 const LMS_STATS = [
   { label: 'Tổng khóa học', value: '148', sub: '+12 tháng này', icon: <BookOpen className="h-5 w-5" />, color: 'primary' },
@@ -74,7 +74,7 @@ export default function LMSDashboard() {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
           { label: 'Tạo khóa học', href: '/lms/khoa-hoc/tao', icon: <BookOpen className="h-5 w-5" />, color: 'primary', desc: 'Tạo & xuất bản khóa mới' },
-          { label: 'Xem bảng điểm', href: '/lms/bang-diem', icon: <BarChart3 className="h-5 w-5" />, color: 'info', desc: 'Xuất & quản lý điểm' },
+          { label: 'Xem bảng điểm', href: '/lms/bang-diem', icon: <BarChart3 className="h-5 w-5"  animationDuration={1500} animationEasing="ease-out" radius={[4, 4, 0, 0]} />, color: 'info', desc: 'Xuất & quản lý điểm' },
           { label: 'Nội dung khóa học', href: '/lms/noi-dung-khoa-hoc', icon: <CheckCircle2 className="h-5 w-5" />, color: 'success', desc: 'Học liệu SCORM/xAPI' },
           { label: 'Bài tập SV', href: '/lms/bai-tap-sinh-vien', icon: <Award className="h-5 w-5" />, color: 'accent', desc: 'Phân công & chấm bài' },
         ].map((q) => (
@@ -163,10 +163,12 @@ export default function LMSDashboard() {
           <CardContent className="h-60">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={ACTIVITY_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <XAxis dataKey="week" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <Tooltip formatter={(v: number) => [`${v.toLocaleString()} lượt`, 'Truy cập']} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Line type="monotone" dataKey="active" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 4, fill: 'rgb(var(--primary))' }} />
+                <Line type="monotone" dataKey="active" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 4, fill: 'rgb(var(--primary))' }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>

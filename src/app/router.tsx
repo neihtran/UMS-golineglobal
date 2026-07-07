@@ -13,6 +13,9 @@ const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const DashboardAdmin = lazy(() => import('@/pages/DashboardAdmin'));
 const DashboardBGH = lazy(() => import('@/pages/DashboardBGH'));
 const DashboardTruongKhoa = lazy(() => import('@/pages/DashboardTruongKhoa'));
+const DashboardGiaoVien = lazy(() => import('@/pages/DashboardGiaoVien'));
+const DashboardNhanVien = lazy(() => import('@/pages/DashboardNhanVien'));
+const DashboardSinhVien = lazy(() => import('@/pages/DashboardSinhVien'));
 const DashboardGV = lazy(() => import('@/pages/DashboardGV'));
 const Landing = lazy(() => import('@/pages/Landing'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
@@ -262,9 +265,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // ─── Role guard ──────────────────────────────────────────────────────────────
 function getRoleDashboard(role?: string): string {
   if (!role) return '/dashboard';
-  if (role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN) return '/dashboard/admin';
+  if (role === ROLES.ADMIN) return '/dashboard/admin';
   if (role === ROLES.HIEU_TRUONG || role === ROLES.PHO_HIEU_TRUONG) return '/dashboard/bgh';
-  if (role === ROLES.TRUONG_KHOA || role === ROLES.PHO_TRUONG_KHOA) return '/dashboard/truong-khoa';
+  if (role === ROLES.TRUONG_KHOA) return '/dashboard/truong-khoa';
   return '/dashboard/gv';
 }
 
@@ -310,10 +313,12 @@ export default function AppRouter() {
 
           {/* Dashboard — all roles */}
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/admin" element={<RoleRoute roles={[ROLES.SUPER_ADMIN, ROLES.ADMIN]}><DashboardAdmin /></RoleRoute>} />
+          <Route path="/dashboard/admin" element={<RoleRoute roles={[ROLES.ADMIN]}><DashboardAdmin /></RoleRoute>} />
           <Route path="/dashboard/bgh" element={<RoleRoute roles={[ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DashboardBGH /></RoleRoute>} />
           <Route path="/dashboard/truong-khoa" element={<RoleRoute roles={[ROLES.TRUONG_KHOA]}><DashboardTruongKhoa /></RoleRoute>} />
-          <Route path="/dashboard/gv" element={<RoleRoute roles={[ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.SINH_VIEN]}><DashboardGV /></RoleRoute>} />
+          <Route path="/dashboard/giao-vien" element={<RoleRoute roles={[ROLES.GIAO_VIEN]}><DashboardGiaoVien /></RoleRoute>} />
+          <Route path="/dashboard/nhan-vien" element={<RoleRoute roles={[ROLES.NHAN_VIEN]}><DashboardNhanVien /></RoleRoute>} />
+          <Route path="/dashboard/sinh-vien" element={<RoleRoute roles={[ROLES.SINH_VIEN]}><DashboardSinhVien /></RoleRoute>} />
           <Route path="/thong-bao" element={<NotificationCenter />} />
 
           {/* IAM — admin only */}
@@ -330,72 +335,72 @@ export default function AppRouter() {
           <Route path="/iam/trang-thai-he-thong" element={<RoleRoute roles={[ROLES.ADMIN]}><SystemHealth /></RoleRoute>} />
           <Route path="/iam/cai-dat-he-thong" element={<RoleRoute roles={[ROLES.ADMIN]}><SystemConfig /></RoleRoute>} />
 
-          {/* HRM — admin + nhan-vien */}
-          <Route path="/hrm" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><HRMDashboard /></RoleRoute>} />
-          <Route path="/hrm/don-vi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><DepartmentList /></RoleRoute>} />
-          <Route path="/hrm/vien-chuc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><VienChucList /></RoleRoute>} />
-          <Route path="/hrm/vien-chuc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><VienChucCreate /></RoleRoute>} />
-          <Route path="/hrm/vien-chuc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><VienChucDetail /></RoleRoute>} />
-          <Route path="/hrm/nghi-phep" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><LeaveRequestList /></RoleRoute>} />
-          <Route path="/hrm/nghi-phep/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><LeaveRequestForm /></RoleRoute>} />
-          <Route path="/hrm/nghi-phep/so-du" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><LeaveBalance /></RoleRoute>} />
-          <Route path="/hrm/tuyen-dung" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><RecruitmentList /></RoleRoute>} />
-          <Route path="/hrm/ky-luat" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><DisciplineList /></RoleRoute>} />
-          <Route path="/hrm/luong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SalarySheet /></RoleRoute>} />
-          <Route path="/hrm/hop-dong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><ContractList /></RoleRoute>} />
-          <Route path="/hrm/bo-nhiem" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AppointmentList /></RoleRoute>} />
-          <Route path="/hrm/bo-nhiem/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AppointmentCreate /></RoleRoute>} />
-          <Route path="/hrm/cau-hinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><HRMConfig /></RoleRoute>} />
+          {/* HRM — admin + nhan-vien + BGH */}
+          <Route path="/hrm" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMDashboard /></RoleRoute>} />
+          <Route path="/hrm/don-vi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DepartmentList /></RoleRoute>} />
+          <Route path="/hrm/vien-chuc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><VienChucList /></RoleRoute>} />
+          <Route path="/hrm/vien-chuc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><VienChucCreate /></RoleRoute>} />
+          <Route path="/hrm/vien-chuc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><VienChucDetail /></RoleRoute>} />
+          <Route path="/hrm/nghi-phep" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><LeaveRequestList /></RoleRoute>} />
+          <Route path="/hrm/nghi-phep/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><LeaveRequestForm /></RoleRoute>} />
+          <Route path="/hrm/nghi-phep/so-du" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><LeaveBalance /></RoleRoute>} />
+          <Route path="/hrm/tuyen-dung" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RecruitmentList /></RoleRoute>} />
+          <Route path="/hrm/ky-luat" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DisciplineList /></RoleRoute>} />
+          <Route path="/hrm/luong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SalarySheet /></RoleRoute>} />
+          <Route path="/hrm/hop-dong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ContractList /></RoleRoute>} />
+          <Route path="/hrm/bo-nhiem" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><AppointmentList /></RoleRoute>} />
+          <Route path="/hrm/bo-nhiem/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><AppointmentCreate /></RoleRoute>} />
+          <Route path="/hrm/cau-hinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMConfig /></RoleRoute>} />
 
-          {/* SIS — admin + giang-vien + nhan-vien */}
-          <Route path="/sis" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><SISDashboard /></RoleRoute>} />
-          <Route path="/sis/sinh-vien" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><StudentList /></RoleRoute>} />
-          <Route path="/sis/sinh-vien/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><StudentDetail /></RoleRoute>} />
-          <Route path="/sis/sinh-vien/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><StudentEdit /></RoleRoute>} />
-          <Route path="/sis/mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><SubjectList /></RoleRoute>} />
-          <Route path="/sis/dang-ky-hoc-phan" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><StudentEnrollment /></RoleRoute>} />
-          <Route path="/sis/dang-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><StudentEnrollment /></RoleRoute>} />
-          <Route path="/sis/dang-ky-hoc-phan/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><EnrollmentCreate /></RoleRoute>} />
-          <Route path="/sis/dang-ky-hoc-phan/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><EnrollmentDetail /></RoleRoute>} />
-          <Route path="/sis/dang-ky-hoc-phan/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><EnrollmentEdit /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><Curriculum /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CurriculumCreate /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><SubjectList /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SubjectCreate /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:code" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><SubjectDetail /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:code/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SubjectEdit /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><CurriculumDetail /></RoleRoute>} />
-          <Route path="/sis/tot-nghiep" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><GraduationList /></RoleRoute>} />
-          <Route path="/sis/tot-nghiep/mo-dot" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><GraduationOpenSession /></RoleRoute>} />
-          <Route path="/sis/tot-nghiep/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><GraduationDetail /></RoleRoute>} />
-          <Route path="/sis/thuc-tap" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><InternshipList /></RoleRoute>} />
-          <Route path="/sis/thuc-tap/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><InternshipCreate /></RoleRoute>} />
-          <Route path="/sis/thuc-tap/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><InternshipDetail /></RoleRoute>} />
+          {/* SIS — admin + giang-vien + nhan-vien + BGH */}
+          <Route path="/sis" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SISDashboard /></RoleRoute>} />
+          <Route path="/sis/sinh-vien" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentList /></RoleRoute>} />
+          <Route path="/sis/sinh-vien/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentDetail /></RoleRoute>} />
+          <Route path="/sis/sinh-vien/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentEdit /></RoleRoute>} />
+          <Route path="/sis/mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SubjectList /></RoleRoute>} />
+          <Route path="/sis/dang-ky-hoc-phan" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentEnrollment /></RoleRoute>} />
+          <Route path="/sis/dang-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentEnrollment /></RoleRoute>} />
+          <Route path="/sis/dang-ky-hoc-phan/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentCreate /></RoleRoute>} />
+          <Route path="/sis/dang-ky-hoc-phan/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentDetail /></RoleRoute>} />
+          <Route path="/sis/dang-ky-hoc-phan/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentEdit /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><Curriculum /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumCreate /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SubjectList /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SubjectCreate /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:code" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SubjectDetail /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:code/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SubjectEdit /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumDetail /></RoleRoute>} />
+          <Route path="/sis/tot-nghiep" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><GraduationList /></RoleRoute>} />
+          <Route path="/sis/tot-nghiep/mo-dot" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><GraduationOpenSession /></RoleRoute>} />
+          <Route path="/sis/tot-nghiep/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><GraduationDetail /></RoleRoute>} />
+          <Route path="/sis/thuc-tap" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><InternshipList /></RoleRoute>} />
+          <Route path="/sis/thuc-tap/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><InternshipCreate /></RoleRoute>} />
+          <Route path="/sis/thuc-tap/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><InternshipDetail /></RoleRoute>} />
 
-          {/* DMS */}
-          <Route path="/dms" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><DMSDashboard /></RoleRoute>} />
+          {/* DMS — admin + nhan-vien + BGH */}
+          <Route path="/dms" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DMSDashboard /></RoleRoute>} />
           <Route path="/dms/soan-thao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SoanThaoMoiPage /></RoleRoute>} />
           <Route path="/dms/soan-thao/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SoanThaoMoiPage /></RoleRoute>} />
           <Route path="/dms/ban-nhap" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><DraftList /></RoleRoute>} />
           <Route path="/dms/ban-nhap/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SoanThaoMoiPage /></RoleRoute>} />
           <Route path="/dms/ban-nhap/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><BanNhapDetailPage /></RoleRoute>} />
-          <Route path="/dms/cho-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><DocumentListPage /></RoleRoute>} />
-          <Route path="/dms/cho-ky/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><DocumentDetailPage /></RoleRoute>} />
-          <Route path="/dms/da-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SignedDocuments /></RoleRoute>} />
-          <Route path="/dms/van-ban-da-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SignedDocuments /></RoleRoute>} />
-          <Route path="/dms/van-ban-da-ky/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SignedDocumentDetail /></RoleRoute>} />
-          <Route path="/dms/thong-ke" element={<RoleRoute roles={[ROLES.ADMIN]}><DocStatistics /></RoleRoute>} />
-          <Route path="/dms/tra-cuu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><DocSearch /></RoleRoute>} />
-          <Route path="/dms/phe-duyet" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><ApprovalList /></RoleRoute>} />
+          <Route path="/dms/cho-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DocumentListPage /></RoleRoute>} />
+          <Route path="/dms/cho-ky/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DocumentDetailPage /></RoleRoute>} />
+          <Route path="/dms/da-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SignedDocuments /></RoleRoute>} />
+          <Route path="/dms/van-ban-da-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SignedDocuments /></RoleRoute>} />
+          <Route path="/dms/van-ban-da-ky/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SignedDocumentDetail /></RoleRoute>} />
+          <Route path="/dms/thong-ke" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DocStatistics /></RoleRoute>} />
+          <Route path="/dms/tra-cuu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DocSearch /></RoleRoute>} />
+          <Route path="/dms/phe-duyet" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ApprovalList /></RoleRoute>} />
 
-          {/* FIN */}
-          <Route path="/fin" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><FINDashboard /></RoleRoute>} />
-          <Route path="/fin/hoc-phi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><TuitionPage /></RoleRoute>} />
-          <Route path="/fin/hoc-phi/danh-sach" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><HocPhiList /></RoleRoute>} />
+          {/* FIN — admin + nhan-vien + BGH */}
+          <Route path="/fin" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><FINDashboard /></RoleRoute>} />
+          <Route path="/fin/hoc-phi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><TuitionPage /></RoleRoute>} />
+          <Route path="/fin/hoc-phi/danh-sach" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HocPhiList /></RoleRoute>} />
           <Route path="/fin/hoc-phi/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CreateTuitionPage /></RoleRoute>} />
-          <Route path="/fin/hoc-phi/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><HocPhiDetailPage /></RoleRoute>} />
-          <Route path="/fin/chi-tieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><ExpensesPage /></RoleRoute>} />
-          <Route path="/fin/chi-tieu/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><ChiTieuDetailPage /></RoleRoute>} />
+          <Route path="/fin/hoc-phi/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HocPhiDetailPage /></RoleRoute>} />
+          <Route path="/fin/chi-tieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ExpensesPage /></RoleRoute>} />
+          <Route path="/fin/chi-tieu/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ChiTieuDetailPage /></RoleRoute>} />
 
           {/* LMS — admin + giang-vien + sinh-vien */}
           <Route path="/lms" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><LMSDashboard /></RoleRoute>} />
@@ -461,47 +466,47 @@ export default function AppRouter() {
           <Route path="/lib/muon/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><LoanDetailPage /></RoleRoute>} />
           <Route path="/lib/muon-tra" element={<BookLoan />} />
 
-          {/* WMS — admin + giang-vien + nhan-vien */}
-          <Route path="/wms" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><WMSDashboard /></RoleRoute>} />
-          <Route path="/wms/cong-viec" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><TaskList /></RoleRoute>} />
-          <Route path="/wms/cong-viec/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><TaskDetailPage /></RoleRoute>} />
-          <Route path="/wms/cong-viec-cua-toi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><WMSNotification /></RoleRoute>} />
-          <Route path="/wms/kanban" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><TaskBoard /></RoleRoute>} />
-          <Route path="/wms/tao-cv" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><TaskCreateForm /></RoleRoute>} />
+          {/* WMS — admin + giang-vien + nhan-vien + BGH */}
+          <Route path="/wms" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><WMSDashboard /></RoleRoute>} />
+          <Route path="/wms/cong-viec" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><TaskList /></RoleRoute>} />
+          <Route path="/wms/cong-viec/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><TaskDetailPage /></RoleRoute>} />
+          <Route path="/wms/cong-viec-cua-toi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><WMSNotification /></RoleRoute>} />
+          <Route path="/wms/kanban" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><TaskBoard /></RoleRoute>} />
+          <Route path="/wms/tao-cv" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><TaskCreateForm /></RoleRoute>} />
 
-          {/* KTX */}
-          <Route path="/ktx" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN]}><KTXDashboard /></RoleRoute>} />
-          <Route path="/ktx/phong/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><RoomDetailPage /></RoleRoute>} />
-          <Route path="/ktx/phong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><KTXRoomPage /></RoleRoute>} />
-          <Route path="/ktx/dang-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN]}><RoomRegistration /></RoleRoute>} />
-          <Route path="/ktx/sinh-vien" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><TenantList /></RoleRoute>} />
-          <Route path="/ktx/thu-phi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><ThuPhiKTX /></RoleRoute>} />
-          <Route path="/ktx/su-co" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SuCoKTX /></RoleRoute>} />
-          <Route path="/ktx/sinh-hoat" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN]}><SinhHoatKTX /></RoleRoute>} />
+          {/* KTX — admin + nhan-vien + giang-vien + BGH */}
+          <Route path="/ktx" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><KTXDashboard /></RoleRoute>} />
+          <Route path="/ktx/phong/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RoomDetailPage /></RoleRoute>} />
+          <Route path="/ktx/phong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><KTXRoomPage /></RoleRoute>} />
+          <Route path="/ktx/dang-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RoomRegistration /></RoleRoute>} />
+          <Route path="/ktx/sinh-vien" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><TenantList /></RoleRoute>} />
+          <Route path="/ktx/thu-phi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ThuPhiKTX /></RoleRoute>} />
+          <Route path="/ktx/su-co" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SuCoKTX /></RoleRoute>} />
+          <Route path="/ktx/sinh-hoat" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SinhHoatKTX /></RoleRoute>} />
 
-          {/* RIT */}
-          <Route path="/rit" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><RITDashboard /></RoleRoute>} />
-          <Route path="/rit/de-tai/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><CreateProjectPage /></RoleRoute>} />
-          <Route path="/rit/de-tai" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><ResearchProjectListPage /></RoleRoute>} />
-          <Route path="/rit/de-tai/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><ResearchDetail /></RoleRoute>} />
-          <Route path="/rit/ncv/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><CreateMemberPage /></RoleRoute>} />
-          <Route path="/rit/ncv/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><MemberDetailPage /></RoleRoute>} />
-          <Route path="/rit/ncv" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><ResearchMemberList /></RoleRoute>} />
-          <Route path="/rit/hop-tac" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><HopTacQuocTe /></RoleRoute>} />
-          <Route path="/rit/hop-tac/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><NckhDetailPage /></RoleRoute>} />
-          <Route path="/rit/danh-sach-nckh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><ResearchList /></RoleRoute>} />
+          {/* RIT — admin + giang-vien + BGH */}
+          <Route path="/rit" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><RITDashboard /></RoleRoute>} />
+          <Route path="/rit/de-tai/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><CreateProjectPage /></RoleRoute>} />
+          <Route path="/rit/de-tai" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><ResearchProjectListPage /></RoleRoute>} />
+          <Route path="/rit/de-tai/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><ResearchDetail /></RoleRoute>} />
+          <Route path="/rit/ncv/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><CreateMemberPage /></RoleRoute>} />
+          <Route path="/rit/ncv/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><MemberDetailPage /></RoleRoute>} />
+          <Route path="/rit/ncv" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><ResearchMemberList /></RoleRoute>} />
+          <Route path="/rit/hop-tac" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><HopTacQuocTe /></RoleRoute>} />
+          <Route path="/rit/hop-tac/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><NckhDetailPage /></RoleRoute>} />
+          <Route path="/rit/danh-sach-nckh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><ResearchList /></RoleRoute>} />
 
-          {/* BI */}
-          <Route path="/bi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><BIDashboard /></RoleRoute>} />
-          <Route path="/bi/bao-cao/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CreateReportPage /></RoleRoute>} />
-          <Route path="/bi/bao-cao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><BaoCaoList /></RoleRoute>} />
-          <Route path="/bi/chi-so" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><KPIsPage /></RoleRoute>} />
+          {/* BI — admin + nhan-vien + BGH */}
+          <Route path="/bi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><BIDashboard /></RoleRoute>} />
+          <Route path="/bi/bao-cao/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CreateReportPage /></RoleRoute>} />
+          <Route path="/bi/bao-cao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><BaoCaoList /></RoleRoute>} />
+          <Route path="/bi/chi-so" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><KPIsPage /></RoleRoute>} />
 
-          {/* INT */}
-          <Route path="/int" element={<RoleRoute roles={[ROLES.ADMIN]}><INTDashboard /></RoleRoute>} />
-          <Route path="/int/tich-hop" element={<RoleRoute roles={[ROLES.ADMIN]}><IntegrationList /></RoleRoute>} />
-          <Route path="/int/tich-hop/:id" element={<RoleRoute roles={[ROLES.ADMIN]}><IntegrationDetail /></RoleRoute>} />
-          <Route path="/int/nhat-ky" element={<RoleRoute roles={[ROLES.ADMIN]}><IntegrationLogs /></RoleRoute>} />
+          {/* INT — admin + BGH */}
+          <Route path="/int" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG]}><INTDashboard /></RoleRoute>} />
+          <Route path="/int/tich-hop" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG]}><IntegrationList /></RoleRoute>} />
+          <Route path="/int/tich-hop/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG]}><IntegrationDetail /></RoleRoute>} />
+          <Route path="/int/nhat-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG]}><IntegrationLogs /></RoleRoute>} />
 
           {/* OCR */}
           <Route path="/ocr" element={<RoleRoute roles={[ROLES.ADMIN]}><OCRDashboard /></RoleRoute>} />
@@ -511,12 +516,12 @@ export default function AppRouter() {
           {/* DCE — all roles */}
           <Route path="/dce" element={<DCEDashboard />} />
           <Route path="/dce/chuan-dau-ra" element={<CompetencyList />} />
-          <Route path="/dce/chuan-dau-ra/tao" element={<CompetencyCreate />} />
+          <Route path="/dce/chuan-dau-ra/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><CompetencyCreate /></RoleRoute>} />
           <Route path="/dce/chuan-dau-ra/:id" element={<CompetencyDetail />} />
           <Route path="/dce/khoa-dao-tao" element={<CourseCatalog />} />
           <Route path="/dce/khoa-dao-tao/ds" element={<CourseCatalogFull />} />
           <Route path="/dce/khoa-dao-tao/:id" element={<DCECourseDetail />} />
-          <Route path="/dce/khoa-dao-tao/tao" element={<DCECourseCreate />} />
+          <Route path="/dce/khoa-dao-tao/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA]}><DCECourseCreate /></RoleRoute>} />
 
           {/* PMS */}
           <Route path="/pms" element={<RoleRoute roles={[ROLES.ADMIN]}><PMSDashboard /></RoleRoute>} />
@@ -527,25 +532,25 @@ export default function AppRouter() {
           <Route path="/pms/bao-cao/chi-tiet/:id" element={<RoleRoute roles={[ROLES.ADMIN]}><PMSReportDetailPage /></RoleRoute>} />
           <Route path="/pms/bao-cao" element={<RoleRoute roles={[ROLES.ADMIN]}><PMSReportListPage /></RoleRoute>} />
 
-          {/* QA */}
-          <Route path="/qa" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QADashboard /></RoleRoute>} />
-          <Route path="/qa/kiem-dinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QAReviewPage /></RoleRoute>} />
-          <Route path="/qa/kiem-dinh/:id/minh-chung" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QAReviewEvidence /></RoleRoute>} />
-          <Route path="/qa/kiem-dinh/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QAReviewDetail /></RoleRoute>} />
-          <Route path="/qa/khieu-nai/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QAComplaintDetail /></RoleRoute>} />
-          <Route path="/qa/khieu-nai" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QAComplaintPage /></RoleRoute>} />
-          <Route path="/qa/bao-cao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QAReportListFull /></RoleRoute>} />
-          <Route path="/qa/bao-cao/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QAReportCreate /></RoleRoute>} />
-          <Route path="/qa/bao-cao/:id/minh-chung" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QAEvidenceList /></RoleRoute>} />
-          <Route path="/qa/bao-cao/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QAReportDetail /></RoleRoute>} />
-          <Route path="/qa/tai-san" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QATaiSanPage /></RoleRoute>} />
-          <Route path="/qa/tai-san/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QATaiSanCreate /></RoleRoute>} />
-          <Route path="/qa/tai-san/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QATaiSanDetail /></RoleRoute>} />
-          <Route path="/qa/tai-san/:id/chinh-sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QATaiSanEdit /></RoleRoute>} />
-          <Route path="/qa/tai-san/:id/bao-tri" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QATaiSanMaintenance /></RoleRoute>} />
-          <Route path="/qa/csvc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QACsvcPage /></RoleRoute>} />
-          <Route path="/qa/csvc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QACsvcCreate /></RoleRoute>} />
-          <Route path="/qa/csvc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN]}><QACsvcDetail /></RoleRoute>} />
+          {/* QA — admin + giang-vien + nhan-vien + BGH */}
+          <Route path="/qa" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QADashboard /></RoleRoute>} />
+          <Route path="/qa/kiem-dinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QAReviewPage /></RoleRoute>} />
+          <Route path="/qa/kiem-dinh/:id/minh-chung" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QAReviewEvidence /></RoleRoute>} />
+          <Route path="/qa/kiem-dinh/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QAReviewDetail /></RoleRoute>} />
+          <Route path="/qa/khieu-nai/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QAComplaintDetail /></RoleRoute>} />
+          <Route path="/qa/khieu-nai" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QAComplaintPage /></RoleRoute>} />
+          <Route path="/qa/bao-cao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QAReportListFull /></RoleRoute>} />
+          <Route path="/qa/bao-cao/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QAReportCreate /></RoleRoute>} />
+          <Route path="/qa/bao-cao/:id/minh-chung" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QAEvidenceList /></RoleRoute>} />
+          <Route path="/qa/bao-cao/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QAReportDetail /></RoleRoute>} />
+          <Route path="/qa/tai-san" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QATaiSanPage /></RoleRoute>} />
+          <Route path="/qa/tai-san/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QATaiSanCreate /></RoleRoute>} />
+          <Route path="/qa/tai-san/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QATaiSanDetail /></RoleRoute>} />
+          <Route path="/qa/tai-san/:id/chinh-sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QATaiSanEdit /></RoleRoute>} />
+          <Route path="/qa/tai-san/:id/bao-tri" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QATaiSanMaintenance /></RoleRoute>} />
+          <Route path="/qa/csvc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QACsvcPage /></RoleRoute>} />
+          <Route path="/qa/csvc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QACsvcCreate /></RoleRoute>} />
+          <Route path="/qa/csvc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QACsvcDetail /></RoleRoute>} />
 
           {/* Portal */}
 

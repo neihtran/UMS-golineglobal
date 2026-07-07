@@ -4,9 +4,11 @@ import {
   RefreshCw, Shield, Globe, Activity, ToggleLeft, ToggleRight,
 } from 'lucide-react';
 import {
-  Button, Badge, Card, CardContent,
+  Button, Badge, Card, CardContent, Switch,
 } from '@/components/ui';
+import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { PageHeader } from '@/components/layout';
+import { toast } from '@/components/ui/Toast';
 import CreateApiKeyModal from './CreateApiKeyModal';
 
 const API_KEYS = [
@@ -46,6 +48,8 @@ export default function ApiKeysPage() {
   const [showKey, setShowKey] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set(API_KEYS.filter(k => k.status === 'active').map(k => k.id)));
 
   const handleCopy = (key: string, id: string) => {
     navigator.clipboard.writeText(key);
@@ -53,7 +57,31 @@ export default function ApiKeysPage() {
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const activeCount = API_KEYS.filter(k => k.status === 'active').length;
+  const handleDeleteKey = () => {
+    if (!deleteTarget) return;
+    toast.success(`Đã xóa API Key "${deleteTarget.name}"`);
+    setDeleteTarget(null);
+  };
+
+  const handleRegenerateAll = () => {
+    toast.success('Đã regenerate tất cả API Keys. Token mới đang được tạo...');
+  };
+
+  const handleToggleKey = (keyId: string, keyName: string) => {
+    setActiveKeys(prev => {
+      const next = new Set(prev);
+      if (next.has(keyId)) {
+        next.delete(keyId);
+        toast.warning(`API Key "${keyName}" đã bị tắt`);
+      } else {
+        next.add(keyId);
+        toast.success(`API Key "${keyName}" đã bật hoạt động`);
+      }
+      return next;
+    });
+  };
+
+  const activeCount = activeKeys.size;
   const totalUsage = API_KEYS.reduce((s, k) => s + k.usage, 0);
 
   return (
@@ -64,7 +92,7 @@ export default function ApiKeysPage() {
         breadcrumbs={[{ label: 'IAM', href: '/iam' }, { label: 'API Keys' }]}
         actions={
           <>
-            <Button variant="outline" leftIcon={<RefreshCw className="h-4 w-4" />}>Regenerate all</Button>
+            <Button variant="outline" leftIcon={<RefreshCw className="h-4 w-4" />} onClick={handleRegenerateAll}>Regenerate all</Button>
             <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => setModalOpen(true)}>Tạo API Key mới</Button>
           </>
         }
@@ -95,7 +123,10 @@ export default function ApiKeysPage() {
       {/* Keys list */}
       <div className="space-y-4">
         {API_KEYS.map((apiKey) => {
-          const sc = STATUS_CONFIG[apiKey.status];
+          const isActive = activeKeys.has(apiKey.id);
+          const sc = isActive
+            ? { variant: 'success' as const, label: 'Hoạt động' }
+            : { variant: 'neutral' as const, label: 'Tắt' };
           const usagePercent = Math.round((apiKey.usage / apiKey.dailyLimit) * 100);
           const isShow = showKey === apiKey.id;
 
@@ -104,7 +135,7 @@ export default function ApiKeysPage() {
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
                   <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                    apiKey.status === 'active'
+                    isActive
                       ? 'bg-[rgb(var(--primary)/0.08)] text-[rgb(var(--primary))]'
                       : 'bg-[rgb(var(--border))] text-[rgb(var(--text-muted))]'
                   }`}>
@@ -177,10 +208,11 @@ export default function ApiKeysPage() {
                   </div>
 
                   <div className="shrink-0 flex flex-col items-end gap-2">
-                    <Badge variant={apiKey.status === 'active' ? 'success' : 'neutral'} size="sm">
-                      {apiKey.status === 'active' ? <ToggleRight className="h-3.5 w-3.5" /> : <ToggleLeft className="h-3.5 w-3.5" />}
-                    </Badge>
-                    <Button variant="ghost" size="sm" className="text-[rgb(var(--error))]">
+                    <Switch
+                      checked={activeKeys.has(apiKey.id)}
+                      onChange={() => handleToggleKey(apiKey.id, apiKey.name)}
+                    />
+                    <Button variant="ghost" size="sm" className="text-[rgb(var(--error))]" onClick={() => setDeleteTarget({ id: apiKey.id, name: apiKey.name })}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -193,6 +225,16 @@ export default function ApiKeysPage() {
       <CreateApiKeyModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
+      />
+      <ConfirmModal
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteKey}
+        title="Xóa API Key"
+        description={`Bạn có chắc chắn muốn xóa API Key "${deleteTarget?.name}"? Hành động này không thể hoàn tác.`}
+        confirmText="Xóa"
+        cancelText="Hủy"
+        variant="danger"
       />
     </div>
   );

@@ -6,12 +6,12 @@ import type { User } from '@/types/auth.types';
 // Role aliases — maps shorthand names from localStorage sessions to full ROLES constants
 const ROLE_ALIASES: Record<string, string> = {
   admin: ROLES.ADMIN,
-  'giang-vien': ROLES.GIAO_VIEN,
-  'sinh-vien': ROLES.SINH_VIEN,
-  'nhan-vien': ROLES.NHAN_VIEN,
   'hieu-truong': ROLES.HIEU_TRUONG,
   'pho-hieu-truong': ROLES.PHO_HIEU_TRUONG,
   'truong-khoa': ROLES.TRUONG_KHOA,
+  'giao-vien': ROLES.GIAO_VIEN,
+  'nhan-vien': ROLES.NHAN_VIEN,
+  'sinh-vien': ROLES.SINH_VIEN,
 };
 
 interface AuthContextValue {
@@ -26,55 +26,35 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// Demo users — one per role
+// Demo users — 7 roles matching the quick login accounts
 const DEMO_USERS: Record<string, User> = {
-  [ROLES.SUPER_ADMIN]: {
-    id: 'u000', name: 'Nguyễn Văn Super', email: 'super@truong.edu.vn',
-    role: ROLES.SUPER_ADMIN, avatar: null, permissions: ['*'],
-  },
   [ROLES.ADMIN]: {
-    id: 'u001', name: 'Nguyễn Văn Admin', email: 'admin@truong.edu.vn',
+    id: 'u001', name: 'Nguyễn Văn Admin', email: 'admin@truong-dhcn.vn',
     role: ROLES.ADMIN, avatar: null, permissions: ['*'],
   },
   [ROLES.HIEU_TRUONG]: {
-    id: 'u002', name: 'PGS.TS. Hoàng Văn Minh', email: 'hieu-truong@truong.edu.vn',
+    id: 'u002', name: 'PGS.TS. Trần Đình Long', email: 'tran.dinh.long@truong.edu.vn',
     role: ROLES.HIEU_TRUONG, avatar: null, permissions: ['*'],
   },
   [ROLES.PHO_HIEU_TRUONG]: {
-    id: 'u003', name: 'TS. Lê Thị Lan', email: 'pho-hieu-truong@truong.edu.vn',
+    id: 'u003', name: 'TS. Nguyễn Thị Lan Hương', email: 'nguyen.thi.lan.huong@truong.edu.vn',
     role: ROLES.PHO_HIEU_TRUONG, avatar: null, permissions: ['*'],
   },
   [ROLES.TRUONG_KHOA]: {
-    id: 'u004', name: 'TS. Nguyễn Văn Khoa', email: 'truong-khoa-cntt@truong.edu.vn',
+    id: 'u004', name: 'TS. Trường Minh Tuấn', email: 'truong.minh.tuan@truong.edu.vn',
     role: ROLES.TRUONG_KHOA, avatar: null, permissions: ['sis.*', 'hrm.*', 'dms.*', 'rit.*', 'qa.*'],
   },
-  [ROLES.PHO_TRUONG_KHOA]: {
-    id: 'u005', name: 'TS. Phạm Thị Phó', email: 'photruongkhoa@truong.edu.vn',
-    role: ROLES.PHO_TRUONG_KHOA, avatar: null, permissions: ['sis.*', 'hrm.*', 'dms.*'],
-  },
   [ROLES.GIAO_VIEN]: {
-    id: 'u006', name: 'Th.S. Thảo Nguyễn', email: 'thao.nguyen@truong.edu.vn',
-    role: ROLES.GIAO_VIEN, avatar: null, permissions: ['lms.*', 'portal.giang-vien', 'portal.*', 'lib.*', 'sis.*', 'exam.*', 'rit.*', 'dce.*', 'qa.*'],
-  },
-  [ROLES.CAN_BO_PHAN_CONG]: {
-    id: 'u007', name: 'CN. Nguyễn Thị Phân', email: 'phancb@truong.edu.vn',
-    role: ROLES.CAN_BO_PHAN_CONG, avatar: null, permissions: ['sis.*', 'wms.*'],
-  },
-  [ROLES.CHUYEN_VIEN]: {
-    id: 'u008', name: 'ThS. Trần Văn Chuyên', email: 'chuyenvien@truong.edu.vn',
-    role: ROLES.CHUYEN_VIEN, avatar: null, permissions: ['hrm.*', 'fin.*', 'dms.*', 'wms.*', 'ktx.*'],
+    id: 'u005', name: 'Th.S. Nguyễn Hoàng Long', email: 'nguyen.hoang.long@truong.edu.vn',
+    role: ROLES.GIAO_VIEN, avatar: null, permissions: ['lms.*', 'portal.*', 'lib.*', 'sis.*', 'exam.*', 'rit.*', 'dce.*', 'qa.*'],
   },
   [ROLES.NHAN_VIEN]: {
-    id: 'u009', name: 'Chu Hanh', email: 'hanh.chu@truong.edu.vn',
+    id: 'u006', name: 'CN. Hoàng Thị Tân', email: 'hoang.thi.tan@truong.edu.vn',
     role: ROLES.NHAN_VIEN, avatar: null, permissions: ['hrm.*', 'dms.*', 'fin.*', 'sis.*', 'wms.*', 'bi.*', 'ktx.*', 'qa.*'],
   },
   [ROLES.SINH_VIEN]: {
-    id: 'u010', name: 'Nguyễn Văn An', email: 'an.nguyen@truong.edu.vn',
+    id: 'u007', name: 'Trần Văn Sinh', email: 'sv-2025-0001@sinhvien.truong.edu.vn',
     role: ROLES.SINH_VIEN, avatar: null, permissions: ['portal.sinh-vien', 'portal.*', 'lms.*', 'lib.*', 'exam.view'],
-  },
-  [ROLES.KHAI_THA]: {
-    id: 'u011', name: 'Lê Văn Khai', email: 'khai.tha@truong.edu.vn',
-    role: ROLES.KHAI_THA, avatar: null, permissions: ['bi.bao-cao', 'bi.chi-so'],
   },
 };
 
@@ -112,18 +92,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('ums_session', JSON.stringify(userWithEmail));
 
     const roleDashboardMap: Partial<Record<string, string>> = {
-      [ROLES.SUPER_ADMIN]: '/dashboard',
-      [ROLES.ADMIN]: '/dashboard',
+      [ROLES.ADMIN]: '/dashboard/admin',
       [ROLES.HIEU_TRUONG]: '/dashboard/bgh',
       [ROLES.PHO_HIEU_TRUONG]: '/dashboard/bgh',
       [ROLES.TRUONG_KHOA]: '/dashboard/truong-khoa',
-      [ROLES.PHO_TRUONG_KHOA]: '/dashboard/truong-khoa',
-      [ROLES.GIAO_VIEN]: '/dashboard/gv',
-      [ROLES.CAN_BO_PHAN_CONG]: '/dashboard/gv',
-      [ROLES.CHUYEN_VIEN]: '/dashboard/gv',
-      [ROLES.NHAN_VIEN]: '/dashboard/gv',
-      [ROLES.SINH_VIEN]: '/portal',
-      [ROLES.KHAI_THA]: '/bi',
+      [ROLES.GIAO_VIEN]: '/dashboard/giao-vien',
+      [ROLES.NHAN_VIEN]: '/dashboard/nhan-vien',
+      [ROLES.SINH_VIEN]: '/dashboard/sinh-vien',
     };
     navigate(roleDashboardMap[matchedUser.role] ?? '/dashboard');
   };

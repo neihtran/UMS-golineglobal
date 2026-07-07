@@ -14,7 +14,7 @@ import {
   Badge,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 
 const DEPT_BARS = [
   { name: 'CNTT', count: 42 },
@@ -121,8 +121,8 @@ export default function HRMDashboard() {
               <BarChart data={DEPT_BARS} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                 <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
-                <Bar dataKey="count" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                <Bar dataKey="count" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} maxBarSize={40}  animationDuration={1500} animationEasing="ease-out" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -134,11 +134,11 @@ export default function HRMDashboard() {
           </div>
           <CardContent className="h-72 flex flex-col items-center justify-center">
             <ResponsiveContainer width="100%" height="80%">
-              <PieChart>
+              <PieChart animationDuration={1500} animationEasing="ease-out">
                 <Pie
                   data={EDUCATION_PIE} cx="50%" cy="50%"
                   innerRadius={55} outerRadius={80} paddingAngle={4} dataKey="value"
-                >
+                 animationDuration={1500} animationEasing="ease-out">
                   {EDUCATION_PIE.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index]} />
                   ))}
@@ -169,10 +169,12 @@ export default function HRMDashboard() {
         <CardContent className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={MONTHLY_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} domain={[440, 460]} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
-              <Line type="monotone" dataKey="count" stroke="rgb(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: 'rgb(var(--primary))' }} />
+              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+              <Line type="monotone" dataKey="count" stroke="rgb(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: 'rgb(var(--primary))' }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -195,12 +197,14 @@ export default function HRMDashboard() {
               { month: 'T5', applied: 47, interviewed: 33, hired: 7 },
               { month: 'T6', applied: 78, interviewed: 52, hired: 12 },
             ]} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
-              <Line type="monotone" dataKey="applied" name={t('dashboard.chart.applied')} stroke="rgb(var(--primary))" strokeWidth={2} dot={{ r: 3, fill: 'rgb(var(--primary))' }} />
-              <Line type="monotone" dataKey="interviewed" name={t('dashboard.chart.interviewed')} stroke="rgb(var(--accent))" strokeWidth={2} dot={{ r: 3, fill: 'rgb(var(--accent))' }} />
-              <Line type="monotone" dataKey="hired" name={t('dashboard.chart.hired')} stroke="rgb(var(--success))" strokeWidth={2} dot={{ r: 3, fill: 'rgb(var(--success))' }} />
+              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+              <Line type="monotone" dataKey="applied" name={t('dashboard.chart.applied')} stroke="rgb(var(--primary))" strokeWidth={2} dot={{ r: 3, fill: 'rgb(var(--primary))' }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="interviewed" name={t('dashboard.chart.interviewed')} stroke="rgb(var(--accent))" strokeWidth={2} dot={{ r: 3, fill: 'rgb(var(--accent))' }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
+              <Line type="monotone" dataKey="hired" name={t('dashboard.chart.hired')} stroke="rgb(var(--success))" strokeWidth={2} dot={{ r: 3, fill: 'rgb(var(--success))' }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>

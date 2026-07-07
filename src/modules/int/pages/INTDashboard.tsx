@@ -12,7 +12,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const TYPE_BADGE: Record<string, 'primary' | 'accent' | 'info' | 'warning'> = {
   ERP: 'primary', LMS: 'accent', Email: 'info', Portal: 'warning',
@@ -141,10 +141,12 @@ export default function INTDashboard() {
           <CardContent className="h-52">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={UPTIME_TREND} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <XAxis dataKey="day" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis domain={[94, 101]} tick={{ fontSize: 10, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} unit="%" />
                 <Tooltip formatter={(v: number) => [`Uptime: ${v}%`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Line type="monotone" dataKey="uptime" stroke="rgb(var(--success))" strokeWidth={2.5} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="uptime" stroke="rgb(var(--success))" strokeWidth={2.5} dot={{ r: 4 }}  animationDuration={1500} animationEasing="ease-out" activeDot={{ r: 6, strokeWidth: 0 }} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>

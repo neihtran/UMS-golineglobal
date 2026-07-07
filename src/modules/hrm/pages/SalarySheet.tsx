@@ -9,7 +9,7 @@ import {
   TableHeadCell, TableCell, TableEmpty, Modal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const PAYROLLS = [
   { id: 'pr01', name: 'Nguyễn Hoàng Long', code: 'VC-2020-001', dept: 'Khoa CNTT', position: 'Trưởng khoa', salary: 18500000, allowance: 4500000, deduction: 2100000, net: 20900000, month: '06/2026', status: 'paid' },
@@ -121,11 +121,13 @@ export default function SalarySheet() {
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={CHART_DATA} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
               <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
-              <Bar dataKey="total" name={t('salary.chart.total')} fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="bonus" name={t('salary.chart.bonus')} fill="rgb(var(--accent))" radius={[4, 4, 0, 0]} />
+              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+              <Bar dataKey="total" name={t('salary.chart.total')} fill="rgb(var(--primary))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
+              <Bar dataKey="bonus" name={t('salary.chart.bonus')} fill="rgb(var(--accent))" radius={[4, 4, 0, 0]}  animationDuration={1500} animationEasing="ease-out" />
             </BarChart>
           </ResponsiveContainer>
         </div>

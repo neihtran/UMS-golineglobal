@@ -14,7 +14,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const ROLE_BADGE: Record<string, 'error' | 'warning' | 'neutral' | 'info'> = {
   'Bí thư Đảng ủy': 'error',
@@ -163,12 +163,14 @@ export default function PMSDashboard() {
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ACTIVITY} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--border)/0.5)" />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="meetings" fill="rgb(var(--error))" radius={[4, 4, 0, 0]} name={t('dashboard.activities.meetings')} />
-                <Bar dataKey="studies" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.activities.studies')} />
-                <Bar dataKey="campaigns" fill="rgb(var(--success))" radius={[4, 4, 0, 0]} name={t('dashboard.activities.campaigns')} />
+                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }}  cursor={{ fill: 'rgb(var(--border)/0.1)' }} />
+                <Bar dataKey="meetings" fill="rgb(var(--error))" radius={[4, 4, 0, 0]} name={t('dashboard.activities.meetings')}  animationDuration={1500} animationEasing="ease-out" />
+                <Bar dataKey="studies" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.activities.studies')}  animationDuration={1500} animationEasing="ease-out" />
+                <Bar dataKey="campaigns" fill="rgb(var(--success))" radius={[4, 4, 0, 0]} name={t('dashboard.activities.campaigns')}  animationDuration={1500} animationEasing="ease-out" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

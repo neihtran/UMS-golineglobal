@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Plus, RefreshCw, Globe, Eye } from 'lucide-react';
 import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
@@ -42,6 +43,7 @@ const STATUS_CONFIG = {
 
 export default function IntegrationList() {
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('Tất cả');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -141,7 +143,7 @@ export default function IntegrationList() {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />}>Log</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate('/int/nhat-ky')}>Log</Button>
                   </div>
                 </TableCell>
               </TableRow>
