@@ -63,6 +63,7 @@
   "contract": {
     "title": "Labor Contracts",
     "description": "HRM-01 — Manage labor contracts, types, and terms",
+    "breadcrumb": "Contracts",
     "createContract": "Create New Contract",
     "statusActive": "Active",
     "statusExpiring": "Expiring Soon",
@@ -104,6 +105,14 @@
       "downloadFile": "Download Contract",
       "contractFile": "Contract File",
       "downloadHint": "Can be downloaded or printed directly"
+    },
+    "table": {
+      "nam": "Year",
+      "hoTen": "Full Name",
+      "donVi": "Unit",
+      "loaiHD": "Contract",
+      "trangThai": "Status",
+      "thaoTac": "Actions"
     }
   },
     "leave": {
@@ -376,7 +385,9 @@
       "permanent": "Permanent",
       "visiting": "Visiting",
       "trial": "Probationary",
-      "trialNote": "needs monitoring"
+      "trialNote": "needs monitoring",
+      "faculties": "Faculties",
+      "active": "Active"
     },
     "table": {
       "dept": "Department",
@@ -385,8 +396,11 @@
       "visiting": "Visiting",
       "total": "Total",
       "status": "Status",
+      "type": "Type",
+      "contact": "Contact",
       "statusActive": "Active",
-      "statusWarning": "Warning"
+      "statusWarning": "Warning",
+      "statusInactive": "Inactive"
     },
     "chart": {
       "title": "Staff Distribution",

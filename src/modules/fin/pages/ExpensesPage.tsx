@@ -4,42 +4,45 @@ import { Plus, Search, TrendingUp, DollarSign, PieChart, Download } from 'lucide
 import { useTranslation } from 'react-i18next';
 import { Button, Badge } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { usePagination } from '@/hooks';
-
-const EXPENSES = [
-  { id: 'e1', code: 'CP001', description: 'Chi phí vật liệu văn phòng Q1/2026', category: 'Vật liệu', amount: 45000000, dept: 'Phòng HC', date: '2026-03-15', status: 'approved' },
-  { id: 'e2', code: 'CP002', description: 'Chi phí điện nước tháng 3/2026', category: 'Điện nước', amount: 125000000, dept: 'Phòng HC', date: '2026-03-31', status: 'approved' },
-  { id: 'e3', code: 'CP003', description: 'Mua sắm thiết bị phòng lab CNTT', category: 'Thiết bị', amount: 320000000, dept: 'Khoa CNTT', date: '2026-04-05', status: 'pending' },
-  { id: 'e4', code: 'CP004', description: 'Chi phí in ấn tài liệu học kỳ', category: 'In ấn', amount: 18000000, dept: 'Phòng Đào tạo', date: '2026-04-10', status: 'pending' },
-  { id: 'e5', code: 'CP005', description: 'Sửa chữa hệ thống PCCC', category: 'Sửa chữa', amount: 75000000, dept: 'Phòng HC', date: '2026-04-12', status: 'rejected' },
-];
-
-const CATEGORY_COLORS: Record<string, string> = {
-  'Vật liệu': 'primary', 'Điện nước': 'info', 'Thiết bị': 'accent',
-  'In ấn': 'warning', 'Sửa chữa': 'neutral',
-};
+import { useExpenditureList } from '@/hooks/useFin';
 
 function fmt(v: number) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v);
 }
 
+const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; label: string }> = {
+  draft: { variant: 'neutral', label: 'Nháp' },
+  pending: { variant: 'warning', label: 'Chờ duyệt' },
+  approved: { variant: 'success', label: 'Đã duyệt' },
+  rejected: { variant: 'error', label: 'Từ chối' },
+  completed: { variant: 'neutral', label: 'Hoàn thành' },
+};
+
 export default function ExpensesPage() {
   const { t } = useTranslation('fin');
   const navigate = useNavigate();
-  const { pagination, setPage } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
 
-  const filtered = EXPENSES.filter((e) =>
-    !search || e.description.toLowerCase().includes(search.toLowerCase()) || e.code.toLowerCase().includes(search.toLowerCase()),
-  );
-  const paged = filtered.slice((pagination.page - 1) * pagination.pageSize, pagination.page * pagination.pageSize);
-  const total = filtered.reduce((s, e) => s + e.amount, 0);
+  const { data, isLoading } = useExpenditureList({
+    search: search || undefined,
+    status: status || undefined,
+    page,
+    pageSize,
+  });
 
-  const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; label: string }> = {
-    approved: { variant: 'success', label: t('expenditure.status.approved') },
-    pending: { variant: 'warning', label: t('expenditure.status.pending') },
-    rejected: { variant: 'error', label: t('expenditure.status.rejected') },
-  };
+  const list = data?.data ?? [];
+
+  const totalAmount = list.reduce((s: number, e: any) => s + (e.amount ?? 0), 0);
+  const approvedAmount = list.filter((e: any) => e.status === 'approved').reduce((s: number, e: any) => s + (e.amount ?? 0), 0);
+  const pendingAmount = list.filter((e: any) => e.status === 'pending').reduce((s: number, e: any) => s + (e.amount ?? 0), 0);
+  const rejectedAmount = list.filter((e: any) => e.status === 'rejected').reduce((s: number, e: any) => s + (e.amount ?? 0), 0);
+
+  if (isLoading && list.length === 0) {
+    return <div className="flex items-center justify-center h-64"><p className="text-[rgb(var(--text-muted))]">Đang tải...</p></div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -51,10 +54,10 @@ export default function ExpensesPage() {
       />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
-          { label: t('expenditure.statTotal'), value: fmt(583000000), color: 'error', icon: <DollarSign className="h-5 w-5" /> },
-          { label: t('expenditure.statApproved'), value: fmt(170000000), color: 'success', icon: <TrendingUp className="h-5 w-5" /> },
-          { label: t('expenditure.statPending'), value: fmt(338000000), color: 'warning', icon: <PieChart className="h-5 w-5" /> },
-          { label: t('expenditure.statRejected'), value: fmt(75000000), color: 'neutral', icon: <DollarSign className="h-5 w-5" /> },
+          { label: 'Tổng chi', value: fmt(totalAmount), color: 'error', icon: <DollarSign className="h-5 w-5" /> },
+          { label: 'Đã duyệt', value: fmt(approvedAmount), color: 'success', icon: <TrendingUp className="h-5 w-5" /> },
+          { label: 'Chờ duyệt', value: fmt(pendingAmount), color: 'warning', icon: <PieChart className="h-5 w-5" /> },
+          { label: 'Từ chối', value: fmt(rejectedAmount), color: 'neutral', icon: <DollarSign className="h-5 w-5" /> },
         ].map((s) => (
           <div key={s.label} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] p-4 flex items-center gap-3">
             <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--${s.color})/0.1)] text-[rgb(var(--${s.color}))]`}>
@@ -73,37 +76,45 @@ export default function ExpensesPage() {
           <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             placeholder={t('expenditure.search')} className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] pl-9 pr-3 text-sm w-64 focus:outline-none focus:ring-2" />
         </div>
-        <p className="text-sm text-[rgb(var(--text-muted))]">
-          {t('expenditure.total')} <span className="font-bold text-[rgb(var(--text-primary))]">{fmt(total)}</span>
-        </p>
+        <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}
+          className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm focus:outline-none focus:ring-2">
+          <option value="">Tất cả trạng thái</option>
+          {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+            <option key={key} value={key}>{cfg.label}</option>
+          ))}
+        </select>
       </div>
-      <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-[rgb(var(--border)/0.6)]">
-              {['Mã', 'Mô tả', 'Loại', 'Phòng', 'Số tiền', 'Ngày', 'Trạng thái'].map((h) => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-muted))] uppercase tracking-wide">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[rgb(var(--border)/0.4)]">
-            {paged.map((e) => (
-              <tr key={e.id} className="hover:bg-[rgb(var(--bg-hover))] transition-colors">
-                <td className="px-4 py-3 text-xs font-mono text-[rgb(var(--text-secondary))]">{e.code}</td>
-                <td className="px-4 py-3 text-sm text-[rgb(var(--text-primary))]">{e.description}</td>
-                <td className="px-4 py-3"><Badge variant={CATEGORY_COLORS[e.category] as any} size="sm">{e.category}</Badge></td>
-                <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">{e.dept}</td>
-                <td className="px-4 py-3 text-sm font-bold text-[rgb(var(--error))]">{fmt(e.amount)}</td>
-                <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">{e.date}</td>
-                <td className="px-4 py-3"><Badge variant={STATUS_CONFIG[e.status].variant} dot size="sm">{STATUS_CONFIG[e.status].label}</Badge></td>
-                <td className="px-4 py-3">
-                  <Button variant="ghost" size="sm" onClick={() => navigate(`/fin/chi-tieu/${e.id}`)}>{t('expenditure.detail')}</Button>
-                </td>
+      {list.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-[rgb(var(--border))] p-12 text-center">
+          <p className="text-[rgb(var(--text-muted))]">Không có khoản chi nào</p>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[rgb(var(--border)/0.6)]">
+                {['Mã', 'Tên khoản chi', 'Loại', 'Số tiền', 'Trạng thái'].map((h) => (
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-muted))] uppercase tracking-wide">{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-[rgb(var(--border)/0.4)]">
+              {list.map((e: any) => {
+                const sc = STATUS_CONFIG[e.status] || { variant: 'neutral' as const, label: e.status };
+                return (
+                  <tr key={e._id} className="hover:bg-[rgb(var(--bg-hover))] transition-colors">
+                    <td className="px-4 py-3 text-xs font-mono text-[rgb(var(--text-secondary))]">{e.name?.slice(0, 20)}</td>
+                    <td className="px-4 py-3 text-sm text-[rgb(var(--text-primary))]">{e.name || '—'}</td>
+                    <td className="px-4 py-3"><Badge variant="info" size="sm">{e.category || '—'}</Badge></td>
+                    <td className="px-4 py-3 text-sm font-bold text-[rgb(var(--error))]">{fmt(e.amount ?? 0)}</td>
+                    <td className="px-4 py-3"><Badge variant={sc.variant} dot size="sm">{sc.label}</Badge></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

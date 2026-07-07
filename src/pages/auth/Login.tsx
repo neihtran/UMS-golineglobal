@@ -1,23 +1,82 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/app/providers';
 import { Button, Input } from '@/components/ui';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Login() {
   const { t } = useTranslation('common');
-  const { login } = useAuth();
+  const { login: authLogin, isAuthenticated } = useAuth();
+  const { user: storeUser, _hasHydrated } = useAuthStore();
+  const [hasHydrated, setHasHydrated] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => { setHasHydrated(_hasHydrated); }, [_hasHydrated]);
+
+  const ROLE_DASHBOARD_LOGIN: Record<string, string> = {
+    SUPER_ADMIN: '/dashboard',
+    HIEU_TRUONG: '/dashboard',
+    PHO_HIEU_TRUONG: '/dashboard',
+    TRUONG_KHOA: '/dashboard',
+    GIAO_VIEN: '/portal',
+    NHAN_VIEN: '/hrm',
+    SINH_VIEN: '/portal',
+  };
+
+  // Redirect if already authenticated → go to their dashboard, not home
+  useEffect(() => {
+    if (!hasHydrated) return;
+    if (isAuthenticated && storeUser?.role) {
+      navigate(ROLE_DASHBOARD_LOGIN[storeUser.role] ?? '/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, hasHydrated]);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
   const [loading, setLoading] = useState(false);
+
+  // ─── Dev bypass: quick login by role ─────────────────────────────────────────
+  const DEV_ACCOUNTS = [
+    { role: 'SUPER_ADMIN', label: 'Quản trị viên', email: 'admin@truong.edu.vn', color: 'accent' },
+    { role: 'HIEU_TRUONG', label: 'Hiệu trưởng', email: 'tran.dinh.long@truong.edu.vn', color: 'primary' },
+    { role: 'PHO_HIEU_TRUONG', label: 'Phó Hiệu trưởng', email: 'nguyen.thi.lan.huong@truong.edu.vn', color: 'primary' },
+    { role: 'TRUONG_KHOA', label: 'Trưởng khoa', email: 'hoang.minh.tuan@truong.edu.vn', color: 'primary' },
+    { role: 'GIAO_VIEN', label: 'Giảng viên', email: 'nguyen.hoang.long@truong.edu.vn', color: 'success' },
+    { role: 'NHAN_VIEN', label: 'Nhân viên', email: 'hoang.thi.lan@truong.edu.vn', color: 'warning' },
+    { role: 'SINH_VIEN', label: 'Sinh viên', email: 'sv-2020-0001@sinhvien.truong.edu.vn', color: 'info' },
+  ] as const;
+
+  // ─── Dev login: call real API with seed account credentials ───────────────────
+  const handleDevLogin = async (email: string) => {
+    setLoading(true);
+    setErrors({});
+    try {
+      // Dev bypass: call the real backend login API with seed account credentials
+      // Seed accounts all have password: Password@123
+      const result = await authLogin(email, 'Password@123');
+      if (result?.mfaRequired) {
+        navigate('/auth/mfa');
+        return;
+      }
+      if (result?.error) {
+        setErrors({ general: result.error });
+        return;
+      }
+      // On success, authLogin already called storeLogin + navigate internally
+    } catch {
+      setErrors({ general: 'Đăng nhập thất bại. Thử lại.' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validate = () => {
     const errs: typeof errors = {};
-    if (!email) errs.email = t('validation.required');
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = t('validation.emailInvalid');
+    if (!email.trim()) errs.email = t('validation.required');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errs.email = t('validation.emailInvalid');
     if (!password) errs.password = t('validation.required');
-    else if (password.length < 6) errs.password = t('validation.passwordMinLength', { min: 6 });
     return errs;
   };
 
@@ -27,8 +86,19 @@ export default function Login() {
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
     setLoading(true);
+
     try {
-      await login(email, password);
+      const result = await authLogin(email.trim(), password);
+
+      if (result?.mfaRequired) {
+        navigate('/auth/mfa');
+        return;
+      }
+
+      if (result?.error) {
+        setErrors({ general: result.error });
+        return;
+      }
     } finally {
       setLoading(false);
     }
@@ -36,6 +106,18 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen">
+      {/* Loading splash while auth store rehydrates from localStorage */}
+      {!hasHydrated && (
+        <div className="flex min-h-screen items-center justify-center bg-[rgb(var(--bg-base))] w-full">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[rgb(var(--border))] border-t-[rgb(var(--primary))]" />
+            <p className="text-sm text-[rgb(var(--text-muted))]">Đang khởi tạo...</p>
+          </div>
+        </div>
+      )}
+
+      {hasHydrated && (
+      <>
       {/* ─── Left panel: branding ──────────────────────────────────────── */}
       <div
         className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden"
@@ -47,12 +129,8 @@ export default function Login() {
         <div className="absolute -bottom-10 -right-10 h-72 w-72 rounded-full border border-white/5" />
 
         {/* Logo */}
-        <div className="relative z-10 flex items-center gap-3">
+        <div className="relative z-10">
           <img src="/logo-pedagogy.png" alt={t('nav.brandShort')} className="h-12 w-auto" />
-          <div>
-            <p className="text-2xl font-bold text-white">{t('login.brandName')}</p>
-            <p className="text-sm text-white/60">{t('login.brandSubtitle')}</p>
-          </div>
         </div>
 
         {/* Content */}
@@ -65,7 +143,6 @@ export default function Login() {
             {t('login.heroDescription')}
           </p>
 
-          {/* Feature chips */}
           <div className="flex flex-wrap gap-2">
             {['IAM · HRM · SIS', 'LMS · EXAM · FIN', 'DMS · WMS · BI', 'OCR · KTX · RIT'].map((tag) => (
               <span key={tag} className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs text-white/70 backdrop-blur-sm">
@@ -107,6 +184,16 @@ export default function Login() {
               {t('login.subtitle')}
             </p>
           </div>
+
+          {/* General error */}
+          {errors.general && (
+            <div
+              role="alert"
+              className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            >
+              {errors.general}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <Input
@@ -165,11 +252,33 @@ export default function Login() {
             {t('login.ssoButton')}
           </Button>
 
+          {/* ─── Dev bypass: quick role login ──────────────────────────── */}
+          <div className="rounded-xl border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] p-4 space-y-2">
+            <p className="text-xs font-semibold text-[rgb(var(--text-muted))] uppercase tracking-wider mb-2">
+              Dev bypass — đăng nhập nhanh
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {DEV_ACCOUNTS.map((acc) => (
+                <button
+                  key={acc.role}
+                  type="button"
+                  onClick={() => handleDevLogin(acc.email)}
+                  className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] hover:bg-[rgb(var(--primary))/0.08] hover:border-[rgb(var(--primary))] transition-colors"
+                >
+                  <span className="text-[rgb(var(--text-secondary))]">{acc.label}</span>
+                  <span className="block text-[rgb(var(--text-muted))] text-[10px] mt-0.5">{acc.email}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <p className="text-center text-xs text-[rgb(var(--text-muted))]">
             {t('login.contactHint')}
           </p>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

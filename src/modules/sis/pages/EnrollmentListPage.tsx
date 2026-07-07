@@ -1,94 +1,138 @@
 import { useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Download, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Badge } from '@/components/ui';
+import { Card, Badge, Button, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useEnrollmentList } from '@/hooks/useSis';
 
-const ENROLLMENTS = [
-  { id: 'e1', studentCode: 'SV2026001', studentName: 'Nguyễn Văn An', class: 'CNTT-2026.1', course: 'CS101', courseName: 'Nhập môn Lập trình Python', semester: 'HK1 2026-2027', status: 'approved', enrolledAt: '2026-08-15' },
-  { id: 'e2', studentCode: 'SV2026002', studentName: 'Trần Thị Bình', class: 'CNTT-2026.1', course: 'CS101', courseName: 'Nhập môn Lập trình Python', semester: 'HK1 2026-2027', status: 'approved', enrolledAt: '2026-08-15' },
-  { id: 'e3', studentCode: 'SV2026003', studentName: 'Lê Minh Cường', class: 'CNTT-2026.1', course: 'MATH101', courseName: 'Giải tích 1', semester: 'HK1 2026-2027', status: 'pending', enrolledAt: '2026-08-18' },
-  { id: 'e4', studentCode: 'SV2026004', studentName: 'Phạm Thu Dung', class: 'CNTT-2026.2', course: 'CS101', courseName: 'Nhập môn Lập trình Python', semester: 'HK1 2026-2027', status: 'rejected', enrolledAt: '2026-08-16' },
-  { id: 'e5', studentCode: 'SV2026005', studentName: 'Hoàng Văn E', class: 'TOAN-2026.1', course: 'MATH101', courseName: 'Giải tích 1', semester: 'HK1 2026-2027', status: 'approved', enrolledAt: '2026-08-15' },
-  { id: 'e6', studentCode: 'SV2026006', studentName: 'Vũ Thị F', class: 'CNTT-2026.1', course: 'ENG101', courseName: 'Tiếng Anh Đại cương', semester: 'HK1 2026-2027', status: 'pending', enrolledAt: '2026-08-19' },
-];
-
-const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; labelKey: string }> = {
-  approved: { variant: 'success', labelKey: 'enrollment.status.approved' },
-  pending: { variant: 'warning', labelKey: 'enrollment.status.pending' },
-  rejected: { variant: 'error', labelKey: 'enrollment.status.rejected' },
+const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral' | 'info'; label: string }> = {
+  active: { variant: 'success', label: 'Đang học' },
+  completed: { variant: 'info', label: 'Hoàn thành' },
+  failed: { variant: 'error', label: 'Rớt' },
+  dropped: { variant: 'neutral', label: 'Thôi học' },
 };
 
 export default function EnrollmentListPage() {
   const { t } = useTranslation('sis');
-  const { pagination, setPage } = usePagination({ initialPage: 1, initialPageSize: 10 });
+  const navigate = useNavigate();
+  const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('');
 
-  const statuses = ['all', 'approved', 'pending', 'rejected'];
-  const filtered = ENROLLMENTS.filter((e) => {
-    const match = !search || e.studentName.toLowerCase().includes(search.toLowerCase()) || e.studentCode.includes(search);
-    const matchStatus = statusFilter === 'all' || e.status === statusFilter;
-    return match && matchStatus;
+  const { data, isLoading } = useEnrollmentList({
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    search,
+    status: statusFilter || undefined,
   });
-  const paged = filtered.slice((pagination.page - 1) * pagination.pageSize, pagination.page * pagination.pageSize);
-
-  const STATUS_FILTER_LABELS: Record<string, string> = {
-    all: t('enrollment.filter.allStatuses'),
-    approved: t('enrollment.status.approved'),
-    pending: t('enrollment.status.pending'),
-    rejected: t('enrollment.status.rejected'),
-  };
+  const items = data?.data ?? [];
+  const total = data?.pagination?.total ?? 0;
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('enrollment.titleList')}
-        description={t('enrollment.descriptionList', { count: ENROLLMENTS.length, semester: 'HK1 2026-2027' })}
-        breadcrumbs={[{ label: 'SIS', href: '/sis' }, { label: t('enrollment.breadcrumb.list') }]}
-        actions={<Button leftIcon={<Plus className="h-4 w-4" />}>{t('enrollment.add')}</Button>}
+        title={t('enrollment.title')}
+        description={t('enrollment.description')}
+        breadcrumbs={[
+          { label: 'SIS', href: '/sis' },
+          { label: t('enrollment.breadcrumb.list') },
+        ]}
+        actions={
+          <>
+            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('enrollment.export')}</Button>
+            <Button leftIcon={<Plus className="h-4 w-4" />}>{t('enrollment.add')}</Button>
+          </>
+        }
       />
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--text-muted))]" />
-          <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder={t('enrollment.filter.searchPlaceholder')} className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] pl-9 pr-3 text-sm w-64 focus:outline-none focus:ring-2" />
+
+      <Card>
+        <div className="p-5 border-b border-[rgb(var(--border)/0.6)] flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-48">
+            <label className="text-xs text-[rgb(var(--text-muted)] mb-1 block">{t('enrollment.search')}</label>
+            <input
+              type="text"
+              placeholder={t('enrollment.searchPlaceholder')}
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              className="w-full h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-muted))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary))]"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-[rgb(var(--text-muted)] mb-1 block">{t('enrollment.status')}</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+              className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2"
+            >
+              <option value="">{t('enrollment.allStatus')}</option>
+              <option value="active">{STATUS_CONFIG.active.label}</option>
+              <option value="completed">{STATUS_CONFIG.completed.label}</option>
+              <option value="failed">{STATUS_CONFIG.failed.label}</option>
+              <option value="dropped">{STATUS_CONFIG.dropped.label}</option>
+            </select>
+          </div>
         </div>
-        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm focus:outline-none focus:ring-2">
-          {statuses.map((s) => <option key={s} value={s}>{STATUS_FILTER_LABELS[s]}</option>)}
-        </select>
-      </div>
-      <div className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-[rgb(var(--border)/0.6)]">
-              {[t('enrollment.table.maSV'), t('enrollment.table.hoTen'), t('enrollment.table.lop'), t('enrollment.table.monHoc'), t('enrollment.table.hocKy'), t('enrollment.table.trangThai'), t('enrollment.table.ngayDK')].map((h) => (
-                <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-muted))] uppercase tracking-wide">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[rgb(var(--border)/0.4)]">
-            {paged.map((e) => (
-              <tr key={e.id} className="hover:bg-[rgb(var(--bg-hover))] transition-colors">
-                <td className="px-4 py-3 text-xs font-mono text-[rgb(var(--text-secondary))]">{e.studentCode}</td>
-                <td className="px-4 py-3 text-sm font-medium text-[rgb(var(--text-primary))]">{e.studentName}</td>
-                <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">{e.class}</td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[rgb(var(--primary)/0.1)] text-[10px] font-bold text-[rgb(var(--primary))]">{e.course}</div>
-                    <span className="text-sm text-[rgb(var(--text-primary))]">{e.courseName}</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-xs text-[rgb(var(--text-secondary))]">{e.semester}</td>
-                <td className="px-4 py-3"><Badge variant={STATUS_CONFIG[e.status].variant} dot size="sm">{t(STATUS_CONFIG[e.status].labelKey)}</Badge></td>
-                <td className="px-4 py-3 text-xs text-[rgb(var(--text-secondary))]">{e.enrolledAt}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeadCell>STT</TableHeadCell>
+              <TableHeadCell>{t('enrollment.table.student')}</TableHeadCell>
+              <TableHeadCell>{t('enrollment.table.subject')}</TableHeadCell>
+              <TableHeadCell>{t('enrollment.table.semester')}</TableHeadCell>
+              <TableHeadCell>{t('enrollment.table.score')}</TableHeadCell>
+              <TableHeadCell>{t('enrollment.table.status')}</TableHeadCell>
+              <TableHeadCell>{t('enrollment.table.actions')}</TableHeadCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {isLoading ? null : items.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-12 text-sm text-[rgb(var(--text-muted)]">{t('enrollment.noData')}</TableCell>
+              </TableRow>
+            ) : items.map((item: any, i: number) => {
+              const sc = STATUS_CONFIG[item.status] ?? { variant: 'neutral' as const, label: item.status };
+              return (
+                <TableRow key={item._id}>
+                  <TableCell className="text-[rgb(var(--text-muted))] tabular-nums">
+                    {(pagination.page - 1) * pagination.pageSize + i + 1}
+                  </TableCell>
+                  <TableCell>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary)]">{item.studentName || item.student?.name || '—'}</p>
+                    <p className="text-xs text-[rgb(var(--text-muted)]">{item.studentCode || item.student?.code || '—'}</p>
+                  </TableCell>
+                  <TableCell>
+                    <p className="text-sm text-[rgb(var(--text-primary)]">{item.subjectName || item.subject?.name || '—'}</p>
+                    <p className="text-xs text-[rgb(var(--text-muted)]">{item.subjectCode || item.subject?.code || '—'}</p>
+                  </TableCell>
+                  <TableCell className="text-sm text-[rgb(var(--text-secondary)]">{item.semester || item.enrollmentYear || '—'}</TableCell>
+                  <TableCell className="text-sm font-semibold text-[rgb(var(--text-primary)]">
+                    {item.score != null ? `${item.score}/10` : '—'}
+                  </TableCell>
+                  <TableCell><Badge variant={sc.variant} dot size="sm">{sc.label}</Badge></TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />}
+                      onClick={() => navigate(`/sis/enrollment/${item._id}`)}>
+                      {t('enrollment.chiTiet')}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+
+        <TablePagination
+          page={pagination.page}
+          pageSize={pagination.pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+          pageSizeOptions={[10, 25, 50]}
+        />
+      </Card>
     </div>
   );
 }

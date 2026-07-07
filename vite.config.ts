@@ -11,6 +11,16 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true,
+    open: false,
+    proxy: {
+      // Proxy to mock server (port 5001) by default for development
+      // When real backend is running on port 5000, change this to 'http://localhost:5000'
+      '/api': {
+        target: process.env.VITE_USE_REAL_API === 'true'
+          ? 'http://localhost:5000'
+          : 'http://localhost:5001',
+        changeOrigin: true,
+      },
+    },
   },
 });

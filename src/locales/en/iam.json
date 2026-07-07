@@ -32,13 +32,13 @@
       "pending": "Pending"
     },
     "role": {
-      "admin": "Administrator",
-      "giang-vien": "Lecturer",
-      "sinh-vien": "Student",
-      "nhan-vien": "Staff",
-      "hieu-truong": "Rector",
-      "pho-hieu-truong": "Vice Rector",
-      "truong-khoa": "Dean"
+      "SUPER_ADMIN": "Administrator",
+      "HIEU_TRUONG": "Rector",
+      "PHO_HIEU_TRUONG": "Vice Rector",
+      "TRUONG_KHOA": "Dean",
+      "GIAO_VIEN": "Lecturer",
+      "NHAN_VIEN": "Staff",
+      "SINH_VIEN": "Student"
     }
   },
   "role": {

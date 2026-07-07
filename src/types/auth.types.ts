@@ -7,7 +7,7 @@ export { ROLES, ROLE_LABELS, ROLE_HIERARCHY };
 
 // Role aliases — maps shorthand names used in auth demo to full ROLES constants
 export const ROLE_ALIASES: Record<string, (typeof ROLES)[keyof typeof ROLES]> = {
-  admin: ROLES.ADMIN,
+  admin: ROLES.SUPER_ADMIN,
   'giang-vien': ROLES.GIAO_VIEN,
   'sinh-vien': ROLES.SINH_VIEN,
   'nhan-vien': ROLES.NHAN_VIEN,

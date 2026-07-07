@@ -1,24 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, Search, Plus, BookOpen, Star, Eye, BookMarked as BorrowIcon, CheckCircle2 } from 'lucide-react';
-import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
+import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination, TableSkeleton } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { usePagination } from '@/hooks';
-
-const BOOKS = [
-  { id: 'b1', title: 'Introduction to Algorithms (CLRS)', author: 'Cormen, Leiserson, Rivest, Stein', isbn: '978-0262033848', category: 'CNTT', copies: 8, available: 3, borrowed: 5, rating: 4.9, location: 'Kệ A1-03', status: 'available' },
-  { id: 'b2', title: 'Kinh tế học vi mô', author: 'Nguyễn Văn A (CB)', isbn: '978-6040001234', category: 'Kinh tế', copies: 12, available: 7, borrowed: 5, rating: 4.7, location: 'Kệ B2-11', status: 'available' },
-  { id: 'b3', title: 'Giáo trình Luật Hiến pháp', author: 'PGS.TS. Trần Văn B', isbn: '978-6040005678', category: 'Luật', copies: 15, available: 10, borrowed: 5, rating: 4.5, location: 'Kệ C1-02', status: 'available' },
-  { id: 'b4', title: "Oxford Advanced Learner's Dictionary", author: 'Oxford University Press', isbn: '978-0194799000', category: 'Ngoại ngữ', copies: 6, available: 0, borrowed: 6, rating: 4.8, location: 'Kệ D1-05', status: 'borrowed' },
-  { id: 'b5', title: 'Giáo trình Vật lý Đại cương T1', author: 'PGS.TS. Đặng Văn C', isbn: '978-6040009012', category: 'Khoa học', copies: 20, available: 14, borrowed: 6, rating: 4.3, location: 'Kệ E2-08', status: 'available' },
-  { id: 'b6', title: 'Sổ tay Y học cơ sở', author: 'GS.TS. Lê Thị D', isbn: '978-6040003456', category: 'Y dược', copies: 10, available: 4, borrowed: 6, rating: 4.6, location: 'Kệ F1-01', status: 'available' },
-  { id: 'b7', title: 'Python Crash Course (2nd Ed)', author: 'Eric Matthes', isbn: '978-1593279288', category: 'CNTT', copies: 5, available: 2, borrowed: 3, rating: 4.8, location: 'Kệ A1-07', status: 'available' },
-  { id: 'b8', title: 'Lịch sử Đảng Cộng sản VN', author: 'Nxb CTQG', isbn: '978-6040007890', category: 'Chính trị', copies: 30, available: 28, borrowed: 2, rating: 4.1, location: 'Kệ G3-01', status: 'available' },
-  { id: 'b9', title: 'Giáo trình Sư phạm mầm non', author: 'PGS.TS. Nguyễn Thị E', isbn: '978-6040002345', category: 'Sư phạm', copies: 8, available: 5, borrowed: 3, rating: 4.4, location: 'Kệ H2-03', status: 'available' },
-  { id: 'b10', title: 'Marketing căn bản', author: 'TS. Phạm Văn F', isbn: '978-6040004567', category: 'Kinh tế', copies: 7, available: 7, borrowed: 0, rating: 4.2, location: 'Kệ B2-15', status: 'available' },
-  { id: 'b11', title: 'Triết học Mác-Lênin', author: 'Nxb CTQG', isbn: '978-6040001111', category: 'Chính trị', copies: 25, available: 18, borrowed: 7, rating: 4.0, location: 'Kệ G3-05', status: 'available' },
-  { id: 'b12', title: 'Giáo trình Hóa học Đại cương', author: 'PGS.TS. Hoàng Thị G', isbn: '978-6040006789', category: 'Khoa học', copies: 9, available: 0, borrowed: 9, rating: 3.9, location: 'Kệ E1-04', status: 'borrowed' },
-];
+import { usePagination, useDebounce, useBookList } from '@/hooks';
 
 const CATEGORY_COLORS: Record<string, string> = {
   'CNTT': 'primary',
@@ -46,23 +31,27 @@ export default function BookList() {
   const [categoryFilter, setCategoryFilter] = useState('Tất cả');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const filtered = BOOKS.filter((b) => {
-    const matchSearch = !search ||
-      b.title.toLowerCase().includes(search.toLowerCase()) ||
-      b.author.toLowerCase().includes(search.toLowerCase()) ||
-      b.isbn.includes(search);
-    const matchCategory = categoryFilter === 'Tất cả' || b.category === categoryFilter;
-    const matchStatus = statusFilter === 'all' || b.status === statusFilter;
-    return matchSearch && matchCategory && matchStatus;
+  const debouncedSearch = useDebounce(search, 300);
+
+  const { data, isLoading } = useBookList({
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    search: debouncedSearch || undefined,
+    status: statusFilter !== 'all' ? statusFilter : undefined,
+    categoryId: categoryFilter !== 'Tất cả' ? categoryFilter : undefined,
   });
 
-  const paged = filtered.slice((pagination.page - 1) * pagination.pageSize, pagination.page * pagination.pageSize);
+  const books = data?.data ?? [];
+  const total = data?.pagination?.total ?? 0;
+  const uniqueCategories = [...new Set(books.map((b: any) => b.category).filter(Boolean))].sort();
+
+  const getBookById = (id: string) => books.find((b) => b._id === id);
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Danh sách tài liệu"
-        description={`${filtered.length} đầu sách / tài liệu trong kho`}
+        description={`${total} đầu sách / tài liệu trong kho`}
         breadcrumbs={[{ label: 'LIB', href: '/lib' }, { label: 'Tài liệu' }]}
         actions={
           <>
@@ -84,7 +73,8 @@ export default function BookList() {
         </div>
         <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
           className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.3]">
-          {['Tất cả', 'CNTT', 'Kinh tế', 'Luật', 'Ngoại ngữ', 'Khoa học', 'Y dược', 'Chính trị', 'Sư phạm'].map(c => <option key={c}>{c}</option>)}
+          <option value="Tất cả">Tất cả</option>
+          {uniqueCategories.map(c => <option key={c}>{c}</option>)}
         </select>
         <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
           className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.3]">
@@ -109,68 +99,78 @@ export default function BookList() {
             <TableHeadCell>Thao tác</TableHeadCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {paged.map((b) => {
-            const sc = STATUS_CONFIG[b.status as keyof typeof STATUS_CONFIG];
-            return (
-              <TableRow key={b.id}>
-                <TableCell>
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary)/0.1)]">
-                      <BookOpen className="h-4 w-4 text-[rgb(var(--primary))]" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-[rgb(var(--text-primary))] max-w-[240px] truncate">{b.title}</p>
-                      <p className="text-[10px] text-[rgb(var(--text-muted))]">{b.author}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell><Badge variant={CATEGORY_COLORS[b.category] as any || 'neutral'} size="sm">{b.category}</Badge></TableCell>
-                <TableCell className="font-mono text-[10px] text-[rgb(var(--text-secondary))]">{b.isbn}</TableCell>
-                <TableCell className="text-xs text-[rgb(var(--text-secondary))] font-mono">{b.location}</TableCell>
-                <TableCell numeric className="text-[rgb(var(--text-secondary))]">{b.copies}</TableCell>
-                <TableCell numeric>
-                  <span className={`text-sm font-semibold ${b.available > 0 ? 'text-[rgb(var(--success))]' : 'text-[rgb(var(--error))]'}`}>
-                    {b.available}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {b.rating > 0 ? (
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
-                      <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">{b.rating.toFixed(1)}</span>
-                    </div>
-                  ) : (
-                    <span className="text-xs text-[rgb(var(--text-muted))]">—</span>
-                  )}
-                </TableCell>
-                <TableCell><Badge variant={sc.variant} size="sm">{sc.label}</Badge></TableCell>
-                <TableCell>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate(`/lib/tai-lieu/${b.id}`)}>Xem</Button>
-                    {b.available > 0 && (
-                      <Button variant="ghost" size="sm" leftIcon={<BorrowIcon className="h-3.5 w-3.5" />} onClick={() => setBorrowModal(b.id)}>Mượn</Button>
-                    )}
-                  </div>
-                </TableCell>
+        {isLoading ? (
+          <TableSkeleton rows={pagination.pageSize} colSpan={9} />
+        ) : (
+          <TableBody>
+            {books.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center py-12 text-sm text-[rgb(var(--text-muted))]">Không tìm thấy tài liệu nào</TableCell>
               </TableRow>
-            );
-          })}
-        </TableBody>
+            ) : (
+              books.map((b) => {
+                const sc = STATUS_CONFIG[b.status as keyof typeof STATUS_CONFIG] ?? STATUS_CONFIG.available;
+                return (
+                  <TableRow key={b._id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary)/0.1)]">
+                          <BookOpen className="h-4 w-4 text-[rgb(var(--primary))]" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-[rgb(var(--text-primary))] max-w-[240px] truncate">{b.title}</p>
+                          <p className="text-[10px] text-[rgb(var(--text-muted))]">{b.authorNames?.join(', ') || '—'}</p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell><Badge variant={CATEGORY_COLORS[b.categoryName ?? ''] as any || 'neutral'} size="sm">{b.categoryName ?? '—'}</Badge></TableCell>
+                    <TableCell className="font-mono text-[10px] text-[rgb(var(--text-secondary))]">{b.isbn ?? '—'}</TableCell>
+                    <TableCell className="text-xs text-[rgb(var(--text-secondary))] font-mono">{b.location ?? '—'}</TableCell>
+                    <TableCell numeric className="text-[rgb(var(--text-secondary))]">{b.totalCopies}</TableCell>
+                    <TableCell numeric>
+                      <span className={`text-sm font-semibold ${b.availableCopies > 0 ? 'text-[rgb(var(--success))]' : 'text-[rgb(var(--error))]'}`}>
+                        {b.availableCopies}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {b.borrowCount > 0 ? (
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
+                          <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">{b.borrowCount.toFixed(1)}</span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-[rgb(var(--text-muted))]">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell><Badge variant={sc.variant} size="sm">{sc.label}</Badge></TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate(`/lib/tai-lieu/${b._id}`)}>Xem</Button>
+                        {b.availableCopies > 0 && (
+                          <Button variant="ghost" size="sm" leftIcon={<BorrowIcon className="h-3.5 w-3.5" />} onClick={() => setBorrowModal(b._id)}>Mượn</Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        )}
       </Table>
 
       <TablePagination
         page={pagination.page}
         pageSize={pagination.pageSize}
-        total={filtered.length}
+        total={total}
         onPageChange={setPage}
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
 
-      {borrowModal && (
+      {borrowModal && getBookById(borrowModal) && (
         <ListBorrowModal
-          book={BOOKS.find((b) => b.id === borrowModal)!}
+          book={getBookById(borrowModal)!}
           onClose={() => setBorrowModal(null)}
         />
       )}
@@ -178,8 +178,11 @@ export default function BookList() {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type BookItem = any;
+
 interface ListBorrowModalProps {
-  book: typeof BOOKS[0];
+  book: BookItem;
   onClose: () => void;
 }
 

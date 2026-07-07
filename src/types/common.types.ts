@@ -67,30 +67,35 @@ export type VCStatus = 'active' | 'trial' | 'leave' | 'inactive';
 export type ContractType = 'Cơ hữu' | 'Thỉnh giảng' | 'Thử việc';
 
 export interface VienChuc {
-  id: string;
-  code: string;
+  id?: string;
+  _id?: string;
+  code?: string;
   name: string;
-  dob: string;
-  cccd: string;
-  gender: 'Nam' | 'Nữ';
-  ethnicity: string;
+  displayName?: string;
+  dob?: string;
+  cccd?: string;
+  gender?: 'Nam' | 'Nữ';
+  ethnicity?: string;
   religion?: string;
-  address: string;
-  contact: string;
-  phone: string;
-  email: string;
-  title: string;
-  position: string;
-  dept: string;
-  contractType: ContractType;
-  salary: number;
-  status: VCStatus;
-  joinDate: string;
-  education: string;
-  major: string;
-  school: string;
-  gradYear: number;
-  mfaEnabled: boolean;
+  address?: string;
+  contact?: string;
+  phone?: string;
+  email?: string;
+  title?: string;
+  position?: string;
+  dept?: string;
+  department?: string;
+  contractType?: string;
+  salary?: number;
+  status?: string;
+  joinDate?: string;
+  education?: string;
+  major?: string;
+  school?: string;
+  gradYear?: number;
+  mfaEnabled?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LeaveRequest {
@@ -115,32 +120,106 @@ export type EnrollmentStatus = 'registered' | 'completed' | 'failed' | 'withdraw
 
 export interface Student {
   id: string;
-  msv: string;
+  _id?: string;
+  msv?: string;
+  studentCode?: string;
+  code?: string;
   name: string;
-  dob: string;
-  gender: 'Nam' | 'Nữ';
-  class: string;
-  major: string;
-  dept: string;
-  cohort: string;
-  gpa: number;
-  credits: number;
-  status: StudentStatus;
+  displayName?: string;
+  dob?: string;
+  gender?: 'Nam' | 'Nữ';
+  class?: string;
+  className?: string;
+  major?: string;
+  dept?: string;
+  department?: { _id: string; name: string; code?: string };
+  faculty?: string;
+  cohort?: string;
+  gpa?: number;
+  credits?: number;
+  status: 'studying' | 'reserved' | 'suspended' | 'graduated' | 'quit' | 'active';
+  statusLabel?: string;
+  enrollmentDate?: string;
   enrollmentStatus?: EnrollmentStatus;
   phone?: string;
   email?: string;
   address?: string;
+  cccd?: string;
+  ethnicity?: string;
+  nationality?: string;
+  religion?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Subject {
   id: string;
+  _id?: string;
   code: string;
   name: string;
   credits: number;
-  semester: number;
-  type: 'theory' | 'practice' | 'project' | 'internship';
-  dept: string;
+  type?: 'theory' | 'practice' | 'project' | 'internship';
+  semester?: string;
+  semesterNum?: number;
+  hours?: number;
+  theoryHours?: number;
+  practiceHours?: number;
+  dept?: string;
+  department?: string;
+  departmentName?: string;
   ctdtId?: string;
+  prereqIds?: string[];
+  prerequisites?: string[];
+  semesterOffered?: string[];
+  description?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Enrollment {
+  id: string;
+  _id?: string;
+  studentId: string;
+  subjectId: string;
+  subjectName?: string;
+  semester: string;
+  academicYear: string;
+  classGroup?: string;
+  status: string;
+  scoreFormative?: number;
+  scoreMidterm?: number;
+  scoreFinal?: number;
+  grade?: string;
+  note?: string;
+  approvedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Internship {
+  id: string;
+  _id?: string;
+  studentId: string;
+  student?: string;
+  studentName?: string;
+  company?: string;
+  companyName: string;
+  companyAddress?: string;
+  location?: string;
+  position?: string;
+  mentorName?: string;
+  mentorPhone?: string;
+  supervisor?: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  progress?: number;
+  reportUrl?: string;
+  grade?: number;
+  note?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface GradeRecord {
@@ -579,11 +658,29 @@ export interface Pagination {
   totalPages: number;
 }
 
+// ─── API Response wrappers (must match backend: server/src/types/api.types.ts) ────
 export interface ApiResponse<T> {
+  success: true;
   data: T;
-  pagination?: Pagination;
-  error?: string;
   message?: string;
+}
+
+export interface PaginatedResponse<T> {
+  success: true;
+  data: T[];
+  pagination: Pagination;
+  message?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  items?: any; // legacy fallback for mixed API patterns
+}
+
+export interface ApiErrorResponse {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    details?: unknown;
+  };
 }
 
 export interface SelectOption {

@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Calendar, Send, Eye } from 'lucide-react';
+import { ArrowLeft, Calendar, Send } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { FormField } from '@/components/forms/FormField';
 import { Input } from '@/components/ui';
-
-const MOCK_VC = {
-  id: 'vc001', code: 'VC-2020-001', name: 'Nguyen Hoang Long', dept: 'Khoa CNTT',
-  position: 'Truong khoa', availableDays: 12, usedDays: 8, pendingDays: 0,
-};
+import { useCreateLeave, useLeaveBalance, useLeaveList } from '@/hooks/useLeave';
+import { useAuthStore } from '@/stores/authStore';
+import type { LeaveRequest } from '@/services/leave.service';
 
 const LEAVE_TYPES = [
   { id: 'annual', labelKey: 'leaveRequestForm.leaveTypeAnnual', color: 'primary' },
@@ -21,12 +19,6 @@ const LEAVE_TYPES = [
   { id: 'other', labelKey: 'leaveRequestForm.leaveTypeOther', color: 'info' },
 ];
 
-const LEAVE_HISTORY = [
-  { id: 'l1', type: 'annual', startDate: '2026-04-15', endDate: '2026-04-19', days: 5, reason: 'Nghi phep nam 2026', status: 'approved', approvedBy: 'TS. Tran Thi Lan', approvedAt: '2026-04-10' },
-  { id: 'l2', type: 'sick', startDate: '2026-02-03', endDate: '2026-02-04', days: 2, reason: 'Om dau', status: 'approved', approvedBy: 'TS. Tran Thi Lan', approvedAt: '2026-02-03' },
-  { id: 'l3', type: 'annual', startDate: '2025-12-25', endDate: '2025-12-31', days: 7, reason: 'Nghi Tet Duong lich', status: 'approved', approvedBy: 'PGS.TS. Hoang Thi Lan', approvedAt: '2025-12-20' },
-];
-
 const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error'; labelKey: string }> = {
   approved: { variant: 'success', labelKey: 'leave.status.approved' },
   pending: { variant: 'warning', labelKey: 'leave.status.pending' },
@@ -35,10 +27,28 @@ const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error'; 
 
 export default function LeaveRequestForm() {
   const { t } = useTranslation('hrm');
+  const navigate = useNavigate();
+  const user = useAuthStore((s) => s.user);
+  const createLeave = useCreateLeave();
   const [leaveType, setLeaveType] = useState('annual');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
+  const [submitError, setSubmitError] = useState('');
+
+  // Fetch leave balance for current user (if user has a staff/VienChuc record)
+  const { data: balanceData } = useLeaveBalance((user as any)?.vienChucId || (user as any)?.employeeId || '');
+  const balance = balanceData;
+
+  // Fetch leave history for current user
+  const { data: historyData } = useLeaveList({
+    page: 1,
+    pageSize: 10,
+    employeeId: (user as any)?.vienChucId || (user as any)?.employeeId || undefined,
+    sortBy: 'createdAt',
+    sortDir: 'desc',
+  });
+  const leaveHistory = historyData?.data ?? [];
 
   function calculateDays() {
     if (!startDate || !endDate) return 0;
@@ -50,11 +60,40 @@ export default function LeaveRequestForm() {
 
   const days = calculateDays();
 
+  const handleSubmit = () => {
+    setSubmitError('');
+    if (!leaveType || !startDate || !endDate || days <= 0 || !reason) {
+      setSubmitError('Vui lòng điền đầy đủ thông tin');
+      return;
+    }
+    if (!user?.id) {
+      setSubmitError('Không xác định được người dùng');
+      return;
+    }
+    createLeave.mutate(
+      {
+        employeeId: user.id,
+        type: leaveType,
+        startDate,
+        endDate,
+        reason,
+      } as Partial<LeaveRequest>,
+      {
+        onSuccess: () => {
+          navigate('/hrm/nghi-phep');
+        },
+        onError: (err: any) => {
+          setSubmitError(err?.response?.data?.error?.message || 'Gửi đơn thất bại');
+        },
+      }
+    );
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('leaveRequestForm.title')}
-        description={`${t('leaveRequestForm.descriptionStaff')}: ${MOCK_VC.name} · ${MOCK_VC.dept}`}
+        description={t('leaveRequestForm.descriptionStaff')}
         breadcrumbs={[
           { label: 'HRM', href: '/hrm' },
           { label: t('leave.breadcrumb'), href: '/hrm/nghi-phep' },
@@ -65,12 +104,15 @@ export default function LeaveRequestForm() {
             <Link to="/hrm/nghi-phep">
               <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />}>{t('leaveRequestForm.btn.back')}</Button>
             </Link>
-            <Button variant="outline" leftIcon={<Eye className="h-4 w-4" />}>{t('leaveRequestForm.btn.viewDetail')}</Button>
           </div>
         }
       />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      {submitError && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{submitError}</div>
+      )}
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mt-4">
         <div className="lg:col-span-2 space-y-4">
           <Card>
             <div className="px-5 pt-5 pb-4 border-b border-[rgb(var(--border)/0.6)]">
@@ -109,17 +151,17 @@ export default function LeaveRequestForm() {
 
               {days > 0 && (
                 <div className={`flex items-center gap-2 rounded-lg border px-4 py-3 ${
-                  days > MOCK_VC.availableDays
+                  days > 12
                     ? 'border-[rgb(var(--error)/0.3)] bg-[rgb(var(--error)/0.05)]'
                     : 'border-[rgb(var(--success)/0.3)] bg-[rgb(var(--success)/0.05)]'
                 }`}>
-                  <Calendar className={`h-4 w-4 ${days > MOCK_VC.availableDays ? 'text-[rgb(var(--error))]' : 'text-[rgb(var(--success))]'}`} />
+                  <Calendar className={`h-4 w-4 ${days > 12 ? 'text-[rgb(var(--error))]' : 'text-[rgb(var(--success))]'}`} />
                   <div>
                     <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-                      {days} {t('leaveRequestForm.daysSummary')} {days > MOCK_VC.availableDays ? t('leaveRequestForm.daysSummaryExceed') : ''}
+                      {days} {t('leaveRequestForm.daysSummary')} {days > 12 ? t('leaveRequestForm.daysSummaryExceed') : ''}
                     </p>
                     <p className="text-xs text-[rgb(var(--text-muted))]">
-                      {t('leaveRequestForm.annualLeaveRemaining')}: {MOCK_VC.availableDays} {t('leaveRequestForm.daysSummary')}
+                      {t('leaveRequestForm.annualLeaveRemaining')}: 12 {t('leaveRequestForm.daysSummary')}
                     </p>
                   </div>
                 </div>
@@ -136,10 +178,12 @@ export default function LeaveRequestForm() {
               </FormField>
 
               <div className="flex justify-end gap-3 pt-2 border-t border-[rgb(var(--border)/0.6)]">
-                <Button variant="outline">{t('leaveRequestForm.btn.cancel')}</Button>
+                <Button variant="outline" onClick={() => navigate('/hrm/nghi-phep')}>{t('leaveRequestForm.btn.cancel')}</Button>
                 <Button leftIcon={<Send className="h-4 w-4" />}
-                  disabled={!leaveType || !startDate || !endDate || days <= 0 || !reason}>
-                  {t('leaveRequestForm.btn.submit')}
+                  disabled={createLeave.isPending || !leaveType || !startDate || !endDate || days <= 0 || !reason}
+                  loading={createLeave.isPending}
+                  onClick={handleSubmit}>
+                  {createLeave.isPending ? 'Đang gửi...' : t('leaveRequestForm.btn.submit')}
                 </Button>
               </div>
             </CardContent>
@@ -150,45 +194,60 @@ export default function LeaveRequestForm() {
           <Card>
             <CardContent className="p-5 space-y-4">
               <h4 className="font-semibold text-[rgb(var(--text-primary))]">{t('leaveRequestForm.balance.title')}</h4>
-              {[
-                { labelKey: 'leaveRequestForm.balance.total', value: 20, color: 'primary' },
-                { labelKey: 'leaveRequestForm.balance.used', value: MOCK_VC.usedDays, color: 'warning' },
-                { labelKey: 'leaveRequestForm.balance.remaining', value: MOCK_VC.availableDays, color: 'success' },
-              ].map((item) => (
-                <div key={item.labelKey} className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[rgb(var(--text-secondary))]">{t(item.labelKey)}</span>
-                    <span className="font-semibold text-[rgb(var(--text-primary))]">{item.value} {t('leaveRequestForm.daysSummary')}</span>
+              {(() => {
+                const annual = balance?.byType?.find((b) => b.type === 'annual');
+                const entitled = annual?.entitled ?? 12;
+                const used = annual?.used ?? 0;
+                const remaining = annual?.remaining ?? 12;
+                return [
+                  { labelKey: 'leaveRequestForm.balance.total', value: entitled, color: 'primary' },
+                  { labelKey: 'leaveRequestForm.balance.used', value: used, color: 'warning' },
+                  { labelKey: 'leaveRequestForm.balance.remaining', value: remaining, color: 'success' },
+                ].map((item) => (
+                  <div key={item.labelKey} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[rgb(var(--text-secondary))]">{t(item.labelKey)}</span>
+                      <span className="font-semibold text-[rgb(var(--text-primary))]">
+                        {item.value} {t('leaveRequestForm.daysSummary')}
+                      </span>
+                    </div>
+                    <div className="h-2 rounded-full bg-[rgb(var(--border))] overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-[rgb(var(--success))]"
+                        style={{ width: entitled > 0 ? `${(remaining / entitled) * 100}%` : '0%' }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-2 rounded-full bg-[rgb(var(--border))] overflow-hidden">
-                    <div className="h-full rounded-full bg-[rgb(var(--success))]" style={{ width: `${(MOCK_VC.availableDays / 20) * 100}%` }} />
-                  </div>
-                </div>
-              ))}
+                ));
+              })()}
             </CardContent>
           </Card>
 
           <Card>
             <div className="px-5 pt-4 pb-3 border-b border-[rgb(var(--border)/0.6)]">
-              <h4 className="font-semibold text-[rgb(var(--text-primary))]">{t('leaveRequestForm.history.title')} 2026</h4>
+              <h4 className="font-semibold text-[rgb(var(--text-primary))]">{t('leaveRequestForm.history.title')} {balance?.year ?? new Date().getFullYear()}</h4>
             </div>
             <div className="divide-y divide-[rgb(var(--border)/0.4)]">
-              {LEAVE_HISTORY.map((h) => {
-                const sc = STATUS_CONFIG[h.status];
-                return (
-                  <div key={h.id} className="px-5 py-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{h.reason}</p>
-                        <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">
-                          {h.startDate} - {h.endDate} · {h.days} {t('leaveRequestForm.daysSummary')}
-                        </p>
+              {leaveHistory.length === 0 ? (
+                <p className="text-sm text-[rgb(var(--text-muted))] px-5 py-4">Chưa có lịch sử nghỉ phép.</p>
+              ) : (
+                leaveHistory.map((h: any) => {
+                  const sc = STATUS_CONFIG[h.status] ?? { variant: 'neutral', labelKey: 'leave.status.pending' };
+                  return (
+                    <div key={h._id} className="px-5 py-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{h.reason}</p>
+                          <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">
+                            {h.startDate ? new Date(h.startDate).toLocaleDateString('vi-VN') : ''} — {h.endDate ? new Date(h.endDate).toLocaleDateString('vi-VN') : ''}
+                          </p>
+                        </div>
+                        <Badge variant={sc.variant} size="sm">{t(sc.labelKey)}</Badge>
                       </div>
-                      <Badge variant={sc.variant} size="sm">{t(sc.labelKey)}</Badge>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </Card>
         </div>

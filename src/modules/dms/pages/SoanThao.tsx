@@ -29,17 +29,10 @@ const DOC_TYPES = [
 ];
 
 const FLOW_ROLES = [
-  { id: 'r1', label: 'Người soạn thảo', role: 'CAN_BO_PHAN_CONG', assignee: 'TS. Nguyễn Văn A', dept: 'Văn phòng' },
-  { id: 'r2', label: 'Trưởng phòng phụ trách', role: 'TRUONG_PHONG', assignee: 'PGS.TS. Trần Văn B', dept: 'Văn phòng' },
-  { id: 'r3', label: 'Phó Hiệu trưởng phụ trách', role: 'PHO_HIEU_TRUONG', assignee: 'PGS.TS. Lê Thị C', dept: 'Ban Giám hiệu' },
-  { id: 'r4', label: 'Hiệu trưởng ký', role: 'HIEU_TRUONG', assignee: 'PGS.TS. Nguyễn H. D', dept: 'Ban Giám hiệu' },
-];
-
-const FLOW_ROLE_LABEL_KEYS = [
-  'soanthao.flowRole.drafter',
-  'soanthao.flowRole.deptHead',
-  'soanthao.flowRole.viceRector',
-  'soanthao.flowRole.rector',
+  { id: 'r1', labelKey: 'soanthao.flowRole.drafter', role: 'NHAN_VIEN', assignee: null },
+  { id: 'r2', labelKey: 'soanthao.flowRole.deptHead', role: 'TRUONG_KHOA', assignee: null },
+  { id: 'r3', labelKey: 'soanthao.flowRole.viceRector', role: 'PHO_HIEU_TRUONG', assignee: null },
+  { id: 'r4', labelKey: 'soanthao.flowRole.rector', role: 'HIEU_TRUONG', assignee: null },
 ] as const;
 
 const URGENCY_OPTIONS = [
@@ -196,8 +189,8 @@ export default function SoanThao() {
                     {i + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[rgb(var(--text-primary))]">{t(FLOW_ROLE_LABEL_KEYS[i])}</p>
-                    <p className="text-[10px] text-[rgb(var(--text-muted))]">{role.assignee} · {role.dept}</p>
+                    <p className="text-xs font-medium text-[rgb(var(--text-primary))]">{t(role.labelKey)}</p>
+                    <p className="text-[10px] text-[rgb(var(--text-muted))]">{role.assignee ? `${role.assignee}` : t('soanthao.flowRole.unassigned')}</p>
                   </div>
                   {i < FLOW_ROLES.length - 1 && <ChevronRight className="h-3.5 w-3.5 text-[rgb(var(--text-muted))] shrink-0" />}
                 </div>

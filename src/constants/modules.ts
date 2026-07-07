@@ -47,49 +47,34 @@ export const MODULE_COLORS: Record<string, string> = {
 // ─── Role definitions ──────────────────────────────────────────────────────────
 export const ROLES = {
   SUPER_ADMIN: 'SUPER_ADMIN',
-  ADMIN: 'ADMIN',
   HIEU_TRUONG: 'HIEU_TRUONG',
   PHO_HIEU_TRUONG: 'PHO_HIEU_TRUONG',
   TRUONG_KHOA: 'TRUONG_KHOA',
-  PHO_TRUONG_KHOA: 'PHO_TRUONG_KHOA',
   GIAO_VIEN: 'GIAO_VIEN',
-  CAN_BO_PHAN_CONG: 'CAN_BO_PHAN_CONG',
-  CHUYEN_VIEN: 'CHUYEN_VIEN',
   NHAN_VIEN: 'NHAN_VIEN',
   SINH_VIEN: 'SINH_VIEN',
-  KHAI_THA: 'KHAI_THA',
 } as const;
 
 export type Role = typeof ROLES[keyof typeof ROLES];
 
 export const ROLE_LABELS: Record<Role, string> = {
   [ROLES.SUPER_ADMIN]: 'Quản trị viên hệ thống',
-  [ROLES.ADMIN]: 'Quản trị viên',
   [ROLES.HIEU_TRUONG]: 'Hiệu trưởng',
   [ROLES.PHO_HIEU_TRUONG]: 'Phó Hiệu trưởng',
   [ROLES.TRUONG_KHOA]: 'Trưởng khoa',
-  [ROLES.PHO_TRUONG_KHOA]: 'Phó trưởng khoa',
   [ROLES.GIAO_VIEN]: 'Giảng viên',
-  [ROLES.CAN_BO_PHAN_CONG]: 'Cán bộ phân công',
-  [ROLES.CHUYEN_VIEN]: 'Chuyên viên',
   [ROLES.NHAN_VIEN]: 'Nhân viên',
   [ROLES.SINH_VIEN]: 'Sinh viên',
-  [ROLES.KHAI_THA]: 'Khải thác',
 };
 
 export const ROLE_HIERARCHY: Record<Role, number> = {
   [ROLES.SUPER_ADMIN]: 100,
-  [ROLES.ADMIN]: 90,
   [ROLES.HIEU_TRUONG]: 80,
   [ROLES.PHO_HIEU_TRUONG]: 70,
   [ROLES.TRUONG_KHOA]: 60,
-  [ROLES.PHO_TRUONG_KHOA]: 50,
   [ROLES.GIAO_VIEN]: 40,
-  [ROLES.CAN_BO_PHAN_CONG]: 35,
-  [ROLES.CHUYEN_VIEN]: 30,
   [ROLES.NHAN_VIEN]: 20,
   [ROLES.SINH_VIEN]: 10,
-  [ROLES.KHAI_THA]: 5,
 };
 
 // ─── Permission constants ─────────────────────────────────────────────────────

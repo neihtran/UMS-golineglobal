@@ -4,21 +4,9 @@ import {
   TrendingUp, Award,
 } from 'lucide-react';
 import {
-  Button,
-  Input,
-  Badge,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableHeadCell,
-  TableCell,
-  TableEmpty,
-  TablePagination,
-  Card,
-  CardContent,
-  Select,
-  Modal,
+  Button, Input, Badge, Table, TableHead, TableBody, TableRow,
+  TableHeadCell, TableCell, TableEmpty, TablePagination,
+  Card, CardContent, Select, Modal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
@@ -26,17 +14,6 @@ import { usePagination } from '@/hooks';
 const COUNTRIES = ['Tất cả', 'Nhật Bản', 'Hàn Quốc', 'Đức', 'Pháp', 'Mỹ', 'Úc', 'Thái Lan'];
 const TYPES = ['Tất cả', 'Trao đổi sinh viên', 'Hợp tác nghiên cứu', 'Hội thảo quốc tế', 'Chương trình đào tạo', 'Dự án liên kết'];
 const STATUSES = ['Tất cả', 'Đang hoạt động', 'Chuẩn bị', 'Đã kết thúc'];
-
-const PARTNERS = [
-  { id: 'p1', name: 'Đại học Tokyo', country: 'Nhật Bản', flag: '🇯🇵', type: 'Hợp tác nghiên cứu', startDate: '2024-03-15', endDate: '2027-03-14', status: 'active', leader: 'PGS.TS. Nguyễn Hoàng Long', participants: 12, budget: 850000000, field: 'CNTT & AI', moa: 'MOA-2024-001', progress: 65 },
-  { id: 'p2', name: 'Đại học Quốc gia Seoul', country: 'Hàn Quốc', flag: '🇰🇷', type: 'Hợp tác nghiên cứu', startDate: '2025-01-10', endDate: '2028-01-09', status: 'active', leader: 'TS. Trần Thị Lan', participants: 8, budget: 1200000000, field: 'Kinh tế số', moa: 'MOA-2025-003', progress: 40 },
-  { id: 'p3', name: 'TU9 Germany Alliance', country: 'Đức', flag: '🇩🇪', type: 'Chương trình đào tạo', startDate: '2023-09-01', endDate: '2026-08-31', status: 'active', leader: 'PGS.TS. Lê Văn Minh', participants: 24, budget: 2100000000, field: 'Kỹ thuật', moa: 'MOA-2023-007', progress: 78 },
-  { id: 'p4', name: 'Sorbonne University', country: 'Pháp', flag: '🇫🇷', type: 'Trao đổi sinh viên', startDate: '2024-06-01', endDate: '2027-05-31', status: 'active', leader: 'TS. Hoàng Thu Hà', participants: 6, budget: 480000000, field: 'Ngôn ngữ', moa: 'MOA-2024-012', progress: 55 },
-  { id: 'p5', name: 'MIT Open Learning', country: 'Mỹ', flag: '🇺🇸', type: 'Hội thảo quốc tế', startDate: '2026-02-01', endDate: '2026-11-30', status: 'active', leader: 'PGS.TS. Bùi Minh Tuấn', participants: 18, budget: 620000000, field: 'STEM', moa: 'MOA-2026-002', progress: 30 },
-  { id: 'p6', name: 'University of Melbourne', country: 'Úc', flag: '🇦🇺', type: 'Dự án liên kết', startDate: '2025-07-01', endDate: '2028-06-30', status: 'active', leader: 'TS. Đặng Thị Mai', participants: 10, budget: 980000000, field: 'Nông nghiệp', moa: 'MOA-2025-009', progress: 25 },
-  { id: 'p7', name: 'Chulalongkorn University', country: 'Thái Lan', flag: '🇹🇭', type: 'Hội thảo quốc tế', startDate: '2026-03-01', endDate: '2026-12-31', status: 'preparing', leader: 'ThS. Lê Hoàng Nam', participants: 15, budget: 350000000, field: 'Y tế', moa: 'MOA-2026-005', progress: 10 },
-  { id: 'p8', name: 'Kyoto University', country: 'Nhật Bản', flag: '🇯🇵', type: 'Trao đổi sinh viên', startDate: '2022-04-01', endDate: '2026-03-31', status: 'ended', leader: 'TS. Phạm Văn Cường', participants: 20, budget: 750000000, field: 'Môi trường', moa: 'MOA-2022-004', progress: 100 },
-];
 
 const TYPE_CONFIG: Record<string, { variant: 'primary' | 'accent' | 'info' | 'warning' | 'neutral'; label: string }> = {
   'Hợp tác nghiên cứu': { variant: 'accent', label: 'Hợp tác NC' },
@@ -56,8 +33,23 @@ function fmt(v: number) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v);
 }
 
-const ACTIVE_PARTNERS = PARTNERS.filter(p => p.status !== 'ended').length;
-const TOTAL_BUDGET = PARTNERS.reduce((s, p) => s + p.budget, 0);
+interface Partner {
+  id: string;
+  name: string;
+  country: string;
+  flag: string;
+  type: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  leader: string;
+  participants: number;
+  budget: number;
+  field: string;
+  moa: string;
+  progress: number;
+}
+
 const UPCOMING_EVENTS = [
   { date: '2026-07-15', event: 'Hội thảo AI quốc tế — ĐH Tokyo', location: 'Tokyo, Nhật Bản' },
   { date: '2026-08-22', event: 'Trao đổi sinh viên mùa thu — Sorbonne', location: 'Paris, Pháp' },
@@ -71,8 +63,23 @@ export default function HopTacQuocTe() {
   const [country, setCountry] = useState('Tất cả');
   const [type, setType] = useState('Tất cả');
   const [status, setStatus] = useState('Tất cả');
-  const [detailModal, setDetailModal] = useState<typeof PARTNERS[0] | null>(null);
+  const [detailModal, setDetailModal] = useState<Partner | null>(null);
   const [createModal, setCreateModal] = useState(false);
+
+  // TODO: Replace with actual API when backend endpoint exists
+  const PARTNERS: Partner[] = [
+    { id: 'p1', name: 'Đại học Tokyo', country: 'Nhật Bản', flag: '🇯🇵', type: 'Hợp tác nghiên cứu', startDate: '2024-03-15', endDate: '2027-03-14', status: 'active', leader: 'PGS.TS. Nguyễn Hoàng Long', participants: 12, budget: 850000000, field: 'CNTT & AI', moa: 'MOA-2024-001', progress: 65 },
+    { id: 'p2', name: 'Đại học Quốc gia Seoul', country: 'Hàn Quốc', flag: '🇰🇷', type: 'Hợp tác nghiên cứu', startDate: '2025-01-10', endDate: '2028-01-09', status: 'active', leader: 'TS. Trần Thị Lan', participants: 8, budget: 1200000000, field: 'Kinh tế số', moa: 'MOA-2025-003', progress: 40 },
+    { id: 'p3', name: 'TU9 Germany Alliance', country: 'Đức', flag: '🇩🇪', type: 'Chương trình đào tạo', startDate: '2023-09-01', endDate: '2026-08-31', status: 'active', leader: 'PGS.TS. Lê Văn Minh', participants: 24, budget: 2100000000, field: 'Kỹ thuật', moa: 'MOA-2023-007', progress: 78 },
+    { id: 'p4', name: 'Sorbonne University', country: 'Pháp', flag: '🇫🇷', type: 'Trao đổi sinh viên', startDate: '2024-06-01', endDate: '2027-05-31', status: 'active', leader: 'TS. Hoàng Thu Hà', participants: 6, budget: 480000000, field: 'Ngôn ngữ', moa: 'MOA-2024-012', progress: 55 },
+    { id: 'p5', name: 'MIT Open Learning', country: 'Mỹ', flag: '🇺🇸', type: 'Hội thảo quốc tế', startDate: '2026-02-01', endDate: '2026-11-30', status: 'active', leader: 'PGS.TS. Bùi Minh Tuấn', participants: 18, budget: 620000000, field: 'STEM', moa: 'MOA-2026-002', progress: 30 },
+    { id: 'p6', name: 'University of Melbourne', country: 'Úc', flag: '🇦🇺', type: 'Dự án liên kết', startDate: '2025-07-01', endDate: '2028-06-30', status: 'active', leader: 'TS. Đặng Thị Mai', participants: 10, budget: 980000000, field: 'Nông nghiệp', moa: 'MOA-2025-009', progress: 25 },
+    { id: 'p7', name: 'Chulalongkorn University', country: 'Thái Lan', flag: '🇹🇭', type: 'Hội thảo quốc tế', startDate: '2026-03-01', endDate: '2026-12-31', status: 'preparing', leader: 'ThS. Lê Hoàng Nam', participants: 15, budget: 350000000, field: 'Y tế', moa: 'MOA-2026-005', progress: 10 },
+    { id: 'p8', name: 'Kyoto University', country: 'Nhật Bản', flag: '🇯🇵', type: 'Trao đổi sinh viên', startDate: '2022-04-01', endDate: '2026-03-31', status: 'ended', leader: 'TS. Phạm Văn Cường', participants: 20, budget: 750000000, field: 'Môi trường', moa: 'MOA-2022-004', progress: 100 },
+  ];
+
+  const activeCount = PARTNERS.filter(p => p.status !== 'ended').length;
+  const totalBudget = PARTNERS.reduce((s, p) => s + p.budget, 0);
 
   const filtered = PARTNERS.filter((p) => {
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.field.toLowerCase().includes(search.toLowerCase());
@@ -120,8 +127,8 @@ export default function HopTacQuocTe() {
             </div>
             <div>
               <p className="text-xs text-[rgb(var(--text-muted))] uppercase tracking-wide">Đang hoạt động</p>
-              <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">{ACTIVE_PARTNERS}</p>
-              <p className="text-xs text-[rgb(var(--success))]">{Math.round(ACTIVE_PARTNERS / PARTNERS.length * 100)}% tổng</p>
+              <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">{activeCount}</p>
+              <p className="text-xs text-[rgb(var(--success))]">{Math.round(activeCount / PARTNERS.length * 100)}% tổng</p>
             </div>
           </CardContent>
         </Card>
@@ -144,7 +151,7 @@ export default function HopTacQuocTe() {
             </div>
             <div>
               <p className="text-xs text-[rgb(var(--text-muted))] uppercase tracking-wide">Tổng kinh phí</p>
-              <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">₫{(TOTAL_BUDGET / 1e9).toFixed(1)}T</p>
+              <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">₫{(totalBudget / 1e9).toFixed(1)}T</p>
               <p className="text-xs text-[rgb(var(--info))]">cam kết HTQT</p>
             </div>
           </CardContent>
@@ -186,8 +193,8 @@ export default function HopTacQuocTe() {
                     <TableEmpty colSpan={9} message="Không tìm thấy hợp tác nào" />
                   ) : (
                     paged.map((p) => {
-                      const tc = TYPE_CONFIG[p.type];
-                      const sc = STATUS_CONFIG[p.status];
+                      const tc = TYPE_CONFIG[p.type] || { variant: 'neutral' as const, label: p.type };
+                      const sc = STATUS_CONFIG[p.status] || { variant: 'neutral' as const, label: p.status };
                       return (
                         <TableRow key={p.id} className="hover:bg-[rgb(var(--bg-hover))]">
                           <TableCell>
@@ -215,10 +222,7 @@ export default function HopTacQuocTe() {
                           <TableCell>
                             <div className="flex items-center gap-2 justify-end">
                               <div className="h-1.5 w-14 rounded-full bg-[rgb(var(--border))] overflow-hidden">
-                                <div
-                                  className="h-full rounded-full bg-[rgb(var(--primary))]"
-                                  style={{ width: `${p.progress}%` }}
-                                />
+                                <div className="h-full rounded-full bg-[rgb(var(--primary))]" style={{ width: `${p.progress}%` }} />
                               </div>
                               <span className="text-xs text-[rgb(var(--text-muted))] w-9 text-right">{p.progress}%</span>
                             </div>
@@ -301,11 +305,11 @@ export default function HopTacQuocTe() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-[rgb(var(--text-muted))] text-xs">Loại hình</p>
-                <Badge variant={TYPE_CONFIG[detailModal.type].variant} size="sm" className="mt-0.5">{detailModal.type}</Badge>
+                <Badge variant={TYPE_CONFIG[detailModal.type]?.variant || 'neutral'} size="sm" className="mt-0.5">{detailModal.type}</Badge>
               </div>
               <div>
                 <p className="text-[rgb(var(--text-muted))] text-xs">Trạng thái</p>
-                <Badge variant={STATUS_CONFIG[detailModal.status].variant} size="sm" className="mt-0.5" dot>{STATUS_CONFIG[detailModal.status].label}</Badge>
+                <Badge variant={STATUS_CONFIG[detailModal.status]?.variant || 'neutral'} size="sm" className="mt-0.5" dot>{STATUS_CONFIG[detailModal.status]?.label || detailModal.status}</Badge>
               </div>
               <div>
                 <p className="text-[rgb(var(--text-muted))] text-xs">Ngày bắt đầu</p>
@@ -350,28 +354,22 @@ export default function HopTacQuocTe() {
         <div className="space-y-4">
           <Input label="Tên đối tác" placeholder="VD: Đại học Kyoto, TU Munich..." />
           <div className="grid grid-cols-2 gap-4">
-            <Select
-              label="Quốc gia"
-              options={[
-                { value: 'jp', label: 'Nhật Bản 🇯🇵' },
-                { value: 'kr', label: 'Hàn Quốc 🇰🇷' },
-                { value: 'de', label: 'Đức 🇩🇪' },
-                { value: 'fr', label: 'Pháp 🇫🇷' },
-                { value: 'us', label: 'Mỹ 🇺🇸' },
-                { value: 'au', label: 'Úc 🇦🇺' },
-                { value: 'th', label: 'Thái Lan 🇹🇭' },
-              ]}
-            />
-            <Select
-              label="Loại hình hợp tác"
-              options={[
-                { value: 'nckh', label: 'Hợp tác nghiên cứu' },
-                { value: 'dao-tao', label: 'Chương trình đào tạo' },
-                { value: 'trao-doi', label: 'Trao đổi sinh viên' },
-                { value: 'hoi-thao', label: 'Hội thảo quốc tế' },
-                { value: 'du-an', label: 'Dự án liên kết' },
-              ]}
-            />
+            <Select label="Quốc gia" options={[
+              { value: 'jp', label: 'Nhật Bản 🇯🇵' },
+              { value: 'kr', label: 'Hàn Quốc 🇰🇷' },
+              { value: 'de', label: 'Đức 🇩🇪' },
+              { value: 'fr', label: 'Pháp 🇫🇷' },
+              { value: 'us', label: 'Mỹ 🇺🇸' },
+              { value: 'au', label: 'Úc 🇦🇺' },
+              { value: 'th', label: 'Thái Lan 🇹🇭' },
+            ]} />
+            <Select label="Loại hình hợp tác" options={[
+              { value: 'nckh', label: 'Hợp tác nghiên cứu' },
+              { value: 'dao-tao', label: 'Chương trình đào tạo' },
+              { value: 'trao-doi', label: 'Trao đổi sinh viên' },
+              { value: 'hoi-thao', label: 'Hội thảo quốc tế' },
+              { value: 'du-an', label: 'Dự án liên kết' },
+            ]} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Lĩnh vực hợp tác" placeholder="VD: CNTT, Kinh tế, Y tế..." />

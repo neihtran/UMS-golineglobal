@@ -1,21 +1,24 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, UserPlus, Shield } from 'lucide-react';
-import { Button, Card, CardContent, Input } from '@/components/ui';
+import { Button, Card, CardContent, Input, Switch } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 
 const DEPARTMENTS = ['Phòng Tổ chức', 'Phòng Tài chính', 'Phòng Đào tạo', 'Phòng KH-CN', 'Khoa CNTT', 'Khoa Kinh tế', 'Khoa Luật', 'Khoa Ngoại ngữ'];
-const ROLES = [
-  { value: 'admin', label: 'Quản trị hệ thống', color: 'primary' },
-  { value: 'giang-vien', label: 'Giảng viên', color: 'accent' },
-  { value: 'sinh-vien', label: 'Sinh viên', color: 'info' },
-  { value: 'nhan-vien', label: 'Nhân viên hành chính', color: 'neutral' },
+const ROLE_OPTIONS = [
+  { value: 'SUPER_ADMIN', label: 'Quản trị hệ thống', color: 'primary' },
+  { value: 'HIEU_TRUONG', label: 'Hiệu trưởng', color: 'warning' },
+  { value: 'PHO_HIEU_TRUONG', label: 'Phó Hiệu trưởng', color: 'success' },
+  { value: 'TRUONG_KHOA', label: 'Trưởng khoa', color: 'neutral' },
+  { value: 'GIAO_VIEN', label: 'Giảng viên', color: 'accent' },
+  { value: 'NHAN_VIEN', label: 'Nhân viên hành chính', color: 'neutral' },
+  { value: 'SINH_VIEN', label: 'Sinh viên', color: 'info' },
 ];
 
 export default function UserCreate() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    email: '', displayName: '', role: 'sinh-vien', dept: '', mfaRequired: true, sendWelcome: true,
+    email: '', displayName: '', role: 'SINH_VIEN', dept: '', mfaRequired: true, sendWelcome: true,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -69,7 +72,7 @@ export default function UserCreate() {
                     onChange={(e) => setForm({ ...form, role: e.target.value })}
                     className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
                   >
-                    {ROLES.map((r) => (
+                    {ROLE_OPTIONS.map((r) => (
                       <option key={r.value} value={r.value}>{r.label}</option>
                     ))}
                   </select>
@@ -93,25 +96,20 @@ export default function UserCreate() {
             <div className="px-5 py-4 border-b border-[rgb(var(--border)/0.6)]">
               <h3 className="font-semibold text-[rgb(var(--text-primary))]">Cấu hình bảo mật</h3>
             </div>
-            <CardContent className="space-y-4 pt-5">
-              {[
-                { key: 'mfaRequired', label: 'Bắt buộc MFA', desc: 'Người dùng phải xác thực 2 yếu tố khi đăng nhập' },
-                { key: 'sendWelcome', label: 'Gửi email chào mừng', desc: 'Gửi thông tin đăng nhập qua email cho người dùng mới' },
-              ].map(({ key, label, desc }) => (
-                <div key={key} className="flex items-center justify-between py-2 border-b border-[rgb(var(--border)/0.4)] last:border-0">
-                  <div>
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{label}</p>
-                    <p className="text-xs text-[rgb(var(--text-muted))]">{desc}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setForm({ ...form, [key]: !form[key as keyof typeof form] })}
-                    className={`relative h-6 w-11 rounded-full transition-colors ${form[key as keyof typeof form] ? 'bg-[rgb(var(--primary))]' : 'bg-[rgb(var(--border))]'}`}
-                  >
-                    <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${form[key as keyof typeof form] ? 'translate-x-5' : 'translate-x-0.5'}`} />
-                  </button>
-                </div>
-              ))}
+            <CardContent className="space-y-5">
+              <Switch
+                label="Bắt buộc MFA"
+                description="Người dùng phải xác thực 2 yếu tố khi đăng nhập"
+                checked={form.mfaRequired}
+                onChange={(e) => setForm({ ...form, mfaRequired: e.target.checked })}
+              />
+              <div className="border-t border-[rgb(var(--border)/0.4)]" />
+              <Switch
+                label="Gửi email chào mừng"
+                description="Gửi thông tin đăng nhập qua email cho người dùng mới"
+                checked={form.sendWelcome}
+                onChange={(e) => setForm({ ...form, sendWelcome: e.target.checked })}
+              />
             </CardContent>
           </Card>
         </div>
@@ -123,7 +121,7 @@ export default function UserCreate() {
               <h3 className="font-semibold text-[rgb(var(--text-primary))]">Xem trước vai trò</h3>
             </div>
             <CardContent className="space-y-3 pt-4">
-              {ROLES.map((r) => (
+              {ROLE_OPTIONS.map((r) => (
                 <div
                   key={r.value}
                   className={`flex items-center gap-3 rounded-lg border p-3 transition-all cursor-pointer ${

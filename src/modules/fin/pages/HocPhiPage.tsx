@@ -10,27 +10,11 @@ import {
   Send,
   CheckCircle2,
 } from 'lucide-react';
-import { Button, Badge, Card, CardContent, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
+import { Button, Badge, Card, CardContent, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination, TableEmpty } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useTuitionList } from '@/hooks/useFin';
+import { usePagination } from '@/hooks';
 import { formatCurrency } from '@/utils/formatters';
-
-const TUITION_RECORDS = [
-  { id: 't1', studentId: 'sv001', name: 'Nguyễn Văn An', msv: 'SV-2022-0001', class: 'CNTT-K60A', semester: '2026-1', tuition: 12000000, other: 800000, total: 12800000, paid: 12800000, remaining: 0, status: 'paid', dueDate: '2026-03-15', paidAt: '2026-02-28', method: 'Bank transfer' },
-  { id: 't2', studentId: 'sv002', name: 'Trần Thị Bình', msv: 'SV-2022-0002', class: 'KT-K60A', semester: '2026-1', tuition: 10000000, other: 600000, total: 10600000, paid: 0, remaining: 10600000, status: 'unpaid', dueDate: '2026-03-15', paidAt: null, method: null },
-  { id: 't3', studentId: 'sv003', name: 'Lê Hoàng Nam', msv: 'SV-2023-0001', class: 'CNTT-K61A', semester: '2026-1', tuition: 12000000, other: 800000, total: 12800000, paid: 6400000, remaining: 6400000, status: 'partial', dueDate: '2026-03-15', paidAt: '2026-03-01', method: 'Bank transfer' },
-  { id: 't4', studentId: 'sv004', name: 'Phạm Thu Lan', msv: 'SV-2021-0001', class: 'LUAT-K59', semester: '2026-1', tuition: 10000000, other: 500000, total: 10500000, paid: 10500000, remaining: 0, status: 'paid', dueDate: '2026-03-15', paidAt: '2026-02-20', method: 'Scholarship' },
-  { id: 't5', studentId: 'sv005', name: 'Bùi Đình Sơn', msv: 'SV-2022-0003', class: 'NN-K60A', semester: '2026-1', tuition: 9000000, other: 600000, total: 9600000, paid: 0, remaining: 9600000, status: 'unpaid', dueDate: '2026-03-15', paidAt: null, method: null },
-  { id: 't6', studentId: 'sv006', name: 'Đặng Minh Tuấn', msv: 'SV-2020-0001', class: 'CNTT-K58A', semester: '2026-1', tuition: 12000000, other: 800000, total: 12800000, paid: 12800000, remaining: 0, status: 'paid', dueDate: '2026-03-15', paidAt: '2026-01-15', method: 'Bank transfer' },
-  { id: 't7', studentId: 'sv007', name: 'Vũ Thị Hương', msv: 'SV-2023-0002', class: 'SP-K61A', semester: '2026-1', tuition: 8000000, other: 500000, total: 8500000, paid: 0, remaining: 8500000, status: 'unpaid', dueDate: '2026-03-15', paidAt: null, method: null },
-  { id: 't8', studentId: 'sv008', name: 'Hoàng Phương Linh', msv: 'SV-2022-0004', class: 'CNTT-K60B', semester: '2026-1', tuition: 12000000, other: 800000, total: 12800000, paid: 12800000, remaining: 0, status: 'paid', dueDate: '2026-03-15', paidAt: '2026-03-10', method: 'Bank transfer' },
-];
-
-const STATS = [
-  { label: 'Tổng phải thu HK2/2026', value: '14.6 tỷ', icon: <DollarSign className="h-5 w-5" />, color: 'primary' },
-  { label: 'Đã thu', value: '11.8 tỷ', sub: '80.8%', icon: <CheckCircle2 className="h-5 w-5" />, color: 'success' },
-  { label: 'Còn nợ', value: '2.8 tỷ', sub: '234 SV', icon: <AlertTriangle className="h-5 w-5" />, color: 'error' },
-  { label: 'Chờ xác nhận', value: '~100 tr', sub: '15 bản ghi', icon: <Clock className="h-5 w-5" />, color: 'warning' },
-];
 
 const STATUS_CONFIG = {
   paid: { variant: 'success' as const, label: 'Đã đóng' },
@@ -41,26 +25,42 @@ const STATUS_CONFIG = {
 };
 
 const TABS = [
-  { id: 'debt', label: 'Danh sách nợ (234)' },
+  { id: 'debt', label: 'Danh sách nợ' },
   { id: 'payment', label: 'Lịch sử thanh toán' },
   { id: 'config', label: 'Cấu hình học phí' },
   { id: 'scholarship', label: 'Miễn giảm' },
 ];
 
 export default function HocPhiPage() {
+  const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [tab, setTab] = useState('debt');
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [page, setPage] = useState(1);
-  const PAGE_SIZE = 10;
+  const [statusFilter, setStatusFilter] = useState('');
 
-  const filtered = TUITION_RECORDS.filter((r) => {
-    const matchSearch = !search || r.name.toLowerCase().includes(search.toLowerCase()) || r.msv.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === 'all' || r.status === statusFilter;
-    return matchSearch && matchStatus;
+  const { data, isLoading } = useTuitionList({
+    search: search || undefined,
+    status: statusFilter || undefined,
+    page: pagination.page,
+    pageSize: pagination.pageSize,
   });
 
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const list = data?.data ?? [];
+  const total = data?.pagination?.total ?? 0;
+
+  const totalTuition = list.reduce((s: any, r: any) => s + (r.total ?? r.tuitionFee ?? 0), 0);
+  const totalPaid = list.reduce((s: any, r: any) => s + (r.paid ?? 0), 0);
+  const totalRemaining = list.reduce((s: any, r: any) => {
+    const remaining = r.remaining != null ? r.remaining : ((r.total ?? 0) - (r.paid ?? 0));
+    return s + remaining;
+  }, 0);
+  const unpaidCount = list.filter((r: any) => r.status === 'unpaid').length;
+
+  const stats = [
+    { label: 'Tổng phải thu', value: formatCurrency(totalTuition), icon: <DollarSign className="h-5 w-5" />, color: 'primary' as const },
+    { label: 'Đã thu', value: formatCurrency(totalPaid), sub: `${totalPaid > 0 && totalTuition > 0 ? Math.round((totalPaid / totalTuition) * 100) : 0}%`, icon: <CheckCircle2 className="h-5 w-5" />, color: 'success' as const },
+    { label: 'Còn nợ', value: formatCurrency(totalRemaining), sub: `${unpaidCount} SV`, icon: <AlertTriangle className="h-5 w-5" />, color: 'error' as const },
+    { label: 'Chờ xác nhận', value: '—', sub: `${list.filter((r: any) => r.status === 'partial').length} bản ghi`, icon: <Clock className="h-5 w-5" />, color: 'warning' as const },
+  ];
 
   return (
     <div className="space-y-6">
@@ -79,7 +79,7 @@ export default function HocPhiPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {STATS.map((s) => (
+        {stats.map((s) => (
           <Card key={s.label}>
             <CardContent className="flex items-center gap-4 p-5">
               <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--${s.color})/0.1)] text-[rgb(var(--${s.color}))]`}>
@@ -87,8 +87,8 @@ export default function HocPhiPage() {
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-muted))] uppercase tracking-wide">{s.label}</p>
-                <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">{s.value}</p>
-                <p className="text-xs text-[rgb(var(--success))]">{s.sub ?? ''}</p>
+                <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">{isLoading ? '—' : s.value}</p>
+                {s.sub && <p className="text-xs text-[rgb(var(--success))]">{s.sub}</p>}
               </div>
             </CardContent>
           </Card>
@@ -96,13 +96,15 @@ export default function HocPhiPage() {
       </div>
 
       {/* Alert */}
-      <div className="flex items-center gap-3 rounded-lg border border-[rgb(var(--error)/0.3)] bg-[rgb(var(--error)/0.05)] px-4 py-3">
-        <AlertTriangle className="h-5 w-5 text-[rgb(var(--error))] shrink-0" />
-        <p className="text-sm text-[rgb(var(--text-primary))]">
-          <strong>234 sinh viên chưa đóng học phí kỳ 2/2026</strong> — tổng nợ: <strong>~2.8 tỷ đồng</strong>. Đã gửi 180/234 tin nhắn nhắc nợ.
-        </p>
-        <Button size="sm" variant="outline" className="ml-auto shrink-0">Gửi thêm</Button>
-      </div>
+      {unpaidCount > 0 && (
+        <div className="flex items-center gap-3 rounded-lg border border-[rgb(var(--error)/0.3)] bg-[rgb(var(--error)/0.05)] px-4 py-3">
+          <AlertTriangle className="h-5 w-5 text-[rgb(var(--error))] shrink-0" />
+          <p className="text-sm text-[rgb(var(--text-primary))]">
+            <strong>{unpaidCount} sinh viên chưa đóng học phí</strong> — tổng nợ: <strong>{formatCurrency(totalRemaining)}</strong>.
+          </p>
+          <Button size="sm" variant="outline" className="ml-auto shrink-0">Gửi thêm</Button>
+        </div>
+      )}
 
       {/* Tabs + filters */}
       <Card>
@@ -143,7 +145,7 @@ export default function HocPhiPage() {
               onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
               className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.3]"
             >
-              <option value="all">Tất cả trạng thái</option>
+              <option value="">Tất cả trạng thái</option>
               <option value="paid">Đã đóng</option>
               <option value="unpaid">Chưa đóng</option>
               <option value="partial">Đóng một phần</option>
@@ -152,10 +154,14 @@ export default function HocPhiPage() {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[rgb(var(--border)/0.6)]">
+          {isLoading ? (
+            <TableEmpty colSpan={9} message="Đang tải dữ liệu học phí..." />
+          ) : list.length === 0 ? (
+            <TableEmpty colSpan={9} message="Không có dữ liệu học phí" />
+          ) : (
+            <Table>
+              <TableHead>
+                <TableRow>
                   <TableHeadCell>Sinh viên</TableHeadCell>
                   <TableHeadCell>Mã SV</TableHeadCell>
                   <TableHeadCell>Lớp</TableHeadCell>
@@ -165,22 +171,20 @@ export default function HocPhiPage() {
                   <TableHeadCell className="text-right">Ngày đóng</TableHeadCell>
                   <TableHeadCell>Trạng thái</TableHeadCell>
                   <TableHeadCell></TableHeadCell>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgb(var(--border)/0.4)]">
-                {paged.map((record) => {
-                  const sc = STATUS_CONFIG[record.status as keyof typeof STATUS_CONFIG];
-                  const isOverdue = record.status !== 'paid' && record.dueDate < '2026-06-25';
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {list.map((record: any) => {
+                  const sc = STATUS_CONFIG[record.status as keyof typeof STATUS_CONFIG] || { variant: 'neutral' as const, label: record.status };
+                  const remaining = record.remaining ?? (record.total - record.paid);
                   return (
-                    <tr key={record.id} className={`hover:bg-[rgb(var(--bg-hover))] ${isOverdue && record.status !== 'paid' ? 'bg-[rgb(var(--error)/0.02)]' : ''}`}>
-                      <TableCell className="font-medium text-[rgb(var(--text-primary))]">{record.name}</TableCell>
-                      <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{record.msv}</TableCell>
-                      <TableCell className="text-[rgb(var(--text-secondary))]">{record.class}</TableCell>
-                      <TableCell numeric className="font-mono">{formatCurrency(record.total)}</TableCell>
-                      <TableCell numeric className="font-mono text-[rgb(var(--success))]">{formatCurrency(record.paid)}</TableCell>
-                      <TableCell numeric className={`font-mono font-semibold ${record.remaining > 0 ? 'text-[rgb(var(--error))]' : 'text-[rgb(var(--text-secondary))]'}`}>
-                        {formatCurrency(record.remaining)}
-                      </TableCell>
+                    <TableRow key={record._id ?? record.id}>
+                      <TableCell className="font-medium text-[rgb(var(--text-primary))]">{record.studentName ?? record.name ?? '—'}</TableCell>
+                      <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{record.msv ?? record.studentId ?? '—'}</TableCell>
+                      <TableCell className="text-[rgb(var(--text-secondary))]">{record.class ?? '—'}</TableCell>
+                      <TableCell className="text-right font-mono">{formatCurrency(record.total ?? record.tuitionFee ?? 0)}</TableCell>
+                      <TableCell className="text-right font-mono text-[rgb(var(--success))]">{formatCurrency(record.paid ?? 0)}</TableCell>
+                      <TableCell className={`text-right font-mono font-semibold ${remaining > 0 ? 'text-[rgb(var(--error))]' : 'text-[rgb(var(--text-secondary))]'}`}>{formatCurrency(remaining)}</TableCell>
                       <TableCell className="text-[rgb(var(--text-muted))] text-xs">{record.paidAt ?? '—'}</TableCell>
                       <TableCell>
                         <Badge variant={sc.variant} dot={record.status !== 'paid'}>{sc.label}</Badge>
@@ -193,18 +197,19 @@ export default function HocPhiPage() {
                           )}
                         </div>
                       </TableCell>
-                    </tr>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          )}
 
           <TablePagination
-            page={page}
-            pageSize={PAGE_SIZE}
-            total={filtered.length}
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            total={total}
             onPageChange={setPage}
+            onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
             pageSizeOptions={[10, 25, 50]}
           />
         </div>

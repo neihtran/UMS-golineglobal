@@ -1,40 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { ArrowLeft, Download, Edit2, Wrench } from 'lucide-react';
-import { Card, CardContent, Button, Badge } from '@/components/ui';
+import { Card, CardContent, Button, Badge, TableSkeleton } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-
-const FACILITY = {
-  id: 'f001',
-  code: 'CSVC-A101',
-  name: 'Phòng học A1-01',
-  type: 'Phòng học',
-  capacity: 60,
-  currentUsage: 58,
-  floor: 'Tầng 1',
-  building: 'Tòa A',
-  area: 90,
-  equipment: 12,
-  status: 'occupied',
-  condition: 'good',
-  lastInspected: '2026-05-10',
-  nextInspection: '2026-11-10',
-  supervisor: 'ThS. Nguyễn Văn Long',
-  supervisorPhone: '0901234567',
-  features: ['Máy chiếu', 'Điều hòa 2 chiều', 'Bảng trắng điện tử', 'Loa phóng thanh', 'WiFi phủ sóng'],
-};
-
-const MAINTENANCE_HISTORY = [
-  { date: '2026-05-10', type: 'Kiểm tra định kỳ', cost: 0, result: 'Đạt', note: 'Toàn bộ thiết bị hoạt động bình thường', vendor: 'Phòng CNTT' },
-  { date: '2026-03-15', type: 'Bảo trì điều hòa', cost: 1500000, result: 'Hoàn thành', note: 'Vệ sinh, nạp gas điều hòa', vendor: 'Điện lạnh Bách Khoa' },
-  { date: '2025-11-10', type: 'Kiểm tra định kỳ', cost: 0, result: 'Đạt', note: 'Đạt tiêu chuẩn sử dụng', vendor: 'Phòng CNTT' },
-  { date: '2025-06-20', type: 'Sửa chữa', cost: 3500000, result: 'Hoàn thành', note: 'Thay bóng đèn chiếu sáng 4 bộ', vendor: 'Điện lạnh Bách Khoa' },
-];
-
-const OCCUPANCY_DATA = [
-  { name: 'Đã sử dụng', value: FACILITY.currentUsage, color: 'rgb(var(--primary))' },
-  { name: 'Còn trống', value: FACILITY.capacity - FACILITY.currentUsage, color: 'rgb(var(--border))' },
-];
+import { useQuery } from '@tanstack/react-query';
+import { facilityService } from '@/services/qa.service';
 
 const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'neutral' | 'accent'; label: string }> = {
   available: { variant: 'success', label: 'Trống' },
@@ -49,13 +20,54 @@ const CONDITION_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error
   needs_repair: { variant: 'error', label: 'Cần sửa chữa' },
 };
 
+const PIE_COLORS = ['rgb(var(--primary))', 'rgb(var(--border))'];
+
 export default function QACsvcDetail() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [occupancyPct, setOccupancyPct] = useState(0);
 
-  const f = FACILITY;
+  const { data: facilityData, isLoading } = useQuery({
+    queryKey: ['qa-facility', id],
+    queryFn: () => facilityService.get(id!).then((r: any) => r.data.data),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const f = facilityData;
+
+  useEffect(() => {
+    if (f) {
+      setOccupancyPct(f.capacity > 0 ? Math.round((f.currentUsage / f.capacity) * 100) : 0);
+    }
+  }, [f]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Chi tiết CSVC" breadcrumbs={[{ label: 'QA', href: '/qa' }, { label: 'CSVC' }]} />
+        <TableSkeleton rows={3} />
+      </div>
+    );
+  }
+
+  if (!f) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Không tìm thấy" breadcrumbs={[{ label: 'QA', href: '/qa' }, { label: 'CSVC' }]} />
+        <div className="flex items-center justify-center h-64">
+          <p className="text-[rgb(var(--text-muted))]">Không tìm thấy cơ sở vật chất này.</p>
+        </div>
+      </div>
+    );
+  }
+
   const sc = STATUS_CONFIG[f.status];
   const cc = CONDITION_CONFIG[f.condition];
-  const occupancy = Math.round((f.currentUsage / f.capacity) * 100);
+  const occupancyData = [
+    { name: 'Đã sử dụng', value: f.currentUsage, color: PIE_COLORS[0] },
+    { name: 'Còn trống', value: Math.max(0, f.capacity - f.currentUsage), color: PIE_COLORS[1] },
+  ];
 
   return (
     <div className="space-y-6">
@@ -83,9 +95,9 @@ export default function QACsvcDetail() {
           <Card>
             <CardContent className="p-5 space-y-4">
               <div className="flex flex-wrap gap-2">
-                <Badge variant={sc.variant} dot size="sm">{sc.label}</Badge>
+                {sc && <Badge variant={sc.variant} dot size="sm">{sc.label}</Badge>}
                 <Badge variant="neutral" size="sm">{f.type}</Badge>
-                <Badge variant={cc.variant} size="sm">{cc.label}</Badge>
+                {cc && <Badge variant={cc.variant} size="sm">{cc.label}</Badge>}
               </div>
 
               <div className="space-y-3">
@@ -96,8 +108,8 @@ export default function QACsvcDetail() {
                   { label: 'Thiết bị', value: `${f.equipment} thiết bị` },
                   { label: 'Người phụ trách', value: f.supervisor },
                   { label: 'Điện thoại', value: f.supervisorPhone },
-                  { label: 'Kiểm tra gần nhất', value: f.lastInspected },
-                  { label: 'Kiểm tra tiếp theo', value: f.nextInspection },
+                  { label: 'Kiểm tra gần nhất', value: f.lastInspected ? new Date(f.lastInspected).toLocaleDateString('vi-VN') : '—' },
+                  { label: 'Kiểm tra tiếp theo', value: f.nextInspection ? new Date(f.nextInspection).toLocaleDateString('vi-VN') : '—' },
                 ].map((item) => (
                   <div key={item.label}>
                     <p className="text-[10px] uppercase text-[rgb(var(--text-muted))]">{item.label}</p>
@@ -113,7 +125,7 @@ export default function QACsvcDetail() {
               <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">Tiện ích</p>
             </div>
             <CardContent className="pt-0 space-y-2">
-              {f.features.map((feat) => (
+              {(f.features ?? []).map((feat: string) => (
                 <div key={feat} className="flex items-center gap-2">
                   <div className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--primary))]" />
                   <span className="text-sm text-[rgb(var(--text-secondary))]">{feat}</span>
@@ -129,13 +141,13 @@ export default function QACsvcDetail() {
             <Card>
               <div className="px-5 pt-5 pb-3">
                 <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">Công suất sử dụng</p>
-                <p className="text-xs text-[rgb(var(--text-muted))]">Ngày cập nhật: hôm nay</p>
+                <p className="text-xs text-[rgb(var(--text-muted))]">Cập nhật: {new Date().toLocaleDateString('vi-VN')}</p>
               </div>
               <CardContent className="h-48 flex items-center">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={OCCUPANCY_DATA} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
-                      {OCCUPANCY_DATA.map((entry, index) => (
+                    <Pie data={occupancyData} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
+                      {occupancyData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
@@ -143,7 +155,7 @@ export default function QACsvcDetail() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute left-0 right-0 flex flex-col items-center" style={{ position: 'relative' }}>
-                  <p className="text-3xl font-bold text-[rgb(var(--primary))]">{occupancy}%</p>
+                  <p className="text-3xl font-bold text-[rgb(var(--primary))]">{occupancyPct}%</p>
                   <p className="text-xs text-[rgb(var(--text-muted))]">Đang sử dụng</p>
                 </div>
               </CardContent>
@@ -154,7 +166,7 @@ export default function QACsvcDetail() {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="h-2.5 w-2.5 rounded-full bg-[rgb(var(--border))]" />
-                  <span className="text-xs text-[rgb(var(--text-muted))]">Còn trống ({f.capacity - f.currentUsage})</span>
+                  <span className="text-xs text-[rgb(var(--text-muted))]">Còn trống ({Math.max(0, f.capacity - f.currentUsage)})</span>
                 </div>
               </div>
             </Card>
@@ -195,18 +207,11 @@ export default function QACsvcDetail() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[rgb(var(--border)/0.4)]">
-                  {MAINTENANCE_HISTORY.map((log, i) => (
-                    <tr key={i} className="hover:bg-[rgb(var(--bg-hover))]">
-                      <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.date}</td>
-                      <td className="px-4 py-2.5"><Badge variant="neutral" size="sm">{log.type}</Badge></td>
-                      <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.cost > 0 ? `${log.cost.toLocaleString('vi-VN')} đ` : '—'}</td>
-                      <td className="px-4 py-2.5">
-                        <Badge variant={log.result === 'Đạt' || log.result === 'Hoàn thành' ? 'success' : 'warning'} size="sm">{log.result}</Badge>
-                      </td>
-                      <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.note}</td>
-                      <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.vendor}</td>
-                    </tr>
-                  ))}
+                  <tr>
+                    <td colSpan={6} className="px-4 py-6 text-center text-sm text-[rgb(var(--text-muted))]">
+                      Chưa có lịch sử bảo trì (API /qa/facilities/:id/maintenance cần triển khai riêng)
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>

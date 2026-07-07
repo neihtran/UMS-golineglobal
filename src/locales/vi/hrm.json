@@ -63,6 +63,7 @@
   "contract": {
     "title": "Hợp đồng Lao động",
     "description": "HRM-01 — Quản lý hợp đồng lao động, loại hợp đồng và thời hạn",
+    "breadcrumb": "Hợp đồng",
     "createContract": "Tạo hợp đồng mới",
     "statusActive": "Còn hiệu lực",
     "statusExpiring": "Sắp hết hạn",
@@ -104,6 +105,14 @@
       "downloadFile": "Tải file HĐ",
       "contractFile": "File hợp đồng",
       "downloadHint": "Có thể tải về hoặc in trực tiếp"
+    },
+    "table": {
+      "nam": "Năm",
+      "hoTen": "Họ tên",
+      "donVi": "Đơn vị",
+      "loaiHD": "Loại HĐ",
+      "trangThai": "Trạng thái",
+      "thaoTac": "Thao tác"
     }
   },
     "leave": {
@@ -376,7 +385,9 @@
       "permanent": "Cơ hữu",
       "visiting": "Thỉnh giảng",
       "trial": "Đang thử việc",
-      "trialNote": "cần theo dõi"
+      "trialNote": "cần theo dõi",
+      "faculties": "Khoa",
+      "active": "Đang hoạt động"
     },
     "table": {
       "dept": "Đơn vị",
@@ -385,8 +396,11 @@
       "visiting": "Thỉnh giảng",
       "total": "Tổng",
       "status": "Trạng thái",
+      "type": "Loại",
+      "contact": "Liên hệ",
       "statusActive": "Hoạt động",
-      "statusWarning": "Cảnh báo"
+      "statusWarning": "Cảnh báo",
+      "statusInactive": "Ngừng hoạt động"
     },
     "chart": {
       "title": "Phân bổ nhân sự",
@@ -937,6 +951,708 @@
       "current": "Hiện tại"
     },
     "salaryHistoryDate": "Ngày",
-    "leaveDaysUnit": "ngày"
+    "leaveDaysUnit": "ngày",
+    "breadcrumb": {
+      "list": "Nhân sự",
+      "contract": "Hợp đồng lao động"
+    },
+    "alert": {
+      "expiringContracts": "Có {{count}} hợp đồng sắp hết hạn trong 60 ngày tới",
+      "viewList": "Xem danh sách"
+    },
+    "table": {
+      "stt": "STT",
+      "hoTen": "Họ tên",
+      "thaoTac": "Thao tác",
+      "trangThai": "Trạng thái",
+      "maHD": "Mã HĐ",
+      "donVi": "Đơn vị / Chức danh",
+      "loaiHD": "Loại HĐ",
+      "luongCoBan": "Lương cơ bản",
+      "ngayKy": "Ngày ký",
+      "ngayHetHan": "Ngày hết hạn",
+      "maDon": "Mã đơn",
+      "vienChuc": "Viên chức",
+      "loai": "Loại",
+      "tuNgay": "Từ ngày",
+      "denNgay": "Đến ngày",
+      "soNgay": "Số ngày",
+      "nguoiDuyet": "Người duyệt",
+      "ngayDuyet": "Ngày duyệt",
+      "nam": "Năm",
+      "employee": "Viên chức",
+      "type": "Loại",
+      "reason": "Lý do",
+      "date": "Ngày lập",
+      "decisionNo": "Số quyết định",
+      "fromPosition": "Chức vụ cũ",
+      "toPosition": "Chức vụ mới",
+      "effectiveDate": "Ngày hiệu lực",
+      "requester": "Người yêu cầu",
+      "contact": "Liên hệ"
+    },
+    "action": {
+      "detail": "Chi tiết",
+      "edit": "Sửa",
+      "delete": "Xóa",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "viewDetail": "Xem chi tiết",
+      "exportExcel": "Xuất Excel",
+      "importExcel": "Nhập từ Excel",
+      "importProfile": "Import hồ sơ"
+    },
+    "exportExcel": "Xuất Excel",
+    "importExcel": "Nhập từ Excel",
+    "importProfile": "Import hồ sơ",
+    "exportReport": "Xuất báo cáo",
+    "add": "Thêm mới",
+    "empty": {
+      "noContracts": "Không tìm thấy hợp đồng nào",
+      "noLeaveRequests": "Không có đơn nghỉ phép",
+      "noSalarySheets": "Không tìm thấy bảng lương nào",
+      "noAppointments": "Không tìm thấy hồ sơ nào",
+      "noDiscipline": "Không có vụ việc nào",
+      "noRecruitment": "Không tìm thấy tin tuyển dụng nào",
+      "noResults": "Không tìm thấy kết quả nào",
+      "noDepartments": "Không có đơn vị nào",
+      "noStudents": "Không có sinh viên nào"
+    },
+    "contract": {
+      "title": "Hợp đồng Lao động",
+      "description": "HRM-01 — Quản lý hợp đồng lao động, loại hợp đồng và thời hạn",
+      "createContract": "Tạo hợp đồng mới",
+      "statusActive": "Còn hiệu lực",
+      "statusExpiring": "Sắp hết hạn",
+      "statusExpired": "Đã hết hạn",
+      "permanent": "Cơ hữu",
+      "visiting": "Thỉnh giảng",
+      "probation": "Thử việc",
+      "indefinite": "Không thời hạn",
+      "form": {
+        "staffName": "Họ tên viên chức",
+        "staffNamePlaceholder": "Nhập họ tên",
+        "dept": "Đơn vị công tác",
+        "position": "Chức danh",
+        "contractType": "Loại hợp đồng",
+        "salary": "Lương cơ bản",
+        "signDate": "Ngày ký HĐ",
+        "endDate": "Ngày hết hạn",
+        "attachFile": "Đính kèm file HĐ",
+        "selectFile": "Chọn file...",
+        "browse": "Chọn file",
+        "note": "Ghi chú",
+        "notePlaceholder": "Ghi chú thêm...",
+        "expires": "Hết hạn"
+      },
+      "modal": {
+        "createTitle": "Tạo hợp đồng lao động mới",
+        "editTitle": "Chỉnh sửa hợp đồng lao động",
+        "detailTitle": "Chi tiết hợp đồng lao động",
+        "expiringTitle": "Danh sách hợp đồng sắp hết hạn",
+        "expiringDesc": "Có {{count}} hợp đồng sẽ hết hạn trong vòng 60 ngày tới.",
+        "renewAll": "Gia hạn tất cả",
+        "renew": "Gia hạn",
+        "saveContract": "Lưu hợp đồng",
+        "saveChanges": "Lưu thay đổi",
+        "downloadFile": "Tải file HĐ",
+        "contractFile": "File hợp đồng",
+        "downloadHint": "Có thể tải về hoặc in trực tiếp"
+      }
+    },
+    "leave": {
+      "title": "Đơn nghỉ phép",
+      "description": "Quản lý đơn nghỉ phép của viên chức",
+      "breadcrumb": "Nghỉ phép",
+      "createLeaveRequest": "Tạo đơn nghỉ phép",
+      "filter": {
+        "typeAll": "Tất cả",
+        "typeAnnual": "Nghỉ phép năm",
+        "typeSick": "Nghỉ ốm",
+        "typeUnpaid": "Nghỉ không lương",
+        "typeMaternity": "Nghỉ thai sản",
+        "typePaternity": "Nghỉ thăm nom"
+      },
+      "typeLabel": {
+        "annual": "Nghỉ phép năm",
+        "sick": "Nghỉ ốm",
+        "unpaid": "Nghỉ không lương",
+        "maternity": "Nghỉ thai sản",
+        "paternity": "Nghỉ thăm nom"
+      },
+      "stats": {
+        "pending": "Đơn chờ duyệt",
+        "approvedMonth": "Đã duyệt tháng",
+        "rejected": "Bị từ chối",
+        "totalMonth": "Tổng đơn tháng"
+      },
+      "status": {
+        "approved": "Đã duyệt",
+        "pending": "Chờ duyệt",
+        "rejected": "Từ chối",
+        "cancelled": "Đã hủy"
+      },
+      "modal": {
+        "detailTitle": "Chi tiết đơn nghỉ phép",
+        "reason": "Lý do",
+        "approveTitle": "Duyệt đơn nghỉ phép?",
+        "approveDesc": "Đơn nghỉ phép sẽ được chấp thuận và cập nhật vào số ngày nghỉ phép của viên chức.",
+        "rejectTitle": "Từ chối đơn nghỉ phép?",
+        "rejectDesc": "Đơn nghỉ phép sẽ bị từ chối. Viên chức sẽ nhận được thông báo.",
+        "confirmApprove": "Duyệt đơn",
+        "confirmReject": "Từ chối"
+      },
+      "table": {
+        "code": "Mã đơn",
+        "employee": "Viên chức",
+        "tuNgay": "Từ ngày",
+        "denNgay": "Đến ngày",
+        "soNgay": "Số ngày",
+        "nguoiDuyet": "Người duyệt",
+        "ngayDuyet": "Ngày duyệt"
+      }
+    },
+    "leaveBalance": {
+      "title": "Số ngày nghỉ phép",
+      "description": "HRM-01 — Theo dõi số ngày nghỉ phép còn lại trong năm",
+      "breadcrumb": "Số dư",
+      "addBalance": "Thêm khoản nghỉ",
+      "overview": "Tổng quan",
+      "daysRemaining": "ngày còn lại",
+      "usedDays": "Đã dùng {{used}} / {{total}} ngày",
+      "history": "Lịch sử nghỉ phép năm {{year}}",
+      "table": {
+        "type": "Loại",
+        "reason": "Lý do",
+        "from": "Từ ngày",
+        "to": "Đến ngày",
+        "days": "Số ngày",
+        "status": "Trạng thái",
+        "approver": "Người duyệt"
+      }
+    },
+    "salary": {
+      "title": "Bảng lương & Phụ cấp",
+      "description": "HRM-01 — Quản lý lương, phụ cấp và các khoản khấu trừ hàng tháng",
+      "breadcrumb": "Bảng lương",
+      "downloadTemplate": "Tải mẫu",
+      "calculate": "Tính lương",
+      "disburse": "Chi trả",
+      "summary": {
+        "totalFund": "Tổng quỹ lương",
+        "month": "tháng {{month}}",
+        "staffCount": "Số CBNV",
+        "staffUnit": "viên chức",
+        "increaseVsPrev": "Tăng so tháng trước",
+        "increaseNote": "do phụ cấp thêm",
+        "disbursed": "Đã chi trả",
+        "pendingConfirm": "chờ xác nhận"
+      },
+      "chart": {
+        "title": "Quỹ lương 6 tháng gần nhất",
+        "unit": "Đơn vị: tỷ đồng",
+        "total": "Tổng lương",
+        "bonus": "Phụ cấp"
+      },
+      "recruitment": {
+        "title": "Tuyển dụng đang xử lý",
+        "profiles": "hồ sơ",
+        "new": "Hồ sơ mới",
+        "screening": "Sàng lọc",
+        "interview": "Phỏng vấn",
+        "offer": "Đề nghị",
+        "totalCandidates": "Tổng ứng viên",
+        "interviewRate": "Tỷ lệ phỏng vấn",
+        "avgTime": "Thời gian TB"
+      },
+      "table": {
+        "staff": "Viên chức",
+        "maVC": "Mã VC",
+        "allowance": "Phụ cấp",
+        "deduction": "Khấu trừ",
+        "netPay": "Thực nhận",
+        "month": "Tháng",
+        "status": "Trạng thái",
+        "action": "Thao tác",
+        "paid": "Đã chi trả",
+        "pending": "Chờ duyệt",
+        "adjust": "Điều chỉnh"
+      },
+      "modal": {
+        "adjustTitle": "Điều chỉnh lương",
+        "calculateTitle": "Tính lương tháng",
+        "disburseTitle": "Chi trả lương",
+        "salaryMonth": "Tháng tính lương",
+        "applyDept": "Đơn vị áp dụng",
+        "summaryTable": "Bảng tổng hợp quỹ lương",
+        "staffCount": "Số viên chức",
+        "totalSalary": "Tổng lương cơ bản",
+        "totalAllowance": "Tổng phụ cấp",
+        "totalDeduction": "Tổng khấu trừ",
+        "totalNet": "Tổng thực nhận",
+        "note": "Ghi chú",
+        "salaryOld": "Lương cũ",
+        "salaryNew": "Lương mới",
+        "difference": "Chênh lệch",
+        "calculateBtn": "Tính toán",
+        "salaryNewLabel": "Lương cơ bản mới",
+        "salaryOldLabel": "Lương cơ bản",
+        "disbursement": {
+          "confirmTitle": "Xác nhận chi trả lương tháng {{month}}",
+          "confirmDesc": "Tổng số: {{total}} cho {{count}} viên chức",
+          "method": "Phương thức chi trả",
+          "bank": "Ngân hàng",
+          "accountNo": "Số tài khoản",
+          "accountName": "Tên tài khoản",
+          "disbursementDate": "Ngày chi trả dự kiến",
+          "confirmBtn": "Xác nhận chi trả",
+          "transfer": "Chuyển khoản",
+          "cash": "Tiền mặt",
+          "ewallet": "Ví điện tử"
+        }
+      },
+      "deptFilter": {
+        "all": "Tất cả",
+        "khoaCNTT": "Khoa CNTT",
+        "khoaKinhTe": "Khoa Kinh tế",
+        "khoaLuat": "Khoa Luật",
+        "phongToChuc": "Phòng Tổ chức",
+        "banGiamHieu": "Ban Giám hiệu",
+        "khoaNgoaiNgu": "Khoa Ngoại ngữ",
+        "khoaSuPham": "Khoa Sư phạm"
+      },
+      "bank": {
+        "vietcombank": "Vietcombank",
+        "vietinbank": "VietinBank",
+        "bidv": "BIDV",
+        "agribank": "Agribank",
+        "techcombank": "Techcombank",
+        "acb": "ACB"
+      }
+    },
+    "appointment": {
+      "title": "Bổ nhiệm & Thăng chức",
+      "description": "HRM-01 — Theo dõi hồ sơ bổ nhiệm, thăng chức viên chức",
+      "breadcrumb": "Bổ nhiệm",
+      "createAppointment": "Tạo hồ sơ bổ nhiệm",
+      "stats": {
+        "total": "Tổng hồ sơ",
+        "pending": "Chờ duyệt",
+        "approved": "Đã duyệt",
+        "rejected": "Từ chối"
+      },
+      "status": {
+        "pending": "Chờ duyệt",
+        "approved": "Đã duyệt",
+        "rejected": "Từ chối"
+      },
+      "appointmentType": {
+        "boNhiemMoi": "Bổ nhiệm mới",
+        "boNhiem": "Bổ nhiệm",
+        "boNhiemLai": "Bổ nhiệm lại",
+        "thangChuc": "Thăng chức",
+        "dieuChuyen": "Điều chuyển",
+        "mienNhiem": "Miễn nhiệm"
+      },
+      "table": {
+        "maHoSo": "Mã hồ sơ",
+        "donVi": "Đơn vị",
+        "loai": "Loại",
+        "fromPosition": "Chức vụ cũ",
+        "toPosition": "Chức vụ mới",
+        "effectiveDate": "Ngày hiệu lực",
+        "requester": "Người yêu cầu",
+        "vienChuc": "Viên chức",
+        "type": "Loại",
+        "trangThai": "Trạng thái",
+        "thaoTac": "Thao tác"
+      },
+      "type": {
+        "new": "Bổ nhiệm mới",
+        "reappoint": "Bổ nhiệm lại",
+        "promote": "Thăng chức",
+        "transfer": "Điều chuyển",
+        "dismiss": "Miễn nhiệm"
+      },
+      "modal": {
+        "detailTitle": "Chi tiết hồ sơ bổ nhiệm",
+        "appointmentType": "Loại bổ nhiệm",
+        "reason": "Lý do / Nội dung",
+        "downloadQD": "Tải QĐ",
+        "decisionFile": "File quyết định",
+        "downloadHint": "Có thể tải về hoặc in trực tiếp",
+        "approveTitle": "Phê duyệt hồ sơ bổ nhiệm?",
+        "approveDesc": "Hồ sơ bổ nhiệm sẽ được chấp thuận. Quyết định bổ nhiệm sẽ được ban hành.",
+        "rejectTitle": "Từ chối hồ sơ bổ nhiệm?",
+        "rejectDesc": "Hồ sơ bổ nhiệm sẽ bị từ chối. Người yêu cầu sẽ nhận được thông báo.",
+        "confirmApprove": "Phê duyệt",
+        "confirmReject": "Từ chối"
+      }
+    },
+    "discipline": {
+      "title": "Kỷ luật & Vi phạm",
+      "description": "HRM-01 — Theo dõi và xử lý kỷ luật viên chức và sinh viên",
+      "breadcrumb": "Kỷ luật",
+      "createRecord": "Lập biên bản",
+      "viewRegulation": "Xem quy định",
+      "exportReport": "Xuất báo cáo",
+      "add": "Thêm mới",
+      "stats": {
+        "total": "Tổng vụ việc",
+        "pending": "Chờ xử lý",
+        "reviewed": "Đã xem xét",
+        "resolved": "Đã giải quyết"
+      },
+      "filter": {
+        "deptAll": "Tất cả",
+        "statusAll": "Tất cả trạng thái"
+      },
+      "table": {
+        "caseCode": "Mã vụ",
+        "violator": "Người vi phạm",
+        "dept": "Đơn vị",
+        "type": "Loại vi phạm",
+        "level": "Mức độ",
+        "description": "Mô tả",
+        "date": "Ngày lập",
+        "status": "Trạng thái",
+        "action": "Thao tác",
+        "employee": "Viên chức",
+        "reason": "Lý do",
+        "decisionNo": "Số quyết định"
+      },
+      "level": {
+        "severe": "Nặng",
+        "moderate": "Trung bình",
+        "mild": "Nhẹ"
+      },
+      "status": {
+        "pending": "Chờ xử lý",
+        "reviewed": "Đã xem xét",
+        "resolved": "Đã giải quyết"
+      },
+      "type": {
+        "academic": "Vi phạm học thuật",
+        "rule": "Vi phạm nội quy",
+        "ethics": "Vi phạm đạo đức",
+        "safety": "Vi phạm an toàn lao động",
+        "other": "Khác",
+        "warning": "Khiển trách",
+        "reprimand": "Khai trừ",
+        "demotion": "Hạ bậc",
+        "dismissal": "Sa thải"
+      },
+      "modal": {
+        "createTitle": "Lập biên bản kỷ luật",
+        "violator": "Người vi phạm",
+        "violatorPlaceholder": "Nhập họ tên người vi phạm",
+        "dept": "Đơn vị",
+        "violationType": "Loại vi phạm",
+        "level": "Mức độ vi phạm",
+        "recordDate": "Ngày lập biên bản",
+        "recordBy": "Người lập biên bản",
+        "recordByPlaceholder": "Họ tên người lập biên bản",
+        "violationDesc": "Mô tả vi phạm",
+        "violationDescPlaceholder": "Mô tả chi tiết sự việc vi phạm...",
+        "proposedAction": "Biện pháp xử lý đề xuất",
+        "proposedActionPlaceholder": "Đề xuất biện pháp xử lý...",
+        "regulationTitle": "Quy định xử lý kỷ luật",
+        "processTitle": "Quy trình xử lý",
+        "processStep1": "Phát hiện sự việc → Lập biên bản",
+        "processStep2": "Thông báo cho người vi phạm trong 48h",
+        "processStep3": "Họp xét đánh giá mức độ vi phạm",
+        "processStep4": "Ra quyết định xử lý kỷ luật",
+        "processStep5": "Thông báo quyết định cho các bên liên quan",
+        "detailTitle": "Chi tiết vụ kỷ luật",
+        "nextStep": "Bước tiếp theo",
+        "result": "Kết quả xử lý",
+        "resolvedAt": "Đã giải quyết",
+        "downloadRecord": "Tải biên bản",
+        "levelHeader": "Mức độ"
+      },
+      "btn": {
+        "cancel": "Hủy",
+        "saveRecord": "Lưu biên bản",
+        "close": "Đóng"
+      }
+    },
+    "department": {
+      "title": "Danh sách đơn vị",
+      "description": "Danh mục các khoa, phòng ban và số lượng nhân sự theo đơn vị",
+      "breadcrumb": "Đơn vị",
+      "import": "Import",
+      "listTitle": "Danh sách đơn vị",
+      "stats": {
+        "total": "Tổng viên chức",
+        "totalChange": "+8 tuần này",
+        "permanent": "Cơ hữu",
+        "visiting": "Thỉnh giảng",
+        "trial": "Đang thử việc",
+        "trialNote": "cần theo dõi"
+      },
+      "table": {
+        "dept": "Đơn vị",
+        "head": "Trưởng đơn vị",
+        "permanent": "Cơ hữu",
+        "visiting": "Thỉnh giảng",
+        "total": "Tổng",
+        "status": "Trạng thái",
+        "type": "Loại",
+        "contact": "Liên hệ",
+        "statusActive": "Hoạt động",
+        "statusWarning": "Cảnh báo",
+        "statusInactive": "Ngừng hoạt động"
+      },
+      "chart": {
+        "title": "Phân bổ nhân sự",
+        "subtitle": "Tất cả ứng viên đang trong quy trình tuyển dụng",
+        "candidates": "ứng viên"
+      },
+      "searchPlaceholder": "Tìm đơn vị..."
+    },
+    "recruitment": {
+      "title": "Quản lý Tuyển dụng",
+      "description": "HRM-01 — Theo dõi quy trình tuyển dụng từ đăng tin đến phê duyệt",
+      "breadcrumb": "Tuyển dụng",
+      "createJob": "Tạo tin tuyển dụng",
+      "importProfiles": "Import hồ sơ",
+      "stats": {
+        "totalJobs": "Tin tuyển dụng",
+        "open": "đang tuyển",
+        "candidates": "Ứng viên",
+        "allSessions": "tất cả đợt tuyển",
+        "hired": "Đã tuyển thành công",
+        "year": "năm 2026",
+        "processing": "Đang xử lý",
+        "profiles": "hồ sơ chờ"
+      },
+      "pipeline": {
+        "title": "Pipeline tuyển dụng",
+        "subtitle": "Tất cả ứng viên đang trong quy trình tuyển dụng",
+        "total": "ứng viên",
+        "stages": {
+          "new": "Hồ sơ mới",
+          "screening": "Sàng lọc",
+          "test": "Thi / Test",
+          "interview": "Phỏng vấn",
+          "offer": "Đề nghị NV"
+        },
+        "table": {
+          "candidate": "Ứng viên",
+          "position": "Vị trí ứng tuyển",
+          "appliedDate": "Ngày nộp",
+          "method": "Hình thức",
+          "stage": "Giai đoạn",
+          "status": "Trạng thái"
+        },
+        "status": {
+          "pending": "Đang xử lý",
+          "screening": "Đang sàng lọc",
+          "testing": "Đang thi",
+          "interviewed": "Đã phỏng vấn",
+          "offered": "Đã nhận đề nghị"
+        }
+      },
+      "filter": {
+        "deptAll": "Tất cả",
+        "statusAll": "Tất cả trạng thái"
+      },
+      "table": {
+        "jobCode": "Mã tin",
+        "title": "Vị trí tuyển dụng",
+        "dept": "Đơn vị",
+        "level": "Trình độ",
+        "slots": "Số lượng",
+        "candidates": "Ứng viên",
+        "deadline": "Hạn nộp",
+        "status": "Trạng thái",
+        "action": "Thao tác"
+      },
+      "status": {
+        "open": "Đang tuyển",
+        "closed": "Đã đóng",
+        "draft": "Nháp",
+        "completed": "Hoàn thành"
+      },
+      "form": {
+        "levelDaiHoc": "Đại học",
+        "levelThacSi": "Thạc sĩ",
+        "levelTienSi": "Tiến sĩ",
+        "levelCaoDang": "Cao đẳng",
+        "levelSinhVien": "Sinh viên",
+        "methodXetHoSo": "Xét hồ sơ",
+        "methodXetHoSoPhongVan": "Xét hồ sơ + Phỏng vấn",
+        "methodThiVietPhongVan": "Thi viết + Phỏng vấn",
+        "methodThiThucHanh": "Thi thực hành"
+      },
+      "modal": {
+        "createTitle": "Tạo tin tuyển dụng mới",
+        "jobTitle": "Tên tin tuyển dụng",
+        "jobTitlePlaceholder": "VD: Tuyển dụng Giảng viên CNTT",
+        "dept": "Đơn vị",
+        "position": "Vị trí tuyển dụng",
+        "positionPlaceholder": "VD: Giảng viên",
+        "level": "Trình độ yêu cầu",
+        "slots": "Số lượng tuyển",
+        "deadline": "Hạn nộp hồ sơ",
+        "method": "Hình thức tuyển dụng",
+        "jobDesc": "Mô tả công việc",
+        "jobDescPlaceholder": "Mô tả chi tiết công việc, yêu cầu...",
+        "benefits": "Quyền lợi",
+        "benefitsPlaceholder": "Các quyền lợi khi được tuyển dụng...",
+        "detailTitle": "Chi tiết tin tuyển dụng",
+        "profiles": "hồ sơ",
+        "slotsUnit": "người",
+        "applicantsUnit": "hồ sơ",
+        "profileCount": "{{count}} hồ sơ",
+        "applicantList": "Danh sách ứng viên",
+        "profilesTitle": "Hồ sơ ứng viên",
+        "editTitle": "Chỉnh sửa tin tuyển dụng",
+        "editing": "Đang sửa",
+        "profileTitle": "Xem",
+        "profileDownloadCV": "Tải CV",
+        "downloadAll": "Tải tất cả"
+      },
+      "btn": {
+        "cancel": "Hủy",
+        "publish": "Đăng tin tuyển dụng",
+        "close": "Đóng",
+        "edit": "Sửa",
+        "profiles": "Hồ sơ",
+        "saveChanges": "Lưu thay đổi"
+      }
+    },
+    "vienChucCreate": {
+      "title": "Thêm viên chức mới",
+      "description": "HRM-01 — Nhập thông tin viên chức để đưa vào hệ thống nhân sự",
+      "breadcrumb": "Thêm mới",
+      "personalInfo": "Thông tin cá nhân",
+      "workInfo": "Thông tin công tác",
+      "form": {
+        "code": "Mã viên chức",
+        "codePlaceholder": "VC-2026-001",
+        "fullName": "Họ và tên",
+        "fullNamePlaceholder": "Nguyễn Văn A",
+        "dob": "Ngày sinh",
+        "cccd": "CCCD/CMND",
+        "cccdPlaceholder": "001234567890",
+        "gender": "Giới tính",
+        "genderMale": "Nam",
+        "genderFemale": "Nữ",
+        "ethnicity": "Dân tộc",
+        "ethnicityDefault": "Kinh",
+        "address": "Địa chỉ",
+        "addressPlaceholder": "Địa chỉ thường trú",
+        "phone": "Số điện thoại",
+        "phonePlaceholder": "0912 xxx xxx",
+        "email": "Email",
+        "emailPlaceholder": "email@truong.edu.vn",
+        "dept": "Đơn vị",
+        "selectDept": "-- Chọn đơn vị --",
+        "title": "Chức danh",
+        "selectTitle": "-- Chọn chức danh --",
+        "titles": {
+          "professor": "Giáo sư",
+          "associateProfessor": "Phó Giáo sư",
+          "doctoral": "Tiến sĩ",
+          "master": "Thạc sĩ",
+          "engineer": "Kỹ sư",
+          "bachelor": "Cử nhân",
+          "college": "Cao đẳng"
+        },
+        "position": "Vị trí việc làm",
+        "positionPlaceholder": "Giảng viên, Chuyên viên...",
+        "contractType": "Loại hợp đồng",
+        "contractTypeCoHuu": "Cơ hữu",
+        "contractTypeThinhGiang": "Thỉnh giảng",
+        "contractTypeThuViec": "Thử việc",
+        "contractTypeIndefinite": "Không thời hạn",
+        "salary": "Ngạch lương",
+        "salaryPlaceholder": "8.000.000",
+        "education": "Trình độ chuyên môn",
+        "selectEducation": "-- Chọn --",
+        "educations": {
+          "doctoral": "Tiến sĩ",
+          "master": "Thạc sĩ",
+          "engineer": "Kỹ sư",
+          "bachelor": "Cử nhân",
+          "college": "Cao đẳng"
+        },
+        "major": "Chuyên ngành",
+        "school": "Trường tốt nghiệp",
+        "gradYear": "Năm tốt nghiệp",
+        "gradYearPlaceholder": "2020"
+      },
+      "btn": {
+        "back": "Quay lại",
+        "save": "Lưu viên chức"
+      }
+    },
+    "config": {
+      "title": "Cấu hình Nhân sự",
+      "description": "HRM-01 — Thiết lập các tham số nhân sự: nghỉ phép, hợp đồng, lương, cảnh báo",
+      "breadcrumb": "Cấu hình nhân sự",
+      "saved": "Đã lưu!",
+      "saveChanges": "Lưu thay đổi",
+      "section": {
+        "general": "Cấu hình chung",
+        "generalDesc": "Các thiết lập mặc định cho hệ thống nhân sự",
+        "dept": "Phòng ban",
+        "deptDesc": "Danh sách và thiết lập cho các phòng ban trong trường",
+        "contract": "Hợp đồng",
+        "contractDesc": "Thiết lập quy trình và cảnh báo liên quan đến hợp đồng lao động",
+        "leave": "Nghỉ phép",
+        "leaveDesc": "Thiết lập số ngày nghỉ phép mặc định cho từng loại",
+        "salary": "Lương & Phụ cấp",
+        "salaryDesc": "Thiết lập quy trình tính lương và chi trả"
+      },
+      "general": {
+        "autoCode": "Mã VC tự động",
+        "autoCodeDesc": "Tự động sinh mã viên chức theo quy tắc VC-YYYY-NNN",
+        "requireProfile": "Bắt buộc đầy đủ hồ sơ",
+        "requireProfileDesc": "Yêu cầu CCCD, bằng cấp, hợp đồng trước khi kích hoạt tài khoản",
+        "deptHeadApproval": "Trưởng phòng duyệt",
+        "deptHeadApprovalDesc": "Trưởng phòng phê duyệt đơn nghỉ phép, tăng lương của nhân viên cấp dưới",
+        "hrApproval": "Phòng HC duyệt cuối",
+        "hrApprovalDesc": "Phòng Hành chính - Nhân sự duyệt cuối các quyết định nhân sự",
+        "auditTrail": "Ghi log thay đổi",
+        "auditTrailDesc": "Log đầy đủ mọi thay đổi trên hồ sơ nhân sự"
+      },
+      "contract": {
+        "autoExpire": "Cảnh báo hết hạn HĐ",
+        "autoExpireDesc": "Gửi thông báo trước 60 ngày khi HĐ sắp hết hạn",
+        "requireSign": "Yêu cầu ký số",
+        "requireSignDesc": "Bắt buộc ký số khi ký hợp đồng điện tử",
+        "probationReq": "Quản lý thử việc",
+        "probationReqDesc": "Theo dõi và cảnh báo khi hết thời gian thử việc",
+        "contractTemplate": "Mẫu HĐ theo loại",
+        "contractTemplateDesc": "Tự động chọn mẫu HĐ theo loại hợp đồng (Cơ hữu, Thỉnh giảng...)"
+      },
+      "leave": {
+        "annual": "Nghỉ phép năm",
+        "sick": "Nghỉ ốm",
+        "unpaid": "Nghỉ không lương",
+        "maternity": "Nghỉ thai sản",
+        "paternity": "Nghỉ thăm nom",
+        "unit": "ngày",
+        "days": "ngày"
+      },
+      "salary": {
+        "autoCalc": "Tính lương tự động",
+        "autoCalcDesc": "Tự động tính lương cuối tháng theo ngày công",
+        "bankTransfer": "Chuyển khoản lương",
+        "bankTransferDesc": "Chi trả lương qua chuyển khoản ngân hàng",
+        "payslipEmail": "Gửi phiếu lương email",
+        "payslipEmailDesc": "Tự động gửi phiếu lương qua email mỗi kỳ chi trả",
+        "insuranceSync": "Đồng bộ BHXH",
+        "insuranceSyncDesc": "Đồng bộ dữ liệu bảo hiểm xã hội với hệ thống BHXH quốc gia"
+      },
+      "dept": {
+        "head": "Trưởng phòng",
+        "staff": "nhân sự",
+        "edit": "Sửa",
+        "addDept": "Thêm phòng ban"
+      }
+    }
   }
 }

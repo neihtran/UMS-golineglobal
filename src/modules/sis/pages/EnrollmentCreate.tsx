@@ -4,27 +4,9 @@ import { Save, Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, CardContent, Input, Badge } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useStudentList, useSubjectList } from '@/hooks/useSis';
 
 const SEMESTERS = ['HK1/2025-2026', 'HK2/2025-2026', 'HK1/2026-2027'];
-const STUDENTS = [
-  { id: 'sv001', msv: 'SV-2024-0142', name: 'Nguyễn Minh Tuấn', class: 'CNTT-K24' },
-  { id: 'sv002', msv: 'SV-2024-0167', name: 'Trần Thu Hà', class: 'CNTT-K24' },
-  { id: 'sv003', msv: 'SV-2024-0089', name: 'Lê Đình Phong', class: 'CNTT-K24' },
-  { id: 'sv004', msv: 'SV-2023-0211', name: 'Phạm Thị Lan', class: 'KT-K23' },
-  { id: 'sv005', msv: 'SV-2024-0056', name: 'Bùi Hoàng Nam', class: 'LUAT-K24' },
-];
-const COURSES = [
-  { code: 'INT1005', name: 'Nhập môn Tin học', credits: 3, semester: 1 },
-  { code: 'INT2201', name: 'Cấu trúc dữ liệu', credits: 4, semester: 2 },
-  { code: 'INT3110', name: 'Cơ sở dữ liệu', credits: 4, semester: 3 },
-  { code: 'INT3201', name: 'Mạng máy tính', credits: 3, semester: 3 },
-  { code: 'INT3301', name: 'Lập trình hướng đối tượng', credits: 4, semester: 2 },
-  { code: 'INT3401', name: 'Trí tuệ nhân tạo', credits: 3, semester: 5 },
-  { code: 'INT4001', name: 'Đồ án tốt nghiệp', credits: 10, semester: 8 },
-  { code: 'GEN1011', name: 'Toán cao cấp A1', credits: 4, semester: 1 },
-  { code: 'GEN1012', name: 'Tiếng Anh A1', credits: 3, semester: 1 },
-  { code: 'GEN2011', name: 'Xác suất thống kê', credits: 3, semester: 3 },
-];
 
 function Field({ label, required, error, children }: { label: string; required?: boolean; error?: string; children: React.ReactNode }) {
   return (
@@ -47,13 +29,21 @@ export default function EnrollmentCreate() {
   const [searchCourse, setSearchCourse] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const selectedStudent = STUDENTS.find((s) => s.id === form.studentId);
-  const filteredCourses = COURSES.filter(
-    (c) => !selectedCourses.includes(c.code) &&
-    (c.name.toLowerCase().includes(searchCourse.toLowerCase()) || c.code.toLowerCase().includes(searchCourse.toLowerCase()))
+  const { data: studentsResult } = useStudentList({ page: 1, pageSize: 100 });
+  const { data: coursesResult } = useSubjectList({ page: 1, pageSize: 200 });
+
+  const isLoadingCourses = !coursesResult;
+
+  const students: any[] = ((studentsResult as any)?.data ?? []) as any[];
+  const courses: any[] = ((coursesResult as any)?.data ?? []) as any[];
+
+  const selectedStudent = students.find((s) => s._id === form.studentId);
+  const filteredCourses = courses.filter(
+    (c) => !selectedCourses.includes(c._id) &&
+      (c.name?.toLowerCase().includes(searchCourse.toLowerCase()) || c.code?.toLowerCase().includes(searchCourse.toLowerCase()))
   );
-  const selectedCourseDetails = COURSES.filter((c) => selectedCourses.includes(c.code));
-  const totalCredits = selectedCourseDetails.reduce((acc, c) => acc + c.credits, 0);
+  const selectedCourseDetails = courses.filter((c) => selectedCourses.includes(c._id));
+  const totalCredits = selectedCourseDetails.reduce((acc, c) => acc + (c.credits || 0), 0);
 
   const set = (k: string, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -111,7 +101,7 @@ export default function EnrollmentCreate() {
               </select>
             </Field>
             <Field label={t('enrollment.form.ngayDangKy')}>
-              <Input type="date" value="2026-01-15" onChange={() => {}} />
+              <Input type="date" value="" onChange={() => {}} />
             </Field>
           </CardContent>
         </Card>
@@ -126,11 +116,11 @@ export default function EnrollmentCreate() {
               <div className="flex items-center justify-between rounded-lg border border-[rgb(var(--primary))] bg-[rgb(var(--primary)/0.04)] p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-sm font-bold text-white">
-                    {selectedStudent.name.split(' ').slice(-2).map((n) => n[0]).join('')}
+                    {(selectedStudent.name || selectedStudent.code).split(' ').slice(-2).map((n: string) => n[0]).join('')}
                   </div>
                   <div>
                     <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedStudent.name}</p>
-                    <p className="text-xs text-[rgb(var(--text-secondary))]">{selectedStudent.msv} · {selectedStudent.class}</p>
+                    <p className="text-xs text-[rgb(var(--text-secondary))]">{selectedStudent.code || selectedStudent._id} · {selectedStudent.className || ''}</p>
                   </div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => setForm((f) => ({ ...f, studentId: '' }))}>{t('enrollment.form.doi')}</Button>
@@ -143,27 +133,31 @@ export default function EnrollmentCreate() {
                   onChange={(e) => setSearchStudent(e.target.value)}
                 />
                 <div className="max-h-48 overflow-y-auto space-y-1 rounded-lg border border-[rgb(var(--border))]">
-                  {STUDENTS.filter(
-                    (s) => !form.studentId && (
-                      s.name.toLowerCase().includes(searchStudent.toLowerCase()) ||
-                      s.msv.toLowerCase().includes(searchStudent.toLowerCase())
-                    )
-                  ).map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => { setForm((f) => ({ ...f, studentId: s.id })); setSearchStudent(''); }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[rgb(var(--bg-hover))] transition-colors"
-                    >
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-semibold text-[rgb(var(--primary))]">
-                        {s.name.split(' ').slice(-2).map((n) => n[0]).join('')}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{s.name}</p>
-                        <p className="text-xs text-[rgb(var(--text-secondary))]">{s.msv} · {s.class}</p>
-                      </div>
-                    </button>
-                  ))}
+                  {!studentsResult ? (
+                    <p className="text-center py-4 text-xs text-[rgb(var(--text-muted))]">Đang tải danh sách sinh viên...</p>
+                  ) : (
+                    students
+                      .filter((s) => !form.studentId && (
+                        (s.name?.toLowerCase().includes(searchStudent.toLowerCase()) || false) ||
+                        (s.code?.toLowerCase().includes(searchStudent.toLowerCase()) || false)
+                      ))
+                      .map((s) => (
+                        <button
+                          key={s._id}
+                          type="button"
+                          onClick={() => { setForm((f) => ({ ...f, studentId: s._id })); setSearchStudent(''); }}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[rgb(var(--bg-hover))] transition-colors"
+                        >
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-semibold text-[rgb(var(--primary))]">
+                            {(s.name || s.code).split(' ').slice(-2).map((n: string) => n[0]).join('')}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{s.name}</p>
+                            <p className="text-xs text-[rgb(var(--text-secondary))]">{s.code || s._id} · {s.className || ''}</p>
+                          </div>
+                        </button>
+                      ))
+                  )}
                 </div>
                 {errors.studentId && <p className="text-xs text-[rgb(var(--error))]">{errors.studentId}</p>}
               </>
@@ -188,17 +182,17 @@ export default function EnrollmentCreate() {
                 <p className="text-xs font-semibold text-[rgb(var(--text-muted))] uppercase tracking-wide">{t('enrollment.form.selected')}</p>
                 <div className="space-y-1.5">
                   {selectedCourseDetails.map((c) => (
-                    <div key={c.code} className="flex items-center justify-between rounded-lg border border-[rgb(var(--primary)/0.3)] bg-[rgb(var(--primary)/0.04)] px-4 py-2.5">
+                    <div key={c._id} className="flex items-center justify-between rounded-lg border border-[rgb(var(--primary)/0.3)] bg-[rgb(var(--primary)/0.04)] px-4 py-2.5">
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-xs text-[rgb(var(--primary))] font-semibold">{c.code}</span>
                         <span className="text-sm text-[rgb(var(--text-primary))]">{c.name}</span>
-                        <span className="text-xs text-[rgb(var(--text-muted))]">HK{c.semester}</span>
+                        <span className="text-xs text-[rgb(var(--text-muted))]">HK{c.semesterOffered?.[0] || ''}</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-xs text-[rgb(var(--text-secondary))]">{c.credits} TC</span>
                         <button
                           type="button"
-                          onClick={() => toggleCourse(c.code)}
+                          onClick={() => toggleCourse(c._id)}
                           className="text-[rgb(var(--text-muted))] hover:text-[rgb(var(--error))]"
                         >
                           <X className="h-4 w-4" />
@@ -219,25 +213,29 @@ export default function EnrollmentCreate() {
                 onChange={(e) => setSearchCourse(e.target.value)}
               />
               <div className="max-h-48 overflow-y-auto space-y-1 rounded-lg border border-[rgb(var(--border))]">
-                {filteredCourses.map((c) => (
-                  <button
-                    key={c.code}
-                    type="button"
-                    onClick={() => toggleCourse(c.code)}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[rgb(var(--bg-hover))] transition-colors"
-                  >
-                    <div>
-                      <span className="font-mono text-xs text-[rgb(var(--text-secondary))] mr-2">{c.code}</span>
-                      <span className="text-sm text-[rgb(var(--text-primary))]">{c.name}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-[rgb(var(--text-muted))]">HK{c.semester}</span>
-                      <span className="text-xs text-[rgb(var(--text-secondary))]">{c.credits} TC</span>
-                      <Plus className="h-4 w-4 text-[rgb(var(--text-muted))]" />
-                    </div>
-                  </button>
-                ))}
-                {filteredCourses.length === 0 && (
+                {isLoadingCourses ? (
+                  <p className="text-center py-4 text-xs text-[rgb(var(--text-muted))]">Đang tải học phần...</p>
+                ) : (
+                  filteredCourses.map((c) => (
+                    <button
+                      key={c._id}
+                      type="button"
+                      onClick={() => toggleCourse(c._id)}
+                      className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[rgb(var(--bg-hover))] transition-colors"
+                    >
+                      <div>
+                        <span className="font-mono text-xs text-[rgb(var(--text-secondary))] mr-2">{c.code}</span>
+                        <span className="text-sm text-[rgb(var(--text-primary))]">{c.name}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-[rgb(var(--text-muted))]">HK{c.semesterOffered?.[0] || ''}</span>
+                        <span className="text-xs text-[rgb(var(--text-secondary))]">{c.credits} TC</span>
+                        <Plus className="h-4 w-4 text-[rgb(var(--text-muted))]" />
+                      </div>
+                    </button>
+                  ))
+                )}
+                {!isLoadingCourses && filteredCourses.length === 0 && (
                   <p className="text-center py-4 text-xs text-[rgb(var(--text-muted))]">{t('enrollment.form.noMoreCourses')}</p>
                 )}
               </div>

@@ -11,7 +11,17 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
   ({ label, description, error, disabled, className, checked, onChange, ...props }, ref) => {
     return (
       <div className="flex items-start gap-3">
-        <label className={clsx('relative flex items-center cursor-pointer select-none', disabled && 'opacity-50 cursor-not-allowed')}>
+        {(label || description) && (
+          <div className="flex flex-col flex-1 pt-0.5">
+            {label && (
+              <span className="text-sm font-medium text-[rgb(var(--text-primary))] leading-tight">{label}</span>
+            )}
+            {description && (
+              <span className="text-xs text-[rgb(var(--text-muted))] leading-tight mt-0.5">{description}</span>
+            )}
+          </div>
+        )}
+        <label className={clsx('relative flex items-center cursor-pointer select-none shrink-0', disabled && 'opacity-50 cursor-not-allowed')}>
           <input
             ref={ref}
             type="checkbox"
@@ -36,16 +46,6 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
             )}
           />
         </label>
-        {(label || description) && (
-          <div className="flex flex-col pt-0.5">
-            {label && (
-              <span className="text-sm font-medium text-[rgb(var(--text-primary))] leading-tight">{label}</span>
-            )}
-            {description && (
-              <span className="text-xs text-[rgb(var(--text-muted))] leading-tight mt-0.5">{description}</span>
-            )}
-          </div>
-        )}
         {error && <p className="text-xs text-[rgb(var(--error))] mt-0.5">{error}</p>}
       </div>
     );

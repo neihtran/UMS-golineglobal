@@ -11,45 +11,73 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { useExamList, useExamSessionList, useExamResultList } from '@/hooks/useExam';
 
-// ─── Mock ────────────────────────────────────────────────────────────────────
-
-const EXAM_STATS = [
-  { label: 'Tổng kỳ thi', value: '42', change: '+8 HK mới', icon: <CheckCircle2 className="h-5 w-5" />, color: 'primary' },
-  { label: 'Đang diễn ra', value: '3', sub: '⚠️ giám sát live', icon: <Clock className="h-5 w-5" />, color: 'warning' },
-  { label: 'Đã hoàn thành', value: '31', change: '+5 tuần này', icon: <CheckCircle2 className="h-5 w-5" />, color: 'success' },
-  { label: 'Tỷ lệ đạt', value: '84.2%', change: '+1.3%', icon: <TrendingUp className="h-5 w-5" />, color: 'info' },
-];
-
-const ACTIVE_EXAMS = [
-  { id: 'e1', code: 'CS101-2026-T4', name: 'Thi giữa kỳ — CS101 Nhập môn Lập trình', type: 'Giữa kỳ', duration: 90, start: '09:00', room: 'P.301', students: 78, submitted: 64, cheating: 0 },
-  { id: 'e2', code: 'MATH201-2026-T3', name: 'Thi giữa kỳ — MATH201 Giải tích 2', type: 'Giữa kỳ', duration: 120, start: '09:00', room: 'P.401-402', students: 145, submitted: 138, cheating: 0 },
-  { id: 'e3', code: 'ENG301-2026-T2', name: 'Bài kiểm tra — ENG301 Tiếng Anh Học thuật', type: '15 phút', duration: 15, start: '10:30', room: 'P.201', students: 62, submitted: 45, cheating: 1 },
-];
-
-const GRADE_DIST = [
-  { grade: 'A', count: 142, color: 'rgb(var(--success))' },
-  { grade: 'B+', count: 218, color: 'rgb(var(--primary))' },
-  { grade: 'B', count: 310, color: 'rgb(var(--info))' },
-  { grade: 'C+', count: 245, color: 'rgb(var(--accent))' },
-  { grade: 'C', count: 178, color: 'rgb(var(--warning))' },
-  { grade: 'D', count: 89, color: 'rgb(var(--error))' },
-  { grade: 'F', count: 48, color: 'rgb(var(--border))' },
-];
-
-const CHEATING_ALERTS = [
-  { student: 'Nguyễn Văn B', exam: 'ENG301', action: 'Thao tác copy-paste bất thường', time: '10:42', severity: 'medium' },
-  { student: 'Trần Thị C', exam: 'CS101', action: 'Mở tab mới trong khi thi', time: '09:15', severity: 'low' },
-];
-
-const SCORE_TREND = [
-  { exam: 'CS101', avg: 7.2 }, { exam: 'MATH201', avg: 6.8 },
-  { exam: 'ENG301', avg: 7.8 }, { exam: 'PHYS101', avg: 6.4 },
-  { exam: 'CHEM101', avg: 7.1 }, { exam: 'BIO101', avg: 7.5 },
+const GRADE_BUCKETS: { grade: string; color: string; min: number; max: number }[] = [
+  { grade: 'A', color: 'rgb(var(--success))', min: 8.5, max: 10 },
+  { grade: 'B+', color: 'rgb(var(--primary))', min: 8.0, max: 8.4 },
+  { grade: 'B', color: 'rgb(var(--info))', min: 7.0, max: 7.9 },
+  { grade: 'C+', color: 'rgb(var(--accent))', min: 6.5, max: 6.9 },
+  { grade: 'C', color: 'rgb(var(--warning))', min: 5.5, max: 6.4 },
+  { grade: 'D', color: 'rgb(var(--error))', min: 4.0, max: 5.4 },
+  { grade: 'F', color: 'rgb(var(--border))', min: 0, max: 3.9 },
 ];
 
 export default function EXAMDashboard() {
   const { t } = useTranslation('exam');
+
+  const { data: examsResp } = useExamList({ page: 1, pageSize: 100 });
+  const { data: sessionsResp } = useExamSessionList({ status: 'in_progress', page: 1, pageSize: 10 });
+  const { data: sessionsAllResp } = useExamSessionList({ page: 1, pageSize: 200 });
+  const { data: resultsResp } = useExamResultList({ page: 1, pageSize: 500 });
+
+  const exams = (examsResp?.data ?? []) as any[];
+  const activeSessions = (sessionsResp?.data ?? []) as any[];
+  const allSessions = (sessionsAllResp?.data ?? []) as any[];
+  const results = (resultsResp?.data ?? []) as any[];
+
+  const totalExams = examsResp?.pagination?.total ?? exams.length;
+  const completedExams = exams.filter((e: any) => e.status === 'completed').length;
+  const ongoingExams = exams.filter((e: any) => e.status === 'ongoing' || e.status === 'published').length;
+  const passingResults = results.filter((r: any) => r.percentage >= 50).length;
+  const passRate = results.length > 0 ? Math.round((passingResults / results.length) * 1000) / 10 : 0;
+
+  const EXAM_STATS = [
+    { label: t('dashboard.stats.totalExam'), value: totalExams.toString(), change: t('dashboard.stats.newSemester'), icon: <CheckCircle2 className="h-5 w-5" />, color: 'primary' },
+    { label: t('dashboard.stats.ongoing'), value: ongoingExams.toString(), sub: t('dashboard.stats.ongoingSub'), icon: <Clock className="h-5 w-5" />, color: 'warning' },
+    { label: t('dashboard.stats.completed'), value: completedExams.toString(), change: t('dashboard.stats.completedThisWeek'), icon: <CheckCircle2 className="h-5 w-5" />, color: 'success' },
+    { label: t('dashboard.stats.passRate'), value: `${passRate}%`, change: passRate >= 80 ? '+' + (passRate - 80).toFixed(1) + '%' : '', icon: <TrendingUp className="h-5 w-5" />, color: 'info' },
+  ];
+
+  const cheatingSessions = allSessions.filter((s: any) => Array.isArray(s.cheatingFlags) && s.cheatingFlags.length > 0);
+  const CHEATING_ALERTS = cheatingSessions.slice(0, 5).map((s: any) => ({
+    student: s.studentName ?? s.studentCode ?? '—',
+    exam: s.examTitle ?? '—',
+    action: s.cheatingFlags.join(', '),
+    time: s.updatedAt ? new Date(s.updatedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '—',
+    severity: s.cheatingFlags.length > 1 ? 'medium' : 'low',
+  }));
+
+  const GRADE_DIST = GRADE_BUCKETS.map((b) => ({
+    grade: b.grade,
+    color: b.color,
+    count: results.filter((r: any) => {
+      const pct = r.percentage ?? 0;
+      return pct >= b.min && pct <= b.max;
+    }).length,
+  }));
+
+  const examScores = new Map<string, { total: number; count: number }>();
+  for (const r of results) {
+    const key = r.examTitle ?? r.examId ?? '—';
+    if (!examScores.has(key)) examScores.set(key, { total: 0, count: 0 });
+    const bucket = examScores.get(key)!;
+    bucket.total += r.score ?? 0;
+    bucket.count += 1;
+  }
+  const SCORE_TREND = Array.from(examScores.entries())
+    .slice(0, 6)
+    .map(([exam, { total, count }]) => ({ exam: exam.length > 8 ? exam.slice(0, 8) + '…' : exam, avg: count > 0 ? Math.round((total / count) * 10) / 10 : 0 }));
 
   return (
     <div className="space-y-6">
@@ -89,48 +117,57 @@ export default function EXAMDashboard() {
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[rgb(var(--error))] animate-pulse" />
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('dashboard.activeExam.title')}</h3>
-            <Badge variant="error">{ACTIVE_EXAMS.length}</Badge>
+            <Badge variant="error">{activeSessions.length}</Badge>
           </div>
           <Button variant="outline" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />}>
             {t('common.monitorAll')}
           </Button>
         </div>
         <div className="divide-y divide-[rgb(var(--border)/0.5)]">
-          {ACTIVE_EXAMS.map((exam) => (
-            <div key={exam.id} className="px-5 py-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge variant="warning">{exam.type}</Badge>
-                    <span className="font-mono text-xs text-[rgb(var(--text-muted))]">{exam.code}</span>
-                  </div>
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{exam.name}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs text-[rgb(var(--text-muted))]">
-                    <span>📍 {exam.room}</span>
-                    <span>🕐 {exam.start} · {exam.duration} {t('dashboard.activeExam.duration')}</span>
-                    <span>👥 {exam.students} {t('dashboard.activeExam.students')}</span>
+          {activeSessions.length === 0 ? (
+            <p className="px-5 py-8 text-center text-sm text-[rgb(var(--text-muted))]">—</p>
+          ) : (
+            activeSessions.map((exam: any) => {
+              const cheatingCount = Array.isArray(exam.cheatingFlags) ? exam.cheatingFlags.length : 0;
+              const submitted = exam.status === 'submitted' || exam.status === 'graded' ? 1 : 0;
+              const total = 1;
+              return (
+                <div key={exam._id} className="px-5 py-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Badge variant="warning">{exam.examTitle ?? '—'}</Badge>
+                        <span className="font-mono text-xs text-[rgb(var(--text-muted))]">{exam._id?.slice(-6) ?? '—'}</span>
+                      </div>
+                      <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{exam.studentName ?? exam.studentCode ?? '—'}</p>
+                      <div className="flex items-center gap-4 mt-2 text-xs text-[rgb(var(--text-muted))]">
+                        <span>📍 {exam.room ?? '—'}</span>
+                        <span>🕐 {exam.duration ?? '—'} {t('dashboard.activeExam.duration')}</span>
+                        <span>👥 {t('dashboard.activeExam.students')}</span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-lg font-bold text-[rgb(var(--text-primary))]">
+                        {submitted}<span className="text-sm font-normal text-[rgb(var(--text-muted))]">/{total}</span>
+                      </p>
+                      <p className="text-xs text-[rgb(var(--text-muted))]">{t('dashboard.activeExam.submitted')}</p>
+                      <div className="mt-2 h-2 w-24 rounded-full bg-[rgb(var(--border))] overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-[rgb(var(--success))]"
+                          style={{ width: `${(submitted / total) * 100}%` }}
+                        />
+                      </div>
+                      {cheatingCount > 0 && (
+                        <Badge variant="error" size="sm" className="mt-2">
+                          {cheatingCount} {t('dashboard.activeExam.warning')}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="text-lg font-bold text-[rgb(var(--text-primary))]">
-                    {exam.submitted}<span className="text-sm font-normal text-[rgb(var(--text-muted))]">/{exam.students}</span>
-                  </p>
-                  <p className="text-xs text-[rgb(var(--text-muted))]">{t('dashboard.activeExam.submitted')}</p>
-                  <div className="mt-2 h-2 w-24 rounded-full bg-[rgb(var(--border))] overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-[rgb(var(--success))]"
-                      style={{ width: `${(exam.submitted / exam.students) * 100}%` }}
-                    />
-                  </div>
-                  {exam.cheating > 0 && (
-                    <Badge variant="error" size="sm" className="mt-2">
-                      {exam.cheating} {t('dashboard.activeExam.warning')}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+              );
+            })
+          )}
         </div>
       </Card>
 
@@ -144,20 +181,24 @@ export default function EXAMDashboard() {
             </div>
           </div>
           <div className="divide-y divide-[rgb(var(--border)/0.5)]">
-            {CHEATING_ALERTS.map((alert, i) => (
-              <div key={i} className="flex items-start gap-3 px-5 py-3">
-                <div className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${
-                  alert.severity === 'medium' ? 'bg-[rgb(var(--warning)/0.1)] text-[rgb(var(--warning))]' : 'bg-[rgb(var(--info)/0.1)] text-[rgb(var(--info))]'
-                }`}>
-                  ⚠
+            {CHEATING_ALERTS.length === 0 ? (
+              <p className="px-5 py-8 text-center text-sm text-[rgb(var(--text-muted))]">—</p>
+            ) : (
+              CHEATING_ALERTS.map((alert, i) => (
+                <div key={i} className="flex items-start gap-3 px-5 py-3">
+                  <div className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${
+                    alert.severity === 'medium' ? 'bg-[rgb(var(--warning)/0.1)] text-[rgb(var(--warning))]' : 'bg-[rgb(var(--info)/0.1)] text-[rgb(var(--info))]'
+                  }`}>
+                    ⚠
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{alert.student} · {alert.exam}</p>
+                    <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">{alert.action}</p>
+                  </div>
+                  <span className="text-xs text-[rgb(var(--text-muted))] shrink-0">{alert.time}</span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{alert.student} · {alert.exam}</p>
-                  <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">{alert.action}</p>
-                </div>
-                <span className="text-xs text-[rgb(var(--text-muted))] shrink-0">{alert.time}</span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Card>
 
@@ -189,14 +230,18 @@ export default function EXAMDashboard() {
           <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('dashboard.scoreTrend.title')}</h3>
         </div>
         <CardContent className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={SCORE_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-              <XAxis dataKey="exam" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <YAxis domain={[5, 9]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <Tooltip formatter={(v: number) => `${t('examMonitor.progress.submitted')}: ${v.toFixed(1)}`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-              <Line type="monotone" dataKey="avg" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 5, fill: 'rgb(var(--primary))' }} />
-            </LineChart>
-          </ResponsiveContainer>
+          {SCORE_TREND.length === 0 ? (
+            <p className="flex h-full items-center justify-center text-sm text-[rgb(var(--text-muted))]">—</p>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={SCORE_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <XAxis dataKey="exam" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                <YAxis domain={[5, 9]} tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                <Tooltip formatter={(v: number) => `${t('examMonitor.progress.submitted')}: ${v.toFixed(1)}`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
+                <Line type="monotone" dataKey="avg" stroke="rgb(var(--primary))" strokeWidth={2.5} dot={{ r: 5, fill: 'rgb(var(--primary))' }} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </CardContent>
       </Card>
     </div>

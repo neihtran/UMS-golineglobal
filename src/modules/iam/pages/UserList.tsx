@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { UserPlus, Download, Upload } from 'lucide-react';
+import { UserPlus, Download, Upload, Lock, Unlock } from 'lucide-react';
 import {
   Button,
   Input,
@@ -16,40 +16,24 @@ import {
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
-
-const MOCK_USERS = [
-  { id: 'u001', name: 'Nguyễn Văn Admin', email: 'admin@truong.edu.vn', role: 'admin', unit: 'Phòng CNTT', status: 'active', lastLogin: '2026-06-25 09:15' },
-  { id: 'u002', name: 'Thảo Nguyễn', email: 'thao.nguyen@truong.edu.vn', role: 'giang-vien', unit: 'Khoa CNTT', status: 'active', lastLogin: '2026-06-25 08:30' },
-  { id: 'u003', name: 'Nguyễn Văn An', email: 'an.nguyen@truong.edu.vn', role: 'sinh-vien', unit: 'K60 – CNTT', status: 'active', lastLogin: '2026-06-24 22:10' },
-  { id: 'u004', name: 'Chu Hanh', email: 'hanh.chu@truong.edu.vn', role: 'nhan-vien', unit: 'Phòng Tổ chức', status: 'active', lastLogin: '2026-06-25 07:45' },
-  { id: 'u005', name: 'Lê Thị Bình', email: 'binh.le@truong.edu.vn', role: 'sinh-vien', unit: 'K59 – Kinh tế', status: 'locked', lastLogin: '2026-06-20 14:00' },
-  { id: 'u006', name: 'Trần Minh Đức', email: 'minh.duc@truong.edu.vn', role: 'giang-vien', unit: 'Khoa Kinh tế', status: 'active', lastLogin: '2026-06-24 16:20' },
-  { id: 'u007', name: 'Phạm Hoàng Nam', email: 'nam.pham@truong.edu.vn', role: 'sinh-vien', unit: 'K60 – Luật', status: 'pending', lastLogin: '—' },
-  { id: 'u008', name: 'Đặng Thu Hà', email: 'ha.dang@truong.edu.vn', role: 'giang-vien', unit: 'Khoa Luật', status: 'active', lastLogin: '2026-06-23 11:30' },
-  { id: 'u009', name: 'Bùi Minh Tuấn', email: 'tuan.bui@truong.edu.vn', role: 'nhan-vien', unit: 'Phòng Tài chính', status: 'active', lastLogin: '2026-06-25 08:00' },
-  { id: 'u010', name: 'Hoàng Phương Linh', email: 'linh.hoang@truong.edu.vn', role: 'sinh-vien', unit: 'K61 – CNTT', status: 'active', lastLogin: '2026-06-24 20:15' },
-  { id: 'u011', name: 'PGS.TS. Hoàng Văn Minh', email: 'hieu-truong@truong.edu.vn', role: 'hieu-truong', unit: 'Ban Giám hiệu', status: 'active', lastLogin: '2026-06-30 07:30' },
-  { id: 'u012', name: 'TS. Lê Thị Lan', email: 'pho-hieu-truong@truong.edu.vn', role: 'pho-hieu-truong', unit: 'Ban Giám hiệu', status: 'active', lastLogin: '2026-06-29 17:00' },
-  { id: 'u013', name: 'TS. Nguyễn Văn Khoa', email: 'truong-khoa-cntt@truong.edu.vn', role: 'truong-khoa', unit: 'Khoa CNTT', status: 'active', lastLogin: '2026-06-30 08:15' },
-];
+import { useUserList, useLockUser, useUnlockUser } from '@/hooks/useIam';
 
 const ROLE_LABELS: Record<string, string> = {
-  admin: 'Quản trị',
-  'giang-vien': 'Giảng viên',
-  'sinh-vien': 'Sinh viên',
-  'nhan-vien': 'Nhân viên',
-  'hieu-truong': 'Hiệu trưởng',
-  'pho-hieu-truong': 'Phó Hiệu trưởng',
-  'truong-khoa': 'Trưởng khoa',
+  SUPER_ADMIN: 'Quản trị viên',
+  HIEU_TRUONG: 'Hiệu trưởng',
+  PHO_HIEU_TRUONG: 'Phó Hiệu trưởng',
+  TRUONG_KHOA: 'Trưởng khoa',
+  GIAO_VIEN: 'Giảng viên',
+  NHAN_VIEN: 'Nhân viên',
+  SINH_VIEN: 'Sinh viên',
 };
 
 const ROLE_VARIANT = (role: string): 'primary' | 'accent' | 'info' | 'neutral' | 'warning' | 'success' => {
-  if (role === 'admin') return 'primary';
-  if (role === 'giang-vien') return 'accent';
-  if (role === 'sinh-vien') return 'info';
-  if (role === 'hieu-truong') return 'warning';
-  if (role === 'pho-hieu-truong') return 'success';
-  if (role === 'truong-khoa') return 'neutral';
+  if (role === 'SUPER_ADMIN') return 'primary';
+  if (role === 'GIAO_VIEN') return 'accent';
+  if (role === 'SINH_VIEN') return 'info';
+  if (role === 'HIEU_TRUONG') return 'warning';
+  if (role === 'PHO_HIEU_TRUONG') return 'success';
   return 'neutral';
 };
 
@@ -57,6 +41,7 @@ const STATUS_CONFIG = {
   active: { variant: 'success' as const, label: 'Hoạt động' },
   locked: { variant: 'error' as const, label: 'Bị khóa' },
   pending: { variant: 'warning' as const, label: 'Chờ kích hoạt' },
+  inactive: { variant: 'neutral' as const, label: 'Không hoạt động' },
 };
 
 export default function UserList() {
@@ -65,40 +50,54 @@ export default function UserList() {
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const filtered = MOCK_USERS.filter((u) => {
-    const matchSearch = !search || u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
-    const matchRole = roleFilter === 'all' || u.role === roleFilter;
-    const matchStatus = statusFilter === 'all' || u.status === statusFilter;
-    return matchSearch && matchRole && matchStatus;
+  const { data, isLoading } = useUserList({
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    search: search || undefined,
+    role: roleFilter === 'all' ? undefined : roleFilter,
+    status: statusFilter === 'all' ? undefined : statusFilter,
+    sortBy: 'createdAt',
+    sortDir: 'desc',
   });
 
-  const paged = filtered.slice((pagination.page - 1) * pagination.pageSize, pagination.page * pagination.pageSize);
+  const lockMutation = useLockUser();
+  const unlockMutation = useUnlockUser();
+
+  const records = data?.data ?? [];
+  const total = data?.pagination?.total ?? 0;
+
+  const handleToggleLock = (user: { id: string; status: string }) => {
+    if (user.status === 'locked') {
+      unlockMutation.mutate(user.id);
+    } else {
+      lockMutation.mutate(user.id);
+    }
+  };
+
+  // Track which user is being toggled
+  const pendingLock = lockMutation.variables;
+  const pendingUnlock = unlockMutation.variables;
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Danh sách tài khoản"
-        description={`${filtered.length} tài khoản trong hệ thống`}
+        description={`${total} tài khoản trong hệ thống`}
         breadcrumbs={[
           { label: 'IAM', href: '/iam' },
           { label: 'Tài khoản' },
         ]}
         actions={
           <>
-            <Button variant="outline" leftIcon={<Upload className="h-4 w-4" />}>
-              Import Excel
-            </Button>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>
-              Xuất Excel
-            </Button>
-            <Button leftIcon={<UserPlus className="h-4 w-4" />}>
-              Tạo tài khoản
-            </Button>
+            <Button variant="outline" leftIcon={<Upload className="h-4 w-4" />}>Import Excel</Button>
+            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất Excel</Button>
+            <Link to="/iam/tai-khoan/tao">
+              <Button leftIcon={<UserPlus className="h-4 w-4" />}>Tạo tài khoản</Button>
+            </Link>
           </>
         }
       />
 
-      {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <Input
           placeholder="Tìm tên hoặc email..."
@@ -113,13 +112,13 @@ export default function UserList() {
           className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
         >
           <option value="all">Tất cả vai trò</option>
-          <option value="admin">Quản trị</option>
-          <option value="giang-vien">Giảng viên</option>
-          <option value="sinh-vien">Sinh viên</option>
-          <option value="nhan-vien">Nhân viên</option>
-          <option value="hieu-truong">Hiệu trưởng</option>
-          <option value="pho-hieu-truong">Phó Hiệu trưởng</option>
-          <option value="truong-khoa">Trưởng khoa</option>
+          <option value="SUPER_ADMIN">Quản trị viên</option>
+          <option value="HIEU_TRUONG">Hiệu trưởng</option>
+          <option value="PHO_HIEU_TRUONG">Phó Hiệu trưởng</option>
+          <option value="TRUONG_KHOA">Trưởng khoa</option>
+          <option value="GIAO_VIEN">Giảng viên</option>
+          <option value="NHAN_VIEN">Nhân viên</option>
+          <option value="SINH_VIEN">Sinh viên</option>
         </select>
         <select
           title="Lọc theo trạng thái"
@@ -134,7 +133,6 @@ export default function UserList() {
         </select>
       </div>
 
-      {/* Table */}
       <Table>
         <TableHead>
           <TableRow>
@@ -148,33 +146,48 @@ export default function UserList() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {paged.length === 0 ? (
+          {isLoading ? (
+            <TableEmpty colSpan={7} message="Đang tải..." />
+          ) : records.length === 0 ? (
             <TableEmpty colSpan={7} message="Không tìm thấy tài khoản nào" />
           ) : (
-            paged.map((u) => {
-              const sc = STATUS_CONFIG[u.status as keyof typeof STATUS_CONFIG];
+            records.map((u) => {
+              const sc = STATUS_CONFIG[u.status as keyof typeof STATUS_CONFIG] ?? STATUS_CONFIG.inactive;
               return (
                 <TableRow key={u.id}>
                   <TableCell>
-                    <Link to={`/iam/tai-khoan/${u.id}`} className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] transition-colors">
+                    <Link
+                      to={`/iam/tai-khoan/${u.id}`}
+                      className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] transition-colors"
+                    >
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-semibold text-[rgb(var(--primary))]">
-                        {u.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                        {(u.displayName ?? u.email ?? '?').split(' ').map((n) => n[0]).slice(0, 2).join('')}
                       </div>
-                      <span className="font-medium">{u.name}</span>
+                      <span className="font-medium">{u.displayName ?? u.email}</span>
                     </Link>
                   </TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{u.email}</TableCell>
-                  <TableCell><Badge variant={ROLE_VARIANT(u.role)}>{ROLE_LABELS[u.role]}</Badge></TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))]">{u.unit}</TableCell>
+                  <TableCell><Badge variant={ROLE_VARIANT(u.role)}>{ROLE_LABELS[u.role] ?? u.role}</Badge></TableCell>
+                  <TableCell className="text-[rgb(var(--text-secondary))]">{u.unit ?? '—'}</TableCell>
                   <TableCell><Badge variant={sc.variant} dot>{sc.label}</Badge></TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))] tabular-nums text-xs">{u.lastLogin}</TableCell>
+                  <TableCell className="text-[rgb(var(--text-secondary))] tabular-nums text-xs">
+                    {u.lastLogin ? new Date(u.lastLogin).toLocaleString('vi-VN') : '—'}
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <Link to={`/iam/tai-khoan/${u.id}`}>
                         <Button variant="ghost" size="sm">Chi tiết</Button>
                       </Link>
-                      <Button variant="ghost" size="sm">
-                        {u.status === 'locked' ? 'Mở khóa' : 'Khóa'}
+                      <Button
+                        variant="ghost" size="sm"
+                        loading={pendingLock === u.id || pendingUnlock === u.id}
+                        onClick={() => handleToggleLock(u)}
+                      >
+                        {u.status === 'locked' ? (
+                          <span className="flex items-center gap-1"><Unlock className="h-3.5 w-3.5" />Mở khóa</span>
+                        ) : (
+                          <span className="flex items-center gap-1"><Lock className="h-3.5 w-3.5" />Khóa</span>
+                        )}
                       </Button>
                     </div>
                   </TableCell>
@@ -188,10 +201,10 @@ export default function UserList() {
       <TablePagination
         page={pagination.page}
         pageSize={pagination.pageSize}
-        total={filtered.length}
+        total={total}
         onPageChange={setPage}
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
-        pageSizeOptions={[10, 25, 50, 100]}
+        pageSizeOptions={[10, 25, 50]}
       />
     </div>
   );

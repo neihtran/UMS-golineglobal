@@ -8,12 +8,17 @@
     "description": "SIS-01 — Xương sống đào tạo, kết nối HEMIS, LMS, EXAM, PORTAL",
     "stats": {
       "totalStudents": "Tổng sinh viên",
+      "studying": "Đang học",
+      "graduated": "Tốt nghiệp",
+      "byLevel": "Theo bậc",
       "regular": "Chính quy",
       "continuing": "Liên thông",
       "onTimeGraduation": "Tốt nghiệp đúng hạn"
     },
     "chart": {
       "studentsByDept": "Phân bổ sinh viên theo khoa",
+      "studentsByLevel": "Sinh viên theo bậc đào tạo",
+      "curriculumSummary": "Tóm tắt chương trình đào tạo",
       "admissionTrend": "Xu hướng tuyển sinh (5 năm)",
       "gradeDistribution": "Phân bổ kết quả học tập",
       "avgGpa": "GPA TB"
@@ -49,7 +54,8 @@
     "filter": {
       "searchPlaceholder": "Tìm tên hoặc mã SV...",
       "allDepts": "Tất cả",
-      "allStatuses": "Tất cả trạng thái"
+      "allStatuses": "Tất cả trạng thái",
+      "transferred": "Chuyển trường"
     },
     "action": {
       "chiTiet": "Chi tiết",
@@ -60,7 +66,9 @@
       "reserved": "Bảo lưu",
       "suspended": "Đình chỉ",
       "graduated": "Tốt nghiệp",
-      "quit": "Thôi học"
+      "quit": "Thôi học",
+      "transferred": "Chuyển trường",
+      "dropped": "Thôi học"
     },
     "form": {
       "title": "Chỉnh sửa sinh viên",
@@ -95,55 +103,6 @@
       "duKienTotNghiep": "Dự kiến tốt nghiệp",
       "personalInfo": "Thông tin cá nhân",
       "academicInfo": "Thông tin học tập"
-    },
-    "detail": {
-      "profile": "Hồ sơ",
-      "grades": "Bảng điểm",
-      "ctdt": "CTĐT",
-      "schedule": "Lịch học",
-      "certificates": "Văn bằng",
-      "gpaTichLuy": "GPA tích lũy",
-      "tinChiDat": "Tín chỉ đạt",
-      "xeploai": "Xếp loại",
-      "xuatBangDiem": "Xuất bảng điểm",
-      "bangDiem": {
-        "maMon": "Mã môn",
-        "tenMon": "Tên môn",
-        "ky": "Kỳ",
-        "lt": "LT",
-        "th": "TH",
-        "diemGK": "Điểm GK"
-      },
-      "xemLichHoc": "Xem lịch học chi tiết",
-      "lichHocNote": "Lịch học được quản lý qua LMS",
-      "moLMS": "Mở LMS",
-      "ctdtTitle": "CTĐT Công nghệ Thông tin 2022",
-      "ctdtNote": "Phiên bản 2.0 · {{credits}} tín chỉ · Khóa {{cohort}}",
-      "xuatCTDT": "Xuất CTĐT",
-      "bangDiemCTDT": {
-        "maMon": "Mã môn",
-        "tenMon": "Tên môn",
-        "tc": "TC",
-        "ky": "Kỳ",
-        "loai": "Loại",
-        "gio": "Giờ"
-      },
-      "certificateStatus": {
-        "issued": "Đã cấp",
-        "pending": "Chưa cấp"
-      },
-      "profileFields": {
-        "hoVaTen": "Họ và tên",
-        "maSinhVien": "Mã sinh viên",
-        "ngaySinh": "Ngày sinh",
-        "gioiTinh": "Giới tính",
-        "diaChi": "Địa chỉ",
-        "dienThoai": "Điện thoại"
-      },
-      "exportProfile": "Xuất hồ sơ",
-      "back": "Quay lại",
-      "edit": "Chỉnh sửa",
-      "treEm": "–"
     },
     "validation": {
       "msvRequired": "Mã sinh viên không được để trống",
@@ -271,6 +230,7 @@
     "subjectListTitle": "Danh mục môn học",
     "subjectListNote": "Cấu trúc môn học của {{name}} ({{version}})",
     "viewSelect": "Xem:",
+    "viewSelectAll": "Tất cả",
     "searchPlaceholder": "Tìm mã, tên CTĐT...",
     "nienKhoa": "Năm",
     "tinChi": "Tín chỉ",
@@ -367,27 +327,31 @@
 
   "enrollment": {
     "title": "Đăng ký học phần",
+    "description": "SIS-03 — Quản lý đăng ký học phần theo học kỳ",
     "titleList": "Danh sách đăng ký học phần",
-    "description": "SIS-03 — Đăng ký học phần cho sinh viên theo học kỳ",
-    "descriptionList": "{{count}} đăng ký {{semester}}",
     "breadcrumb": { "list": "Đăng ký HP", "create": "Tạo đăng ký", "edit": "Chỉnh sửa", "detail": "Chi tiết" },
     "add": "Tạo đăng ký",
     "create": "Tạo đăng ký học phần",
     "export": "Xuất Excel",
     "print": "In phiếu ĐK",
     "openSession": "Mở đợt đăng ký",
+    "search": "Tìm kiếm",
+    "status": "Trạng thái",
+    "allStatus": "Tất cả trạng thái",
+    "noData": "Không tìm thấy đăng ký nào",
+    "detailTitle": "Chi tiết đăng ký học phần",
     "table": {
-      "maSV": "Mã SV",
+      "student": "Sinh viên",
+      "subject": "Học phần",
+      "semester": "Học kỳ",
+      "score": "Điểm",
+      "status": "Trạng thái",
+      "actions": "Hành động",
       "hoTen": "Họ tên",
-      "lop": "Lớp",
-      "monHoc": "Môn học",
-      "hocKy": "Học kỳ",
-      "trangThai": "Trạng thái",
-      "ngayDK": "Ngày ĐK",
+      "maSV": "Mã SV",
       "sinhVien": "Sinh viên",
       "nganh": "Ngành",
       "ngayDangKy": "Ngày đăng ký",
-      "thaoTac": "Thao tác",
       "chiTiet": "Chi tiết",
       "sua": "Sửa",
       "soHP": "Số HP",
@@ -398,7 +362,8 @@
     "filter": {
       "searchPlaceholder": "Tìm tên, mã SV...",
       "searchStudent": "Tìm sinh viên hoặc mã SV...",
-      "allStatuses": "Tất cả"
+      "allStatuses": "Tất cả",
+      "allMajors": "Tất cả ngành"
     },
     "status": {
       "registered": "Đã đăng ký",
@@ -418,6 +383,8 @@
     },
     "detail": {
       "studentInfo": "Thông tin sinh viên",
+      "subjectInfo": "Thông tin học phần",
+      "scoreInfo": "Điểm & Trạng thái",
       "courseList": "Danh sách học phần đã đăng ký",
       "courseNote": "{{count}} học phần · {{credits}} tín chỉ",
       "summary": {
@@ -439,7 +406,19 @@
       "back": "Quay lại",
       "print": "In phiếu ĐK",
       "edit": "Chỉnh sửa",
-      "nguoiDuyetThoiGian": "{{name}} · {{time}}"
+      "nguoiDuyetThoiGian": "{{name}} · {{time}}",
+      "studentName": "Họ tên sinh viên",
+      "studentCode": "Mã sinh viên",
+      "email": "Email",
+      "department": "Khoa",
+      "subjectName": "Tên học phần",
+      "subjectCode": "Mã học phần",
+      "credits": "Tín chỉ",
+      "semester": "Học kỳ",
+      "score": "Điểm",
+      "labScore": "Điểm TH",
+      "finalScore": "Điểm cuối kỳ",
+      "notes": "Ghi chú"
     },
     "form": {
       "titleCreate": "Tạo đăng ký học phần",
@@ -516,8 +495,19 @@
       "in_progress": "Đang thực tập",
       "pending_report": "Chờ nộp báo cáo",
       "completed": "Hoàn thành",
-      "rejected": "Từ chỗi"
+      "rejected": "Từ chối"
     },
+    "studentList": "Danh sách thực tập sinh",
+    "studentId": "Mã SV",
+    "company": "Công ty",
+    "position": "Vị trí",
+    "duration": "Thời gian",
+    "report": "Báo cáo & Đánh giá",
+    "reportTitle": "Tiêu đề báo cáo",
+    "supervisor": "Người hướng dẫn",
+    "grade": "Điểm",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
     "detail": {
       "student": "Sinh viên",
       "company": "Đơn vị tiếp nhận",

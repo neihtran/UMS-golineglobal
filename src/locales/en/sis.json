@@ -8,12 +8,17 @@
     "description": "SIS-01 — Training backbone, connecting HEMIS, LMS, EXAM, PORTAL",
     "stats": {
       "totalStudents": "Total Students",
+      "studying": "Studying",
+      "graduated": "Graduated",
+      "byLevel": "By Level",
       "regular": "Regular",
       "continuing": "Continuing",
       "onTimeGraduation": "On-time Graduation"
     },
     "chart": {
       "studentsByDept": "Students by Faculty",
+      "studentsByLevel": "Students by Education Level",
+      "curriculumSummary": "Training Program Summary",
       "admissionTrend": "Admission Trend (5 years)",
       "gradeDistribution": "Academic Performance Distribution",
       "avgGpa": "Avg GPA"

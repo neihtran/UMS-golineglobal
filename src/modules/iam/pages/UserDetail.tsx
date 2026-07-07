@@ -1,25 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
-  Save,
-  FileText,
-  History,
-  Shield,
-  Smartphone,
+  Save, FileText, History, Shield, Smartphone,
 } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-
-const MOCK_USER = {
-  id: 'u001',
-  displayName: 'PGS.TS. Nguyễn Hoàng Long',
-  email: 'long.nguyen@truong.edu.vn',
-  role: 'TRUONG_KHOA',
-  mfaEnabled: true,
-  mfaMethod: 'Authenticator App',
-  lastLogin: '2026-06-25T08:32:15',
-  lastMFA: '2026-06-25T08:32:10',
-};
+import { useUserById, type NormalizedUser, useAuditLogList } from '@/hooks/useIam';
 
 const PERMISSION_MATRIX = [
   { module: 'IAM', create: true, read: true, update: true, delete: false, approve: false, export: true },
@@ -37,22 +23,6 @@ const PERMISSION_MATRIX = [
   { module: 'BI', create: false, read: true, update: false, delete: false, approve: false, export: true },
   { module: 'QA', create: false, read: true, update: false, delete: false, approve: false, export: false },
   { module: 'INT', create: false, read: true, update: false, delete: false, approve: false, export: false },
-];
-
-const AUDIT_LOG = [
-  { id: 'a1', action: 'LOGIN', resource: 'Hệ thống', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-25 08:32:15', details: 'Đăng nhập thành công qua MFA' },
-  { id: 'a2', action: 'UPDATE', resource: 'Hồ sơ viên chức', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-24 16:45:22', details: 'Cập nhật chức danh TS. Lê Văn Minh' },
-  { id: 'a3', action: 'CREATE', resource: 'Tài khoản', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-24 14:12:08', details: 'Tạo tài khoản mới: sv2026001@truong.edu.vn' },
-  { id: 'a4', action: 'LOGIN_FAILED', resource: 'Hệ thống', status: 'failure', ip: '192.xx.xx.8', timestamp: '2026-06-24 09:05:33', details: 'Mật khẩu sai (lần thử 3)' },
-  { id: 'a5', action: 'EXPORT', resource: 'Danh sách sinh viên', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-23 11:22:10', details: 'Xuất Excel: DS sinh viên K62 CNTT' },
-  { id: 'a6', action: 'APPROVE', resource: 'Nghỉ phép', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-22 15:08:44', details: 'Duyệt nghỉ phép 5 ngày cho VC Lê Thị Lan' },
-  { id: 'a7', action: 'DISABLE_MFA', resource: 'Tài khoản', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-20 10:30:00', details: 'Tắt MFA tài khoản nhân viên mới' },
-];
-
-const TABS = [
-  { id: 'permissions', label: 'Ma trận quyền', icon: <Shield className="h-4 w-4" /> },
-  { id: 'audit', label: 'Nhật ký hoạt động', icon: <History className="h-4 w-4" /> },
-  { id: 'mfa', label: 'Cấu hình MFA', icon: <Smartphone className="h-4 w-4" /> },
 ];
 
 const ACTION_COLORS: Record<string, string> = {
@@ -76,19 +46,50 @@ function CheckIcon({ checked }: { checked: boolean }) {
 }
 
 export default function UserDetail() {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('permissions');
+
+  const { data: userData, isLoading } = useUserById(id || '');
+  const user = userData as NormalizedUser | undefined;
+
+  const { data: auditData, isLoading: auditLoading } = useAuditLogList({ userId: id });
+
+  if (isLoading || !user) {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title={isLoading ? 'Đang tải...' : 'Không tìm thấy'}
+          breadcrumbs={[{ label: 'IAM', href: '/iam' }, { label: 'Tài khoản' }]}
+        />
+        <div className="flex items-center justify-center h-64">
+          <p className="text-[rgb(var(--text-muted))]">
+            {isLoading ? 'Đang tải thông tin tài khoản...' : 'Không tìm thấy tài khoản này.'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const auditLogs = (auditData as any)?.data ?? [];
+  const displayName = user.displayName || user.email || 'N/A';
+  const initials = displayName.split(' ').slice(-2).map((n) => n[0]).join('');
+  const lastLogin = user.lastLogin ? new Date(user.lastLogin).toLocaleString('vi-VN') : 'N/A';
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={MOCK_USER.displayName}
-        description={`${MOCK_USER.role} · ${MOCK_USER.email}`}
-        breadcrumbs={[{ label: 'IAM', href: '/iam' }, { label: 'Tài khoản', href: '/iam/tai-khoan' }, { label: MOCK_USER.displayName }]}
+        title={displayName}
+        description={`${user.role} — ${user.email}`}
+        breadcrumbs={[
+          { label: 'IAM', href: '/iam' },
+          { label: 'Tài khoản', href: '/iam/tai-khoan' },
+          { label: displayName },
+        ]}
         actions={
           <>
             <Button variant="outline" onClick={() => navigate('/iam/tai-khoan')}>Quay lại</Button>
-            <Button variant="outline" leftIcon={<FileText className="h-4 w-4" />}>Lịch sử chỉnh sửa</Button>
+            <Button variant="outline" leftIcon={<FileText className="h-4 w-4" />}>Lịch sử</Button>
             <Button leftIcon={<Save className="h-4 w-4" />}>Lưu thay đổi</Button>
           </>
         }
@@ -99,20 +100,20 @@ export default function UserDetail() {
         <Card className="lg:col-span-1">
           <CardContent className="flex flex-col items-center p-6">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-2xl font-bold text-white mb-4 ring-4 ring-[rgb(var(--primary)/0.2)]">
-              {MOCK_USER.displayName.split(' ').slice(-2).map((n) => n[0]).join('')}
+              {initials}
             </div>
-            <h2 className="text-lg font-bold text-[rgb(var(--text-primary))]">{MOCK_USER.displayName}</h2>
-            <p className="text-sm text-[rgb(var(--text-secondary))]">{MOCK_USER.role}</p>
+            <h2 className="text-lg font-bold text-[rgb(var(--text-primary))]">{displayName}</h2>
+            <p className="text-sm text-[rgb(var(--text-secondary))]">{user.role}</p>
             <Badge variant="success" dot className="mt-2">Đang hoạt động</Badge>
             <div className="mt-6 w-full space-y-3">
               {[
-                { label: 'Email', value: MOCK_USER.email },
-                { label: 'MFA', value: MOCK_USER.mfaEnabled ? `${MOCK_USER.mfaMethod} ✓` : 'Chưa bật' },
-                { label: 'Đăng nhập lần cuối', value: MOCK_USER.lastLogin.replace('T', ' ').slice(0, 16) },
+                { label: 'Email', value: user.email },
+                { label: 'MFA', value: user.mfaEnabled ? `${user.mfaMethod || 'Authenticator App'} đã` : 'Chưa bật' },
+                { label: 'Đăng nhập lần cuối', value: lastLogin },
               ].map(({ label, value }) => (
                 <div key={label} className="border-b border-[rgb(var(--border)/0.4)] pb-2 last:border-0 last:pb-0">
                   <p className="text-[10px] uppercase tracking-wide text-[rgb(var(--text-muted))]">{label}</p>
-                  <p className="text-sm text-[rgb(var(--text-primary))] mt-0.5">{value}</p>
+                  <p className="text-sm text-[rgb(var(--text-primary))] mt-0.5">{value || 'N/A'}</p>
                 </div>
               ))}
             </div>
@@ -123,7 +124,11 @@ export default function UserDetail() {
           <Card>
             <div className="border-b border-[rgb(var(--border)/0.6)]">
               <div className="flex gap-1 px-4 pt-4">
-                {TABS.map((tab) => (
+                {[
+                  { id: 'permissions', label: 'Ma trận quyền', icon: <Shield className="h-4 w-4" /> },
+                  { id: 'audit', label: 'Nhật ký hoạt động', icon: <History className="h-4 w-4" /> },
+                  { id: 'mfa', label: 'Cấu hình MFA', icon: <Smartphone className="h-4 w-4" /> },
+                ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
@@ -146,7 +151,7 @@ export default function UserDetail() {
                 <div>
                   <div className="mb-3 flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Ma trận quyền RBAC</h3>
-                    <Badge variant="neutral">{MOCK_USER.role}</Badge>
+                    <Badge variant="neutral">{user.role}</Badge>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
@@ -186,24 +191,35 @@ export default function UserDetail() {
                     <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Nhật ký hoạt động</h3>
                     <Button variant="outline" size="sm">Xuất log</Button>
                   </div>
-                  <div className="space-y-0">
-                    {AUDIT_LOG.map((log) => (
-                      <div key={log.id} className="flex items-start gap-3 border-b border-[rgb(var(--border)/0.4)] py-3 last:border-0">
-                        <Badge variant={ACTION_COLORS[log.action] as 'success' | 'error' | 'info' | 'warning' | 'accent' | 'primary' | 'neutral' ?? 'neutral'} size="sm">
-                          {log.action}
-                        </Badge>
-                        <div className="flex-1">
-                          <p className="text-sm text-[rgb(var(--text-primary))]">
-                            <span className="font-medium">{log.resource}</span>
-                            {log.details && <span className="text-[rgb(var(--text-secondary))]"> — {log.details}</span>}
-                          </p>
-                          <p className="text-[10px] text-[rgb(var(--text-muted))] mt-0.5">
-                            {log.timestamp} · IP: {log.ip} · {log.status === 'success' ? '✓' : '✗'}
-                          </p>
+                  {auditLoading ? (
+                    <div className="flex items-center justify-center h-32">
+                      <p className="text-sm text-[rgb(var(--text-muted))]">Đang tải nhật ký...</p>
+                    </div>
+                  ) : auditLogs.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-32 text-center">
+                      <History className="h-8 w-8 text-[rgb(var(--text-muted))] mb-2" />
+                      <p className="text-sm text-[rgb(var(--text-muted))]">Chưa có nhật ký hoạt động</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-0">
+                      {auditLogs.map((log: any) => (
+                        <div key={log.id} className="flex items-start gap-3 border-b border-[rgb(var(--border)/0.4)] py-3 last:border-0">
+                          <Badge variant={(ACTION_COLORS[log.action] ?? 'neutral') as any} size="sm">
+                            {log.action}
+                          </Badge>
+                          <div className="flex-1">
+                            <p className="text-sm text-[rgb(var(--text-primary))]">
+                              <span className="font-medium">{log.resource}</span>
+                              {log.details && <span className="text-[rgb(var(--text-secondary))]"> — {log.details}</span>}
+                            </p>
+                            <p className="text-[10px] text-[rgb(var(--text-muted))] mt-0.5">
+                              {log.timestamp} tại IP: {log.ip} — {log.status === 'success' ? 'Thành công' : 'Thất bại'}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -217,7 +233,7 @@ export default function UserDetail() {
                       </div>
                       <div>
                         <p className="font-semibold text-[rgb(var(--text-primary))]">MFA đang bật</p>
-                        <p className="text-xs text-[rgb(var(--text-secondary))]">Qua Authenticator App — cặp khóa RSA-2048</p>
+                        <p className="text-xs text-[rgb(var(--text-secondary))]">Qua Authenticator App — cấp khóa RSA-2048</p>
                       </div>
                     </div>
                     <Badge variant="success">Bật</Badge>
@@ -227,8 +243,8 @@ export default function UserDetail() {
                     <h4 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Phương thức đã đăng ký</h4>
                     <div className="space-y-3">
                       {[
-                        { method: 'Authenticator App (Microsoft)', added: '2025-03-15', lastUsed: '2026-06-25 08:32:10', primary: true },
-                        { method: 'Email (long.nguyen@truong.edu.vn)', added: '2025-01-10', lastUsed: '2026-05-12 14:20:00', primary: false },
+                        { method: 'Authenticator App (Microsoft)', added: '2025-03-15', lastUsed: lastLogin, primary: true },
+                        { method: `Email (${user.email})`, added: '2025-01-10', lastUsed: '2026-05-12 14:20:00', primary: false },
                       ].map((mfa) => (
                         <div key={mfa.method} className={`flex items-center justify-between rounded-lg border p-4 ${
                           mfa.primary ? 'border-[rgb(var(--success)/0.3)] bg-[rgb(var(--bg-base))]' : 'border-[rgb(var(--border))]'
@@ -239,7 +255,7 @@ export default function UserDetail() {
                               <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{mfa.method}</p>
                               {mfa.primary && <Badge variant="success" size="sm">Chính</Badge>}
                             </div>
-                            <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">Thêm: {mfa.added} · Dùng lần cuối: {mfa.lastUsed}</p>
+                            <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">Thêm: {mfa.added} — Đăng nhập cuối: {mfa.lastUsed}</p>
                           </div>
                           {!mfa.primary && (
                             <Button variant="outline" size="sm">Đặt làm chính</Button>

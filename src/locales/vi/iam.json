@@ -32,13 +32,13 @@
       "pending": "Chờ duyệt"
     },
     "role": {
-      "admin": "Quản trị",
-      "giang-vien": "Giảng viên",
-      "sinh-vien": "Sinh viên",
-      "nhan-vien": "Nhân viên",
-      "hieu-truong": "Hiệu trưởng",
-      "pho-hieu-truong": "Phó Hiệu trưởng",
-      "truong-khoa": "Trưởng khoa"
+      "SUPER_ADMIN": "Quản trị viên",
+      "HIEU_TRUONG": "Hiệu trưởng",
+      "PHO_HIEU_TRUONG": "Phó Hiệu trưởng",
+      "TRUONG_KHOA": "Trưởng khoa",
+      "GIAO_VIEN": "Giảng viên",
+      "NHAN_VIEN": "Nhân viên",
+      "SINH_VIEN": "Sinh viên"
     }
   },
   "role": {

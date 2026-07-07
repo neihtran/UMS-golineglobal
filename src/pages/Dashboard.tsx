@@ -5,9 +5,9 @@ import { ROLES } from '@/constants/modules';
 
 /**
  * Dashboard chuyển hướng — mỗi role sẽ được điều hướng đến trang dashboard riêng.
- * SUPER_ADMIN / ADMIN         → /dashboard/admin
+ * SUPER_ADMIN               → /dashboard/admin
  * HIEU_TRUONG / PHO_HIEU_TRUONG → /dashboard/bgh
- * TRUONG_KHOA               → /dashboard/truong-khoa
+ * TRUONG_KHOA             → /dashboard/truong-khoa
  * Các role còn lại (GIAO_VIEN, NHAN_VIEN, SINH_VIEN, …) → /dashboard/gv
  */
 export default function Dashboard() {
@@ -17,7 +17,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
 
-    if (user.role === ROLES.SUPER_ADMIN || user.role === ROLES.ADMIN) {
+    if (user.role === ROLES.SUPER_ADMIN) {
       navigate('/dashboard/admin', { replace: true });
     } else if (user.role === ROLES.HIEU_TRUONG || user.role === ROLES.PHO_HIEU_TRUONG) {
       navigate('/dashboard/bgh', { replace: true });

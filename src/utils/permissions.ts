@@ -5,29 +5,19 @@ type SimpleRole = string;
 
 const ROLE_HIERARCHY: Record<string, number> = {
   'SUPER_ADMIN': 100,
-  'ADMIN': 90,
   'HIEU_TRUONG': 80,
   'PHO_HIEU_TRUONG': 70,
   'TRUONG_KHOA': 60,
-  'PHO_TRUONG_KHOA': 50,
   'GIAO_VIEN': 40,
-  'CAN_BO_PHAN_CONG': 35,
-  'CHUYEN_VIEN': 30,
   'NHAN_VIEN': 20,
   'SINH_VIEN': 10,
-  'KHAI_THA': 5,
-  // Fallback roles from auth.types
-  'admin': 90,
-  'giang-vien': 40,
-  'sinh-vien': 10,
-  'nhan-vien': 20,
 };
 
 // ─── Role-based permission check ──────────────────────────────────────────────
 
 export function hasPermission(user: User | null, permission: string): boolean {
   if (!user) return false;
-  if (user.role === 'admin' || user.role === 'SUPER_ADMIN' || user.role === 'ADMIN') return true;
+  if (user.role === 'SUPER_ADMIN') return true;
   return user.permissions.includes(permission);
 }
 
@@ -55,7 +45,7 @@ export function isAtLeast(userRole: SimpleRole, requiredRole: SimpleRole): boole
 
 export function canAccessModule(user: User | null, module: string): boolean {
   if (!user) return false;
-  if (user.role === 'admin' || user.role === 'SUPER_ADMIN' || user.role === 'ADMIN') return true;
+  if (user.role === 'SUPER_ADMIN') return true;
   return user.permissions.some((p) => p.startsWith(module.split('-')[0].toLowerCase()));
 }
 
@@ -67,8 +57,8 @@ export function canAccessResource(
   scope: 'own' | 'department' | 'all'
 ): boolean {
   if (!user) return false;
-  if (user.role === 'admin' || user.role === 'SUPER_ADMIN' || user.role === 'ADMIN') return true;
-  if (scope === 'all') return isAtLeast(user.role, 'ADMIN');
+  if (user.role === 'SUPER_ADMIN') return true;
+  if (scope === 'all') return false;
   if (scope === 'department') return user.department === resourceDept;
   return true; // scope === 'own'
 }
@@ -77,7 +67,7 @@ export function canAccessResource(
 
 export function isMFASetupRequired(user: User | null): boolean {
   if (!user) return false;
-  const HIGH_ROLES = ['SUPER_ADMIN', 'ADMIN', 'HIEU_TRUONG', 'PHO_HIEU_TRUONG', 'admin'];
+  const HIGH_ROLES = ['SUPER_ADMIN', 'HIEU_TRUONG', 'PHO_HIEU_TRUONG'];
   return HIGH_ROLES.includes(user.role);
 }
 

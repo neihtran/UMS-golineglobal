@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import {
   Users,
   TrendingUp,
@@ -12,38 +12,60 @@ import {
   CardContent,
   Button,
   Badge,
+  TableSkeleton,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
-
-const DEPT_BARS = [
-  { name: 'CNTT', count: 42 },
-  { name: 'Kinh te', count: 38 },
-  { name: 'Luat', count: 29 },
-  { name: 'Ngoai ngu', count: 35 },
-  { name: 'Khoa hoc', count: 24 },
-  { name: 'Su pham', count: 31 },
-  { name: 'Y duoc', count: 27 },
-];
-
-const EDUCATION_PIE = [
-  { name: 'Tien si', value: 38, color: '#1E3A5F' },
-  { name: 'Thac si', value: 49, color: '#2D5D8A' },
-  { name: 'Dai hoc', value: 13, color: '#94A3B8' },
-];
-
-const MONTHLY_TREND = [
-  { month: 'T7', count: 448 }, { month: 'T8', count: 450 },
-  { month: 'T9', count: 452 }, { month: 'T10', count: 451 },
-  { month: 'T11', count: 453 }, { month: 'T12', count: 455 },
-  { month: 'T1', count: 454 }, { month: 'T2', count: 456 },
-];
+import { useVienChucStats } from '@/hooks/useHrm';
+import { apiClient } from '@/lib/apiClient';
 
 const PIE_COLORS = ['#1E3A5F', '#2D5D8A', '#94A3B8'];
 
 export default function HRMDashboard() {
   const { t } = useTranslation('hrm');
-  const deptTotal = DEPT_BARS.reduce((a, b) => a + b.count, 0);
+  const { data: stats, isLoading } = useVienChucStats();
+
+  const { data: trendData } = useQuery({
+    queryKey: ['hrm', 'stats', 'monthly-trend'],
+    queryFn: () => apiClient.get('/hrm/stats/monthly-trend').then((r: any) => r.data.data),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const total = stats?.total ?? 0;
+  const active = stats?.byStatus?.active ?? 0;
+  const trial = stats?.byStatus?.trial ?? 0;
+  const inactive = stats?.byStatus?.inactive ?? 0;
+  const permanent = active + inactive;
+  const visiting = stats?.byContractType?.filter((c: any) => c.type === 'Thỉnh giảng').reduce((s: number, c: any) => s + c.count, 0) ?? 0;
+
+  const deptData = (stats?.byDepartment ?? []).slice(0, 7).map((d: any) => ({
+    name: d.name.length > 10 ? d.name.slice(0, 10) + '…' : d.name,
+    fullName: d.name,
+    count: d.count,
+  }));
+  const deptTotal = deptData.reduce((a, b) => a + b.count, 0);
+
+  const contractData = stats?.byContractType ?? [];
+  const totalContract = contractData.reduce((a: number, c: any) => a + c.count, 0);
+  const eduData = contractData.map((c: any, i: number) => ({
+    name: c.type === 'Cơ hữu' ? 'Cơ hữu' : c.type === 'Thỉnh giảng' ? 'Thỉnh giảng' : 'Thử việc',
+    value: totalContract > 0 ? Math.round((c.count / totalContract) * 100) : 0,
+    color: PIE_COLORS[i % PIE_COLORS.length],
+  }));
+
+  const trend = (trendData ?? []).map((d: any) => ({
+    month: d.month?.slice(5) ?? d.month,
+    count: d.count,
+  }));
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title={t('dashboard.title')} description={t('dashboard.description')} breadcrumbs={[{ label: 'HRM' }]} />
+        <TableSkeleton rows={4} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -61,10 +83,10 @@ export default function HRMDashboard() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          { label: 'dashboard.stats.total', value: '456', change: '+8', sub: null, icon: <Users className="h-5 w-5" />, color: 'primary' },
-          { label: 'dashboard.stats.permanent', value: '312', sub: '68.4%', icon: <TrendingUp className="h-5 w-5" />, color: 'success' },
-          { label: 'dashboard.stats.visiting', value: '144', sub: '31.6%', icon: <Users className="h-5 w-5" />, color: 'accent' },
-          { label: 'dashboard.stats.trial', value: '8', sub: t('dashboard.stats.trialNote'), icon: <AlertTriangle className="h-5 w-5" />, color: 'warning' },
+          { label: 'dashboard.stats.total', value: String(total), change: '', sub: null, icon: <Users className="h-5 w-5" />, color: 'primary' },
+          { label: 'dashboard.stats.permanent', value: String(permanent), sub: total > 0 ? `${Math.round((permanent / total) * 100)}%` : '0%', icon: <TrendingUp className="h-5 w-5" />, color: 'success' },
+          { label: 'dashboard.stats.visiting', value: String(visiting), sub: total > 0 ? `${Math.round((visiting / total) * 100)}%` : '0%', icon: <Users className="h-5 w-5" />, color: 'accent' },
+          { label: 'dashboard.stats.trial', value: String(trial), sub: t('dashboard.stats.trialNote'), icon: <AlertTriangle className="h-5 w-5" />, color: 'warning' },
         ].map((s) => (
           <Card key={s.label}>
             <CardContent className="flex items-center gap-4 p-5">
@@ -74,37 +96,10 @@ export default function HRMDashboard() {
               <div>
                 <p className="text-xs text-[rgb(var(--text-muted))] uppercase tracking-wide">{t(s.label)}</p>
                 <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">{s.value}</p>
-                <p className="text-xs text-[rgb(var(--success))]">{s.sub ?? `+ ${s.change} ${t('dashboard.stats.totalChange')}`}</p>
+                <p className="text-xs text-[rgb(var(--success))]">{s.sub ?? (s.change ? `+ ${s.change} ${t('dashboard.stats.totalChange')}` : '')}</p>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
-
-      <div className="space-y-2">
-        {[
-          { type: 'warning', icon: '!', textKey: 'dashboard.alerts.contractsExpiring', count: 3, actionKey: 'dashboard.alerts.viewList', route: '/hrm/hop-dong' },
-          { type: 'info', icon: 'i', textKey: 'dashboard.alerts.retiringSoon', count: 5, actionKey: 'dashboard.alerts.view', route: '/hrm/bo-nhiem' },
-          { type: 'error', icon: 'X', textKey: 'dashboard.alerts.pendingAppointments', count: 2, actionKey: 'dashboard.alerts.approveNow', route: '/hrm/bo-nhiem' },
-        ].map((alert, i) => (
-          <div
-            key={i}
-            className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
-              alert.type === 'warning' ? 'border-[rgb(var(--warning)/0.3)] bg-[rgb(var(--warning)/0.05)]' :
-              alert.type === 'error' ? 'border-[rgb(var(--error)/0.3)] bg-[rgb(var(--error)/0.05)]' :
-              'border-[rgb(var(--info)/0.3)] bg-[rgb(var(--info)/0.05)]'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-lg font-bold">{alert.icon}</span>
-              <span className="text-sm text-[rgb(var(--text-primary))]">
-                {alert.count} {t(alert.textKey)}
-              </span>
-            </div>
-            <Link to={alert.route} className="text-xs font-semibold text-[rgb(var(--primary))] hover:underline ml-4 shrink-0">
-              {t(alert.actionKey)}
-            </Link>
-          </div>
         ))}
       </div>
 
@@ -117,14 +112,18 @@ export default function HRMDashboard() {
             </div>
           </div>
           <CardContent className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={DEPT_BARS} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
-                <Bar dataKey="count" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} maxBarSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+            {deptData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={deptData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                  <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} formatter={(v: any, _: any, i: any) => [`${v} VC`, (i.payload as any).fullName]} />
+                  <Bar dataKey="count" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-[rgb(var(--text-muted))]">Chưa có dữ liệu</div>
+            )}
           </CardContent>
         </Card>
 
@@ -133,28 +132,30 @@ export default function HRMDashboard() {
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('dashboard.chart.educationLevel')}</h3>
           </div>
           <CardContent className="h-72 flex flex-col items-center justify-center">
-            <ResponsiveContainer width="100%" height="80%">
-              <PieChart>
-                <Pie
-                  data={EDUCATION_PIE} cx="50%" cy="50%"
-                  innerRadius={55} outerRadius={80} paddingAngle={4} dataKey="value"
-                >
-                  {EDUCATION_PIE.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index]} />
+            {eduData.length > 0 ? (
+              <>
+                <ResponsiveContainer width="100%" height="80%">
+                  <PieChart>
+                    <Pie data={eduData} cx="50%" cy="50%" innerRadius={55} outerRadius={80} paddingAngle={4} dataKey="value">
+                      {eduData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => `${value}%`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="flex gap-4 text-xs mt-2">
+                  {eduData.map((d, i) => (
+                    <div key={d.name} className="flex items-center gap-1.5">
+                      <div className="h-2.5 w-2.5 rounded-full" style={{ background: PIE_COLORS[i] }} />
+                      <span className="text-[rgb(var(--text-secondary))]">{d.name} {d.value}%</span>
+                    </div>
                   ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => `${value}%`}
-                  contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="flex gap-4 text-xs mt-2">
-              {EDUCATION_PIE.map((d, i) => (
-                <div key={d.name} className="flex items-center gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full" style={{ background: PIE_COLORS[i] }} />
-                  <span className="text-[rgb(var(--text-secondary))]">{d.name} {d.value}%</span>
                 </div>
-              ))}
-            </div>
+              </>
+            ) : (
+              <div className="text-sm text-[rgb(var(--text-muted))]">Chưa có dữ liệu</div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -167,42 +168,18 @@ export default function HRMDashboard() {
           </div>
         </div>
         <CardContent className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={MONTHLY_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-              <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} domain={[440, 460]} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
-              <Line type="monotone" dataKey="count" stroke="rgb(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: 'rgb(var(--primary))' }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <div className="px-5 pt-5 pb-4 border-b border-[rgb(var(--border)/0.6)]">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('dashboard.chart.recruitmentRate')}</h3>
-            <Badge variant="success">{t('dashboard.chart.year')}</Badge>
-          </div>
-        </div>
-        <CardContent className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={[
-              { month: 'T1', applied: 45, interviewed: 32, hired: 8 },
-              { month: 'T2', applied: 52, interviewed: 38, hired: 5 },
-              { month: 'T3', applied: 38, interviewed: 25, hired: 3 },
-              { month: 'T4', applied: 61, interviewed: 44, hired: 10 },
-              { month: 'T5', applied: 47, interviewed: 33, hired: 7 },
-              { month: 'T6', applied: 78, interviewed: 52, hired: 12 },
-            ]} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-              <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
-              <Line type="monotone" dataKey="applied" name={t('dashboard.chart.applied')} stroke="rgb(var(--primary))" strokeWidth={2} dot={{ r: 3, fill: 'rgb(var(--primary))' }} />
-              <Line type="monotone" dataKey="interviewed" name={t('dashboard.chart.interviewed')} stroke="rgb(var(--accent))" strokeWidth={2} dot={{ r: 3, fill: 'rgb(var(--accent))' }} />
-              <Line type="monotone" dataKey="hired" name={t('dashboard.chart.hired')} stroke="rgb(var(--success))" strokeWidth={2} dot={{ r: 3, fill: 'rgb(var(--success))' }} />
-            </LineChart>
-          </ResponsiveContainer>
+          {trend.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={trend} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <XAxis dataKey="month" tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 12, fill: 'rgb(var(--text-muted))' }} domain={['auto', 'auto']} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: '8px', fontSize: 12 }} />
+                <Line type="monotone" dataKey="count" stroke="rgb(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: 'rgb(var(--primary))' }} />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex h-full items-center justify-center text-sm text-[rgb(var(--text-muted))]">Chưa có dữ liệu</div>
+          )}
         </CardContent>
       </Card>
     </div>

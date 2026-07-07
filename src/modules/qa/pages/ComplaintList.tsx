@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Search, Download, Plus } from 'lucide-react';
@@ -17,19 +17,13 @@ import {
   Card,
   CardContent,
   Select,
+  TableSkeleton,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { usePagination } from '@/hooks';
+import { usePagination, useDebounce, useComplaintList } from '@/hooks';
+import type { ComplaintFilters } from '@/services/qa.service';
 
-const COMPLAINTS = [
-  { id: 'kn001', code: 'KN-2026-001', student: 'Nguyễn Văn An', class: 'K60-CNTT', category: 'Giảng dạy', content: 'Giảng viên đến lớp muộn, giảng chưa đúng chương trình', date: '2026-06-20', status: 'processing', priority: 'high', handler: 'Phòng Đào tạo', response: 'Đang xử lý' },
-  { id: 'kn002', code: 'KN-2026-002', student: 'Lê Thị Bình', class: 'K59-KT', category: 'Học phí', content: 'Lỗi tính học phí học kỳ 1, bị tính trùng môn học', date: '2026-06-18', status: 'resolved', priority: 'medium', handler: 'Phòng Tài chính', response: 'Đã điều chỉnh, hoàn trả 2.5 triệu đồng' },
-  { id: 'kn003', code: 'KN-2026-003', student: 'Trần Văn Cường', class: 'K60-Luat', category: 'Cơ sở vật chất', content: 'Phòng học thiếu bảng, máy chiếu không hoạt động', date: '2026-06-15', status: 'pending', priority: 'medium', handler: 'Phòng HCNS', response: 'Chưa phản hồi' },
-  { id: 'kn004', code: 'KN-2026-004', student: 'Phạm Thu Dung', class: 'K60-NN', category: 'Tuyển sinh', content: 'Thông tin tuyển sinh không đúng, gây hiểu lầm', date: '2026-06-12', status: 'resolved', priority: 'high', handler: 'Phòng Tuyển sinh', response: 'Đã cập nhật thông tin, gửi email xin lỗi' },
-  { id: 'kn005', code: 'KN-2026-005', student: 'Hoàng Minh Tuấn', class: 'K61-CNTT', category: 'Ký túc xá', content: 'Wifi ký túc xá không hoạt động 3 ngày', date: '2026-06-10', status: 'processing', priority: 'low', handler: 'Phòng CNTT', response: 'Đang sửa chữa' },
-];
-
-const CATEGORIES_KEYS = ['all', 'teaching', 'tuition', 'facility', 'admission', 'dormitory', 'other'];
+const CATEGORIES_KEYS = ['all', 'academic', 'administrative', 'facility', 'service', 'other'];
 
 export default function ComplaintList() {
   const { t } = useTranslation('qa');
@@ -40,40 +34,49 @@ export default function ComplaintList() {
   const [priority, setPriority] = useState('all');
   const [status, setStatus] = useState('all');
 
+  const debouncedSearch = useDebounce(search, 400);
+
+  const filters: ComplaintFilters = useMemo(() => ({
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    search: debouncedSearch || undefined,
+    type: category !== 'all' ? category : undefined,
+    priority: priority !== 'all' ? priority : undefined,
+    status: status !== 'all' ? status : undefined,
+  }), [pagination.page, pagination.pageSize, debouncedSearch, category, priority, status]);
+
+  const { data, isLoading } = useComplaintList(filters);
+
+  const items = data?.data ?? [];
+  const total = data?.pagination?.total ?? 0;
+
   const CATEGORIES = [t('filter.all'), t('complaint.cat.teaching'), t('complaint.cat.tuition'), t('complaint.cat.facility'), t('complaint.cat.admission'), t('complaint.cat.dormitory'), t('complaint.cat.other')];
   const PRIORITIES = [t('filter.all'), t('priority.high'), t('priority.medium'), t('priority.low')];
 
   const PRIORITY_VARIANTS: Record<string, 'error' | 'warning' | 'info'> = {
     high: 'error',
+    urgent: 'error',
+    normal: 'warning',
     medium: 'warning',
     low: 'info',
   };
 
   const STATUSES: Record<string, { variant: 'success' | 'warning' | 'info' | 'error'; label: string }> = {
-    pending: { variant: 'info', label: t('complaint.status.pending') },
-    processing: { variant: 'warning', label: t('complaint.status.processing') },
+    received: { variant: 'info', label: t('complaint.status.pending') },
+    investigating: { variant: 'warning', label: t('complaint.status.processing') },
+    pending_response: { variant: 'warning', label: t('complaint.status.processing') },
     resolved: { variant: 'success', label: t('complaint.status.resolved') },
-    rejected: { variant: 'error', label: t('complaint.status.rejected') },
+    closed: { variant: 'success', label: t('complaint.status.resolved') },
+    escalated: { variant: 'error', label: t('complaint.status.rejected') },
   };
 
-  const CATEGORY_MAP: Record<string, string> = {
-    'Giảng dạy': 'teaching',
-    'Học phí': 'tuition',
-    'Cơ sở vật chất': 'facility',
-    'Tuyển sinh': 'admission',
-    'Ký túc xá': 'dormitory',
-    'Khác': 'other',
+  const CATEGORY_LABELS: Record<string, string> = {
+    academic: t('complaint.cat.teaching'),
+    administrative: t('complaint.cat.tuition'),
+    facility: t('complaint.cat.facility'),
+    service: t('complaint.cat.admission'),
+    other: t('complaint.cat.other'),
   };
-
-  const filtered = COMPLAINTS.filter((c) => {
-    const matchSearch = !search || c.content.toLowerCase().includes(search.toLowerCase()) || c.student.toLowerCase().includes(search.toLowerCase());
-    const matchCat = category === 'all' || CATEGORY_MAP[c.category] === category;
-    const matchPri = priority === 'all' || c.priority === priority;
-    const matchStatus = status === 'all' || c.status === status;
-    return matchSearch && matchCat && matchPri && matchStatus;
-  });
-
-  const paged = filtered.slice((pagination.page - 1) * pagination.pageSize, pagination.page * pagination.pageSize);
 
   return (
     <div className="space-y-6">
@@ -94,17 +97,38 @@ export default function ComplaintList() {
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--text-muted))]" />
-              <Input placeholder={t('complaint.searchPlaceholder')} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+              <Input
+                placeholder={t('complaint.searchPlaceholder')}
+                value={search}
+                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                className="pl-9"
+              />
             </div>
-            <Select value={category} onChange={(e) => setCategory(e.target.value)} options={CATEGORIES_KEYS.map((k, i) => ({ value: k, label: CATEGORIES[i] }))} className="w-44" />
-            <Select value={priority} onChange={(e) => setPriority(e.target.value)} options={['all', 'high', 'medium', 'low'].map((k, i) => ({ value: k, label: PRIORITIES[i] }))} className="w-36" />
-            <Select value={status} onChange={(e) => setStatus(e.target.value)} options={[
-              { value: 'all', label: t('filter.all') },
-              { value: 'pending', label: t('complaint.status.pending') },
-              { value: 'processing', label: t('complaint.status.processing') },
-              { value: 'resolved', label: t('complaint.status.resolved') },
-              { value: 'rejected', label: t('complaint.status.rejected') },
-            ]} className="w-36" />
+            <Select
+              value={category}
+              onChange={(e) => { setCategory(e.target.value); setPage(1); }}
+              options={CATEGORIES_KEYS.map((k, i) => ({ value: k, label: CATEGORIES[i] }))}
+              className="w-44"
+            />
+            <Select
+              value={priority}
+              onChange={(e) => { setPriority(e.target.value); setPage(1); }}
+              options={['all', 'high', 'urgent', 'normal', 'low'].map((k, i) => ({ value: k, label: PRIORITIES[Math.min(i, 3)] }))}
+              className="w-36"
+            />
+            <Select
+              value={status}
+              onChange={(e) => { setStatus(e.target.value); setPage(1); }}
+              options={[
+                { value: 'all', label: t('filter.all') },
+                { value: 'received', label: t('complaint.status.pending') },
+                { value: 'investigating', label: t('complaint.status.processing') },
+                { value: 'pending_response', label: t('complaint.status.processing') },
+                { value: 'resolved', label: t('complaint.status.resolved') },
+                { value: 'escalated', label: t('complaint.status.rejected') },
+              ]}
+              className="w-36"
+            />
           </div>
 
           <Table>
@@ -121,32 +145,40 @@ export default function ComplaintList() {
                 <TableHeadCell></TableHeadCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {paged.length === 0 ? (
-                <TableEmpty colSpan={9} message={t('complaint.empty')} />
-              ) : (
-                paged.map((c) => (
-                  <TableRow key={c.id} className="hover:bg-[rgb(var(--bg-hover))]">
-                    <TableCell className="text-xs font-mono text-[rgb(var(--text-muted))]">{c.code}</TableCell>
+            {isLoading ? (
+              <TableSkeleton colSpan={9} />
+            ) : items.length === 0 ? (
+              <TableEmpty colSpan={9} message={t('complaint.empty')} />
+            ) : (
+              <TableBody>
+                {items.map((c) => (
+                  <TableRow key={c._id} className="hover:bg-[rgb(var(--bg-hover))]">
+                    <TableCell className="text-xs font-mono text-[rgb(var(--text-muted))]">{c._id.slice(-8).toUpperCase()}</TableCell>
                     <TableCell>
                       <div>
-                        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{c.student}</p>
-                        <p className="text-xs text-[rgb(var(--text-muted))]">{c.class}</p>
+                        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{c.complainantName ?? c.complainantId}</p>
+                        <p className="text-xs text-[rgb(var(--text-muted))]">{c.departmentName ?? c.department}</p>
                       </div>
                     </TableCell>
-                    <TableCell><Badge variant="neutral" size="sm">{c.category}</Badge></TableCell>
-                    <TableCell className="max-w-[200px] truncate text-sm text-[rgb(var(--text-secondary))]">{c.content}</TableCell>
+                    <TableCell><Badge variant="neutral" size="sm">{CATEGORY_LABELS[c.type] ?? c.type}</Badge></TableCell>
+                    <TableCell className="max-w-[200px] truncate text-sm text-[rgb(var(--text-secondary))]">{c.description}</TableCell>
                     <TableCell><Badge variant={PRIORITY_VARIANTS[c.priority] ?? 'info'} size="sm">{t(`priority.${c.priority}`)}</Badge></TableCell>
-                    <TableCell className="text-sm text-[rgb(var(--text-secondary))]">{c.date}</TableCell>
-                    <TableCell className="text-sm">{c.handler}</TableCell>
-                    <TableCell><Badge variant={STATUSES[c.status]?.variant ?? 'neutral'} size="sm">{STATUSES[c.status]?.label}</Badge></TableCell>
-                    <TableCell><Button variant="ghost" size="sm" onClick={() => navigate(`/qa/khieu-nai/${c.id}`)}>{t('table.detail')}</Button></TableCell>
+                    <TableCell className="text-sm text-[rgb(var(--text-secondary))]">{c.createdAt ? new Date(c.createdAt).toLocaleDateString('vi-VN') : '—'}</TableCell>
+                    <TableCell className="text-sm">{c.assignedToName ?? c.assignedTo ?? '—'}</TableCell>
+                    <TableCell><Badge variant={STATUSES[c.status]?.variant ?? 'neutral'} size="sm">{STATUSES[c.status]?.label ?? c.status}</Badge></TableCell>
+                    <TableCell><Button variant="ghost" size="sm" onClick={() => navigate(`/qa/khieu-nai/${c._id}`)}>{t('table.detail')}</Button></TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
+                ))}
+              </TableBody>
+            )}
           </Table>
-          <TablePagination page={pagination.page} pageSize={pagination.pageSize} total={filtered.length} onPageChange={setPage} onPageSizeChange={setPageSize} />
+          <TablePagination
+            page={pagination.page}
+            pageSize={pagination.pageSize}
+            total={total}
+            onPageChange={setPage}
+            onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+          />
         </CardContent>
       </Card>
     </div>

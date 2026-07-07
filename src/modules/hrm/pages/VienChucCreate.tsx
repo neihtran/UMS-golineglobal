@@ -4,23 +4,47 @@ import { useTranslation } from 'react-i18next';
 import { Save } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useCreateVienChuc, useDepartmentList } from '@/hooks/useHrm';
 
-const DEPARTMENTS = ['Khoa CNTT', 'Khoa Kinh te', 'Khoa Luat', 'Khoa Ngoai ngu', 'Khoa Su pham', 'Khoa Y duoc', 'Phong To chuc', 'Phong Tai chinh', 'Phong Dao tao'];
-const CONTRACT_TYPES = ['Co huu', 'Thinh giang', 'Thu viec'];
-const TITLES = ['Giao su', 'Pho Giao su', 'Tien si', 'Thac si', 'Ky su', 'Cu nhan'];
-const EDUCATIONS = ['Tien si', 'Thac si', 'Dai hoc', 'Cao dang'];
+const CONTRACT_TYPES = ['Cơ hữu', 'Thỉnh giảng', 'Thử việc'];
+const TITLES = ['Giáo sư', 'Phó Giáo sư', 'Tiến sĩ', 'Thạc sĩ', 'Kỹ sư', 'Cử nhân'];
+const EDUCATIONS = ['Tiến sĩ', 'Thạc sĩ', 'Đại học', 'Cao đẳng'];
 
 export default function VienChucCreate() {
   const { t } = useTranslation('hrm');
   const navigate = useNavigate();
   const [form, setForm] = useState({
     code: '', name: '', dob: '', cccd: '', gender: 'Nam', ethnicity: 'Kinh', address: '', phone: '', email: '',
-    dept: '', title: '', position: '', contractType: 'Co huu', salary: '', education: '', major: '', school: '', gradYear: '',
+    dept: '', title: '', position: '', contractType: 'Cơ hữu', salary: '', education: '', major: '', school: '', gradYear: '',
   });
+
+  const [submitError, setSubmitError] = useState('');
+  const createMutation = useCreateVienChuc();
+  const { data: deptData } = useDepartmentList({ pageSize: 100 });
+  const departments = deptData?.data ?? [];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/hrm/vien-chuc');
+    setSubmitError('');
+    if (!form.name || !form.code) {
+      setSubmitError('Vui lòng điền đầy đủ thông tin bắt buộc');
+      return;
+    }
+    createMutation.mutate(
+      {
+        ...form,
+        salary: form.salary ? Number(form.salary) : undefined,
+        department: form.dept || undefined,
+      } as any,
+      {
+        onSuccess: () => {
+          navigate('/hrm/vien-chuc');
+        },
+        onError: (err: any) => {
+          setSubmitError(err?.response?.data?.error?.message || 'Tạo viên chức thất bại');
+        },
+      }
+    );
   };
 
   const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
@@ -44,6 +68,9 @@ export default function VienChucCreate() {
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {submitError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{submitError}</div>
+        )}
         <Card>
           <div className="px-5 py-4 border-b border-[rgb(var(--border)/0.6)]">
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('vienChucCreate.personalInfo')}</h3>
@@ -89,7 +116,7 @@ export default function VienChucCreate() {
             <Field label={t('vienChucCreate.form.dept') + ' (*)'}>
               <select value={form.dept} onChange={(e) => setForm({ ...form, dept: e.target.value })} className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2">
                 <option value="">{t('vienChucCreate.form.selectDept')}</option>
-                {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
+                {departments.map((d: any) => <option key={d._id} value={d._id}>{d.name}</option>)}
               </select>
             </Field>
             <Field label={t('vienChucCreate.form.title')}>

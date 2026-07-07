@@ -29,7 +29,6 @@ const AVAILABLE_SCOPES = [
   { value: 'vbqg:read', label: 'CSDL VBQG — Đọc', group: 'VBQG' },
   { value: 'vbqg:write', label: 'CSDL VBQG — Ghi', group: 'VBQG' },
   { value: 'dce:read', label: 'DCE — Đọc năng lực số', group: 'DCE' },
-  { value: 'admin:*', label: 'ADMIN — Toàn quyền (⚠️ cực kỳ nguy hiểm)', group: 'ADMIN' },
 ];
 
 const GROUPED_SCOPES = AVAILABLE_SCOPES.reduce<Record<string, typeof AVAILABLE_SCOPES>>((acc, scope) => {

@@ -1,31 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { Button, Card, CardContent } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { questionService } from '@/services/exam.service';
 
-const COURSES = ['CS101', 'MATH201', 'ENG301', 'PHYS101', 'CHEM101'];
 const DIFFICULTY_OPTIONS_OUTER = [
   { id: 'easy', variant: 'success' as const },
   { id: 'medium', variant: 'warning' as const },
   { id: 'hard', variant: 'error' as const },
 ];
-
-const QUESTION_DATA: Record<string, {
-  course: string; type: string; difficulty: string;
-  content: string; score: string; tags: string[];
-  options: { id: string; text: string; isCorrect: boolean }[];
-  explanation: string;
-}> = {
-  q2: { course: 'CS101', type: 'multiple_choice', difficulty: 'medium', content: 'Kết quả của len([1, [2, 3], 4]) là bao nhiêu?', score: '1', tags: ['Python', 'Built-in'], options: [{ id: 'A', text: '3', isCorrect: true }, { id: 'B', text: '4', isCorrect: false }, { id: 'C', text: '2', isCorrect: false }, { id: 'D', text: '5', isCorrect: false }], explanation: 'Danh sách có 3 phần tử: 1, [2, 3], và 4. Hàm len() đếm số phần tử ở cấp cao nhất.' },
-  q3: { course: 'CS101', type: 'essay', difficulty: 'hard', content: 'Giải thích sự khác nhau giữa list và tuple trong Python. Cho ví dụ minh họa.', score: '3', tags: ['Python', 'Data types', 'Advanced'], options: [], explanation: 'List là cấu trúc dữ liệu có thể thay đổi (mutable), sử dụng dấu ngoặc vuông []. Tuple là cấu trúc không thể thay đổi (immutable), sử dụng dấu ngoặc tròn ().' },
-  q4: { course: 'MATH201', type: 'true_false', difficulty: 'easy', content: 'Hàm f(x) = x³ là hàm chẵn.', score: '0.5', tags: ['Calculus', 'Functions'], options: [{ id: 'A', text: 'Đúng', isCorrect: false }, { id: 'B', text: 'Sai', isCorrect: true }], explanation: 'Hàm f(x) = x³ là hàm lẻ vì f(-x) = -f(x). Hàm chẵn phải thỏa f(-x) = f(x).' },
-  q5: { course: 'MATH201', type: 'multiple_choice', difficulty: 'easy', content: 'Đạo hàm của sin(x) theo x là gì?', score: '1', tags: ['Derivative', 'Trigonometry'], options: [{ id: 'A', text: 'cos(x)', isCorrect: true }, { id: 'B', text: '-cos(x)', isCorrect: false }, { id: 'C', text: 'sin(x)', isCorrect: false }, { id: 'D', text: '-sin(x)', isCorrect: false }], explanation: 'Theo công thức đạo hàm: d/dx[sin(x)] = cos(x).' },
-  q6: { course: 'ENG301', type: 'fill_blank', difficulty: 'medium', content: 'Complete: The meeting ___ (start) at 9 AM yesterday.', score: '1', tags: ['Grammar', 'Tense'], options: [], explanation: 'Câu trần thuật ở quá khứ đơn: yesterday → V-ed (start → started).' },
-  q7: { course: 'CS101', type: 'multiple_choice', difficulty: 'easy', content: 'Output của print(type([])) là gì?', score: '1', tags: ['Python', 'OOP'], options: [{ id: 'A', text: "<class 'list'>", isCorrect: true }, { id: 'B', text: "<class 'tuple'>", isCorrect: false }, { id: 'C', text: "<class 'dict'>", isCorrect: false }, { id: 'D', text: "<type 'list'>", isCorrect: false }], explanation: '[] là literal tạo danh sách rỗng, type() trả về class của đối tượng.' },
-  q8: { course: 'PHYS101', type: 'multiple_choice', difficulty: 'medium', content: 'Định luật Newton thứ hai: F = ?', score: '1', tags: ['Mechanics', 'Newton'], options: [{ id: 'A', text: 'm × a', isCorrect: true }, { id: 'B', text: 'm × v', isCorrect: false }, { id: 'C', text: 'p × t', isCorrect: false }, { id: 'D', text: 'W / d', isCorrect: false }], explanation: 'Định luật II Newton: F = m × a (Lực = Khối lượng × Gia tốc).' },
-};
 
 interface AnswerOption { id: string; text: string; isCorrect: boolean; }
 
@@ -45,29 +31,51 @@ export default function QuestionEdit() {
   const { t } = useTranslation('exam');
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const data = id ? QUESTION_DATA[id] : undefined;
 
-  if (!data) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <h2 className="text-xl font-bold text-[rgb(var(--text-primary))]">{t('questionEdit.notFound.title')}</h2>
-        <Button variant="outline" className="mt-4" onClick={() => navigate('/exam/ngan-hang-cau-hoi')}>
-          {t('questionEdit.notFound.back')}
-        </Button>
-      </div>
-    );
-  }
+  const { data: questionData, isLoading } = useQuery({
+    queryKey: ['exam', 'question', id],
+    queryFn: () => questionService.get(id!).then((r) => r.data.data),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
 
-  const [type, setType] = useState(data.type);
-  const [course, setCourse] = useState(data.course);
-  const [difficulty, setDifficulty] = useState(data.difficulty);
-  const [content, setContent] = useState(data.content);
-  const [score, setScore] = useState(data.score);
-  const [explanation, setExplanation] = useState(data.explanation);
-  const [tags, setTags] = useState<string[]>([...data.tags]);
+  const [type, setType] = useState('multiple_choice');
+  const [course, setCourse] = useState('');
+  const [difficulty, setDifficulty] = useState('medium');
+  const [content, setContent] = useState('');
+  const [score, setScore] = useState('1');
+  const [explanation, setExplanation] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
-  const [options, setOptions] = useState<AnswerOption[]>([...data.options]);
+  const [options, setOptions] = useState<AnswerOption[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (questionData) {
+      setType(questionData.type || 'multiple_choice');
+      setCourse(questionData.courseId || questionData.courseName || '');
+      setDifficulty(questionData.difficulty || 'medium');
+      setContent(questionData.content || '');
+      setScore(String(questionData.score ?? 1));
+      setExplanation(questionData.correctAnswerExplanation || questionData.explanation || '');
+      setTags(questionData.tags || []);
+      const rawOpts = (questionData as any).options;
+      if (rawOpts && Array.isArray(rawOpts) && rawOpts.length > 0) {
+        setOptions(rawOpts.map((o: any, i: number) => ({
+          id: o.key || String.fromCharCode(65 + i),
+          text: o.text || '',
+          isCorrect: o.isCorrect || false,
+        })));
+      } else {
+        setOptions([
+          { id: 'A', text: '', isCorrect: false },
+          { id: 'B', text: '', isCorrect: false },
+          { id: 'C', text: '', isCorrect: false },
+          { id: 'D', text: '', isCorrect: false },
+        ]);
+      }
+    }
+  }, [questionData]);
 
   const setField = (k: string, v: string) => {
     setErrors((e) => { const n = { ...e }; delete n[k]; return n; });
@@ -138,6 +146,26 @@ export default function QuestionEdit() {
     fill_blank: t('type.fill_blank'),
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title={t('questionEdit.title', { id: id || '' })} breadcrumbs={[{ label: 'EXAM', href: '/exam' }, { label: 'Ngân hàng câu hỏi', href: '/exam/ngan-hang-cau-hoi' }]} />
+        <Card><CardContent className="p-6"><p className="text-sm text-[rgb(var(--text-muted))]">Đang tải câu hỏi...</p></CardContent></Card>
+      </div>
+    );
+  }
+
+  if (!questionData) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <h2 className="text-xl font-bold text-[rgb(var(--text-primary))]">{t('questionEdit.notFound.title')}</h2>
+        <Button variant="outline" className="mt-4" onClick={() => navigate('/exam/ngan-hang-cau-hoi')}>
+          {t('questionEdit.notFound.back')}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -162,13 +190,12 @@ export default function QuestionEdit() {
           <CardContent className="pt-5 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <Field label={t('questionEdit.form.course')} required error={errors.course}>
-                <select
+                <input
                   value={course}
                   onChange={(e) => setField('course', e.target.value)}
                   className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.3)]"
-                >
-                  {COURSES.map((c) => <option key={c}>{c}</option>)}
-                </select>
+                  readOnly
+                />
               </Field>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-[rgb(var(--text-secondary))]">{t('questionEdit.form.difficulty')}</label>

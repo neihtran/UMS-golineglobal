@@ -1,41 +1,11 @@
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Edit2, Wrench } from 'lucide-react';
-import { Card, CardContent, Button, Badge } from '@/components/ui';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { ArrowLeft, Download, Edit2, Wrench, Loader2 } from 'lucide-react';
+import { Card, CardContent, Button, Badge, TableSkeleton } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-
-const ASSET = {
-  id: 'ts001',
-  code: 'TS-IT-001',
-  name: 'Máy tính Dell OptiPlex 7090',
-  category: 'Thiết bị CNTT',
-  dept: 'Phòng CNTT',
-  quantity: 25,
-  unit: 'bộ',
-  value: 750000000,
-  status: 'active',
-  depreciation: 45,
-  location: 'Tòa A, Tầng 3',
-  supplier: 'Công ty TNHH Viễn Thông ABC',
-  purchaseDate: '2024-01-15',
-  warranty: '2027-01-15',
-  assignee: 'Nguyễn Văn Minh',
-};
-
-const MAINTENANCE_LOG = [
-  { date: '2025-06-10', type: 'Bảo trì định kỳ', cost: 5000000, note: 'Vệ sinh, thay keo tản nhiệt', vendor: 'Công ty ABC' },
-  { date: '2025-03-01', type: 'Sửa chữa', cost: 3500000, note: 'Thay nguồn 1 máy', vendor: 'Trung tâm sửa chữa IT' },
-  { date: '2024-12-15', type: 'Bảo trì định kỳ', cost: 0, note: 'Cài đặt bản vá Windows', vendor: 'Nội bộ' },
-];
-
-const DEPRECIATION_DATA = [
-  { year: '2024', bookValue: 750, depreciation: 0 },
-  { year: '2025', bookValue: 600, depreciation: 150 },
-  { year: '2026', bookValue: 450, depreciation: 150 },
-  { year: '2027', bookValue: 300, depreciation: 150 },
-  { year: '2028', bookValue: 150, depreciation: 150 },
-  { year: '2029', bookValue: 0, depreciation: 150 },
-];
+import { useQuery } from '@tanstack/react-query';
+import { assetService } from '@/services/qa.service';
 
 const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; label: string }> = {
   active: { variant: 'success', label: 'Đang sử dụng' },
@@ -48,9 +18,60 @@ const fmt = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND',
 
 export default function QATaiSanDetail() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const [maintenance, setMaintenance] = useState<any[]>([]);
 
-  const asset = ASSET;
-  const sc = STATUS_CONFIG[asset.status];
+  const { data: assetData, isLoading: assetLoading } = useQuery({
+    queryKey: ['qa-asset', id],
+    queryFn: () => assetService.get(id!).then((r: any) => r.data.data),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: depData, isLoading: depLoading } = useQuery({
+    queryKey: ['qa-asset', id, 'depreciation'],
+    queryFn: () => assetService.getDepreciation(id!).then((r: any) => r.data.data),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: maintenanceData } = useQuery({
+    queryKey: ['qa-asset', id, 'maintenance'],
+    queryFn: () => assetService.getMaintenance(id!).then((r: any) => r.data.data),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  useEffect(() => {
+    if (maintenanceData?.data) {
+      setMaintenance(maintenanceData.data);
+    }
+  }, [maintenanceData]);
+
+  const asset = assetData;
+  const sc = asset ? STATUS_CONFIG[asset.status] : undefined;
+
+  if (assetLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Chi tiết tài sản" breadcrumbs={[{ label: 'QA', href: '/qa' }, { label: 'Quản lý Tài sản' }]} />
+        <TableSkeleton rows={3} />
+      </div>
+    );
+  }
+
+  if (!asset) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Không tìm thấy" breadcrumbs={[{ label: 'QA', href: '/qa' }, { label: 'Quản lý Tài sản' }]} />
+        <div className="flex items-center justify-center h-64">
+          <p className="text-[rgb(var(--text-muted))]">Không tìm thấy tài sản này.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const depreciationRows = depData?.years ?? [];
 
   return (
     <div className="space-y-6">
@@ -78,18 +99,18 @@ export default function QATaiSanDetail() {
           <Card>
             <CardContent className="p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <Badge variant={sc.variant} dot size="sm">{sc.label}</Badge>
+                {sc && <Badge variant={sc.variant} dot size="sm">{sc.label}</Badge>}
                 <Badge variant="neutral" size="sm">{asset.category}</Badge>
               </div>
 
               <div className="space-y-3">
                 {[
-                  { label: 'Đơn vị sử dụng', value: asset.dept },
+                  { label: 'Đơn vị sử dụng', value: asset.departmentName ?? '—' },
                   { label: 'Vị trí', value: asset.location },
-                  { label: 'Ngày mua', value: asset.purchaseDate },
-                  { label: 'Hạn bảo hành', value: asset.warranty },
-                  { label: 'Người phụ trách', value: asset.assignee },
-                  { label: 'Nhà cung cấp', value: asset.supplier },
+                  { label: 'Ngày mua', value: asset.purchaseDate ? new Date(asset.purchaseDate).toLocaleDateString('vi-VN') : '—' },
+                  { label: 'Hạn bảo hành', value: asset.warranty ? new Date(asset.warranty).toLocaleDateString('vi-VN') : '—' },
+                  { label: 'Người phụ trách', value: asset.assignee ?? '—' },
+                  { label: 'Nhà cung cấp', value: asset.supplier ?? '—' },
                 ].map((item) => (
                   <div key={item.label}>
                     <p className="text-[10px] uppercase text-[rgb(var(--text-muted))]">{item.label}</p>
@@ -109,7 +130,9 @@ export default function QATaiSanDetail() {
               </div>
               <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[rgb(var(--border)/0.5)]">
                 <div className="text-center">
-                  <p className="text-lg font-bold text-[rgb(var(--primary))]">{fmt.format(asset.value * 0.55)}</p>
+                  <p className="text-lg font-bold text-[rgb(var(--primary))]">
+                    {fmt.format(depData ? asset.value - depreciationRows[0]?.depreciation * depreciationRows.length : asset.value)}
+                  </p>
                   <p className="text-[10px] text-[rgb(var(--text-muted))]">Giá trị còn lại</p>
                 </div>
                 <div className="text-center">
@@ -120,7 +143,7 @@ export default function QATaiSanDetail() {
               <div>
                 <div className="flex justify-between text-xs mb-1">
                   <span className="text-[rgb(var(--text-muted))]">Khấu hao</span>
-                  <span className="text-[rgb(var(--primary))]">{fmt.format(asset.value * 0.45)}</span>
+                  <span className="text-[rgb(var(--primary))]">{fmt.format(asset.value * asset.depreciation / 100)}</span>
                 </div>
                 <div className="h-2.5 w-full rounded-full bg-[rgb(var(--border))] overflow-hidden">
                   <div className="h-full rounded-full bg-[rgb(var(--primary))]" style={{ width: `${asset.depreciation}%` }} />
@@ -138,15 +161,19 @@ export default function QATaiSanDetail() {
               <Badge variant="info">Đơn vị: triệu VNĐ</Badge>
             </div>
             <CardContent className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={DEPRECIATION_DATA} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                  <Tooltip formatter={(v: number) => [`${v} triệu`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                  <Bar dataKey="bookValue" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name="Giá trị còn lại" />
-                  <Bar dataKey="depreciation" fill="rgb(var(--warning))" radius={[4, 4, 0, 0]} name="Khấu hao năm" />
-                </BarChart>
-              </ResponsiveContainer>
+              {depLoading ? (
+                <div className="flex items-center justify-center h-full"><Loader2 className="h-6 w-6 animate-spin text-[rgb(var(--text-muted))]" /></div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={depreciationRows.map((d: { bookValue: number; depreciation: number; year: number }) => ({ ...d, bookValueM: d.bookValue / 1_000_000, depreciationM: d.depreciation / 1_000_000 }))} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                    <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                    <Tooltip formatter={(v: number) => `${v.toLocaleString('vi-VN')} triệu`} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
+                    <Bar dataKey="bookValueM" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name="Giá trị còn lại" />
+                    <Bar dataKey="depreciationM" fill="rgb(var(--warning))" radius={[4, 4, 0, 0]} name="Khấu hao năm" />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
 
@@ -165,15 +192,19 @@ export default function QATaiSanDetail() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[rgb(var(--border)/0.4)]">
-                  {MAINTENANCE_LOG.map((log, i) => (
-                    <tr key={i} className="hover:bg-[rgb(var(--bg-hover))]">
-                      <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.date}</td>
-                      <td className="px-4 py-2.5"><Badge variant="neutral" size="sm">{log.type}</Badge></td>
-                      <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.cost > 0 ? fmt.format(log.cost) : '—'}</td>
-                      <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.note}</td>
-                      <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.vendor}</td>
-                    </tr>
-                  ))}
+                  {maintenance.length === 0 ? (
+                    <tr><td colSpan={5} className="px-4 py-6 text-center text-sm text-[rgb(var(--text-muted))]">Chưa có lịch sử bảo trì</td></tr>
+                  ) : (
+                    maintenance.map((log, i) => (
+                      <tr key={i} className="hover:bg-[rgb(var(--bg-hover))]">
+                        <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.date ? new Date(log.date).toLocaleDateString('vi-VN') : '—'}</td>
+                        <td className="px-4 py-2.5"><Badge variant="neutral" size="sm">{log.type}</Badge></td>
+                        <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.cost > 0 ? fmt.format(log.cost) : '—'}</td>
+                        <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.note}</td>
+                        <td className="px-4 py-2.5 text-[rgb(var(--text-secondary))]">{log.vendor}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

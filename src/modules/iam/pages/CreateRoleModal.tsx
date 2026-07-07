@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Shield, Save, AlertTriangle, Copy, CheckCircle2, XCircle } from 'lucide-react';
+import { Shield, Save, AlertTriangle, Copy } from 'lucide-react';
 import { Modal, Button, Input } from '@/components/ui';
 
 interface CreateRoleModalProps {
@@ -43,7 +43,6 @@ const BASE_ROLES = [
   { value: 'GIANG_VIEN', label: 'Giảng viên (copy quyền)' },
   { value: 'NHAN_VIEN', label: 'Nhân viên HC (copy quyền)' },
   { value: 'SINH_VIEN', label: 'Sinh viên (copy quyền)' },
-  { value: 'ADMIN', label: 'Quản trị (copy quyền)' },
 ];
 
 const BASE_PERMISSIONS: Record<string, Record<string, { read: boolean; write: boolean; approve: boolean }>> = {
@@ -51,22 +50,25 @@ const BASE_PERMISSIONS: Record<string, Record<string, { read: boolean; write: bo
   GIANG_VIEN: Object.fromEntries(MODULES.filter(m => ['SIS', 'LMS', 'EXAM', 'DMS', 'WMS', 'PORTAL', 'LIB'].includes(m.id)).map(m => [m.id, { read: true, write: true, approve: false }])),
   NHAN_VIEN: Object.fromEntries(MODULES.filter(m => ['HRM', 'DMS', 'FIN', 'WMS', 'PORTAL', 'KTX'].includes(m.id)).map(m => [m.id, { read: true, write: true, approve: false }])),
   SINH_VIEN: Object.fromEntries(MODULES.filter(m => ['SIS', 'LMS', 'EXAM', 'PORTAL', 'LIB'].includes(m.id)).map(m => [m.id, { read: true, write: true, approve: false }])),
-  ADMIN: Object.fromEntries(MODULES.map(m => [m.id, { read: true, write: true, approve: true }])),
 };
 
-function Toggle({ checked, onChange, label }: { checked: boolean; onChange: () => void; label: string }) {
+function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void; label?: string }) {
   return (
     <button
       type="button"
       onClick={onChange}
-      title={label}
-      className="flex items-center justify-center"
+      className="flex h-6 w-11 items-center rounded-full px-0.5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--primary))] focus-visible:ring-offset-1"
+      style={{
+        backgroundColor: checked
+          ? 'rgb(var(--success))'
+          : 'rgb(var(--border))',
+      }}
+      aria-pressed={checked}
     >
-      {checked ? (
-        <CheckCircle2 className="h-5 w-5 text-[rgb(var(--success))]" />
-      ) : (
-        <XCircle className="h-5 w-5 text-[rgb(var(--border))]" />
-      )}
+      <span
+        className="h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200"
+        style={{ transform: checked ? 'translateX(20px)' : 'translateX(0)' }}
+      />
     </button>
   );
 }

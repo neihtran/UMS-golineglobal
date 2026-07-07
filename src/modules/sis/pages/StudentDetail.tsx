@@ -1,53 +1,32 @@
 import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
-  BookOpen,
-  Award,
-  ArrowLeft,
-  Download,
-  Edit2,
+  BookOpen, Award, ArrowLeft, Download, Edit2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Badge, Card, CardContent, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell } from '@/components/ui';
+import { Button, Badge, Card, CardContent } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-
-const SUBJECTS = [
-  { id: 's1', code: 'CS101', name: 'Nhập môn Lập trình Python', credits: 4, semester: 1, type: 'Bắt buộc', dept: 'Khoa CNTT', hours: 60 },
-  { id: 's2', code: 'CS102', name: 'Cấu trúc dữ liệu và Giải thuật', credits: 4, semester: 2, type: 'Bắt buộc', dept: 'Khoa CNTT', hours: 60 },
-  { id: 's3', code: 'CS201', name: 'Cơ sở dữ liệu', credits: 3, semester: 3, type: 'Bắt buộc', dept: 'Khoa CNTT', hours: 45 },
-  { id: 's4', code: 'CS202', name: 'Mạng máy tính', credits: 3, semester: 4, type: 'Bắt buộc', dept: 'Khoa CNTT', hours: 45 },
-  { id: 's5', code: 'CS301', name: 'Trí tuệ Nhân tạo', credits: 3, semester: 5, type: 'Tự chọn', dept: 'Khoa CNTT', hours: 45 },
-  { id: 's6', code: 'MATH101', name: 'Toán cao cấp 1', credits: 4, semester: 1, type: 'Bắt buộc', dept: 'Khoa CNTT', hours: 60 },
-  { id: 's7', code: 'MATH102', name: 'Toán cao cấp 2', credits: 4, semester: 2, type: 'Bắt buộc', dept: 'Khoa CNTT', hours: 60 },
-  { id: 's8', code: 'ENG101', name: 'Tiếng Anh cơ bản', credits: 3, semester: 1, type: 'Bắt buộc', dept: 'Khoa Ngoại ngữ', hours: 45 },
-];
-
-const GRADE_RECORDS = [
-  { subjectCode: 'CS101', name: 'Nhập môn Lập trình Python', semester: '2022-1', theory: 8.5, practice: 9.0, final: 8.7, grade: 'A', credits: 4 },
-  { subjectCode: 'MATH101', name: 'Toán cao cấp 1', semester: '2022-1', theory: 7.5, practice: null, final: 7.5, grade: 'B+', credits: 4 },
-  { subjectCode: 'ENG101', name: 'Tiếng Anh cơ bản', semester: '2022-1', theory: 8.0, practice: 8.5, final: 8.2, grade: 'A', credits: 3 },
-  { subjectCode: 'CS102', name: 'Cấu trúc dữ liệu và Giải thuật', semester: '2022-2', theory: 7.0, practice: 7.5, final: 7.2, grade: 'B', credits: 4 },
-  { subjectCode: 'MATH102', name: 'Toán cao cấp 2', semester: '2022-2', theory: 6.5, practice: null, final: 6.5, grade: 'C+', credits: 4 },
-  { subjectCode: 'CS201', name: 'Cơ sở dữ liệu', semester: '2023-1', theory: 8.0, practice: 8.5, final: 8.2, grade: 'A', credits: 3 },
-];
-
-const STUDENT = {
-  id: 'sv001', msv: 'SV-2022-0001', name: 'Nguyễn Văn An', dob: '2004-05-12',
-  class: 'CNTT-K60A', major: 'Công nghệ thông tin', dept: 'Khoa CNTT',
-  cohort: '2022', gpa: 3.45, credits: 98, status: 'studying',
-  address: '48/5 Đường Lê Văn Việt, Quận 9, TP.HCM', phone: '0912 345 678',
-  email: 'an.nguyen@student.truong.edu.vn',
-  enrollmentDate: '2022-09-01', expectedGraduation: '2026-06-30',
-};
-
-const TYPE_BADGE: Record<string, 'primary' | 'accent' | 'neutral'> = {
-  'Bắt buộc': 'primary',
-  'Tự chọn': 'accent',
-};
+import { useStudentDetail } from '@/hooks/useSis';
 
 export default function StudentDetail() {
   const { t } = useTranslation('sis');
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('profile');
-  const s = STUDENT;
+
+  const { data: studentData, isLoading } = useStudentDetail(id || '');
+  const s = studentData as any;
+
+  if (isLoading || !s) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title={isLoading ? 'Đang tải...' : 'Không tìm thấy'} breadcrumbs={[{ label: 'SIS', href: '/sis' }, { label: 'Sinh viên' }]} />
+        <div className="flex items-center justify-center h-64">
+          <p className="text-[rgb(var(--text-muted))]">{isLoading ? 'Đang tải thông tin sinh viên...' : 'Không tìm thấy sinh viên này.'}</p>
+        </div>
+      </div>
+    );
+  }
 
   const tabs = [
     { id: 'profile', label: t('student.detail.profile') },
@@ -57,36 +36,26 @@ export default function StudentDetail() {
     { id: 'certificates', label: t('student.detail.certificates') },
   ];
 
-  const profileFields = [
-    { labelKey: 'student.detail.profileFields.hoVaTen', value: s.name },
-    { labelKey: 'student.detail.profileFields.maSinhVien', value: s.msv },
-    { labelKey: 'student.detail.profileFields.ngaySinh', value: s.dob },
-    { labelKey: 'student.detail.profileFields.gioiTinh', value: 'Nam' },
-    { labelKey: 'student.detail.profileFields.diaChi', value: s.address },
-    { labelKey: 'student.detail.profileFields.dienThoai', value: s.phone },
-  ];
-
-  const gradeStats = [
-    { labelKey: 'student.detail.gpaTichLuy', value: s.gpa.toFixed(2) },
-    { labelKey: 'student.detail.tinChiDat', value: s.credits.toString() },
-    { labelKey: 'student.detail.xeploai', value: 'Giỏi' },
-  ];
+  const displayName = s.name || s.displayName || '—';
+  const msv = s.studentCode || (s as any).msv || s.code || '';
+  const initials = displayName.split(' ').slice(-2).map((n: string) => n[0]).join('');
+  const statusVariant = s.status === 'studying' || s.status === 'active' ? 'success' : s.status === 'graduated' ? 'primary' : 'neutral';
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={s.name}
-        description={`${s.msv} · ${s.major} · ${s.class}`}
+        title={displayName}
+        description={`${msv} · ${s.major || s.department?.name || ''} · ${s.className || s.class || ''}`}
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
-          { label: t('student.breadcrumb.list'), href: '/sis/sinh-vien' },
-          { label: s.name },
+          { label: t('student.breadcrumb.list', { defaultValue: 'Sinh viên' }), href: '/sis/sinh-vien' },
+          { label: displayName },
         ]}
         actions={
           <>
-            <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => history.back()}>{t('student.detail.back')}</Button>
+            <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/sis/sinh-vien')}>{t('student.detail.back')}</Button>
             <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('student.detail.exportProfile')}</Button>
-            <Button leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => window.location.href = `/sis/sinh-vien/${s.id}/sua`}>{t('student.detail.edit')}</Button>
+            <Button leftIcon={<Edit2 className="h-4 w-4" />}>{t('student.detail.edit')}</Button>
           </>
         }
       />
@@ -97,37 +66,54 @@ export default function StudentDetail() {
           <Card>
             <CardContent className="flex flex-col items-center p-6">
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-2xl font-bold text-white mb-4 ring-4 ring-[rgb(var(--primary)/0.2)]">
-                {s.name.split(' ').slice(-2).map((n) => n[0]).join('')}
+                {initials}
               </div>
-              <h2 className="text-lg font-bold text-[rgb(var(--text-primary))]">{s.name}</h2>
-              <p className="text-sm text-[rgb(var(--text-secondary))]">{s.msv}</p>
-              <Badge variant="success" dot className="mt-2">{t('student.status.studying')}</Badge>
+              <h2 className="text-lg font-bold text-[rgb(var(--text-primary))]">{displayName}</h2>
+              <p className="text-sm text-[rgb(var(--text-secondary))]">{msv}</p>
+              <Badge variant={statusVariant} dot className="mt-2">{s.statusLabel || s.status || 'Đang học'}</Badge>
               <div className="mt-6 w-full space-y-2.5">
                 {[
-                  { label: t('student.detail.profileFields.ngaySinh'), value: s.dob },
-                  { label: t('student.table.lop'), value: s.class },
-                  { label: t('student.table.nganhKhoa').split(' / ')[1] || t('student.table.nganhKhoa'), value: s.dept },
-                  { label: t('student.form.khoaHoc'), value: s.cohort },
-                  { label: t('student.table.gpa'), value: `${s.gpa.toFixed(2)} / 4.0` },
-                  { label: 'Tín chỉ tích lũy', value: `${s.credits} TC` },
-                  { label: t('student.detail.profileFields.gioiTinh') === 'Giới tính' ? 'Email' : 'Email', value: s.email },
-                  { label: t('student.detail.profileFields.dienThoai'), value: s.phone },
-                  { label: t('student.form.ngayNhapHoc'), value: s.enrollmentDate },
-                  { label: t('student.form.duKienTotNghiep'), value: s.expectedGraduation },
+                  { label: 'Ngày sinh', value: s.dob ? new Date(s.dob).toLocaleDateString('vi-VN') : '' },
+                  { label: 'Lớp', value: s.className || s.class || '' },
+                  { label: 'Khoa', value: s.department?.name || (s as any).dept || '' },
+                  { label: 'Khóa', value: s.cohort || '' },
+                  { label: 'GPA', value: s.gpa ? `${s.gpa.toFixed(2)} / 4.0` : '' },
+                  { label: 'Tín chỉ tích lũy', value: s.credits ? `${s.credits} TC` : '' },
+                  { label: 'Email', value: s.email || '' },
+                  { label: 'Điện thoại', value: s.phone || '' },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex justify-between text-xs border-b border-[rgb(var(--border)/0.4)] pb-2 last:border-0 last:pb-0">
                     <span className="text-[rgb(var(--text-muted))]">{label}</span>
-                    <span className="font-medium text-[rgb(var(--text-primary))] text-right max-w-[140px] truncate">{value}</span>
+                    <span className="font-medium text-[rgb(var(--text-primary))] text-right max-w-[140px] truncate">{value || '—'}</span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
+
+          {/* Quick stats */}
+          <Card>
+            <CardContent className="p-4 space-y-3">
+              {[
+                { icon: <BookOpen className="h-4 w-4" />, label: 'GPA tích lũy', value: s.gpa ? s.gpa.toFixed(2) : '—', color: 'primary' },
+                { icon: <Award className="h-4 w-4" />, label: 'Tín chỉ đạt', value: s.credits ? String(s.credits) : '—', color: 'success' },
+              ].map((stat) => (
+                <div key={stat.label} className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))]">
+                  <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--${stat.color})/0.1)] text-[rgb(var(--${stat.color}))]`}>
+                    {stat.icon}
+                  </div>
+                  <div>
+                    <p className="text-xs text-[rgb(var(--text-muted))]">{stat.label}</p>
+                    <p className="font-bold text-[rgb(var(--text-primary))]">{stat.value}</p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Main content */}
+        {/* Main content with tabs */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Tabs */}
           <Card>
             <div className="border-b border-[rgb(var(--border)/0.6)]">
               <div className="flex gap-1 px-4 pt-4">
@@ -151,127 +137,88 @@ export default function StudentDetail() {
               {/* Profile tab */}
               {activeTab === 'profile' && (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-6">
-                    {profileFields.map(({ labelKey, value }) => (
-                      <div key={labelKey} className="border-b border-[rgb(var(--border)/0.4)] pb-2">
-                        <p className="text-[10px] uppercase tracking-wide text-[rgb(var(--text-muted))]">{t(labelKey)}</p>
-                        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{value}</p>
-                      </div>
-                    ))}
+                  {/* Personal info */}
+                  <div>
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-muted))] mb-3">Thông tin cá nhân</h4>
+                    <div className="grid grid-cols-2 gap-x-8">
+                      {[
+                        { label: 'Họ và tên', value: displayName },
+                        { label: 'Mã sinh viên', value: msv },
+                        { label: 'Ngày sinh', value: s.dob ? new Date(s.dob).toLocaleDateString('vi-VN') : '' },
+                        { label: 'Giới tính', value: s.gender || '' },
+                        { label: 'Số CCCD', value: s.cccd || '' },
+                        { label: 'Dân tộc', value: s.ethnicity || '' },
+                        { label: 'Quốc tịch', value: s.nationality || '' },
+                        { label: 'Tôn giáo', value: s.religion || '' },
+                        { label: 'Địa chỉ', value: s.address || '' },
+                        { label: 'Điện thoại', value: s.phone || '' },
+                        { label: 'Email', value: s.email || '' },
+                        { label: 'Ngày nhập học', value: s.enrollmentDate ? new Date(s.enrollmentDate).toLocaleDateString('vi-VN') : '' },
+                      ].map(({ label, value }) => (
+                        <div key={label} className="flex gap-4 py-2 border-b border-[rgb(var(--border)/0.4)] last:border-0">
+                          <p className="w-36 shrink-0 text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wide">{label}</p>
+                          <p className="text-sm text-[rgb(var(--text-primary))]">{value || '—'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Academic info */}
+                  <div>
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-muted))] mb-3">Thông tin học tập</h4>
+                    <div className="grid grid-cols-2 gap-x-8">
+                      {[
+                        { label: 'Lớp', value: s.className || s.class || '' },
+                        { label: 'Ngành', value: s.major || s.department?.name || '' },
+                        { label: 'Khoa', value: (s as any).faculty?.name || (s as any).dept || '' },
+                        { label: 'Khóa', value: s.cohort || '' },
+                        { label: 'Hệ đào tạo', value: (s as any).programType || '' },
+                        { label: 'Năm học hiện tại', value: (s as any).currentYear || '' },
+                        { label: 'Học kỳ hiện tại', value: (s as any).currentSemester || '' },
+                        { label: 'GPA tích lũy', value: s.gpa ? s.gpa.toFixed(2) : '' },
+                        { label: 'Tổng tín chỉ', value: s.credits ? `${s.credits} TC` : '' },
+                        { label: 'Dự kiến tốt nghiệp', value: (s as any).expectedGraduation ? new Date((s as any).expectedGraduation).toLocaleDateString('vi-VN') : '' },
+                        { label: 'Trạng thái', value: s.statusLabel || s.status || '' },
+                      ].map(({ label, value }) => (
+                        <div key={label} className="flex gap-4 py-2 border-b border-[rgb(var(--border)/0.4)] last:border-0">
+                          <p className="w-36 shrink-0 text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wide">{label}</p>
+                          <p className="text-sm text-[rgb(var(--text-primary))]">{value || '—'}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
 
               {/* Grades tab */}
               {activeTab === 'grades' && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-4">
-                      {gradeStats.map(({ labelKey, value }) => (
-                        <div key={labelKey} className="text-center">
-                          <p className="text-xs text-[rgb(var(--text-muted))]">{t(labelKey)}</p>
-                          <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{value}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <Button variant="outline" size="sm" leftIcon={<Download className="h-3.5 w-3.5" />}>{t('student.detail.xuatBangDiem')}</Button>
-                  </div>
-                  <div className="overflow-x-auto rounded-lg border border-[rgb(var(--border))]">
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableHeadCell>{t('student.detail.bangDiem.maMon')}</TableHeadCell>
-                          <TableHeadCell>{t('student.detail.bangDiem.tenMon')}</TableHeadCell>
-                          <TableHeadCell>{t('student.detail.bangDiem.ky')}</TableHeadCell>
-                          <TableHeadCell className="text-right">{t('student.detail.bangDiem.lt')}</TableHeadCell>
-                          <TableHeadCell className="text-right">{t('student.detail.bangDiem.th')}</TableHeadCell>
-                          <TableHeadCell className="text-right">{t('student.detail.bangDiem.diemGK')}</TableHeadCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {GRADE_RECORDS.map((g) => (
-                          <TableRow key={`${g.subjectCode}-${g.semester}`}>
-                            <TableCell className="font-mono text-xs">{g.subjectCode}</TableCell>
-                            <TableCell className="text-sm">{g.name}</TableCell>
-                            <TableCell>{g.semester}</TableCell>
-                            <TableCell>{g.theory?.toFixed(1) ?? '—'}</TableCell>
-                            <TableCell>{g.practice?.toFixed(1) ?? '—'}</TableCell>
-                            <TableCell className="font-semibold">{g.final.toFixed(1)}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                <div className="text-center py-12">
+                  <BookOpen className="h-10 w-10 mx-auto text-[rgb(var(--text-muted))] mb-3" />
+                  <p className="text-sm text-[rgb(var(--text-muted))]">Dữ liệu điểm sẽ được tải từ API khi backend có endpoint điểm sinh viên.</p>
                 </div>
               )}
 
               {/* CTDT tab */}
               {activeTab === 'ctdt' && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold text-[rgb(var(--text-primary))]">{t('student.detail.ctdtTitle')}</h4>
-                      <p className="text-xs text-[rgb(var(--text-muted))]">{t('student.detail.ctdtNote', { credits: 140, cohort: 2022 })}</p>
-                    </div>
-                    <Button variant="outline" size="sm" leftIcon={<Download className="h-3.5 w-3.5" />}>{t('student.detail.xuatCTDT')}</Button>
-                  </div>
-                  <div className="overflow-x-auto rounded-lg border border-[rgb(var(--border))]">
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableHeadCell>{t('student.detail.bangDiemCTDT.maMon')}</TableHeadCell>
-                          <TableHeadCell>{t('student.detail.bangDiemCTDT.tenMon')}</TableHeadCell>
-                          <TableHeadCell>{t('student.detail.bangDiemCTDT.tc')}</TableHeadCell>
-                          <TableHeadCell>{t('student.detail.bangDiemCTDT.ky')}</TableHeadCell>
-                          <TableHeadCell>{t('student.detail.bangDiemCTDT.loai')}</TableHeadCell>
-                          <TableHeadCell>{t('student.detail.bangDiemCTDT.gio')}</TableHeadCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {SUBJECTS.map((subj) => (
-                          <TableRow key={subj.id}>
-                            <TableCell className="font-mono text-xs">{subj.code}</TableCell>
-                            <TableCell className="text-sm">{subj.name}</TableCell>
-                            <TableCell className="text-right">{subj.credits}</TableCell>
-                            <TableCell>{subj.semester}</TableCell>
-                            <TableCell><Badge variant={TYPE_BADGE[subj.type] ?? 'neutral'} size="sm">{subj.type}</Badge></TableCell>
-                            <TableCell className="text-right">{subj.hours}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                <div className="text-center py-12">
+                  <BookOpen className="h-10 w-10 mx-auto text-[rgb(var(--text-muted))] mb-3" />
+                  <p className="text-sm text-[rgb(var(--text-muted))]">Chương trình đào tạo của sinh viên sẽ được tải từ API.</p>
                 </div>
               )}
 
               {/* Schedule tab */}
               {activeTab === 'schedule' && (
-                <div className="flex flex-col items-center py-10 text-center">
-                  <BookOpen className="h-12 w-12 text-[rgb(var(--text-muted))] mb-3" />
-                  <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('student.detail.xemLichHoc')}</p>
-                  <p className="text-xs text-[rgb(var(--text-muted))] mt-1">{t('student.detail.lichHocNote')}</p>
-                  <Button variant="outline" size="sm" className="mt-4">{t('student.detail.moLMS')}</Button>
+                <div className="text-center py-12">
+                  <BookOpen className="h-10 w-10 mx-auto text-[rgb(var(--text-muted))] mb-3" />
+                  <p className="text-sm text-[rgb(var(--text-muted))]">Thời khóa biểu sẽ được tải từ API khi có endpoint lịch học.</p>
                 </div>
               )}
 
               {/* Certificates tab */}
               {activeTab === 'certificates' && (
-                <div className="space-y-3">
-                  {[
-                    { name: 'Chứng chỉ hoàn thành CTĐT năm 2', date: '2024-06-30', status: 'issued' },
-                    { name: 'Bằng tốt nghiệp dự kiến', date: '2026-06-30', status: 'pending' },
-                  ].map((cert, i) => (
-                    <div key={i} className="flex items-center gap-3 rounded-lg border border-[rgb(var(--border))] p-3">
-                      <Award className="h-8 w-8 text-[rgb(var(--warning))]" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{cert.name}</p>
-                        <p className="text-xs text-[rgb(var(--text-muted))]">{cert.date}</p>
-                      </div>
-                      <Badge variant={cert.status === 'issued' ? 'success' : 'neutral'} size="sm">
-                        {cert.status === 'issued' ? t('student.detail.certificateStatus.issued') : t('student.detail.certificateStatus.pending')}
-                      </Badge>
-                    </div>
-                  ))}
+                <div className="text-center py-12">
+                  <Award className="h-10 w-10 mx-auto text-[rgb(var(--text-muted))] mb-3" />
+                  <p className="text-sm text-[rgb(var(--text-muted))]">Chứng chỉ và bằng cấp sẽ được tải từ API khi có endpoint chứng chỉ.</p>
                 </div>
               )}
             </div>

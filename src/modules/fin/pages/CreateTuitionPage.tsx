@@ -6,15 +6,7 @@ import {
 } from 'lucide-react';
 import { Button, Card, CardContent } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-
-const STUDENTS = [
-  { id: 's1', code: 'SV2026001', name: 'Nguyễn Văn An', class: 'K60-CNTT', dept: 'Khoa CNTT' },
-  { id: 's2', code: 'SV2026002', name: 'Trần Thị Bình', class: 'K59-KT', dept: 'Khoa Kinh tế' },
-  { id: 's3', code: 'SV2026003', name: 'Lê Minh Cường', class: 'K60-Luat', dept: 'Khoa Luật' },
-  { id: 's4', code: 'SV2026004', name: 'Phạm Thu Dung', class: 'K60-NN', dept: 'Khoa Ngoại ngữ' },
-  { id: 's5', code: 'SV2026005', name: 'Hoàng Văn E', class: 'K61-CNTT', dept: 'Khoa CNTT' },
-  { id: 's6', code: 'SV2026006', name: 'Vũ Thị F', class: 'K60-YD', dept: 'Khoa Y dược' },
-];
+import { useStudentList } from '@/hooks/useSis';
 
 const SEMESTERS = ['HK1 2026-2027', 'HK2 2025-2026', 'HK1 2025-2026', 'HK2 2024-2025'];
 const PAYMENT_METHODS = [
@@ -36,12 +28,19 @@ function fmt(v: number) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v);
 }
 
+interface StudentOption {
+  _id: string;
+  name?: string;
+  code?: string;
+  className?: string;
+}
+
 export default function CreateTuitionPage() {
   const { t } = useTranslation('fin');
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [showStudentList, setShowStudentList] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<typeof STUDENTS[0] | null>(null);
+  const [selectedStudent, setSelectedStudent] = useState<StudentOption | null>(null);
   const [semester, setSemester] = useState(SEMESTERS[0]);
   const [breakdown, setBreakdown] = useState(DEFAULT_BREAKDOWN);
   const [paymentMethod, setPaymentMethod] = useState('bank');
@@ -49,10 +48,15 @@ export default function CreateTuitionPage() {
   const [receiptNote, setReceiptNote] = useState('');
   const [saved, setSaved] = useState(false);
 
-  const filteredStudents = STUDENTS.filter((s) =>
+  const { data: studentsData } = useStudentList({ page: 1, pageSize: 100 });
+  const isLoadingStudents = !studentsData;
+
+  const allStudents: StudentOption[] = ((studentsData as any)?.data ?? []) as StudentOption[];
+
+  const filteredStudents = allStudents.filter((s) =>
     !search ||
-    s.name.toLowerCase().includes(search.toLowerCase()) ||
-    s.code.toLowerCase().includes(search),
+    (s.name?.toLowerCase().includes(search.toLowerCase()) || false) ||
+    (s.code?.toLowerCase().includes(search.toLowerCase()) || false),
   );
 
   const totalAmount = breakdown.reduce((s, b) => s + b.amount, 0);
@@ -117,11 +121,11 @@ export default function CreateTuitionPage() {
                 {selectedStudent ? (
                   <div className="flex items-center gap-3 p-3 rounded-xl border border-[rgb(var(--primary))] bg-[rgb(var(--primary)/0.04)]">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[rgb(var(--primary))] text-white text-xs font-bold">
-                      {selectedStudent.name.split(' ').slice(-2).map((n) => n[0]).join('')}
+                      {(selectedStudent.name || selectedStudent.code || 'NA').split(' ').slice(-2).map((n) => n[0]).join('')}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">{selectedStudent.name}</p>
-                      <p className="text-xs text-[rgb(var(--text-muted))]">{selectedStudent.code} · {selectedStudent.class}</p>
+                      <p className="text-xs text-[rgb(var(--text-muted))]">{selectedStudent.code} · {selectedStudent.className}</p>
                     </div>
                     <button
                       onClick={() => setSelectedStudent(null)}
@@ -143,22 +147,24 @@ export default function CreateTuitionPage() {
                       />
                     </div>
                     {showStudentList && (
-                      <div className="absolute z-10 mt-1 w-full rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] shadow-xl overflow-hidden">
-                        {filteredStudents.length === 0 ? (
+                      <div className="absolute z-10 mt-1 w-full rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+                        {isLoadingStudents ? (
+                          <p className="px-4 py-3 text-sm text-[rgb(var(--text-muted))]">Đang tải sinh viên...</p>
+                        ) : filteredStudents.length === 0 ? (
                           <p className="px-4 py-3 text-sm text-[rgb(var(--text-muted))]">{t('createTuition.student.notFound')}</p>
                         ) : (
                           filteredStudents.map((s) => (
                             <button
-                              key={s.id}
+                              key={s._id}
                               onClick={() => { setSelectedStudent(s); setShowStudentList(false); setSearch(''); }}
                               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[rgb(var(--bg-hover))] transition-colors text-left"
                             >
                               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))] text-xs font-bold">
-                                {s.name.split(' ').slice(-2).map((n) => n[0]).join('')}
+                                {(s.name || s.code || 'NA').split(' ').slice(-2).map((n) => n[0]).join('')}
                               </div>
                               <div>
                                 <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{s.name}</p>
-                                <p className="text-xs text-[rgb(var(--text-muted))]">{s.code} · {s.class}</p>
+                                <p className="text-xs text-[rgb(var(--text-muted))]">{s.code} · {s.className}</p>
                               </div>
                             </button>
                           ))
@@ -308,7 +314,7 @@ export default function CreateTuitionPage() {
                   </div>
                   <div className="flex gap-2">
                     <span className="w-20 shrink-0 text-[rgb(var(--text-muted))]">{t('createTuition.preview.class')}</span>
-                    <span className="font-medium text-[rgb(var(--text-primary))]">{selectedStudent?.class ?? '—'}</span>
+                    <span className="font-medium text-[rgb(var(--text-primary))]">{selectedStudent?.className ?? '—'}</span>
                   </div>
                   <div className="flex gap-2">
                     <span className="w-20 shrink-0 text-[rgb(var(--text-muted))]">{t('createTuition.preview.semester')}</span>

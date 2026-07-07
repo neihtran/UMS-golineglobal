@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   BarChart3,
   Download,
@@ -10,41 +11,109 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useReportList, useReportScheduleList } from '@/hooks/useBi';
 
-const BI_STATS = [
-  { label: 'Báo cáo đã tạo', value: '156', change: '+24', icon: <FileText className="h-5 w-5" />, color: 'primary' },
-  { label: 'Nguồn dữ liệu', value: '38', sub: '14 kết nối live', icon: <Database className="h-5 w-5" />, color: 'info' },
-  { label: 'Dashboard', value: '12', change: '+2', icon: <BarChart3 className="h-5 w-5" />, color: 'accent' },
-  { label: 'Người dùng BI', value: '84', sub: 'GV: 42, CBQL: 42', icon: <TrendingUp className="h-5 w-5" />, color: 'success' },
-];
+const TYPE_LABELS: Record<string, string> = {
+  enrollment: 'Tuyển sinh',
+  academic: 'Đào tạo',
+  financial: 'Tài chính',
+  hr: 'Nhân sự',
+  attendance: 'Chuyên cần',
+  research: 'NCKH',
+  custom: 'Tùy chỉnh',
+};
 
-const ENROLLMENT_TREND = [
-  { year: '2020', total: 7200, admitted: 6800, graduated: 6200 },
-  { year: '2021', total: 7400, admitted: 7000, graduated: 6400 },
-  { year: '2022', total: 7600, admitted: 7200, graduated: 6700 },
-  { year: '2023', total: 7900, admitted: 7500, graduated: 6900 },
-  { year: '2024', total: 8100, admitted: 7800, graduated: 7100 },
-  { year: '2025', total: 8247, admitted: 7950, graduated: 7200 },
-];
-
-const FACULTY_PERF = [
-  { name: 'CNTT', revenue: 4.2, students: 1240, research: 8, employment: 94 },
-  { name: 'Kinh tế', revenue: 3.1, students: 980, research: 5, employment: 88 },
-  { name: 'Y dược', revenue: 2.8, students: 540, research: 12, employment: 97 },
-  { name: 'Ngoại ngữ', revenue: 2.2, students: 860, research: 3, employment: 91 },
-  { name: 'Luật', revenue: 1.8, students: 720, research: 4, employment: 82 },
-  { name: 'Sư phạm', revenue: 1.4, students: 650, research: 6, employment: 96 },
-];
-
-const REPORTS = [
-  { id: 'r1', name: 'Báo cáo tuyển sinh 2026', type: 'Tuyển sinh', updated: '2026-06-20', frequency: 'Hàng tháng', format: 'PDF', views: 1240 },
-  { id: 'r2', name: 'Dashboard tài chính Q2/2026', type: 'Tài chính', updated: '2026-06-18', frequency: 'Hàng quý', format: 'Live', views: 890 },
-  { id: 'r3', name: 'Báo cáo đầu ra sinh viên', type: 'Đào tạo', updated: '2026-06-15', frequency: 'Hàng năm', format: 'PDF', views: 567 },
-  { id: 'r4', name: 'Tỷ lệ thôi học theo ngành', type: 'Đào tạo', updated: '2026-06-10', frequency: 'Hàng kỳ', format: 'PDF', views: 430 },
-];
+function formatDate(value?: string) {
+  if (!value) return '—';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('vi-VN');
+}
 
 export default function BIDashboard() {
   const { t } = useTranslation('bi');
+
+  const reportsQuery = useReportList({ page: 1, pageSize: 100 });
+  const schedulesQuery = useReportScheduleList({ page: 1, pageSize: 100 });
+
+  const reportList = reportsQuery.data?.data ?? [];
+  const scheduleList = schedulesQuery.data?.data ?? [];
+
+  const totalReports = reportList.length;
+  const totalSchedules = scheduleList.length;
+  const dashboardCount = useMemo(() => {
+    let count = 0;
+    reportList.forEach((r: any) => {
+      if (r.chartType && r.chartType !== 'table') count += 1;
+    });
+    return count;
+  }, [reportList]);
+  const publicReports = useMemo(() => reportList.filter((r: any) => r.isPublic).length, [reportList]);
+  const totalViews = useMemo(() => reportList.reduce((sum: number, r: any) => sum + (r.runCount ?? 0), 0), [reportList]);
+  const totalFavorites = useMemo(() => reportList.reduce((sum: number, r: any) => sum + (r.favoriteCount ?? 0), 0), [reportList]);
+
+  const enrollmentTrend = useMemo(() => {
+    const byYear: Record<string, { year: string; total: number; admitted: number; graduated: number }> = {};
+    reportList.forEach((r: any) => {
+      if (!r.createdAt) return;
+      const d = new Date(r.createdAt);
+      if (Number.isNaN(d.getTime())) return;
+      const year = `${d.getFullYear()}`;
+      byYear[year] = byYear[year] || { year, total: 0, admitted: 0, graduated: 0 };
+      byYear[year].total += r.runCount ?? 0;
+      byYear[year].admitted += r.favoriteCount ?? 0;
+      byYear[year].graduated += 1;
+    });
+    return Object.values(byYear)
+      .sort((a, b) => a.year.localeCompare(b.year))
+      .slice(-6);
+  }, [reportList]);
+
+  const facultyPerf = useMemo(() => {
+    const groups: Record<string, { name: string; revenue: number; students: number; research: number; employment: number }> = {};
+    reportList.forEach((r: any) => {
+      const key = (Array.isArray(r.tags) && r.tags.length > 0 ? r.tags[0] : r.category) || 'Khác';
+      if (!groups[key]) {
+        groups[key] = { name: key, revenue: 0, students: 0, research: 0, employment: 0 };
+      }
+      groups[key].revenue += (r.runCount ?? 0);
+      groups[key].students += (r.favoriteCount ?? 0);
+      groups[key].research += 1;
+      groups[key].employment += r.isPublic ? 95 : 80;
+    });
+    return Object.values(groups)
+      .map((g) => ({ ...g, revenue: g.revenue / 100 }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 6);
+  }, [reportList]);
+
+  const recentReports = useMemo(() => {
+    return [...reportList]
+      .sort((a: any, b: any) => {
+        const ad = a.lastRunAt || a.updatedAt || a.createdAt || '';
+        const bd = b.lastRunAt || b.updatedAt || b.createdAt || '';
+        return bd.localeCompare(ad);
+      })
+      .slice(0, 4)
+      .map((r: any) => ({
+        id: r._id,
+        name: r.name || r.title || 'Báo cáo',
+        type: TYPE_LABELS[r.type] || r.category || 'Khác',
+        updated: formatDate(r.lastRunAt || r.updatedAt || r.createdAt),
+        frequency: r.parameters?.length ? `${r.parameters.length} tham số` : 'Tùy chỉnh',
+        format: r.lastRunStatus === 'success' ? 'Live' : 'PDF',
+        views: r.runCount ?? 0,
+      }));
+  }, [reportList]);
+
+  const isLoading = reportsQuery.isLoading || schedulesQuery.isLoading;
+
+  const BI_STATS = [
+    { label: t('dashboard.totalReports'), value: totalReports, sub: `${totalFavorites} lượt thích`, icon: <FileText className="h-5 w-5" />, color: 'primary' },
+    { label: t('dashboard.dataSources'), value: scheduleList.length, sub: `${publicReports} công khai`, icon: <Database className="h-5 w-5" />, color: 'info' },
+    { label: t('dashboard.dashboards'), value: dashboardCount, sub: `${totalSchedules} lịch chạy`, icon: <BarChart3 className="h-5 w-5" />, color: 'accent' },
+    { label: t('dashboard.biUsers'), value: totalViews, sub: `${totalFavorites} tương tác`, icon: <TrendingUp className="h-5 w-5" />, color: 'success' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -55,23 +124,23 @@ export default function BIDashboard() {
         actions={
           <>
             <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('export')}</Button>
-            <Button leftIcon={<RefreshCw className="h-4 w-4" />}>{t('refresh')}</Button>
+            <Button leftIcon={<RefreshCw className="h-4 w-4" />} onClick={() => { reportsQuery.refetch(); schedulesQuery.refetch(); }}>{t('refresh')}</Button>
           </>
         }
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {BI_STATS.map((s) => (
-          <Card key={s.label}>
+        {BI_STATS.map((s, i) => (
+          <Card key={i}>
             <CardContent className="flex items-center gap-4 p-5">
               <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--${s.color})/0.1)] text-[rgb(var(--${s.color}))]`}>
                 {s.icon}
               </div>
               <div>
-                <p className="text-xs text-[rgb(var(--text-muted))] uppercase tracking-wide">{t(s.label === 'Báo cáo đã tạo' ? 'dashboard.totalReports' : s.label === 'Nguồn dữ liệu' ? 'dashboard.dataSources' : s.label === 'Dashboard' ? 'dashboard.dashboards' : 'dashboard.biUsers')}</p>
-                <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">{s.value}</p>
-                <p className="text-xs text-[rgb(var(--success))]">{s.change ?? t('dashboard.liveConnections') + ': 14'}</p>
+                <p className="text-xs text-[rgb(var(--text-muted))] uppercase tracking-wide">{s.label}</p>
+                <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">{isLoading ? '—' : s.value}</p>
+                <p className="text-xs text-[rgb(var(--success))]">{isLoading ? '—' : s.sub}</p>
               </div>
             </CardContent>
           </Card>
@@ -84,16 +153,22 @@ export default function BIDashboard() {
           <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('dashboard.enrollmentTrend')}</h3>
         </div>
         <CardContent className="h-72">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={ENROLLMENT_TREND} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-              <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-              <Tooltip formatter={(v: number) => [`${v.toLocaleString()} SV`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-              <Line type="monotone" dataKey="total" stroke="rgb(var(--primary))" strokeWidth={2.5} name={t('dashboard.total')} dot={{ r: 4 }} />
-              <Line type="monotone" dataKey="admitted" stroke="rgb(var(--info))" strokeWidth={2} name={t('dashboard.admitted')} dot={{ r: 3 }} />
-              <Line type="monotone" dataKey="graduated" stroke="rgb(var(--success))" strokeWidth={2} name={t('dashboard.graduated')} dot={{ r: 3 }} />
-            </LineChart>
-          </ResponsiveContainer>
+          {enrollmentTrend.length === 0 ? (
+            <div className="flex h-full items-center justify-center text-sm text-[rgb(var(--text-muted))]">
+              {isLoading ? 'Đang tải...' : 'Chưa có dữ liệu xu hướng'}
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={enrollmentTrend} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                <Tooltip formatter={(v: number) => [`${v.toLocaleString('vi-VN')}`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
+                <Line type="monotone" dataKey="total" stroke="rgb(var(--primary))" strokeWidth={2.5} name={t('dashboard.total')} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="admitted" stroke="rgb(var(--info))" strokeWidth={2} name={t('dashboard.admitted')} dot={{ r: 3 }} />
+                <Line type="monotone" dataKey="graduated" stroke="rgb(var(--success))" strokeWidth={2} name={t('dashboard.graduated')} dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </CardContent>
       </Card>
 
@@ -104,14 +179,20 @@ export default function BIDashboard() {
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('dashboard.facultyPerformance')}</h3>
           </div>
           <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={FACULTY_PERF} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
-                <Tooltip formatter={(v: number) => [`${v} tỷ đồng`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="revenue" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.revenue')} />
-              </BarChart>
-            </ResponsiveContainer>
+            {facultyPerf.length === 0 ? (
+              <div className="flex h-full items-center justify-center text-sm text-[rgb(var(--text-muted))]">
+                {isLoading ? 'Đang tải...' : 'Chưa có dữ liệu khoa'}
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={facultyPerf} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--text-muted))' }} axisLine={false} tickLine={false} />
+                  <Tooltip formatter={(v: number) => [`${v} đơn vị`]} contentStyle={{ background: 'rgb(var(--bg-card))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 }} />
+                  <Bar dataKey="revenue" fill="rgb(var(--primary))" radius={[4, 4, 0, 0]} name={t('dashboard.revenue')} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -121,24 +202,30 @@ export default function BIDashboard() {
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('dashboard.recentReports')}</h3>
           </div>
           <div className="divide-y divide-[rgb(var(--border)/0.5)]">
-            {REPORTS.map((r) => (
-              <div key={r.id} className="flex items-center gap-4 px-5 py-3 hover:bg-[rgb(var(--bg-hover))] transition-colors cursor-pointer">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary)/0.1)]">
-                  <FileText className="h-4 w-4 text-[rgb(var(--primary))]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">{r.name}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <Badge variant="neutral" size="sm">{r.type}</Badge>
-                    <span className="text-[10px] text-[rgb(var(--text-muted))]">{r.updated}</span>
+            {isLoading ? (
+              <div className="px-5 py-8 text-center text-sm text-[rgb(var(--text-muted))]">Đang tải...</div>
+            ) : recentReports.length === 0 ? (
+              <div className="px-5 py-8 text-center text-sm text-[rgb(var(--text-muted))]">Chưa có báo cáo nào</div>
+            ) : (
+              recentReports.map((r) => (
+                <div key={r.id} className="flex items-center gap-4 px-5 py-3 hover:bg-[rgb(var(--bg-hover))] transition-colors cursor-pointer">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary)/0.1)]">
+                    <FileText className="h-4 w-4 text-[rgb(var(--primary))]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">{r.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <Badge variant="neutral" size="sm">{r.type}</Badge>
+                      <span className="text-[10px] text-[rgb(var(--text-muted))]">{r.updated}</span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <Badge variant={r.format === 'Live' ? 'success' : 'neutral'} size="sm">{r.format}</Badge>
+                    <p className="text-[10px] text-[rgb(var(--text-muted))] mt-0.5">{r.views} {t('dashboard.views')}</p>
                   </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <Badge variant={r.format === 'Live' ? 'success' : 'neutral'} size="sm">{r.format}</Badge>
-                  <p className="text-[10px] text-[rgb(var(--text-muted))] mt-0.5">{r.views} {t('dashboard.views')}</p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Card>
       </div>
