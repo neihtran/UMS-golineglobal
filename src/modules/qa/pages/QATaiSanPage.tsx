@@ -24,9 +24,12 @@ import {
   TableEmpty,
   Card,
   CardContent,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import QATaiSanDetail from './QATaiSanDetail';
 
 const ASSETS = [
   { id: 'ts001', code: 'TS-IT-001', name: 'Máy tính Dell OptiPlex 7090', category: 'Thiết bị CNTT', dept: 'Phòng CNTT', quantity: 25, unit: 'bộ', value: 750000000, status: 'active', depreciation: 45, location: 'Tòa A, Tầng 3', supplier: 'Công ty TNHH Viễn Thông ABC' },
@@ -79,6 +82,9 @@ export default function QATaiSanPage() {
   const [filterDept, setFilterDept] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+
+  const selectedAsset = selectedId ? ASSETS.find((a) => a.id === selectedId) : null;
 
   const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; label: string }> = {
     active: { variant: 'success', label: t('asset.status.active') },
@@ -206,7 +212,7 @@ export default function QATaiSanPage() {
                 <TableCell><Badge variant={sc.variant} dot size="sm">{sc.label}</Badge></TableCell>
                 <TableCell className="text-xs text-[rgb(var(--text-muted))] max-w-[120px] truncate">{a.location}</TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="sm" onClick={() => navigate(`/qa/tai-san/${a.id}`)}>{t('table.detail')}</Button>
+                  <Button variant="ghost" size="sm" onClick={() => openDetail(a.id)}>{t('table.detail')}</Button>
                 </TableCell>
               </TableRow>
             );
@@ -219,6 +225,16 @@ export default function QATaiSanPage() {
         onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedAsset ? `${selectedAsset.code} — Chi tiết tài sản` : ''}
+        description={selectedAsset ? selectedAsset.name : ''}
+        size="fullscreen"
+      >
+        {selectedId ? <QATaiSanDetail id={selectedId} /> : null}
+      </DetailModal>
     </div>
   );
 }

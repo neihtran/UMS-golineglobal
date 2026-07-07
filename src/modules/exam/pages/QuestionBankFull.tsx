@@ -3,10 +3,11 @@ import { Plus, Eye, Copy, FileText, HelpCircle, CheckCircle2 } from 'lucide-reac
 import { useTranslation } from 'react-i18next';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty,
+  TableHeadCell, TableCell, TablePagination, TableEmpty, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 
 const QUESTIONS = [
   { id: 'q01', content: 'Trong mô hình OSI, tầng nào chịu trách nhiệm mã hóa dữ liệu?', type: 'multiple_choice', difficulty: 'medium', subject: 'Mạng máy tính', course: 'INT3201', usageCount: 12, createdBy: 'Phạm Thu Hà', createdAt: '2026-05-15', status: 'active', correctAnswer: 'Tầng 6 (Presentation)' },
@@ -25,6 +26,9 @@ export default function QuestionBankFull() {
   const [type, setType] = useState('all');
   const [difficulty, setDifficulty] = useState('all');
   const [status, setStatus] = useState('all');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedQuestion = selectedId ? QUESTIONS.find((q) => q.id === selectedId) : null;
 
   const TYPE_CONFIG: Record<string, { variant: 'info' | 'warning' | 'accent' | 'primary'; label: string; icon: React.ReactNode }> = {
     multiple_choice: { variant: 'info', label: t('type.multiple_choice'), icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
@@ -157,7 +161,7 @@ export default function QuestionBankFull() {
                   <TableCell><Badge variant={q.status === 'active' ? 'success' : 'neutral'} dot size="sm">{STATUS_LABEL[q.status as keyof typeof STATUS_LABEL] || q.status}</Badge></TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />}>{t('common.view')}</Button>
+                      <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(q.id)}>{t('common.view')}</Button>
                       <Button variant="ghost" size="sm" leftIcon={<Copy className="h-3.5 w-3.5" />}>{t('common.copy')}</Button>
                     </div>
                   </TableCell>
@@ -173,6 +177,55 @@ export default function QuestionBankFull() {
         onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedQuestion?.content.slice(0, 80) ?? ''}
+        description={selectedQuestion ? `${selectedQuestion.subject} · ${selectedQuestion.course}` : ''}
+        size="fullscreen"
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={close}>Đóng</Button>
+          </div>
+        }
+      >
+        {selectedQuestion && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { label: 'Môn học', value: selectedQuestion.subject },
+                { label: 'Khóa học', value: selectedQuestion.course },
+                { label: 'Loại', value: TYPE_CONFIG[selectedQuestion.type]?.label },
+                { label: 'Độ khó', value: DIFF_CONFIG[selectedQuestion.difficulty]?.label },
+                { label: 'Số lần sử dụng', value: `${selectedQuestion.usageCount}` },
+                { label: 'Người tạo', value: selectedQuestion.createdBy },
+                { label: 'Ngày tạo', value: selectedQuestion.createdAt },
+                { label: 'Trạng thái', value: STATUS_LABEL[selectedQuestion.status as keyof typeof STATUS_LABEL] || selectedQuestion.status },
+              ].map(({ label, value }) => (
+                <div key={label} className="rounded-lg border border-[rgb(var(--border))] p-3">
+                  <p className="text-xs text-[rgb(var(--text-muted))]">{label}</p>
+                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{value}</p>
+                </div>
+              ))}
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-medium text-[rgb(var(--text-secondary))]">Nội dung câu hỏi</p>
+              <div className="rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] p-4">
+                <p className="text-sm text-[rgb(var(--text-primary))]">{selectedQuestion.content}</p>
+              </div>
+            </div>
+            {selectedQuestion.correctAnswer && (
+              <div>
+                <p className="mb-2 text-sm font-medium text-[rgb(var(--text-secondary))]">Đáp án đúng</p>
+                <div className="rounded-lg border border-[rgb(var(--success)/0.3)] bg-[rgb(var(--success)/0.05)] p-4">
+                  <p className="text-sm text-[rgb(var(--success))] font-medium">{selectedQuestion.correctAnswer}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </DetailModal>
     </div>
   );
 }

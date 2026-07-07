@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, TrendingUp, AlertTriangle, Download, Upload } from 'lucide-react';
+import { Users, TrendingUp, AlertTriangle, Download, Upload, Building2 } from 'lucide-react';
 import {
   Card, CardContent, Button, Badge, Table, TableHead,
-  TableBody, TableRow, TableHeadCell, TableCell,
+  TableBody, TableRow, TableHeadCell, TableCell, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useDetailModal } from '@/hooks/useDetailModal';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const STATS = [
@@ -29,6 +30,8 @@ const DEPT_BARS = DEPARTMENTS.map((d) => ({ name: d.name.replace('Khoa ', ''), c
 export default function DepartmentList() {
   const { t } = useTranslation('hrm');
   const [search, setSearch] = useState('');
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedDept = selectedId ? DEPARTMENTS.find((d) => d.id === selectedId) ?? null : null;
 
   const filtered = DEPARTMENTS.filter((d) =>
     !search || d.name.toLowerCase().includes(search.toLowerCase()) || d.head.toLowerCase().includes(search.toLowerCase())
@@ -87,13 +90,19 @@ export default function DepartmentList() {
                   <TableHeadCell>{t('department.table.visiting')}</TableHeadCell>
                   <TableHeadCell>{t('department.table.total')}</TableHeadCell>
                   <TableHeadCell>{t('department.table.status')}</TableHeadCell>
+                  <TableHeadCell></TableHeadCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {filtered.map((d) => (
                   <TableRow key={d.id}>
                     <TableCell>
-                      <p className="font-medium text-[rgb(var(--text-primary))]">{d.name}</p>
+                      <button
+                        onClick={() => openDetail(d.id)}
+                        className="font-medium text-[rgb(var(--text-primary))] hover:text-[rgb(var(--primary))] transition-colors text-left"
+                      >
+                        {d.name}
+                      </button>
                     </TableCell>
                     <TableCell className="text-[rgb(var(--text-secondary))]">{d.head}</TableCell>
                     <TableCell className="text-[rgb(var(--success))]">{d.vc}</TableCell>
@@ -103,6 +112,9 @@ export default function DepartmentList() {
                       <Badge variant={d.status === 'active' ? 'success' : 'warning'} dot size="sm">
                         {d.status === 'active' ? t('department.table.statusActive') : t('department.table.statusWarning')}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(d.id)}>{t('action.detail')}</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -129,6 +141,51 @@ export default function DepartmentList() {
           </CardContent>
         </Card>
       </div>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedDept ? selectedDept.name : ''}
+        description={selectedDept ? `${t('department.table.head')}: ${selectedDept.head}` : ''}
+        size="fullscreen"
+        onEdit={selectedDept ? () => {/* could open edit form */} : undefined}
+      >
+        {selectedDept && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary))] text-white">
+                <Building2 className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedDept.name}</p>
+                <p className="text-sm text-[rgb(var(--text-secondary))]">{t('department.table.head')}: {selectedDept.head}</p>
+              </div>
+              <Badge
+                variant={selectedDept.status === 'active' ? 'success' : 'warning'}
+                dot
+                className="ml-auto"
+              >
+                {selectedDept.status === 'active' ? t('department.table.statusActive') : t('department.table.statusWarning')}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              {[
+                { label: t('department.table.head'), value: selectedDept.head },
+                { label: t('department.table.permanent'), value: `${selectedDept.vc} ${t('department.chart.unit')}` },
+                { label: t('department.table.visiting'), value: `${selectedDept.guest} ${t('department.chart.unit')}` },
+                { label: t('department.table.total'), value: `${selectedDept.staff} ${t('department.chart.unit')}` },
+                { label: t('department.table.status'), value: selectedDept.status === 'active' ? t('department.table.statusActive') : t('department.table.statusWarning') },
+              ].map(({ label, value }) => (
+                <div key={label} className="flex gap-3 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                  <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">{label}:</span>
+                  <span className="font-medium text-[rgb(var(--text-primary))]">{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </DetailModal>
     </div>
   );
 }

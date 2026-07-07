@@ -16,9 +16,11 @@ import {
   CardContent,
   Select,
   Modal,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 
 const TENANTS = [
   { id: 'tt001', name: 'Nguyễn Văn An', studentId: 'SV20240001', room: 'A101', block: 'Khu A', gender: 'Nam', checkIn: '2026-09-01', checkOut: '2027-06-30', fee: '1.2M', status: 'active', debt: '0' },
@@ -43,6 +45,9 @@ export default function TenantList() {
   const [block, setBlock] = useState('Tất cả');
   const [status, setStatus] = useState('Tất cả');
   const [addModal, setAddModal] = useState(false);
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedTenant = selectedId ? TENANTS.find((t) => t.id === selectedId) : null;
 
   const filtered = TENANTS.filter((t) => {
     const matchSearch = !search || t.name.toLowerCase().includes(search.toLowerCase()) || t.studentId.toLowerCase().includes(search.toLowerCase());
@@ -124,7 +129,7 @@ export default function TenantList() {
                       </span>
                     </TableCell>
                     <TableCell><Badge variant={STATUSES[t.status]?.variant ?? 'neutral'} size="sm">{STATUSES[t.status]?.label}</Badge></TableCell>
-                    <TableCell><Button variant="ghost" size="sm">Chi tiết</Button></TableCell>
+                    <TableCell><Button variant="ghost" size="sm" onClick={() => openDetail(t.id)}>Chi tiết</Button></TableCell>
                   </TableRow>
                 ))
               )}
@@ -178,6 +183,64 @@ export default function TenantList() {
           </div>
         </div>
       </Modal>
+
+      {/* Detail Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedTenant ? selectedTenant.name : ''}
+        description={selectedTenant ? `${selectedTenant.studentId} · Phòng ${selectedTenant.room} · ${selectedTenant.block}` : ''}
+        size="fullscreen"
+      >
+        {selectedTenant ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Mã sinh viên:</span>
+                <span className="font-medium text-[rgb(var(--text-primary))]">{selectedTenant.studentId}</span>
+              </div>
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Họ tên:</span>
+                <span className="font-medium text-[rgb(var(--text-primary))]">{selectedTenant.name}</span>
+              </div>
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Giới tính:</span>
+                <span className="font-medium text-[rgb(var(--text-primary))]">{selectedTenant.gender}</span>
+              </div>
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Phòng:</span>
+                <span className="font-medium text-[rgb(var(--text-primary))]">{selectedTenant.room}</span>
+              </div>
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Khu:</span>
+                <span className="font-medium text-[rgb(var(--text-primary))]">{selectedTenant.block}</span>
+              </div>
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Ngày vào:</span>
+                <span className="font-medium text-[rgb(var(--text-primary))]">{selectedTenant.checkIn}</span>
+              </div>
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Hạn ở:</span>
+                <span className="font-medium text-[rgb(var(--text-primary))]">{selectedTenant.checkOut}</span>
+              </div>
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Phí hàng tháng:</span>
+                <span className="font-medium text-[rgb(var(--text-primary))]">{selectedTenant.fee}</span>
+              </div>
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Công nợ:</span>
+                <span className={`font-medium ${selectedTenant.debt !== '0' ? 'text-[rgb(var(--error))]' : 'text-[rgb(var(--success))]'}`}>
+                  {selectedTenant.debt === '0' ? 'Không' : selectedTenant.debt}
+                </span>
+              </div>
+              <div className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">Trạng thái:</span>
+                <Badge variant={STATUSES[selectedTenant.status]?.variant ?? 'neutral'} size="sm">{STATUSES[selectedTenant.status]?.label}</Badge>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </DetailModal>
     </div>
   );
 }

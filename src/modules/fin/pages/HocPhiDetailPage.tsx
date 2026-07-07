@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  ArrowLeft, Printer, Download, CreditCard, CheckCircle2,
+  Printer, Download, CreditCard, CheckCircle2,
   AlertTriangle, Clock, User, CalendarDays,
 } from 'lucide-react';
 import { Button, Card, CardContent } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const TUITION_DETAIL = {
   id: 'th001',
@@ -45,10 +44,15 @@ function fmt(v: number) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v);
 }
 
-export default function HocPhiDetailPage() {
+interface HocPhiDetailPageProps {
+  id?: string;
+}
+
+export default function HocPhiDetailPage({ id }: HocPhiDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const { t } = useTranslation('fin');
-  const navigate = useNavigate();
-  const d = TUITION_DETAIL;
+  const d = { ...TUITION_DETAIL, id: actualId };
 
   const STATUS_CONFIG: Record<string, { variant: 'info' | 'success' | 'warning' | 'error'; label: string; icon: React.ReactNode }> = {
     paid: { variant: 'success', label: t('tuition.status.paid'), icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
@@ -62,29 +66,15 @@ export default function HocPhiDetailPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`${t('tuition.title')} — ${d.student}`}
-        description={`FIN-01 · ${d.code} · ${d.semester}`}
-        breadcrumbs={[
-          { label: 'FIN', href: '/fin' },
-          { label: t('tuition.title'), href: '/fin/hoc-phi' },
-          { label: d.student },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/fin/hoc-phi')}>
-              {t('detail.tuition.back')}
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Printer className="h-4 w-4" />}>{t('detail.tuition.print')}</Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>{t('detail.tuition.download')}</Button>
-            {d.status !== 'paid' && (
-              <Button size="sm" leftIcon={<CreditCard className="h-4 w-4" />} onClick={() => setShowRemind(true)}>
-                {t('detail.tuition.sendRemind')}
-              </Button>
-            )}
-          </div>
-        }
-      />
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" size="sm" leftIcon={<Printer className="h-4 w-4" />}>{t('detail.tuition.print')}</Button>
+        <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>{t('detail.tuition.download')}</Button>
+        {d.status !== 'paid' && (
+          <Button size="sm" leftIcon={<CreditCard className="h-4 w-4" />} onClick={() => setShowRemind(true)}>
+            {t('detail.tuition.sendRemind')}
+          </Button>
+        )}
+      </div>
 
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))]">
         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-[rgb(var(--${sc.variant})/0.1)] text-[rgb(var(--${sc.variant}))]`}>

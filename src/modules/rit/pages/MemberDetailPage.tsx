@@ -1,11 +1,10 @@
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Edit, FlaskConical, Users, BookOpen,
+  Edit, FlaskConical, Users, BookOpen,
   Award, Calendar, Mail, Phone, Globe, ExternalLink,
   FileText,
 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const MEMBER = {
   id: 'm01',
@@ -29,6 +28,14 @@ const MEMBER = {
   scopus: '5721-ABC-456',
 };
 
+const MEMBERS_MAP: Record<string, typeof MEMBER> = {
+  m01: MEMBER,
+  m02: { ...MEMBER, id: 'm02', code: 'NCV-2018-012', name: 'TS. Thảo Nguyễn', degree: 'Tiến sĩ', field: 'Trí tuệ nhân tạo', dept: 'Khoa CNTT' },
+  m03: { ...MEMBER, id: 'm03', code: 'NCV-2020-023', name: 'TS. Bùi Đình Nam', degree: 'Thạc sĩ', field: 'Kinh tế số', dept: 'Khoa Kinh tế' },
+  m04: { ...MEMBER, id: 'm04', code: 'NCV-2012-003', name: 'PGS.TS. Hoàng Thị Lan', degree: 'Phó Giáo sư', field: 'Quản trị kinh doanh', dept: 'Khoa Kinh tế' },
+  m05: { ...MEMBER, id: 'm05', code: 'NCV-2010-001', name: 'GS.TS. Nguyễn Hoàng Long', degree: 'Giáo sư', field: 'An toàn thông tin', dept: 'Khoa CNTT' },
+};
+
 const PROJECT_HISTORY = [
   { id: 'p1', code: 'NCKH-2024-001', title: 'Ứng dụng AI trong phát hiện gian lận thi cử', role: 'Chủ nhiệm', year: 2024, status: 'done' },
   { id: 'p2', code: 'NCKH-2023-007', title: 'Hệ thống gợi ý học tập thông minh cho sinh viên', role: 'Chủ nhiệm', year: 2023, status: 'done' },
@@ -46,29 +53,20 @@ const PROJECT_STATUS: Record<string, { variant: 'success' | 'warning' | 'neutral
   active: { variant: 'warning', label: 'Đang thực hiện' },
 };
 
-export default function MemberDetailPage() {
-  const navigate = useNavigate();
-  const m = MEMBER;
+interface MemberDetailPageProps {
+  id?: string;
+}
+
+export default function MemberDetailPage({ id }: MemberDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const m = MEMBERS_MAP[actualId] ?? MEMBER;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={m.name}
-        description={`${m.code} · ${m.degree} · ${m.dept}`}
-        breadcrumbs={[
-          { label: 'RIT', href: '/rit' },
-          { label: 'Nghiên cứu viên', href: '/rit/ncv' },
-          { label: m.code },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/rit/ncv')}>
-              Quay lại
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
-          </div>
-        }
-      />
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
+      </div>
 
       {/* Stats strip */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -132,7 +130,7 @@ export default function MemberDetailPage() {
                 {PROJECT_HISTORY.map((proj) => {
                   const sc = PROJECT_STATUS[proj.status];
                   return (
-                    <div key={proj.id} className="px-5 py-3.5 hover:bg-[rgb(var(--bg-hover))] transition-colors cursor-pointer" onClick={() => navigate(`/rit/de-tai/${proj.id}`)}>
+                    <div key={proj.id} className="px-5 py-3.5 hover:bg-[rgb(var(--bg-hover))] transition-colors cursor-pointer">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-0.5">

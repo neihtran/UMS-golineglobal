@@ -1,14 +1,24 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Download, Edit3, Plus, FileSearch } from 'lucide-react';
+import { Download, Edit3, Plus, FileSearch, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, Badge, Button, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TableEmpty, TablePagination } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
 
-const REPORTS = [
-  { id: 'r01', code: 'AUN-2026-01', title: 'Báo cáo tự đánh giá theo chuẩn AUN-QA (Cấp chương trình)', program: 'Công nghệ thông tin', standard: '6 tiêu chuẩn', dept: 'Khoa CNTT', status: 'in_progress', dueDate: '2026-09-30', progress: 45, evidenceCount: 124, lastUpdate: '2026-06-25', assignedTo: 'PGS.TS. Lý Văn Hùng', description: 'Báo cáo đánh giá chương trình CNTT theo tiêu chuẩn AUN-QA, tập trung vào 6 tiêu chuẩn cốt lõi.' },
-  { id: 'r02', code: 'AUN-2026-02', title: 'Báo cáo tự đánh giá theo chuẩn AUN-QA (Cấp chương trình)', program: 'Kinh tế', standard: '6 tiêu chuẩn', dept: 'Khoa Kinh tế', status: 'in_progress', dueDate: '2026-09-30', progress: 30, evidenceCount: 78, lastUpdate: '2026-06-20', assignedTo: 'PGS.TS. Hoàng Thị Lan', description: 'Báo cáo đánh giá chương trình Kinh tế theo AUN-QA.' },
-  { id: 'r03', code: 'AUN-2025-01', title: 'Báo cáo tự đánh giá AUN-QA lần 2', program: 'Công nghệ thông tin', standard: '11 tiêu chuẩn', dept: 'Khoa CNTT', status: 'submitted', dueDate: '2025-12-15', progress: 100, evidenceCount: 312, lastUpdate: '2025-12-10', assignedTo: 'GS.TS. Nguyễn Hoàng Long', description: 'Báo cáo đánh giá toàn diện CTĐT CNTT theo 11 tiêu chuẩn AUN-QA.' },
-];
+interface ReportDetailProps {
+  id?: string;
+}
+
+const REPORTS_MAP: Record<string, {
+  id: string; code: string; title: string; program: string; standard: string;
+  dept: string; status: string; dueDate: string; progress: number;
+  evidenceCount: number; lastUpdate: string; assignedTo: string; description: string;
+}> = {
+  r01: { id: 'r01', code: 'AUN-2026-01', title: 'Báo cáo tự đánh giá theo chuẩn AUN-QA (Cấp chương trình)', program: 'Công nghệ thông tin', standard: '6 tiêu chuẩn', dept: 'Khoa CNTT', status: 'in_progress', dueDate: '2026-09-30', progress: 45, evidenceCount: 124, lastUpdate: '2026-06-25', assignedTo: 'PGS.TS. Lý Văn Hùng', description: 'Báo cáo đánh giá chương trình CNTT theo tiêu chuẩn AUN-QA, tập trung vào 6 tiêu chuẩn cốt lõi.' },
+  r02: { id: 'r02', code: 'AUN-2026-02', title: 'Báo cáo tự đánh giá theo chuẩn AUN-QA (Cấp chương trình)', program: 'Kinh tế', standard: '6 tiêu chuẩn', dept: 'Khoa Kinh tế', status: 'in_progress', dueDate: '2026-09-30', progress: 30, evidenceCount: 78, lastUpdate: '2026-06-20', assignedTo: 'PGS.TS. Hoàng Thị Lan', description: 'Báo cáo đánh giá chương trình Kinh tế theo AUN-QA.' },
+  r03: { id: 'r03', code: 'AUN-2025-01', title: 'Báo cáo tự đánh giá AUN-QA lần 2', program: 'Công nghệ thông tin', standard: '11 tiêu chuẩn', dept: 'Khoa CNTT', status: 'submitted', dueDate: '2025-12-15', progress: 100, evidenceCount: 312, lastUpdate: '2025-12-10', assignedTo: 'GS.TS. Nguyễn Hoàng Long', description: 'Báo cáo đánh giá toàn diện CTĐT CNTT theo 11 tiêu chuẩn AUN-QA.' },
+  r04: { id: 'r04', code: 'KIEMDINH-2024-03', title: 'Kiểm định chất lượng cơ sở giáo dục', program: 'Toàn trường', standard: 'Bộ GD&ĐT', dept: 'Phòng Khảo đảm bảo CL', status: 'not_started', dueDate: '2026-12-31', progress: 0, evidenceCount: 0, lastUpdate: '2026-01-15', assignedTo: 'TS. Thảo Nguyễn', description: 'Báo cáo kiểm định chất lượng cơ sở giáo dục theo Bộ GD&ĐT.' },
+  r05: { id: 'r05', code: 'ISO-2026-01', title: 'Đánh giá nội bộ theo ISO 9001:2015', program: 'Toàn trường', standard: 'ISO 9001:2015', dept: 'Phòng Hành chính', status: 'in_progress', dueDate: '2026-08-31', progress: 65, evidenceCount: 198, lastUpdate: '2026-06-22', assignedTo: 'Chu Hanh', description: 'Báo cáo đánh giá nội bộ theo ISO 9001:2015.' },
+  r06: { id: 'r06', code: 'AUN-2025-02', title: 'Kiểm định AUN-QA lần 1 ngành Luật', program: 'Luật', standard: '11 tiêu chuẩn', dept: 'Khoa Luật', status: 'external_assessed', dueDate: '2025-11-20', progress: 100, evidenceCount: 289, lastUpdate: '2025-11-18', assignedTo: 'TS. Bùi Đình Nam', description: 'Báo cáo kiểm định AUN-QA lần 1 ngành Luật.' },
+};
 
 const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'neutral' | 'info'; label: string }> = {
   submitted: { variant: 'success', label: 'Đã nộp' },
@@ -31,45 +41,26 @@ const EVIDENCE_STATUS = {
   pending: { variant: 'neutral' as const, label: 'Chưa duyệt' },
 };
 
-export default function ReportDetail() {
+export default function ReportDetail({ id }: ReportDetailProps) {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const report = REPORTS.find((r) => r.id === id);
-  const sc = report ? STATUS_CONFIG[report.status] : null;
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const report = REPORTS_MAP[actualId] ?? REPORTS_MAP['r01'];
+  const sc = STATUS_CONFIG[report.status];
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
-
-  if (!report) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-xl font-bold text-[rgb(var(--text-primary))]">Không tìm thấy báo cáo</p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate('/qa/bao-cao')}>Quay lại</Button>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`${report.code} — Chi tiết`}
-        description={report.title}
-        breadcrumbs={[
-          { label: 'QA', href: '/qa' },
-          { label: 'Báo cáo chất lượng', href: '/qa/bao-cao' },
-          { label: report.code },
-        ]}
-        actions={
-          <>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất báo cáo</Button>
-            <Button variant="outline" leftIcon={<Edit3 className="h-4 w-4" />}>Chỉnh sửa</Button>
-            <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => navigate(`/qa/bao-cao/${id}/minh-chung/tao`)}>Thêm minh chứng</Button>
-          </>
-        }
-      />
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất báo cáo</Button>
+        <Button variant="outline" leftIcon={<Edit3 className="h-4 w-4" />}>Chỉnh sửa</Button>
+        <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => navigate(`/qa/bao-cao/${id}/minh-chung/tao`)}>Thêm minh chứng</Button>
+      </div>
 
       <Card>
         <CardContent className="p-6 space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={sc?.variant} dot size="sm">{sc?.label}</Badge>
+            <Badge variant={sc.variant} dot size="sm">{sc.label}</Badge>
             <Badge variant="neutral" size="sm">{report.standard}</Badge>
             <Badge variant="accent" size="sm">{report.program}</Badge>
           </div>
@@ -140,7 +131,7 @@ export default function ReportDetail() {
       </Card>
 
       <div className="flex justify-start">
-        <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/qa/bao-cao')}>
+        <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />}>
           Quay lại danh sách
         </Button>
       </div>

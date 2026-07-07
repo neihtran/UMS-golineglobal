@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Search, Building2, Eye } from 'lucide-react';
-import { Button, Badge, Card, CardContent } from '@/components/ui';
+import { Search, Building2 } from 'lucide-react';
+import { Button, Badge, Card, CardContent, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import RoomDetailPage from './RoomDetailPage';
 
 const ROOMS = [
   { id: 'r1', code: 'A101', floor: 'Tầng 1', type: 'Nam', capacity: 6, occupied: 5, status: 'available', building: 'Khu A' },
@@ -18,9 +19,11 @@ const TYPES_KEYS = ['all', 'Nam', 'Nữ'];
 
 export default function KTXRoomPage() {
   const { t } = useTranslation('ktx');
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedRoom = selectedId ? ROOMS.find((r) => r.id === selectedId) : null;
 
   const STATUS_CONFIG: Record<string, { variant: 'success' | 'error' | 'warning'; label: string }> = {
     available: { variant: 'success', label: t('room.status.availableShort') },
@@ -41,7 +44,6 @@ export default function KTXRoomPage() {
         title={t('room.title')}
         description={t('room.description', { count: ROOMS.length, resident: ROOMS.reduce((s, r) => s + r.occupied, 0) })}
         breadcrumbs={[{ label: 'KTX', href: '/ktx' }, { label: t('room.breadcrumb') }]}
-        actions={<Button variant="outline" size="sm" leftIcon={<Eye className="h-4 w-4" />} onClick={() => navigate('/ktx/phong/A102')}>{t('room.viewDetail')}</Button>}
       />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
@@ -105,12 +107,22 @@ export default function KTXRoomPage() {
                   </div>
                   <p className="text-[10px] text-[rgb(var(--text-muted))] text-right">{pct}% {t('room.occupancy')}</p>
                 </div>
-                <Button variant="ghost" size="sm" className="w-full mt-2" onClick={() => navigate(`/ktx/phong/${r.code}`)}>{t('room.detail')}</Button>
+                <Button variant="ghost" size="sm" className="w-full mt-2" onClick={() => openDetail(r.id)}>{t('room.detail')}</Button>
               </CardContent>
             </Card>
           );
         })}
       </div>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedRoom ? `Phòng ${selectedRoom.code}` : ''}
+        description={selectedRoom ? `${selectedRoom.building} · ${selectedRoom.floor} · ${selectedRoom.type}` : ''}
+        size="fullscreen"
+      >
+        {selectedRoom ? <RoomDetailPage id={selectedRoom.code} /> : null}
+      </DetailModal>
     </div>
   );
 }

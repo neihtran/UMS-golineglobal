@@ -5,22 +5,31 @@ import { Save } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 
-const DEPARTMENTS = ['Khoa CNTT', 'Khoa Kinh te', 'Khoa Luat', 'Khoa Ngoai ngu', 'Khoa Su pham', 'Khoa Y duoc', 'Phong To chuc', 'Phong Tai chinh', 'Phong Dao tao'];
-const CONTRACT_TYPES = ['Co huu', 'Thinh giang', 'Thu viec'];
-const TITLES = ['Giao su', 'Pho Giao su', 'Tien si', 'Thac si', 'Ky su', 'Cu nhan'];
-const EDUCATIONS = ['Tien si', 'Thac si', 'Dai hoc', 'Cao dang'];
+const DEPARTMENTS = ['Khoa CNTT', 'Khoa Kinh tế', 'Khoa Luật', 'Khoa Ngoại ngữ', 'Khoa Sư phạm', 'Khoa Y dược', 'Phòng Tổ chức', 'Phòng Tài chính', 'Phòng Đào tạo'];
+const CONTRACT_TYPES = ['Cơ hữu', 'Thỉnh giảng', 'Thử việc'];
+const TITLES = ['Giáo sư', 'Phó Giáo sư', 'Tiến sĩ', 'Thạc sĩ', 'Kỹ sư', 'Cử nhân'];
+const EDUCATIONS = ['Tiến sĩ', 'Thạc sĩ', 'Đại học', 'Cao đẳng'];
 
-export default function VienChucCreate() {
+interface VienChucCreateProps {
+  /** Khi dùng trong modal — gọi sau khi submit thành công, thay vì navigate */
+  onSuccess?: () => void;
+}
+
+export default function VienChucCreate({ onSuccess }: VienChucCreateProps = {}) {
   const { t } = useTranslation('hrm');
   const navigate = useNavigate();
   const [form, setForm] = useState({
     code: '', name: '', dob: '', cccd: '', gender: 'Nam', ethnicity: 'Kinh', address: '', phone: '', email: '',
-    dept: '', title: '', position: '', contractType: 'Co huu', salary: '', education: '', major: '', school: '', gradYear: '',
+    dept: '', title: '', position: '', contractType: 'Cơ hữu', salary: '', education: '', major: '', school: '', gradYear: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/hrm/vien-chuc');
+    if (onSuccess) {
+      onSuccess();
+    } else {
+      navigate('/hrm/vien-chuc');
+    }
   };
 
   const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
@@ -128,7 +137,7 @@ export default function VienChucCreate() {
         </Card>
 
         <div className="flex items-center justify-end gap-3">
-          <Button variant="outline" onClick={() => navigate('/hrm/vien-chuc')}>{t('vienChucCreate.btn.cancel')}</Button>
+          <Button variant="outline" onClick={onSuccess ?? (() => navigate('/hrm/vien-chuc'))}>{t('vienChucCreate.btn.cancel')}</Button>
           <Button type="submit" leftIcon={<Save className="h-4 w-4" />}>{t('vienChucCreate.btn.save')}</Button>
         </div>
       </form>

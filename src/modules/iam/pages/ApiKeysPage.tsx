@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   Key, Plus, Copy, Trash2, Eye, EyeOff, CheckCircle2,
-  RefreshCw, Shield, Globe, Activity, ToggleLeft, ToggleRight,
+  RefreshCw, Shield, Globe, Activity,
 } from 'lucide-react';
 import {
   Button, Badge, Card, CardContent, Switch,
@@ -37,12 +37,6 @@ const API_KEYS = [
     keyPreview: 'ums_cdio_sk_•••••••••••••••••5d28', createdBy: 'Thảo Nguyễn', createdAt: '2025-04-12', lastUsed: '2026-06-24 18:00', scope: ['dce:read', 'sis:read'], status: 'active', usage: 892, dailyLimit: 2000,
   },
 ];
-
-const STATUS_CONFIG: Record<string, { variant: 'success' | 'neutral' | 'error'; label: string }> = {
-  active: { variant: 'success', label: 'Hoạt động' },
-  inactive: { variant: 'neutral', label: 'Tắt' },
-  revoked: { variant: 'error', label: 'Đã thu hồi' },
-};
 
 export default function ApiKeysPage() {
   const [showKey, setShowKey] = useState<string | null>(null);

@@ -1,10 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Download, Edit, FileText, Calendar, TrendingUp,
+  Download, Edit, FileText, Calendar, TrendingUp,
   Users, Award, BarChart3,
 } from 'lucide-react';
 import { Card, CardContent, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 
 const REPORT = {
@@ -59,30 +58,27 @@ const REPORT = {
   ],
 };
 
-export default function ReportDetailPage() {
-  const navigate = useNavigate();
-  const r = REPORT;
+const REPORTS_MAP: Record<string, typeof REPORT> = {
+  r2026: REPORT,
+  r2025: { ...REPORT, id: 'r2025', title: 'Báo cáo công tác Đảng Q1/2026', period: 'Quý I/2026' },
+  r2024: { ...REPORT, id: 'r2024', title: 'Báo cáo kiểm điểm đảng viên năm 2025', period: 'Năm 2025' },
+};
+
+interface ReportDetailPageProps {
+  id?: string;
+}
+
+export default function ReportDetailPage({ id }: ReportDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const r = REPORTS_MAP[actualId] ?? REPORT;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={r.title}
-        description={`${r.period} · ${r.createdAt}`}
-        breadcrumbs={[
-          { label: 'PMS', href: '/pms' },
-          { label: 'Báo cáo', href: '/pms/bao-cao' },
-          { label: r.period },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/pms/bao-cao')}>
-              Quay lại
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>Tải PDF</Button>
-          </div>
-        }
-      />
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
+        <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>Tải PDF</Button>
+      </div>
 
       {/* Overview stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

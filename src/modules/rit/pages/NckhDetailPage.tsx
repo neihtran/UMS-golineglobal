@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Edit, RefreshCw, Users, Calendar, DollarSign,
+  Edit, RefreshCw, Users, Calendar, DollarSign,
   BookOpen, CheckCircle2, FileText, Plus,
 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const PROJECT = {
   id: 'p1',
@@ -44,6 +43,13 @@ const PROJECT = {
   ],
 };
 
+const PROJECT_MAP: Record<string, typeof PROJECT> = {
+  p1: PROJECT,
+  p2: { ...PROJECT, id: 'p2', code: 'HTQT-2026-001', title: 'Hợp tác với ĐH Tokyo về nghiên cứu Data Science', leader: 'PGS.TS. Lê Thị Lan' },
+  p3: { ...PROJECT, id: 'p3', code: 'NCKH-2026-002', title: 'Phát triển ứng dụng IoT cho nông nghiệp thông minh', leader: 'TS. Bùi Minh Tuấn' },
+  p4: { ...PROJECT, id: 'p4', code: 'NCKH-2025-003', title: 'Mô hình dự báo thời tiết sử dụng Deep Learning', leader: 'TS. Hoàng Thu Lan' },
+};
+
 const MILESTONE_STATUS: Record<string, { variant: 'success' | 'warning' | 'info' | 'neutral'; label: string }> = {
   completed: { variant: 'success', label: 'Hoàn thành' },
   in_progress: { variant: 'warning', label: 'Đang thực hiện' },
@@ -59,31 +65,22 @@ function formatVND(v: number) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(v);
 }
 
-export default function NckhDetailPage() {
-  const navigate = useNavigate();
+interface NckhDetailPageProps {
+  id?: string;
+}
+
+export default function NckhDetailPage({ id }: NckhDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const [showExtend, setShowExtend] = useState(false);
-  const p = PROJECT;
+  const p = PROJECT_MAP[actualId] ?? PROJECT;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={p.title}
-        description={`${p.code} · ${p.level} · ${p.dept}`}
-        breadcrumbs={[
-          { label: 'RIT', href: '/rit' },
-          { label: 'Đề tài NCKH', href: '/rit/hop-tac' },
-          { label: p.code },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/rit/hop-tac')}>
-              Quay lại
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<RefreshCw className="h-4 w-4" />} onClick={() => setShowExtend(true)}>Gia hạn</Button>
-            <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
-          </div>
-        }
-      />
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" size="sm" leftIcon={<RefreshCw className="h-4 w-4" />} onClick={() => setShowExtend(true)}>Gia hạn</Button>
+        <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
+      </div>
 
       {/* Overview stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

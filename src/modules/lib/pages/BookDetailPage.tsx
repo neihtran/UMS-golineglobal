@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, BookOpen, Star, MapPin, Hash, User,
+  BookOpen, Star, MapPin, Hash, User,
   BarChart2, Download, Printer, BookMarked as BorrowIcon,
   CheckCircle2, Clock,
 } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const BOOK_DETAIL = {
   id: 'b1',
@@ -47,36 +46,27 @@ const STATUS_CONFIG: Record<string, { variant: 'warning' | 'success' | 'error'; 
   returned: { variant: 'success', label: 'Đã trả' },
 };
 
-export default function BookDetailPage() {
-  const navigate = useNavigate();
+interface BookDetailPageProps {
+  id?: string;
+}
+
+export default function BookDetailPage({ id }: BookDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const [showBorrow, setShowBorrow] = useState(false);
-  const d = BOOK_DETAIL;
+  const d = { ...BOOK_DETAIL, id: actualId };
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={d.title}
-        description={`LIB-01 · ${d.isbn} · ${d.category}`}
-        breadcrumbs={[
-          { label: 'LIB', href: '/lib' },
-          { label: 'Tài liệu', href: '/lib/tai-lieu' },
-          { label: d.title },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/lib/tai-lieu')}>
-              Quay lại
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Printer className="h-4 w-4" />}>In thông tin</Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>Tải file</Button>
-            {d.available > 0 && (
-              <Button size="sm" leftIcon={<BorrowIcon className="h-4 w-4" />} onClick={() => setShowBorrow(true)}>
-                Mượn tài liệu
-              </Button>
-            )}
-          </div>
-        }
-      />
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" size="sm" leftIcon={<Printer className="h-4 w-4" />}>In thông tin</Button>
+        <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>Tải file</Button>
+        {d.available > 0 && (
+          <Button size="sm" leftIcon={<BorrowIcon className="h-4 w-4" />} onClick={() => setShowBorrow(true)}>
+            Mượn tài liệu
+          </Button>
+        )}
+      </div>
 
       {/* Status strip */}
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))]">
@@ -271,7 +261,7 @@ export default function BookDetailPage() {
 
       {/* Borrow modal */}
       {showBorrow && (
-        <BorrowModal book={d} onClose={() => setShowBorrow(false)} onSuccess={() => navigate('/lib/tai-lieu')} />
+        <BorrowModal book={d} onClose={() => setShowBorrow(false)} onSuccess={() => setShowBorrow(false)} />
       )}
     </div>
   );

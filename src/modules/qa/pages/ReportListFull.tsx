@@ -7,10 +7,12 @@ import {
 } from 'lucide-react';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty,
+  TableHeadCell, TableCell, TablePagination, TableEmpty, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import ReportDetail from './ReportDetail';
 
 const REPORTS = [
   { id: 'r01', code: 'AUN-2026-01', title: 'Báo cáo tự đánh giá theo chuẩn AUN-QA (Cấp chương trình)', program: 'Công nghệ thông tin', standard: '6 tiêu chuẩn', dept: 'Khoa CNTT', status: 'in_progress', dueDate: '2026-09-30', progress: 45, evidenceCount: 124, lastUpdate: '2026-06-25', assignedTo: 'PGS.TS. Lý Văn Hùng' },
@@ -28,6 +30,9 @@ export default function QAReportList() {
   const [search, setSearch] = useState('');
   const [dept, setDept] = useState('all');
   const [status, setStatus] = useState('all');
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+
+  const selectedReport = selectedId ? REPORTS.find((r) => r.id === selectedId) : null;
 
   const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'info' | 'neutral' | 'error'; label: string }> = {
     submitted: { variant: 'success', label: t('report.status.submitted') },
@@ -142,7 +147,7 @@ export default function QAReportList() {
                   <TableCell><Badge variant={sc.variant} dot size="sm">{sc.label}</Badge></TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/qa/bao-cao/${r.id}`)}>{t('table.view')}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(r.id)}>{t('table.view')}</Button>
                       <Button variant="ghost" size="sm" onClick={() => navigate(`/qa/bao-cao/${r.id}/minh-chung`)}>{t('report.evidence')}</Button>
                     </div>
                   </TableCell>
@@ -158,6 +163,16 @@ export default function QAReportList() {
         onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedReport ? `${selectedReport.code} — Chi tiết` : ''}
+        description={selectedReport ? selectedReport.title : ''}
+        size="fullscreen"
+      >
+        {selectedId ? <ReportDetail id={selectedId} /> : null}
+      </DetailModal>
     </div>
   );
 }

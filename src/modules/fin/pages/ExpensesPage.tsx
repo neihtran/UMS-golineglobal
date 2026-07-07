@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, TrendingUp, DollarSign, PieChart, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Badge } from '@/components/ui';
+import { Button, Badge, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import ChiTieuDetailPage from './ChiTieuDetailPage';
 
 const EXPENSES = [
   { id: 'e1', code: 'CP001', description: 'Chi phí vật liệu văn phòng Q1/2026', category: 'Vật liệu', amount: 45000000, dept: 'Phòng HC', date: '2026-03-15', status: 'approved' },
@@ -28,6 +30,9 @@ export default function ExpensesPage() {
   const navigate = useNavigate();
   const { pagination, setPage } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedExpense = selectedId ? EXPENSES.find((e) => e.id === selectedId) : null;
 
   const filtered = EXPENSES.filter((e) =>
     !search || e.description.toLowerCase().includes(search.toLowerCase()) || e.code.toLowerCase().includes(search.toLowerCase()),
@@ -97,13 +102,23 @@ export default function ExpensesPage() {
                 <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">{e.date}</td>
                 <td className="px-4 py-3"><Badge variant={STATUS_CONFIG[e.status].variant} dot size="sm">{STATUS_CONFIG[e.status].label}</Badge></td>
                 <td className="px-4 py-3">
-                  <Button variant="ghost" size="sm" onClick={() => navigate(`/fin/chi-tieu/${e.id}`)}>{t('expenditure.detail')}</Button>
+                  <Button variant="ghost" size="sm" onClick={() => openDetail(e.id)}>{t('expenditure.detail')}</Button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedExpense ? selectedExpense.description : ''}
+        description={selectedExpense ? `${selectedExpense.code} · ${selectedExpense.category}` : ''}
+        size="fullscreen"
+      >
+        {selectedExpense ? <ChiTieuDetailPage id={selectedExpense.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

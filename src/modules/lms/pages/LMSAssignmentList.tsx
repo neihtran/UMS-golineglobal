@@ -1,12 +1,22 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Search, CheckCircle2, Clock, AlertTriangle, FileText, Edit2, Eye, Download } from 'lucide-react';
 import {
-  Button, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty,
+  Button,
+  Badge,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeadCell,
+  TableCell,
+  TablePagination,
+  TableEmpty,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import AssignmentView from './AssignmentView';
 
 const ASSIGNMENTS = [
   { id: 'a1', courseCode: 'CS101', course: 'Nhập môn Lập trình Python', title: 'Bài tập tuần 3 — Vòng lặp', type: 'individual', instructor: 'TS. Nguyễn Văn Minh', due: '2026-06-30', maxScore: 10, submitted: 245, graded: 240, status: 'open', studentCount: 298 },
@@ -25,11 +35,13 @@ const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' |
 };
 
 export default function LMSAssignmentList() {
-  const navigate = useNavigate();
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
   const [course, setCourse] = useState('Tất cả');
   const [status, setStatus] = useState('all');
+
+  const { selectedId, openDetail, close } = useDetailModal<string>({ size: 'fullscreen' });
+  const selectedAssignment = selectedId ? ASSIGNMENTS.find((a) => a.id === selectedId) : null;
 
   const courses = ['Tất cả', ...Array.from(new Set(ASSIGNMENTS.map((a) => a.course)))];
   const statuses = ['all', 'open', 'closed', 'draft'];
@@ -60,9 +72,7 @@ export default function LMSAssignmentList() {
         actions={
           <>
             <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất danh sách</Button>
-            <Link to="/lms/bai-tap/tao">
-              <Button leftIcon={<Plus className="h-4 w-4" />}>Tạo bài tập mới</Button>
-            </Link>
+            <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => window.location.href = '/lms/bai-tap/tao'}>Tạo bài tập mới</Button>
           </>
         }
       />
@@ -165,9 +175,9 @@ export default function LMSAssignmentList() {
                   <TableCell>
                     <div className="flex gap-1">
                       <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />}
-                        onClick={() => navigate(`/lms/bai-tap/${a.id}`)}>Xem</Button>
+                        onClick={() => openDetail(a.id)}>Xem</Button>
                       <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />}
-                        onClick={() => navigate(`/lms/bai-tap/${a.id}/cham`)}>Chấm</Button>
+                        onClick={() => window.location.href = `/lms/bai-tap/${a.id}/cham`}>Chấm</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -182,6 +192,19 @@ export default function LMSAssignmentList() {
         onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      {/* Detail Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedAssignment ? selectedAssignment.title : ''}
+        description={selectedAssignment ? `${selectedAssignment.courseCode} · ${selectedAssignment.course}` : ''}
+        size="fullscreen"
+      >
+        {selectedAssignment ? (
+          <AssignmentView id={selectedAssignment.id} />
+        ) : null}
+      </DetailModal>
     </div>
   );
 }

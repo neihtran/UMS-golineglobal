@@ -1,19 +1,30 @@
 import { useState } from 'react';
-import { ArrowLeft, RefreshCw, CheckCircle2, AlertTriangle, XCircle, Plug } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { RefreshCw, CheckCircle2, AlertTriangle, XCircle, Plug } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
-const INTEGRATION = {
-  id: 'int1',
-  name: 'HEMIS - He thong thong tin quan ly giao duc',
-  type: 'Government',
-  direction: 'bidirectional' as const,
-  status: 'active' as const,
-  uptime: 99.8,
-  lastSync: '2026-06-26 07:30:15',
-  eventsToday: 1247,
-  endpoint: 'https://hemis.moet.edu.vn/api/v1',
-  description: 'Ket noi du lieu sinh vien, chuong trinh dao tao, van bang voi HEMIS quoc gia.',
+interface IntegrationDetailProps {
+  id?: string;
+}
+
+type IntegrationStatus = 'active' | 'warning' | 'inactive';
+type IntegrationDirection = 'push' | 'pull' | 'bidirectional';
+
+const INTEGRATIONS_MAP: Record<string, {
+  id: string; name: string; type: string; direction: IntegrationDirection;
+  status: IntegrationStatus; uptime: number; lastSync: string; eventsToday: number;
+  endpoint: string; description: string;
+}> = {
+  i1: { id: 'i1', name: 'HEMIS API', type: 'Government', direction: 'bidirectional', status: 'active', uptime: 99.8, lastSync: '2026-06-26 07:30:15', eventsToday: 1247, endpoint: 'https://hemis.moet.edu.vn/api/v1', description: 'Kết nối dữ liệu sinh viên, chương trình đào tạo, văn bằng với HEMIS quốc gia.' },
+  i2: { id: 'i2', name: 'Học trực tuyến LMS', type: 'LMS', direction: 'pull', status: 'active', uptime: 99.2, lastSync: '2026-06-26 07:25:00', eventsToday: 480, endpoint: 'https://lms.truong.edu.vn/api', description: 'Nhận kết quả học tập, điểm thi, tiến độ sinh viên.' },
+  i3: { id: 'i3', name: 'Email University', type: 'Email', direction: 'push', status: 'active', uptime: 100, lastSync: '2026-06-26 07:28:00', eventsToday: 124, endpoint: 'smtp://email.truong.edu.vn', description: 'Gửi thông báo, nhắc nhở, newsletter cho sinh viên và giảng viên.' },
+  i4: { id: 'i4', name: 'Cổng thông tin PORTAL', type: 'Portal', direction: 'bidirectional', status: 'active', uptime: 99.5, lastSync: '2026-06-26 07:27:00', eventsToday: 85, endpoint: 'https://portal.truong.edu.vn/api', description: 'Hiển thị tin tức, thông báo, dữ liệu công khai.' },
+  i5: { id: 'i5', name: 'Thi trực tuyến EXAM', type: 'Exam', direction: 'pull', status: 'active', uptime: 98.7, lastSync: '2026-06-26 07:20:00', eventsToday: 62, endpoint: 'https://exam.truong.edu.vn/api', description: 'Lấy danh sách thi, gửi kết quả thi về hệ thống.' },
+  i6: { id: 'i6', name: 'Thư viện số LIB', type: 'Library', direction: 'pull', status: 'warning', uptime: 95.2, lastSync: '2026-06-26 06:30:00', eventsToday: 28, endpoint: 'https://lib.truong.edu.vn/api', description: 'Tra cứu tài liệu, lịch sử mượn trả.' },
+  i7: { id: 'i7', name: 'API Tuyển sinh Bộ', type: 'Government', direction: 'push', status: 'active', uptime: 100, lastSync: '2026-06-26 07:00:00', eventsToday: 3, endpoint: 'https://tuyensinh.moet.gov.vn/api', description: 'Gửi dữ liệu tuyển sinh lên hệ thống Bộ GD&ĐT.' },
+  i8: { id: 'i8', name: 'Hệ thống KTX', type: 'KTX', direction: 'bidirectional', status: 'warning', uptime: 94.1, lastSync: '2026-06-26 05:30:00', eventsToday: 15, endpoint: 'https://ktx.truong.edu.vn/api', description: 'Đồng bộ danh sách sinh viên ở KTX.' },
+  i9: { id: 'i9', name: 'Chatbot hỗ trợ SV', type: 'LMS', direction: 'pull', status: 'active', uptime: 99.9, lastSync: '2026-06-26 07:29:00', eventsToday: 340, endpoint: 'https://chatbot.truong.edu.vn/api', description: 'Tự động trả lời thắc mắc sinh viên 24/7.' },
+  i10: { id: 'i10', name: 'Hệ thống hóa đơn điện tử', type: 'FIN', direction: 'push', status: 'active', uptime: 99.4, lastSync: '2026-06-26 07:15:00', eventsToday: 56, endpoint: 'https://einvoice.vnpt.vn/api', description: 'Gửi hóa đơn điện tử qua VNPT/eSMS.' },
 };
 
 const EVENTS = [
@@ -34,8 +45,10 @@ const DIR_CONFIG: Record<string, string> = {
   push: 'Day du lieu', pull: 'Nhan du lieu', bidirectional: 'Hai chieu',
 };
 
-export default function IntegrationDetail() {
-  const intg = INTEGRATION;
+export default function IntegrationDetail({ id }: IntegrationDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const intg = INTEGRATIONS_MAP[actualId] ?? INTEGRATIONS_MAP['i1'];
   const [syncing, setSyncing] = useState(false);
 
   const handleSync = () => {
@@ -45,28 +58,14 @@ export default function IntegrationDetail() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={intg.name}
-        description={intg.type + ' / ' + DIR_CONFIG[intg.direction] + ' / Endpoint: ' + intg.endpoint}
-        breadcrumbs={[
-          { label: 'INT', href: '/int' },
-          { label: 'Tich hop', href: '/int/tich-hop' },
-          { label: intg.type },
-        ]}
-        actions={
-          <div className="flex items-center gap-2">
-            <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => window.location.href = '/int/tich-hop'}>
-              Quay lai
-            </Button>
-            <Button
-              leftIcon={<RefreshCw className={'h-4 w-4' + (syncing ? ' animate-spin' : '')} />}
-              onClick={handleSync}
-            >
-              Dong bo ngay
-            </Button>
-          </div>
-        }
-      />
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button
+          leftIcon={<RefreshCw className={'h-4 w-4' + (syncing ? ' animate-spin' : '')} />}
+          onClick={handleSync}
+        >
+          Đồng bộ ngay
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>

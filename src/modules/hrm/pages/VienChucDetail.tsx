@@ -1,28 +1,62 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Mail, Phone, Building2, Calendar, Award, Edit2, ArrowLeft, Printer, Plus, FileText, Download } from 'lucide-react';
+import { Mail, Phone, Building2, Calendar, Award, Edit2, Plus, FileText, Download } from 'lucide-react';
 import { Button, Badge, Card, CardContent, CardHeader, CardTitle, Modal, Input } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
-const MOCK_STAFF = {
-  id: 'vc001', code: 'VC-2020-001', name: 'Nguyen Hoang Long', dob: '1985-03-15',
-  cccd: '025 085 001234', gender: 'Nam', ethnicity: 'Kinh', religion: 'Khong',
-  address: 'So 12, Duong Nguyen Trai, Quan 1, TP.HCM',
-  contact: '48/5 Duong Le Van Viet, Quan 9, TP.HCM',
-  phone: '0912 345 678', email: 'long.nguyen@truong.edu.vn',
-  title: 'PGS.TS', position: 'Truong khoa', dept: 'Khoa CNTT',
-  contractType: 'Co huu', salary: 18500000, status: 'active', joinDate: '2015-09-01',
-  education: 'Tien si', major: 'Khoa hoc May tinh', school: 'DH Bach Khoa TP.HCM', gradYear: 2012,
-  languages: [{ name: 'Tieng Anh', level: 'IELTS 7.0' }, { name: 'Tieng Phap', level: 'B1' }],
-  itSkills: 'MOS Excel, Word',
+const MOCK_STAFF_MAP: Record<string, {
+  id: string; code: string; name: string; dob: string;
+  cccd: string; gender: string; ethnicity: string; religion: string;
+  address: string; contact: string; phone: string; email: string;
+  title: string; position: string; dept: string;
+  contractType: string; salary: number; status: string; joinDate: string;
+  education: string; major: string; school: string; gradYear: number;
+  languages: { name: string; level: string }[];
+  itSkills: string;
+}> = {
+  vc001: {
+    id: 'vc001', code: 'VC-2020-001', name: 'Nguyễn Hoàng Long', dob: '1985-03-15',
+    cccd: '025 085 001234', gender: 'Nam', ethnicity: 'Kinh', religion: 'Không',
+    address: 'Số 12, Đường Nguyễn Trãi, Quận 1, TP.HCM',
+    contact: '48/5 Đường Lê Văn Việt, Quận 9, TP.HCM',
+    phone: '0912 345 678', email: 'long.nguyen@truong.edu.vn',
+    title: 'PGS.TS', position: 'Trưởng khoa', dept: 'Khoa CNTT',
+    contractType: 'Cơ hữu', salary: 18500000, status: 'active', joinDate: '2015-09-01',
+    education: 'Tiến sĩ', major: 'Khoa học Máy tính', school: 'ĐH Bách Khoa TP.HCM', gradYear: 2012,
+    languages: [{ name: 'Tiếng Anh', level: 'IELTS 7.0' }, { name: 'Tiếng Pháp', level: 'B1' }],
+    itSkills: 'MOS Excel, Word',
+  },
+  vc002: {
+    id: 'vc002', code: 'VC-2018-042', name: 'Trần Thị Mai Lan', dob: '1990-07-22',
+    cccd: '025 085 002345', gender: 'Nữ', ethnicity: 'Kinh', religion: 'Không',
+    address: 'Số 5, Đường Pasteur, Quận 1, TP.HCM',
+    contact: '15 Đường Nguyễn Du, Quận 1, TP.HCM',
+    phone: '0913 456 789', email: 'mai.tran@truong.edu.vn',
+    title: 'TS', position: 'Phó trưởng khoa', dept: 'Khoa Kinh tế',
+    contractType: 'Cơ hữu', salary: 15200000, status: 'active', joinDate: '2013-09-01',
+    education: 'Tiến sĩ', major: 'Kinh tế Quốc tế', school: 'ĐH Kinh tế TP.HCM', gradYear: 2010,
+    languages: [{ name: 'Tiếng Anh', level: 'IELTS 8.0' }],
+    itSkills: 'MOS Word, PowerPoint',
+  },
+  vc003: {
+    id: 'vc003', code: 'VC-2022-108', name: 'Lê Văn Minh', dob: '1995-11-08',
+    cccd: '025 085 003456', gender: 'Nam', ethnicity: 'Kinh', religion: 'Không',
+    address: 'Số 88, Đường Trần Hưng Đạo, Quận 5, TP.HCM',
+    contact: '88 Đường Trần Hưng Đạo, Quận 5, TP.HCM',
+    phone: '0914 567 890', email: 'minh.le@truong.edu.vn',
+    title: 'ThS', position: 'Giảng viên', dept: 'Khoa Luật',
+    contractType: 'Thử việc', salary: 9800000, status: 'trial', joinDate: '2026-01-15',
+    education: 'Thạc sĩ', major: 'Luật Học', school: 'ĐH Luật TP.HCM', gradYear: 2022,
+    languages: [{ name: 'Tiếng Anh', level: 'IELTS 6.0' }],
+    itSkills: 'Word, Excel',
+  },
 };
 
 const CONTRACT_HISTORY = [
-  { year: '2015', type: 'Thu viec', note: 'HD 03 thang', status: 'Het han' },
-  { year: '2015', type: 'Co huu lan 1', note: 'HD 12 thang', status: 'Het han' },
-  { year: '2016', type: 'Co huu lan 2', note: 'HD khong xac dinh thoi han', status: 'Het han' },
-  { year: '2020', type: 'Bo nhiem Truong khoa', note: 'QD so 234/TK-2020', status: 'Hieu luc' },
+  { year: '2015', type: 'Thử việc', note: 'HD 03 tháng', status: 'Hết hạn' },
+  { year: '2015', type: 'Cơ hữu lần 1', note: 'HD 12 tháng', status: 'Hết hạn' },
+  { year: '2016', type: 'Cơ hữu lần 2', note: 'HD không xác định thời hạn', status: 'Hết hạn' },
+  { year: '2020', type: 'Bổ nhiệm Trưởng khoa', note: 'QĐ số 234/TK-2020', status: 'Hiệu lực' },
 ];
 
 const SALARY_HISTORY = [
@@ -32,28 +66,28 @@ const SALARY_HISTORY = [
 ];
 
 const TRAINING = [
-  { id: 'tr01', name: 'Phuong phap giang day hien dai', org: 'Bo GD&DT', year: 2023, cert: 'Chung chi' },
-  { id: 'tr02', name: 'Ky nang lanh dao cho Truong khoa', org: 'Hoc vien Hanh chinh', year: 2022, cert: 'Chung chi' },
-  { id: 'tr03', name: 'AI trong giao duc dai hoc', org: 'DH RMIT', year: 2024, cert: 'Chung chi' },
+  { id: 'tr01', name: 'Phương pháp giảng dạy hiện đại', org: 'Bộ GD&ĐT', year: 2023, cert: 'Chứng chỉ' },
+  { id: 'tr02', name: 'Kỹ năng lãnh đạo cho Trưởng khoa', org: 'Học viện Hành chính', year: 2022, cert: 'Chứng chỉ' },
+  { id: 'tr03', name: 'AI trong giáo dục đại học', org: 'ĐH RMIT', year: 2024, cert: 'Chứng chỉ' },
 ];
 
 const DISCIPLINE = [
-  { year: 2023, type: 'Khen thuong', note: 'Chien si thi dua cap truong', level: 'success' },
-  { year: 2022, type: 'Khen thuong', note: 'Tap the lop xuat sac', level: 'success' },
-  { year: 2021, type: 'Ky luat', note: 'Nhac nho vi pham gio giang', level: 'warning' },
+  { year: 2023, type: 'Khen thưởng', note: 'Chiến sĩ thi đua cấp trường', level: 'success' },
+  { year: 2022, type: 'Khen thưởng', note: 'Tập thể lớp xuất sắc', level: 'success' },
+  { year: 2021, type: 'Kỷ luật', note: 'Nhắc nhở vi phạm giờ giảng', level: 'warning' },
 ];
 
 const APPOINTMENTS = [
-  { id: 'apt01', type: 'Bo nhiem', title: 'Truong khoa CNTT', decisionNo: '234/TK-2020', decisionDate: '2020-06-10', effectiveDate: '2020-06-15', signer: 'Hieu truong', status: 'Het hieu luc', statusVariant: 'neutral' as const, isCurrent: false },
-  { id: 'apt02', type: 'Bo nhiem lai', title: 'Truong khoa CNTT', decisionNo: '112/TK-2024', decisionDate: '2024-06-05', effectiveDate: '2024-06-10', signer: 'Hieu truong', status: 'Hieu luc', statusVariant: 'success' as const, isCurrent: true },
-  { id: 'apt03', type: 'Dieu chuyen', title: 'Giang vien Khoa CNTT', decisionNo: 'QD-2015-001', decisionDate: '2015-09-01', effectiveDate: '2015-09-01', signer: 'Hieu truong', status: 'Het hieu luc', statusVariant: 'neutral' as const, isCurrent: false },
+  { id: 'apt01', type: 'Bổ nhiệm', title: 'Trưởng khoa CNTT', decisionNo: '234/TK-2020', decisionDate: '2020-06-10', effectiveDate: '2020-06-15', signer: 'Hiệu trưởng', status: 'Hết hiệu lực', statusVariant: 'neutral' as const, isCurrent: false },
+  { id: 'apt02', type: 'Bổ nhiệm lại', title: 'Trưởng khoa CNTT', decisionNo: '112/TK-2024', decisionDate: '2024-06-05', effectiveDate: '2024-06-10', signer: 'Hiệu trưởng', status: 'Hiệu lực', statusVariant: 'success' as const, isCurrent: true },
+  { id: 'apt03', type: 'Điều chuyển', title: 'Giảng viên Khoa CNTT', decisionNo: 'QĐ-2015-001', decisionDate: '2015-09-01', effectiveDate: '2015-09-01', signer: 'Hiệu trưởng', status: 'Hết hiệu lực', statusVariant: 'neutral' as const, isCurrent: false },
 ];
 
 const ATTACHMENTS = [
-  { name: 'Bang Tien si', type: 'PDF', size: '2.4 MB', date: '2012-05-20' },
-  { name: 'CCCD mat truoc', type: 'JPG', size: '1.1 MB', date: '2020-09-01' },
-  { name: 'HDLKhong xac dinh', type: 'PDF', size: '0.8 MB', date: '2016-03-15' },
-  { name: 'QD bo nhiem TK 2024', type: 'PDF', size: '0.5 MB', date: '2024-06-05' },
+  { name: 'Bằng Tiến sĩ', type: 'PDF', size: '2.4 MB', date: '2012-05-20' },
+  { name: 'CCCD mặt trước', type: 'JPG', size: '1.1 MB', date: '2020-09-01' },
+  { name: 'HĐL không xác định', type: 'PDF', size: '0.8 MB', date: '2016-03-15' },
+  { name: 'QĐ bổ nhiệm TK 2024', type: 'PDF', size: '0.5 MB', date: '2024-06-05' },
 ];
 
 const TAB_KEYS = [
@@ -90,7 +124,13 @@ type SelectField = React.ChangeEvent<HTMLSelectElement>;
 type InputField = React.ChangeEvent<HTMLInputElement>;
 type TextareaField = React.ChangeEvent<HTMLTextAreaElement>;
 
-export default function VienChucDetail() {
+interface VienChucDetailProps {
+  id?: string;
+}
+
+export default function VienChucDetail({ id }: VienChucDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const { t } = useTranslation('hrm');
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const [personalOpen, setPersonalOpen] = useState(false);
@@ -103,51 +143,19 @@ export default function VienChucDetail() {
   const [leaveOpen, setLeaveOpen] = useState(false);
   const [disciplineOpen, setDisciplineOpen] = useState(false);
 
-  const [personalForm, setPersonalForm] = useState({
-    name: MOCK_STAFF.name, dob: MOCK_STAFF.dob, cccd: MOCK_STAFF.cccd,
-    phone: MOCK_STAFF.phone, email: MOCK_STAFF.email,
-    address: MOCK_STAFF.contact, ethnicity: MOCK_STAFF.ethnicity, religion: MOCK_STAFF.religion,
-  });
+  const [personalForm, setPersonalForm] = useState({ name: '', dob: '', cccd: '', phone: '', email: '', address: '', ethnicity: '', religion: '' });
+  const [contractForm, setContractForm] = useState({ type: 'Cơ hữu', startDate: '', endDate: '', salary: '', note: '' });
+  const [salaryForm, setSalaryForm] = useState({ salary: '', allowance: '4200000', reason: '' });
+  const [appointmentForm, setAppointmentForm] = useState({ type: 'Bổ nhiệm', title: '', decisionNo: '', decisionDate: '', effectiveDate: '', signer: 'Hiệu trưởng' });
+  const [credentialForm, setCredentialForm] = useState({ name: '', org: '', year: new Date().getFullYear().toString(), cert: 'Chứng chỉ' });
+  const [leaveForm, setLeaveForm] = useState({ type: 'Nghỉ phép năm', startDate: '', endDate: '', reason: '', days: '0' });
 
-  const [contractForm, setContractForm] = useState({
-    type: 'Co huu', startDate: '', endDate: '', salary: MOCK_STAFF.salary.toString(), note: '',
-  });
-
-  const [salaryForm, setSalaryForm] = useState({
-    salary: MOCK_STAFF.salary.toString(), allowance: '4200000', reason: '',
-  });
-
-  const [appointmentForm, setAppointmentForm] = useState({
-    type: 'Bo nhiem', title: '', decisionNo: '', decisionDate: '', effectiveDate: '', signer: 'Hieu truong',
-  });
-
-  const [credentialForm, setCredentialForm] = useState({
-    name: '', org: '', year: new Date().getFullYear().toString(), cert: 'Chung chi',
-  });
-
-  const [leaveForm, setLeaveForm] = useState({
-    type: 'Nghi phep nam', startDate: '', endDate: '', reason: '', days: '0',
-  });
-
-  const staff = MOCK_STAFF;
+  const staff = MOCK_STAFF_MAP[actualId] ?? MOCK_STAFF_MAP['vc001'];
   const sc = STATUS_CONFIG[staff.status as keyof typeof STATUS_CONFIG];
   const activeTab = TAB_KEYS[activeTabIdx];
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={staff.name}
-        description={`${staff.code} · ${staff.title} · ${staff.dept}`}
-        breadcrumbs={[{ label: 'HRM', href: '/hrm' }, { label: t('vienChuc.title', { defaultValue: 'Vien chuc' }), href: '/hrm/vien-chuc' }, { label: staff.name }]}
-        actions={
-          <>
-            <Link to="/hrm/vien-chuc"><Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />}>{t('vienChucDetail.btn.back')}</Button></Link>
-            <Button variant="outline" leftIcon={<Printer className="h-4 w-4" />}>{t('vienChucDetail.btn.print')}</Button>
-            <Button variant="primary" leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => setPersonalOpen(true)}>{t('vienChucDetail.btn.edit')}</Button>
-          </>
-        }
-      />
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-4">
           <Card>
@@ -272,7 +280,7 @@ export default function VienChucDetail() {
                             <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{c.type}</p>
                             <p className="text-xs text-[rgb(var(--text-muted))]">{c.note}</p>
                           </div>
-                          <Badge variant={c.status === 'Hieu luc' ? 'success' : 'neutral'}>{c.status}</Badge>
+                          <Badge variant={c.status === 'Hiệu lực' ? 'success' : 'neutral'}>{c.status}</Badge>
                         </div>
                       ))}
                     </div>
@@ -347,7 +355,7 @@ export default function VienChucDetail() {
                             </div>
                             <div>
                               <div className="flex items-center gap-2 mb-0.5">
-                                <Badge variant="neutral" size="sm">{t(`appointment.appointmentType.${apt.type.replace(/ /g, '')}`) || apt.type}</Badge>
+                                <Badge variant="neutral" size="sm">{apt.type}</Badge>
                                 {apt.isCurrent && <Badge variant="primary" size="sm">{t('vienChucDetail.badge.current')}</Badge>}
                               </div>
                               <p className="font-semibold text-[rgb(var(--text-primary))]">{apt.title}</p>
@@ -358,19 +366,19 @@ export default function VienChucDetail() {
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           <div className="flex items-center gap-2 text-[rgb(var(--text-secondary))]">
                             <FileText className="h-3.5 w-3.5 shrink-0 text-[rgb(var(--text-muted))" />
-                            <span>{t('vienChucDetail.modal.decisionShortLabels.decisionNo')}: <strong className="font-mono text-[rgb(var(--text-primary))]">{apt.decisionNo}</strong></span>
+                            <span>Số QĐ: <strong className="font-mono text-[rgb(var(--text-primary))]">{apt.decisionNo}</strong></span>
                           </div>
                           <div className="flex items-center gap-2 text-[rgb(var(--text-secondary))]">
                             <Calendar className="h-3.5 w-3.5 shrink-0 text-[rgb(var(--text-muted))" />
-                            <span>{t('vienChucDetail.modal.decisionShortLabels.decisionDate')}: <strong className="text-[rgb(var(--text-primary))]">{apt.decisionDate}</strong></span>
+                            <span>Ngày QĐ: <strong className="text-[rgb(var(--text-primary))]">{apt.decisionDate}</strong></span>
                           </div>
                           <div className="flex items-center gap-2 text-[rgb(var(--text-secondary))]">
                             <Building2 className="h-3.5 w-3.5 shrink-0 text-[rgb(var(--text-muted))" />
-                            <span>{t('vienChucDetail.modal.decisionShortLabels.signer')}: <strong className="text-[rgb(var(--text-primary))]">{apt.signer}</strong></span>
+                            <span>Người ký: <strong className="text-[rgb(var(--text-primary))]">{apt.signer}</strong></span>
                           </div>
                           <div className="flex items-center gap-2 text-[rgb(var(--text-secondary))]">
                             <Calendar className="h-3.5 w-3.5 shrink-0 text-[rgb(var(--text-muted))" />
-                            <span>{t('vienChucDetail.modal.decisionShortLabels.effectiveDate')}: <strong className="text-[rgb(var(--text-primary))]">{apt.effectiveDate}</strong></span>
+                            <span>Hiệu lực: <strong className="text-[rgb(var(--text-primary))]">{apt.effectiveDate}</strong></span>
                           </div>
                         </div>
                         <div className="flex gap-2 mt-4">
@@ -488,7 +496,7 @@ export default function VienChucDetail() {
 
       {/* Modal: Edit Personal */}
       <Modal open={personalOpen} onClose={() => setPersonalOpen(false)} title={t('vienChucDetail.modal.editPersonalTitle')} size="xl"
-        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setPersonalOpen(false)}>{t('cancel')}</Button><Button variant="primary" onClick={() => setPersonalOpen(false)}>{t('save')}</Button></div>}>
+        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setPersonalOpen(false)}>{t('common.cancel')}</Button><Button variant="primary" onClick={() => setPersonalOpen(false)}>{t('common.save')}</Button></div>}>
         <div className="space-y-4">
           <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-lg font-bold text-white">
@@ -514,7 +522,7 @@ export default function VienChucDetail() {
 
       {/* Modal: Renew Contract */}
       <Modal open={contractOpen} onClose={() => setContractOpen(false)} title={t('vienChucDetail.modal.contractTitle')} size="lg"
-        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setContractOpen(false)}>{t('cancel')}</Button><Button variant="primary" onClick={() => setContractOpen(false)}>{t('save')}</Button></div>}>
+        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setContractOpen(false)}>{t('common.cancel')}</Button><Button variant="primary" onClick={() => setContractOpen(false)}>{t('common.save')}</Button></div>}>
         <div className="space-y-4">
           <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-sm font-bold text-white">
@@ -526,16 +534,16 @@ export default function VienChucDetail() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.contractType')}</label>
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Loại hợp đồng</label>
               <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2]" value={contractForm.type} onChange={(e: SelectField) => setContractForm(f => ({ ...f, type: e.target.value }))}>
-                <option>Co huu</option><option>Thinh giang</option><option>Thu viec</option>
+                <option>Cơ hữu</option><option>Thỉnh giảng</option><option>Thử việc</option>
               </select>
             </div>
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.salaryBase')} (VND)</label><Input type="number" value={contractForm.salary} onChange={(e: InputField) => setContractForm(f => ({ ...f, salary: e.target.value }))} /></div>
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.startDate')}</label><Input type="date" value={contractForm.startDate} onChange={(e: InputField) => setContractForm(f => ({ ...f, startDate: e.target.value }))} /></div>
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.endDate')}</label><Input type="date" value={contractForm.endDate} onChange={(e: InputField) => setContractForm(f => ({ ...f, endDate: e.target.value }))} /></div>
-            <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.note')}</label>
-              <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={2} placeholder={t('vienChucDetail.modal.notePlaceholder')} value={contractForm.note} onChange={(e: TextareaField) => setContractForm(f => ({ ...f, note: e.target.value }))} />
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Lương (VND)</label><Input type="number" value={contractForm.salary} onChange={(e: InputField) => setContractForm(f => ({ ...f, salary: e.target.value }))} /></div>
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Ngày bắt đầu</label><Input type="date" value={contractForm.startDate} onChange={(e: InputField) => setContractForm(f => ({ ...f, startDate: e.target.value }))} /></div>
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Ngày kết thúc</label><Input type="date" value={contractForm.endDate} onChange={(e: InputField) => setContractForm(f => ({ ...f, endDate: e.target.value }))} /></div>
+            <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Ghi chú</label>
+              <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={2} value={contractForm.note} onChange={(e: TextareaField) => setContractForm(f => ({ ...f, note: e.target.value }))} />
             </div>
           </div>
         </div>
@@ -543,7 +551,7 @@ export default function VienChucDetail() {
 
       {/* Modal: Salary Adjust */}
       <Modal open={salaryOpen} onClose={() => setSalaryOpen(false)} title={t('vienChucDetail.modal.salaryAdjustTitle')} size="lg"
-        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setSalaryOpen(false)}>{t('cancel')}</Button><Button variant="primary" onClick={() => setSalaryOpen(false)}>{t('save')}</Button></div>}>
+        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setSalaryOpen(false)}>{t('common.cancel')}</Button><Button variant="primary" onClick={() => setSalaryOpen(false)}>{t('common.save')}</Button></div>}>
         <div className="space-y-4">
           <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-sm font-bold text-white">
@@ -551,21 +559,21 @@ export default function VienChucDetail() {
             </div>
             <div>
               <p className="font-semibold text-[rgb(var(--text-primary))]">{staff.name}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))]">{staff.code} · {t('vienChucDetail.salaryBase')}: <strong>{fmt(SALARY_HISTORY[0].salary)}</strong></p>
+              <p className="text-xs text-[rgb(var(--text-secondary))]">{staff.code} · Lương cơ bản: <strong>{fmt(SALARY_HISTORY[0].salary)}</strong></p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.newSalary')}</label><Input type="number" value={salaryForm.salary} onChange={(e: InputField) => setSalaryForm(f => ({ ...f, salary: e.target.value }))} /></div>
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.allowanceAmount')}</label><Input type="number" value={salaryForm.allowance} onChange={(e: InputField) => setSalaryForm(f => ({ ...f, allowance: e.target.value }))} /></div>
-            <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.salaryReason')}</label>
-              <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={3} placeholder={t('vienChucDetail.modal.salaryReasonPlaceholder')} value={salaryForm.reason} onChange={(e: TextareaField) => setSalaryForm(f => ({ ...f, reason: e.target.value }))} />
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Lương mới (VND)</label><Input type="number" value={salaryForm.salary} onChange={(e: InputField) => setSalaryForm(f => ({ ...f, salary: e.target.value }))} /></div>
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Phụ cấp (VND)</label><Input type="number" value={salaryForm.allowance} onChange={(e: InputField) => setSalaryForm(f => ({ ...f, allowance: e.target.value }))} /></div>
+            <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Lý do điều chỉnh</label>
+              <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={3} value={salaryForm.reason} onChange={(e: TextareaField) => setSalaryForm(f => ({ ...f, reason: e.target.value }))} />
             </div>
           </div>
           <div className="p-4 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))] space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-[rgb(var(--text-secondary))]">{t('vienChucDetail.modal.salaryOld')}</span><span className="font-mono font-semibold text-[rgb(var(--text-primary))]">{fmt(SALARY_HISTORY[0].salary)}</span></div>
-            <div className="flex justify-between"><span className="text-[rgb(var(--text-secondary))]">{t('vienChucDetail.modal.newSalaryLabel')}</span><span className="font-mono font-semibold text-[rgb(var(--success))]">{fmt(Number(salaryForm.salary))}</span></div>
+            <div className="flex justify-between"><span className="text-[rgb(var(--text-secondary))]">Lương cũ</span><span className="font-mono font-semibold text-[rgb(var(--text-primary))]">{fmt(SALARY_HISTORY[0].salary)}</span></div>
+            <div className="flex justify-between"><span className="text-[rgb(var(--text-secondary))]">Lương mới</span><span className="font-mono font-semibold text-[rgb(var(--success))]">{fmt(Number(salaryForm.salary))}</span></div>
             <div className="flex justify-between border-t border-[rgb(var(--border)/0.5)] pt-2">
-              <span className="text-[rgb(var(--text-secondary))]">{t('vienChucDetail.modal.difference')}</span>
+              <span className="text-[rgb(var(--text-secondary))]">Chênh lệch</span>
               <span className={`font-mono font-bold ${Number(salaryForm.salary) >= SALARY_HISTORY[0].salary ? 'text-[rgb(var(--success))]' : 'text-[rgb(var(--error))]'}`}>
                 {Number(salaryForm.salary) >= SALARY_HISTORY[0].salary ? '+' : ''}{fmt(Number(salaryForm.salary) - SALARY_HISTORY[0].salary)}
               </span>
@@ -574,7 +582,7 @@ export default function VienChucDetail() {
         </div>
       </Modal>
 
-      {/* Modal: Decision (create/view/edit/renew) */}
+      {/* Modal: Decision */}
       <Modal open={appointmentOpen} onClose={() => setAppointmentOpen(false)}
         title={
           appointmentAction === 'create' ? t('vienChucDetail.modal.decisionModal.create') :
@@ -583,20 +591,20 @@ export default function VienChucDetail() {
           t('vienChucDetail.modal.decisionModal.edit')
         }
         size="xl"
-        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setAppointmentOpen(false)}>{t('close')}</Button>
-          {appointmentAction !== 'view' && <Button variant="primary" onClick={() => setAppointmentOpen(false)}>{appointmentAction === 'renew' ? t('save') : t('save')}</Button>}
+        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setAppointmentOpen(false)}>{t('common.close')}</Button>
+          {appointmentAction !== 'view' && <Button variant="primary" onClick={() => setAppointmentOpen(false)}>{t('common.save')}</Button>}
         </div>}>
         {appointmentAction === 'view' && selectedAppointment ? (
           <div className="space-y-3 text-sm">
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: t('vienChucDetail.modal.decisionFields.type'), value: selectedAppointment.type },
-                { label: t('vienChucDetail.modal.decisionFields.title'), value: selectedAppointment.title },
-                { label: t('vienChucDetail.modal.decisionFields.decisionNo'), value: selectedAppointment.decisionNo },
-                { label: t('vienChucDetail.modal.decisionFields.decisionDate'), value: selectedAppointment.decisionDate },
-                { label: t('vienChucDetail.modal.decisionFields.signer'), value: selectedAppointment.signer },
-                { label: t('vienChucDetail.modal.decisionFields.effectiveDate'), value: selectedAppointment.effectiveDate },
-                { label: t('table.trangThai'), value: selectedAppointment.status },
+                { label: 'Loại quyết định', value: selectedAppointment.type },
+                { label: 'Chức vụ', value: selectedAppointment.title },
+                { label: 'Số QĐ', value: selectedAppointment.decisionNo },
+                { label: 'Ngày QĐ', value: selectedAppointment.decisionDate },
+                { label: 'Người ký', value: selectedAppointment.signer },
+                { label: 'Ngày hiệu lực', value: selectedAppointment.effectiveDate },
+                { label: 'Trạng thái', value: selectedAppointment.status },
               ].map(({ label, value }) => (
                 <div key={label} className="flex gap-3 border-b border-[rgb(var(--border)/0.4)] pb-2">
                   <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">{label}:</span>
@@ -606,8 +614,7 @@ export default function VienChucDetail() {
             </div>
             <div className="p-4 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] text-center text-[rgb(var(--text-muted))]">
               <FileText className="h-8 w-8 mx-auto mb-2 opacity-40" />
-              <p className="text-sm">{t('vienChucDetail.modal.decisionFields.file')}: <strong className="font-mono">{selectedAppointment.decisionNo}.pdf</strong></p>
-              <p className="text-xs mt-1">{t('vienChucDetail.modal.decisionFields.canDownload')}</p>
+              <p className="text-sm">File đính kèm: <strong className="font-mono">{selectedAppointment.decisionNo}.pdf</strong></p>
             </div>
           </div>
         ) : (
@@ -618,31 +625,31 @@ export default function VienChucDetail() {
                 <div>
                   <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedAppointment.title}</p>
                   <p className="text-xs text-[rgb(var(--text-secondary))]">
-                    {selectedAppointment.type} · So QD: <strong className="font-mono">{selectedAppointment.decisionNo}</strong> · Ngay: {selectedAppointment.decisionDate}
+                    {selectedAppointment.type} · Số QĐ: <strong className="font-mono">{selectedAppointment.decisionNo}</strong> · Ngày: {selectedAppointment.decisionDate}
                   </p>
                 </div>
                 <Badge variant={selectedAppointment.statusVariant} dot className="ml-auto shrink-0">{selectedAppointment.status}</Badge>
               </div>
             )}
             <div className="grid grid-cols-2 gap-4">
-              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.decisionFields.type')}</label>
+              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Loại quyết định</label>
                 <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2]" value={appointmentForm.type} onChange={(e: SelectField) => setAppointmentForm(f => ({ ...f, type: e.target.value }))}>
-                  <option value="Bo nhiem">{t('appointment.appointmentType.boNhiemMoi')}</option><option value="Bo nhiem lai">{t('appointment.appointmentType.boNhiemLai')}</option><option value="Dieu chuyen">{t('appointment.appointmentType.dieuChuyen')}</option><option value="Mien nhiem">{t('appointment.appointmentType.mienNhiem')}</option>
+                  <option value="Bổ nhiệm">Bổ nhiệm</option><option value="Bổ nhiệm lại">Bổ nhiệm lại</option><option value="Điều chuyển">Điều chuyển</option><option value="Miễn nhiệm">Miễn nhiệm</option>
                 </select>
               </div>
-              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.decisionFields.title')}</label>
-                <Input value={selectedAppointment ? selectedAppointment.title : appointmentForm.title} onChange={(e: InputField) => setAppointmentForm(f => ({ ...f, title: e.target.value }))} placeholder={t('vienChucDetail.modal.decisionFields.titlePlaceholder')} />
+              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Chức vụ</label>
+                <Input value={selectedAppointment ? selectedAppointment.title : appointmentForm.title} onChange={(e: InputField) => setAppointmentForm(f => ({ ...f, title: e.target.value }))} placeholder="Ví dụ: Trưởng khoa CNTT" />
               </div>
-              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.decisionFields.decisionNo')}</label>
-                <Input value={selectedAppointment ? selectedAppointment.decisionNo : appointmentForm.decisionNo} onChange={(e: InputField) => setAppointmentForm(f => ({ ...f, decisionNo: e.target.value }))} placeholder={t('vienChucDetail.modal.decisionFields.decisionNoPlaceholder')} />
+              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Số quyết định</label>
+                <Input value={selectedAppointment ? selectedAppointment.decisionNo : appointmentForm.decisionNo} onChange={(e: InputField) => setAppointmentForm(f => ({ ...f, decisionNo: e.target.value }))} placeholder="Ví dụ: 234/TK-2020" />
               </div>
-              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.decisionFields.signer')}</label>
+              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Người ký</label>
                 <Input value={appointmentForm.signer} onChange={(e: InputField) => setAppointmentForm(f => ({ ...f, signer: e.target.value }))} />
               </div>
-              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.decisionFields.decisionDate')}</label>
+              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Ngày ký</label>
                 <Input type="date" value={selectedAppointment ? selectedAppointment.decisionDate : appointmentForm.decisionDate} onChange={(e: InputField) => setAppointmentForm(f => ({ ...f, decisionDate: e.target.value }))} />
               </div>
-              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.decisionFields.effectiveDate')}</label>
+              <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Ngày hiệu lực</label>
                 <Input type="date" value={selectedAppointment ? selectedAppointment.effectiveDate : appointmentForm.effectiveDate} onChange={(e: InputField) => setAppointmentForm(f => ({ ...f, effectiveDate: e.target.value }))} />
               </div>
             </div>
@@ -652,20 +659,20 @@ export default function VienChucDetail() {
 
       {/* Modal: Credential */}
       <Modal open={credentialOpen} onClose={() => setCredentialOpen(false)} title={t('vienChucDetail.modal.credentialTitle')} size="lg"
-        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setCredentialOpen(false)}>{t('cancel')}</Button><Button variant="primary" onClick={() => setCredentialOpen(false)}>{t('save')}</Button></div>}>
+        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setCredentialOpen(false)}>{t('common.cancel')}</Button><Button variant="primary" onClick={() => setCredentialOpen(false)}>{t('common.save')}</Button></div>}>
         <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.credentialName')}</label>
-            <Input value={credentialForm.name} onChange={(e: InputField) => setCredentialForm(f => ({ ...f, name: e.target.value }))} placeholder={t('vienChucDetail.modal.credentialNamePlaceholder')} />
+          <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Tên chứng chỉ</label>
+            <Input value={credentialForm.name} onChange={(e: InputField) => setCredentialForm(f => ({ ...f, name: e.target.value }))} placeholder="Ví dụ: Phương pháp giảng dạy hiện đại" />
           </div>
-          <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.issuer')}</label>
-            <Input value={credentialForm.org} onChange={(e: InputField) => setCredentialForm(f => ({ ...f, org: e.target.value }))} placeholder={t('vienChucDetail.modal.issuerPlaceholder')} />
+          <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Đơn vị cấp</label>
+            <Input value={credentialForm.org} onChange={(e: InputField) => setCredentialForm(f => ({ ...f, org: e.target.value }))} placeholder="Ví dụ: Bộ GD&ĐT" />
           </div>
-          <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.issueYear')}</label>
+          <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Năm cấp</label>
             <Input type="number" value={credentialForm.year} onChange={(e: InputField) => setCredentialForm(f => ({ ...f, year: e.target.value }))} />
           </div>
-          <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.credentialType')}</label>
+          <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Loại</label>
             <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2]" value={credentialForm.cert} onChange={(e: SelectField) => setCredentialForm(f => ({ ...f, cert: e.target.value }))}>
-              <option value="Chung chi">{t('vienChucDetail.modal.credentialTypeCertificate')}</option><option value="Bang tot nghiep">{t('vienChucDetail.modal.credentialTypeDegree')}</option><option value="Chung nhan">{t('vienChucDetail.modal.credentialTypeCertification')}</option>
+              <option value="Chứng chỉ">Chứng chỉ</option><option value="Bằng tốt nghiệp">Bằng tốt nghiệp</option><option value="Chứng nhận">Chứng nhận</option>
             </select>
           </div>
         </div>
@@ -673,7 +680,7 @@ export default function VienChucDetail() {
 
       {/* Modal: Leave Request */}
       <Modal open={leaveOpen} onClose={() => setLeaveOpen(false)} title={t('vienChucDetail.modal.leaveTitle')} size="lg"
-        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setLeaveOpen(false)}>{t('cancel')}</Button><Button variant="primary" onClick={() => setLeaveOpen(false)}>{t('save')}</Button></div>}>
+        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setLeaveOpen(false)}>{t('common.cancel')}</Button><Button variant="primary" onClick={() => setLeaveOpen(false)}>{t('common.save')}</Button></div>}>
         <div className="space-y-4">
           <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-sm font-bold text-white">
@@ -681,26 +688,26 @@ export default function VienChucDetail() {
             </div>
             <div>
               <p className="font-semibold text-[rgb(var(--text-primary))]">{staff.name}</p>
-              <p className="text-xs text-[rgb(var(--text-secondary))]">{staff.code} · {t('vienChucDetail.modal.remainingDays')}: <strong>12 {t('vienChucDetail.leaveDaysUnit')}</strong></p>
+              <p className="text-xs text-[rgb(var(--text-secondary))]">{staff.code} · Số ngày nghỉ còn lại: <strong>12 ngày</strong></p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.leaveType')}</label>
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Loại nghỉ phép</label>
               <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2]" value={leaveForm.type} onChange={(e: SelectField) => setLeaveForm(f => ({ ...f, type: e.target.value }))}>
-                <option value="Nghi phep nam">{t('leaveRequestForm.leaveTypeAnnual')}</option><option value="Nghi om">{t('leaveRequestForm.leaveTypeSick')}</option><option value="Nghi khong luong">{t('leaveRequestForm.leaveTypeUnpaid')}</option><option value="Nghi thai san">{t('leaveRequestForm.leaveTypeMaternity')}</option><option value="Nghi tham nom">{t('leaveRequestForm.leaveTypePaternity')}</option>
+                <option value="Nghỉ phép năm">Nghỉ phép năm</option><option value="Nghỉ ốm">Nghỉ ốm</option><option value="Nghỉ không lương">Nghỉ không lương</option><option value="Nghỉ thai sản">Nghỉ thai sản</option><option value="Nghỉ thăm nom">Nghỉ thăm nom</option>
               </select>
             </div>
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.leaveDays')}</label>
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Số ngày nghỉ</label>
               <Input type="number" min="1" value={leaveForm.days} onChange={(e: InputField) => setLeaveForm(f => ({ ...f, days: e.target.value }))} />
             </div>
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.startDate')}</label>
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Ngày bắt đầu</label>
               <Input type="date" value={leaveForm.startDate} onChange={(e: InputField) => setLeaveForm(f => ({ ...f, startDate: e.target.value }))} />
             </div>
-            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.endDate')}</label>
+            <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Ngày kết thúc</label>
               <Input type="date" value={leaveForm.endDate} onChange={(e: InputField) => setLeaveForm(f => ({ ...f, endDate: e.target.value }))} />
             </div>
-            <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.leaveReason')}</label>
-              <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={3} placeholder={t('vienChucDetail.modal.leaveReasonPlaceholder')} value={leaveForm.reason} onChange={(e: TextareaField) => setLeaveForm(f => ({ ...f, reason: e.target.value }))} />
+            <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Lý do</label>
+              <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={3} value={leaveForm.reason} onChange={(e: TextareaField) => setLeaveForm(f => ({ ...f, reason: e.target.value }))} />
             </div>
           </div>
         </div>
@@ -708,18 +715,18 @@ export default function VienChucDetail() {
 
       {/* Modal: Discipline */}
       <Modal open={disciplineOpen} onClose={() => setDisciplineOpen(false)} title={t('vienChucDetail.modal.disciplineTitle')} size="lg"
-        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setDisciplineOpen(false)}>{t('cancel')}</Button><Button variant="primary" onClick={() => setDisciplineOpen(false)}>{t('save')}</Button></div>}>
+        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setDisciplineOpen(false)}>{t('common.cancel')}</Button><Button variant="primary" onClick={() => setDisciplineOpen(false)}>{t('common.save')}</Button></div>}>
         <div className="grid grid-cols-2 gap-4">
-          <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.disciplineType')}</label>
+          <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Loại</label>
             <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2]">
-              <option value="Khen thuong">{t('vienChucDetail.modal.disciplineTypeReward')}</option><option value="Ky luat">{t('vienChucDetail.modal.disciplineTypeDiscipline')}</option>
+              <option value="Khen thưởng">Khen thưởng</option><option value="Kỷ luật">Kỷ luật</option>
             </select>
           </div>
-          <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.disciplineYear')}</label>
+          <div><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Năm</label>
             <Input type="number" value={new Date().getFullYear().toString()} />
           </div>
-          <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('vienChucDetail.modal.disciplineContent')}</label>
-            <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={3} placeholder={t('vienChucDetail.modal.disciplineContentPlaceholder')} />
+          <div className="col-span-2"><label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">Nội dung</label>
+            <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={3} placeholder="Nhập nội dung khen thưởng hoặc kỷ luật..." />
           </div>
         </div>
       </Modal>

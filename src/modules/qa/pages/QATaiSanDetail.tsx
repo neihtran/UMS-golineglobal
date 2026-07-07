@@ -1,25 +1,28 @@
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Edit2, Wrench } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Download, Edit2, Wrench } from 'lucide-react';
 import { Card, CardContent, Button, Badge } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
-const ASSET = {
-  id: 'ts001',
-  code: 'TS-IT-001',
-  name: 'Máy tính Dell OptiPlex 7090',
-  category: 'Thiết bị CNTT',
-  dept: 'Phòng CNTT',
-  quantity: 25,
-  unit: 'bộ',
-  value: 750000000,
-  status: 'active',
-  depreciation: 45,
-  location: 'Tòa A, Tầng 3',
-  supplier: 'Công ty TNHH Viễn Thông ABC',
-  purchaseDate: '2024-01-15',
-  warranty: '2027-01-15',
-  assignee: 'Nguyễn Văn Minh',
+interface QATaiSanDetailProps {
+  id?: string;
+}
+
+const ASSETS_MAP: Record<string, {
+  id: string; code: string; name: string; category: string; dept: string;
+  quantity: number; unit: string; value: number; status: string;
+  depreciation: number; location: string; supplier: string;
+  purchaseDate: string; warranty: string; assignee: string;
+}> = {
+  ts001: { id: 'ts001', code: 'TS-IT-001', name: 'Máy tính Dell OptiPlex 7090', category: 'Thiết bị CNTT', dept: 'Phòng CNTT', quantity: 25, unit: 'bộ', value: 750000000, status: 'active', depreciation: 45, location: 'Tòa A, Tầng 3', supplier: 'Công ty TNHH Viễn Thông ABC', purchaseDate: '2024-01-15', warranty: '2027-01-15', assignee: 'Nguyễn Văn Minh' },
+  ts002: { id: 'ts002', code: 'TS-IT-002', name: 'Máy in laser HP LaserJet Pro', category: 'Thiết bị CNTT', dept: 'Khoa CNTT', quantity: 8, unit: 'máy', value: 120000000, status: 'active', depreciation: 30, location: 'Tòa B, Tầng 2', supplier: 'Công ty TNHH Thiết bị VN', purchaseDate: '2023-09-10', warranty: '2026-09-10', assignee: 'Trần Văn An' },
+  ts003: { id: 'ts003', code: 'TS-DA-001', name: 'Máy chiếu Sony VPL-PHZ10', category: 'Thiết bị nghe nhìn', dept: 'Khoa Kinh tế', quantity: 15, unit: 'máy', value: 450000000, status: 'maintenance', depreciation: 20, location: 'Hội trường lớn', supplier: 'Công ty TNHH AV Việt Nam', purchaseDate: '2023-05-20', warranty: '2026-05-20', assignee: 'Lê Hoàng Nam' },
+  ts004: { id: 'ts004', code: 'TS-NN-001', name: 'Ghế văn phòng Ergonomic Pro', category: 'Nội thất', dept: 'Khoa Ngoại ngữ', quantity: 120, unit: 'cái', value: 360000000, status: 'active', depreciation: 60, location: 'Tòa C, Tầng 1', supplier: 'Nội thất Đại Phát', purchaseDate: '2022-08-15', warranty: '2025-08-15', assignee: 'Phạm Thị Hà' },
+  ts005: { id: 'ts005', code: 'TS-CN-001', name: 'Máy CNC mini Roland MODELA', category: 'Thiết bị chuyên ngành', dept: 'Khoa Cơ khí', quantity: 3, unit: 'máy', value: 900000000, status: 'broken', depreciation: 15, location: 'Xưởng thực hành', supplier: 'CNC Vietnam JSC', purchaseDate: '2024-06-01', warranty: '2027-06-01', assignee: 'Bùi Văn Đức' },
+  ts006: { id: 'ts006', code: 'TS-PT-001', name: 'Xe ô tô Toyota Innova G', category: 'Phương tiện', dept: 'Phòng Hành chính', quantity: 2, unit: 'chiếc', value: 1400000000, status: 'active', depreciation: 50, location: 'Bãi xe tầng 1', supplier: 'Toyota Đà Nẵng', purchaseDate: '2022-03-12', warranty: '2025-03-12', assignee: 'Ngô Văn Tài' },
+  ts007: { id: 'ts007', code: 'TS-IT-003', name: 'Máy chủ Dell PowerEdge R750', category: 'Thiết bị CNTT', dept: 'Phòng CNTT', quantity: 4, unit: 'máy', value: 1600000000, status: 'active', depreciation: 25, location: 'Phòng server Tòa A', supplier: 'Dell Việt Nam', purchaseDate: '2024-09-05', warranty: '2027-09-05', assignee: 'Đặng Văn Hùng' },
+  ts008: { id: 'ts008', code: 'TS-DA-002', name: 'Hệ thống âm thanh hội trường', category: 'Thiết bị nghe nhìn', dept: 'Phòng Hành chính', quantity: 1, unit: 'hệ thống', value: 650000000, status: 'maintenance', depreciation: 10, location: 'Hội trường A', supplier: 'Audio Visual JSC', purchaseDate: '2025-01-10', warranty: '2028-01-10', assignee: 'Vũ Văn Cường' },
+  ts009: { id: 'ts009', code: 'TS-NN-002', name: 'Bàn họp dài 4m', category: 'Nội thất', dept: 'Ban Giám hiệu', quantity: 6, unit: 'bộ', value: 180000000, status: 'disposed', depreciation: 80, location: 'Tòa B, Tầng 5', supplier: 'Nội thất Đại Phát', purchaseDate: '2020-11-22', warranty: '2023-11-22', assignee: 'Hoàng Văn Minh' },
+  ts010: { id: 'ts010', code: 'TS-CN-002', name: 'Máy hàn laser fiber 1kW', category: 'Thiết bị chuyên ngành', dept: 'Khoa Cơ khí', quantity: 2, unit: 'máy', value: 2200000000, status: 'active', depreciation: 5, location: 'Xưởng thực hành', supplier: 'LaserTech Asia', purchaseDate: '2026-02-15', warranty: '2029-02-15', assignee: 'Trịnh Văn Tâm' },
 };
 
 const MAINTENANCE_LOG = [
@@ -46,31 +49,21 @@ const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' |
 
 const fmt = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 });
 
-export default function QATaiSanDetail() {
+export default function QATaiSanDetail({ id }: QATaiSanDetailProps) {
   const navigate = useNavigate();
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
 
-  const asset = ASSET;
+  const asset = ASSETS_MAP[actualId] ?? ASSETS_MAP['ts001'];
   const sc = STATUS_CONFIG[asset.status];
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`${asset.code} — Chi tiết tài sản`}
-        description={asset.name}
-        breadcrumbs={[
-          { label: 'QA', href: '/qa' },
-          { label: 'Quản lý Tài sản', href: '/qa/tai-san' },
-          { label: asset.code },
-        ]}
-        actions={
-          <>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất báo cáo</Button>
-            <Button variant="outline" leftIcon={<Wrench className="h-4 w-4" />} onClick={() => navigate(`/qa/tai-san/${asset.id}/bao-tri`)}>Bảo trì</Button>
-            <Button variant="outline" leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => navigate(`/qa/tai-san/${asset.id}/chinh-sua`)}>Chỉnh sửa</Button>
-            <Button leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/qa/tai-san')}>Quay lại</Button>
-          </>
-        }
-      />
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất báo cáo</Button>
+        <Button variant="outline" leftIcon={<Wrench className="h-4 w-4" />} onClick={() => navigate(`/qa/tai-san/${asset.id}/bao-tri`)}>Bảo trì</Button>
+        <Button variant="outline" leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => navigate(`/qa/tai-san/${asset.id}/chinh-sua`)}>Chỉnh sửa</Button>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: Info */}

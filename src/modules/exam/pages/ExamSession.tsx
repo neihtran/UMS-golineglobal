@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Video, Users, Clock } from 'lucide-react';
+import { Video, Users, Clock, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, Badge, Button, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell } from '@/components/ui';
+import { Card, CardContent, Badge, Button, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useDetailModal } from '@/hooks';
 
 const SESSIONS = [
   { id: 's1', examId: 'EX001', name: 'Thi giữa kỳ – INT2201', course: 'Cấu trúc dữ liệu', type: 'midterm', room: 'A101', duration: 90, totalStudents: 45, present: 42, proctor: 'TS. Nguyễn Văn A', status: 'active', startTime: '2026-06-26 08:00', endTime: '2026-06-26 09:30' },
@@ -14,6 +15,8 @@ const SESSIONS = [
 export default function ExamSession() {
   const { t } = useTranslation('exam');
   const [statusFilter, setStatusFilter] = useState('all');
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedSession = selectedId ? SESSIONS.find((s) => s.id === selectedId) : null;
   const active = SESSIONS.filter((s) => s.status === 'active');
 
   const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' | 'info' | 'neutral'; label: string }> = {
@@ -80,7 +83,7 @@ export default function ExamSession() {
                     </div>
                     <Badge variant="warning" size="sm">{s.totalStudents - s.present} {t('examSession.card.present')}</Badge>
                   </div>
-                  <Button variant="outline" size="sm" className="w-full mt-3" leftIcon={<Video className="h-3.5 w-3.5" />}>
+                  <Button variant="outline" size="sm" className="w-full mt-3" leftIcon={<Video className="h-3.5 w-3.5" />} onClick={() => openDetail(s.id)}>
                     {t('common.monitorNow')}
                   </Button>
                 </CardContent>
@@ -117,7 +120,8 @@ export default function ExamSession() {
               <TableHeadCell>{t('examSession.table.time')}</TableHeadCell>
               <TableHeadCell>{t('examSession.table.students')}</TableHeadCell>
               <TableHeadCell>{t('examSession.table.proctor')}</TableHeadCell>
-              <TableHeadCell>{t('common.trangThai')}</TableHeadCell>
+<TableHeadCell>{t('common.trangThai')}</TableHeadCell>
+              <TableHeadCell>{t('common.thaoTac')}</TableHeadCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -147,12 +151,46 @@ export default function ExamSession() {
                   </TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{s.proctor}</TableCell>
                   <TableCell><Badge variant={sc.variant} dot size="sm">{sc.label}</Badge></TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(s.id)}>
+                      {t('common.detail')}
+                    </Button>
+                  </TableCell>
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
       </Card>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedSession?.name ?? ''}
+        description={selectedSession?.examId ?? ''}
+        size="fullscreen"
+        footer={<div className="flex justify-end"><Button variant="outline" onClick={close}>{t('common.close')}</Button></div>}
+      >
+        <div className="space-y-4">
+          {[
+            { label: t('examSession.detail.examId'), value: selectedSession?.examId },
+            { label: t('examSession.detail.course'), value: selectedSession?.course },
+            { label: t('examSession.detail.type'), value: selectedSession?.type ? TYPE_CONFIG[selectedSession.type]?.label : undefined },
+            { label: t('examSession.detail.room'), value: selectedSession?.room },
+            { label: t('examSession.detail.startTime'), value: selectedSession?.startTime },
+            { label: t('examSession.detail.endTime'), value: selectedSession?.endTime },
+            { label: t('examSession.detail.duration'), value: selectedSession ? `${selectedSession.duration} ${t('examSession.card.minutes')}` : undefined },
+            { label: t('examSession.detail.students'), value: selectedSession ? `${selectedSession.present}/${selectedSession.totalStudents}` : undefined },
+            { label: t('examSession.detail.proctor'), value: selectedSession?.proctor },
+            { label: t('common.trangThai'), value: selectedSession ? STATUS_CONFIG[selectedSession.status]?.label : undefined },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+              <span className="text-sm text-[rgb(var(--text-secondary))] w-40 shrink-0">{label}</span>
+              <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{value ?? '—'}</span>
+            </div>
+          ))}
+        </div>
+      </DetailModal>
     </div>
   );
 }

@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Calendar, DollarSign, BookOpen, Edit, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Users, Calendar, DollarSign, BookOpen, Edit, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const PROJECT = {
   id: 'rit1',
@@ -28,6 +27,13 @@ const PROJECT = {
   ],
 };
 
+const PROJECTS_MAP: Record<string, typeof PROJECT> = {
+  p1: PROJECT,
+  p2: { ...PROJECT, id: 'p2', code: 'HTQT-2026-001', title: 'Hợp tác với ĐH Tokyo về nghiên cứu Data Science', leader: 'PGS.TS. Lê Thị Lan' },
+  p3: { ...PROJECT, id: 'p3', code: 'NCKH-2026-002', title: 'Phát triển ứng dụng IoT cho nông nghiệp thông minh', leader: 'TS. Bùi Minh Tuấn' },
+  p4: { ...PROJECT, id: 'p4', code: 'NCKH-2025-003', title: 'Mô hình dự báo thời tiết sử dụng Deep Learning', leader: 'TS. Hoàng Thu Lan' },
+};
+
 const MILESTONE_STATUS: Record<string, { variant: 'success' | 'warning' | 'info' | 'neutral'; label: string }> = {
   completed: { variant: 'success', label: 'Hoàn thành' },
   in_progress: { variant: 'warning', label: 'Đang thực hiện' },
@@ -39,31 +45,22 @@ function formatVND(v: number) {
   return `${v.toLocaleString('vi-VN')}đ`;
 }
 
-export default function ResearchDetail() {
-  const navigate = useNavigate();
+interface ResearchDetailProps {
+  id?: string;
+}
+
+export default function ResearchDetail({ id }: ResearchDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const [showExtend, setShowExtend] = useState(false);
-  const p = PROJECT;
+  const p = PROJECTS_MAP[actualId] ?? PROJECT;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={p.title}
-        description={`${p.code} · ${p.level} · ${p.dept}`}
-        breadcrumbs={[
-          { label: 'RIT', href: '/rit' },
-          { label: 'Đề tài', href: '/rit/de-tai' },
-          { label: p.code },
-        ]}
-        actions={
-          <>
-            <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/rit/de-tai')}>
-              Quay lại
-            </Button>
-            <Button variant="outline" leftIcon={<RefreshCw className="h-4 w-4" />} onClick={() => setShowExtend(true)}>Gia hạn</Button>
-            <Button variant="outline" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
-          </>
-        }
-      />
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" leftIcon={<RefreshCw className="h-4 w-4" />} onClick={() => setShowExtend(true)}>Gia hạn</Button>
+        <Button variant="outline" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
+      </div>
 
       {/* Overview */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

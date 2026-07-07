@@ -1,22 +1,86 @@
 import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Users,
   FileText,
   Plus,
   Download,
-  Edit2,
 } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
-const COURSE = {
-  id: 'c1', code: 'CS101', name: 'Nhập môn Lập trình Python',
-  instructor: 'TS. Nguyễn Văn Minh', instructorTitle: 'Giảng viên',
-  dept: 'Khoa CNTT', semester: '2026-1', credits: 4, students: 312, enrolled: 298,
-  completionRate: 78, rating: 4.8, status: 'published',
-  startDate: '2026-01-15', endDate: '2026-05-30',
-  description: 'Môn học giới thiệu về lập trình Python cho sinh viên năm nhất, bao gồm các khái niệm cơ bản về biến, vòng lặp, hàm, cấu trúc dữ liệu và lập trình hướng đối tượng.',
-  syl: 'CS101-SYL-2026.pdf',
+const COURSES_MAP: Record<string, {
+  id: string;
+  code: string;
+  name: string;
+  instructor: string;
+  instructorTitle: string;
+  dept: string;
+  semester: string;
+  credits: number;
+  students: number;
+  enrolled: number;
+  completionRate: number;
+  rating: number;
+  status: 'published' | 'draft' | 'archived' | 'closed';
+  startDate: string;
+  endDate: string;
+  description: string;
+  syl: string;
+}> = {
+  c1: {
+    id: 'c1', code: 'CS101', name: 'Nhập môn Lập trình Python',
+    instructor: 'TS. Nguyễn Văn Minh', instructorTitle: 'Giảng viên',
+    dept: 'Khoa CNTT', semester: '2026-1', credits: 4, students: 312, enrolled: 298,
+    completionRate: 78, rating: 4.8, status: 'published',
+    startDate: '2026-01-15', endDate: '2026-05-30',
+    description: 'Môn học giới thiệu về lập trình Python cho sinh viên năm nhất, bao gồm các khái niệm cơ bản về biến, vòng lặp, hàm, cấu trúc dữ liệu và lập trình hướng đối tượng.',
+    syl: 'CS101-SYL-2026.pdf',
+  },
+  c2: {
+    id: 'c2', code: 'MATH201', name: 'Giải tích 2',
+    instructor: 'PGS.TS. Lê Thị Lan', instructorTitle: 'Giảng viên',
+    dept: 'Khoa CNTT', semester: '2026-1', credits: 4, students: 280, enrolled: 265,
+    completionRate: 65, rating: 4.5, status: 'published',
+    startDate: '2026-01-15', endDate: '2026-05-30',
+    description: 'Học phần Giải tích 2 cung cấp kiến thức về tích phân, chuỗi và phương trình vi phân.',
+    syl: 'MATH201-SYL-2026.pdf',
+  },
+  c3: {
+    id: 'c3', code: 'ENG301', name: 'Tiếng Anh Học thuật',
+    instructor: 'ThS. Trần Hoàng Nam', instructorTitle: 'Giảng viên',
+    dept: 'Khoa Ngoại ngữ', semester: '2026-1', credits: 3, students: 245, enrolled: 240,
+    completionRate: 72, rating: 4.6, status: 'published',
+    startDate: '2026-01-15', endDate: '2026-05-30',
+    description: 'Phát triển kỹ năng đọc, viết và thuyết trình học thuật bằng tiếng Anh.',
+    syl: 'ENG301-SYL-2026.pdf',
+  },
+  c4: {
+    id: 'c4', code: 'PHYS101', name: 'Vật lý Đại cương',
+    instructor: 'TS. Bùi Minh Tuấn', instructorTitle: 'Giảng viên',
+    dept: 'Khoa Khoa học', semester: '2026-1', credits: 4, students: 198, enrolled: 190,
+    completionRate: 58, rating: 4.2, status: 'published',
+    startDate: '2026-01-15', endDate: '2026-05-30',
+    description: 'Các khái niệm nền tảng về cơ học, nhiệt học và điện từ học.',
+    syl: 'PHYS101-SYL-2026.pdf',
+  },
+  c5: {
+    id: 'c5', code: 'CHEM101', name: 'Hóa học Đại cương',
+    instructor: 'PGS.TS. Đặng Văn Minh', instructorTitle: 'Giảng viên',
+    dept: 'Khoa Khoa học', semester: '2026-1', credits: 3, students: 165, enrolled: 160,
+    completionRate: 81, rating: 4.7, status: 'published',
+    startDate: '2026-01-15', endDate: '2026-05-30',
+    description: 'Khám phá các nguyên lý cơ bản của hóa học: cấu tạo nguyên tử, liên kết hóa học và phản ứng.',
+    syl: 'CHEM101-SYL-2026.pdf',
+  },
+  c6: {
+    id: 'c6', code: 'CS201', name: 'Cơ sở dữ liệu',
+    instructor: 'TS. Hoàng Thu Lan', instructorTitle: 'Giảng viên',
+    dept: 'Khoa CNTT', semester: '2026-2', credits: 3, students: 0, enrolled: 0,
+    completionRate: 0, rating: 0, status: 'draft',
+    startDate: '', endDate: '',
+    description: 'Học phần Cơ sở dữ liệu cung cấp nền tảng về mô hình quan hệ, SQL và thiết kế CSDL.',
+    syl: 'CS201-SYL-2026.pdf',
+  },
 };
 
 const ASSIGNMENTS = [
@@ -42,47 +106,58 @@ const TABS = [
   { id: 'gradebook', label: 'Bảng điểm' },
 ];
 
-export default function CourseDetail() {
+const STATUS_LABELS = {
+  published: 'Đã xuất bản',
+  draft: 'Nháp',
+  archived: 'Lưu trữ',
+  closed: 'Đã đóng',
+};
+
+interface CourseDetailProps {
+  id?: string;
+  onEdit?: () => void;
+}
+
+export default function CourseDetail({ id }: CourseDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const course = COURSES_MAP[actualId] ?? COURSES_MAP['c1'];
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={COURSE.name}
-        description={`${COURSE.code} · ${COURSE.dept} · ${COURSE.semester}`}
-        breadcrumbs={[{ label: 'LMS', href: '/lms' }, { label: 'Khóa học', href: '/lms/khoa-hoc' }, { label: COURSE.name }]}
-        actions={
-          <>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất danh sách</Button>
-            <Button leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => window.location.href = `/lms/khoa-hoc/${COURSE.id}/sua`}>Chỉnh sửa</Button>
-          </>
-        }
-      />
-
       {/* Course header card */}
       <Card>
         <CardContent className="p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <Badge variant="success">Đã xuất bản</Badge>
-                <span className="text-xs text-[rgb(var(--text-muted))]">📅 {COURSE.startDate} → {COURSE.endDate}</span>
-                <span className="text-xs text-[rgb(var(--text-muted))]">🎓 {COURSE.credits} tín chỉ</span>
+                <Badge variant="success">{STATUS_LABELS[course.status]}</Badge>
+                {course.startDate && (
+                  <span className="text-xs text-[rgb(var(--text-muted))]">📅 {course.startDate} → {course.endDate}</span>
+                )}
+                <span className="text-xs text-[rgb(var(--text-muted))]">🎓 {course.credits} tín chỉ</span>
               </div>
-              <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed">{COURSE.description}</p>
+              <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed">{course.description}</p>
             </div>
             <div className="text-right shrink-0">
               <div className="flex items-center gap-1">
-                <span className="text-2xl font-bold text-[rgb(var(--text-primary))]">{COURSE.rating}</span>
-                <svg className="h-5 w-5 text-amber-400 fill-amber-400" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
+                <span className="text-2xl font-bold text-[rgb(var(--text-primary))]">{course.rating || '—'}</span>
+                {course.rating > 0 && (
+                  <svg className="h-5 w-5 text-amber-400 fill-amber-400" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                )}
               </div>
-              <p className="text-xs text-[rgb(var(--text-muted))]">{COURSE.enrolled}/{COURSE.students} SV</p>
-              <div className="mt-2 h-1.5 w-24 rounded-full bg-[rgb(var(--border))] overflow-hidden">
-                <div className="h-full rounded-full bg-[rgb(var(--success))]" style={{ width: `${COURSE.completionRate}%` }} />
-              </div>
-              <p className="text-[10px] text-[rgb(var(--text-muted))] mt-0.5">{COURSE.completionRate}% hoàn thành</p>
+              <p className="text-xs text-[rgb(var(--text-muted))]">{course.enrolled}/{course.students} SV</p>
+              {course.completionRate > 0 && (
+                <>
+                  <div className="mt-2 h-1.5 w-24 rounded-full bg-[rgb(var(--border))] overflow-hidden">
+                    <div className="h-full rounded-full bg-[rgb(var(--success))]" style={{ width: `${course.completionRate}%` }} />
+                  </div>
+                  <p className="text-[10px] text-[rgb(var(--text-muted))] mt-0.5">{course.completionRate}% hoàn thành</p>
+                </>
+              )}
             </div>
           </div>
         </CardContent>
@@ -114,14 +189,14 @@ export default function CourseDetail() {
             </div>
             <CardContent className="space-y-4 p-5">
               {[
-                { label: 'Giảng viên', value: `${COURSE.instructor} — ${COURSE.instructorTitle}` },
-                { label: 'Khoa', value: COURSE.dept },
-                { label: 'Học kỳ', value: COURSE.semester },
-                { label: 'Số tín chỉ', value: `${COURSE.credits} tín chỉ` },
-                { label: 'Số sinh viên', value: `${COURSE.enrolled} SV` },
-                { label: 'Ngày bắt đầu', value: COURSE.startDate },
-                { label: 'Ngày kết thúc', value: COURSE.endDate },
-                { label: 'File đề cương', value: COURSE.syl },
+                { label: 'Giảng viên', value: `${course.instructor} — ${course.instructorTitle}` },
+                { label: 'Khoa', value: course.dept },
+                { label: 'Học kỳ', value: course.semester },
+                { label: 'Số tín chỉ', value: `${course.credits} tín chỉ` },
+                { label: 'Số sinh viên', value: `${course.enrolled} SV` },
+                ...(course.startDate ? [{ label: 'Ngày bắt đầu', value: course.startDate }] : []),
+                ...(course.endDate ? [{ label: 'Ngày kết thúc', value: course.endDate }] : []),
+                { label: 'File đề cương', value: course.syl },
               ].map(({ label, value }) => (
                 <div key={label} className="flex justify-between text-sm border-b border-[rgb(var(--border)/0.4)] pb-2 last:border-0 last:pb-0">
                   <span className="text-[rgb(var(--text-muted))]">{label}</span>
@@ -181,7 +256,7 @@ export default function CourseDetail() {
                   <p className="text-xs text-[rgb(var(--text-muted))]">📅 {a.due} · Tối đa {a.maxScore} điểm</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-semibold text-[rgb(var(--text-primary)]">{a.submissions}/{COURSE.enrolled}</p>
+                  <p className="text-sm font-semibold text-[rgb(var(--text-primary)]">{a.submissions}/{course.enrolled}</p>
                   <p className="text-[10px] text-[rgb(var(--text-muted))]">nộp · {a.graded} đã chấm</p>
                 </div>
               </div>
@@ -194,12 +269,12 @@ export default function CourseDetail() {
       {activeTab === 'students' && (
         <Card>
           <div className="px-5 pt-5 pb-4 border-b border-[rgb(var(--border)/0.6)] flex items-center justify-between">
-            <h3 className="font-semibold text-[rgb(var(--text-primary))]">Danh sách sinh viên ({COURSE.enrolled})</h3>
+            <h3 className="font-semibold text-[rgb(var(--text-primary))]">Danh sách sinh viên ({course.enrolled})</h3>
             <Button variant="outline" size="sm">Danh sách lớp</Button>
           </div>
           <div className="px-5 py-10 text-center">
             <Users className="h-12 w-12 text-[rgb(var(--text-muted))] mx-auto mb-3" />
-            <p className="text-sm text-[rgb(var(--text-secondary))]">{COURSE.enrolled} sinh viên đã đăng ký</p>
+            <p className="text-sm text-[rgb(var(--text-secondary))]">{course.enrolled} sinh viên đã đăng ký</p>
             <Button variant="outline" size="sm" className="mt-4">Xem danh sách</Button>
           </div>
         </Card>

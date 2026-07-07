@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Download, Search, Upload, Eye, FileText } from 'lucide-react';
-import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
+import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import ScanDetail from './ScanDetail';
 
 const DOCUMENTS = [
   { id: 'd1', name: 'Hồ sơ tuyển dụng 2026-001', type: 'Hồ sơ nhân sự', pages: 8, processed: '2026-06-20', status: 'done', accuracy: 98.2, docType: 'PDF', size: '4.2 MB', source: 'HRM' },
@@ -40,11 +41,13 @@ const SOURCE_COLORS: Record<string, string> = {
 };
 
 export default function ScanList() {
-  const navigate = useNavigate();
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('Tất cả');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedDoc = selectedId ? DOCUMENTS.find((d) => d.id === selectedId) : null;
 
   const filtered = DOCUMENTS.filter((d) => {
     const matchSearch = !search || d.name.toLowerCase().includes(search.toLowerCase()) || d.type.toLowerCase().includes(search.toLowerCase());
@@ -147,7 +150,7 @@ export default function ScanList() {
                 <TableCell><Badge variant={sc.variant} size="sm">{sc.label}</Badge></TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate(`/ocr/tai-lieu/${doc.id}`)}>Xem</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(doc.id)}>Xem</Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -164,6 +167,16 @@ export default function ScanList() {
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedDoc ? selectedDoc.name : ''}
+        description={selectedDoc ? `${selectedDoc.docType} · ${selectedDoc.pages} trang · ${selectedDoc.size}` : ''}
+        size="fullscreen"
+      >
+        {selectedDoc ? <ScanDetail id={selectedDoc.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

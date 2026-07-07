@@ -9,12 +9,28 @@ import {
   XCircle,
   Eye,
 } from 'lucide-react';
-import { Card, CardContent, Badge, Button, Select, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TableEmpty, TablePagination } from '@/components/ui';
+import { Card, CardContent, Badge, Button, Select, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TableEmpty, TablePagination, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 import { useTranslation } from 'react-i18next';
+import DocumentDetailPage from './DocumentDetailPage';
 
-const DOCUMENTS = [
+interface ApprovalDoc {
+  id: string;
+  code: string;
+  title: string;
+  dept: string;
+  type: string;
+  urgent: boolean;
+  date: string;
+  deadline: string;
+  status: string;
+  creator: string;
+  description: string;
+}
+
+const DOCUMENTS: ApprovalDoc[] = [
   { id: 'd1', code: 'VB-2026-001', title: 'Quyết định thành lập Hội đồng Tuyển sinh', dept: 'Phòng Tuyển sinh', type: 'Quyết định', urgent: true, date: '2026-06-20', deadline: '2026-06-27', status: 'pending', creator: 'Nguyễn Văn A', description: 'Thành lập Hội đồng Tuyển sinh năm 2026 gồm 7 thành viên' },
   { id: 'd2', code: 'VB-2026-002', title: 'Thông báo lịch thi học kỳ 2 năm học 2025-2026', dept: 'Phòng Đào tạo', type: 'Thông báo', urgent: true, date: '2026-06-18', deadline: '2026-06-25', status: 'pending', creator: 'Trần Thị B', description: 'Kỳ thi được tổ chức từ 15/07 đến 25/07/2026' },
   { id: 'd3', code: 'VB-2026-003', title: 'Kế hoạch bảo trì hệ thống tháng 7/2026', dept: 'Phòng CNTT', type: 'Kế hoạch', urgent: false, date: '2026-06-15', deadline: '2026-07-01', status: 'pending', creator: 'Lê Văn C', description: 'Bảo trì định kỳ hệ thống LMS và Portal' },
@@ -58,10 +74,13 @@ const STATUS_SELECT_OPTIONS = [
 export default function ApprovalList() {
   const { t } = useTranslation('dms');
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
+  const { selectedId, openDetail, close } = useDetailModal<string>({ size: 'fullscreen' });
   const [search, setSearch] = useState('');
   const [type, setType] = useState('Tất cả');
   const [status, setStatus] = useState('pending');
   const [urgentOnly, setUrgentOnly] = useState(false);
+
+  const selectedDoc = selectedId ? DOCUMENTS.find((d) => d.id === selectedId) : null;
 
   const filtered = DOCUMENTS.filter((d) => {
     const matchSearch = !search || d.title.toLowerCase().includes(search.toLowerCase()) || d.code.toLowerCase().includes(search.toLowerCase());
@@ -172,7 +191,7 @@ export default function ApprovalList() {
                     <TableCell><Badge variant={STATUSES[d.status]?.variant ?? 'neutral'} size="sm">{t(STATUSES[d.status]?.labelKey ?? 'status.pending')}</Badge></TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" leftIcon={<Eye className="h-4 w-4" />}>{t('approval.view')}</Button>
+                        <Button variant="ghost" size="sm" leftIcon={<Eye className="h-4 w-4" />} onClick={() => openDetail(d.id)}>{t('approval.view')}</Button>
                         {d.status === 'pending' && (
                           <>
                             <Button variant="ghost" size="sm" leftIcon={<CheckCircle2 className="h-4 w-4" />}>{t('approval.approve')}</Button>
@@ -190,6 +209,16 @@ export default function ApprovalList() {
           <TablePagination page={pagination.page} pageSize={pagination.pageSize} total={filtered.length} onPageChange={setPage} onPageSizeChange={setPageSize} />
         </CardContent>
       </Card>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedDoc ? `${selectedDoc.code} — ${t('common.detail')}` : t('common.detail')}
+        description={selectedDoc?.title}
+        size="fullscreen"
+      >
+        {selectedId && <DocumentDetailPage id={selectedId} />}
+      </DetailModal>
     </div>
   );
 }

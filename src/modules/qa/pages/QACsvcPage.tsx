@@ -25,9 +25,12 @@ import {
   TableEmpty,
   Card,
   CardContent,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import QACsvcDetail from './QACsvcDetail';
 
 type Facility = {
   id: string;
@@ -92,6 +95,9 @@ export default function QACsvcPage() {
   const [filterType, setFilterType] = useState('Tất cả');
   const [filterBuilding, setFilterBuilding] = useState('Tất cả');
   const [filterStatus, setFilterStatus] = useState('Tất cả');
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+
+  const selectedFacility = selectedId ? FACILITIES.find((f) => f.id === selectedId) : null;
 
   const types = ['Tất cả', ...Array.from(new Set(FACILITIES.map(f => f.type)))];
   const buildings = ['Tất cả', ...Array.from(new Set(FACILITIES.map(f => f.building)))].sort();
@@ -242,7 +248,7 @@ export default function QACsvcPage() {
                 </TableCell>
                 <TableCell className="text-sm text-[rgb(var(--text-muted))]">{f.lastInspected}</TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="sm" onClick={() => navigate(`/qa/csvc/${f.id}`)}>Chi tiết</Button>
+                  <Button variant="ghost" size="sm" onClick={() => openDetail(f.id)}>Chi tiết</Button>
                 </TableCell>
               </TableRow>
             );
@@ -255,6 +261,16 @@ export default function QACsvcPage() {
         onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedFacility ? `${selectedFacility.code} — Chi tiết CSVC` : ''}
+        description={selectedFacility ? selectedFacility.name : ''}
+        size="fullscreen"
+      >
+        {selectedId ? <QACsvcDetail id={selectedId} /> : null}
+      </DetailModal>
     </div>
   );
 }

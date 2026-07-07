@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, CardContent, Input } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const DEGREES = ['Tốt nghiệp PTTH', 'Tốt nghiệp THPT', 'Tốt nghiệp Trung cấp'];
 const STATUS_OPTIONS = ['Đang học', 'Bảo lưu', 'Đình chỉ', 'Thôi học', 'Tốt nghiệp'];
@@ -20,7 +19,12 @@ function Field({ label, required, error, children }: { label: string; required?:
   );
 }
 
-export default function StudentEdit() {
+interface StudentEditProps {
+  id?: string;
+  onSuccess?: () => void;
+}
+
+export default function StudentEdit({ onSuccess }: StudentEditProps = {}) {
   const { t } = useTranslation('sis');
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -50,26 +54,16 @@ export default function StudentEdit() {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    navigate('/sis/sinh-vien');
+    if (onSuccess) {
+      onSuccess();
+    } else {
+      navigate('/sis/sinh-vien');
+    }
   };
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={t('student.form.title')}
-        description={`${form.msv} — Cập nhật thông tin sinh viên`}
-        breadcrumbs={[
-          { label: 'SIS', href: '/sis' },
-          { label: t('student.breadcrumb.list'), href: '/sis/sinh-vien' },
-          { label: form.name },
-          { label: t('student.breadcrumb.edit') },
-        ]}
-        actions={<Button variant="outline" onClick={() => navigate('/sis/sinh-vien')}>{t('common.cancelShort')}</Button>}
-      />
-
       <form onSubmit={handleSubmit} className="space-y-6">
-
-        {/* Thông tin cá nhân */}
         <Card>
           <div className="px-5 py-4 border-b border-[rgb(var(--border)/0.6)]">
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('student.form.personalInfo')}</h3>
@@ -91,34 +85,31 @@ export default function StudentEdit() {
                   onChange={(e) => set('gender', e.target.value)}
                   className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
                 >
-                  <option>{t('student.form.gioiTinhMale')}</option>
-                  <option>{t('student.form.gioiTinhFemale')}</option>
-                  <option>{t('student.form.gioiTinhOther')}</option>
+                  <option>Nam</option><option>Nữ</option><option>Khác</option>
                 </select>
               </Field>
             </div>
             <Field label={t('student.form.email')}>
-              <Input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder={t('student.form.emailPlaceholder')} />
+              <Input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="email@student.truong.edu.vn" />
             </Field>
             <Field label={t('student.form.soDienThoai')}>
-              <Input value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder={t('student.form.phonePlaceholder')} />
+              <Input value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="0912 345 678" />
             </Field>
             <div className="col-span-2">
               <Field label={t('student.form.diaChi')}>
-                <Input value={form.address} onChange={(e) => set('address', e.target.value)} placeholder={t('student.form.addressPlaceholder')} />
+                <Input value={form.address} onChange={(e) => set('address', e.target.value)} placeholder="Số 12, Đường Nguyễn Trãi, Quận 1, TP.HCM" />
               </Field>
             </div>
           </CardContent>
         </Card>
 
-        {/* Thông tin học tập */}
         <Card>
           <div className="px-5 py-4 border-b border-[rgb(var(--border)/0.6)]">
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('student.form.academicInfo')}</h3>
           </div>
           <CardContent className="grid grid-cols-2 gap-4 pt-5">
             <Field label={t('student.form.lop')}>
-              <Input value={form.class} onChange={(e) => set('class', e.target.value)} placeholder={t('student.form.classPlaceholder')} />
+              <Input value={form.class} onChange={(e) => set('class', e.target.value)} placeholder="CNTT-K60A" />
             </Field>
             <Field label={t('student.form.nganh')}>
               <Input value={form.major} onChange={(e) => set('major', e.target.value)} />
@@ -133,7 +124,7 @@ export default function StudentEdit() {
               </select>
             </Field>
             <Field label={t('student.form.khoaHoc')}>
-              <Input value={form.cohort} onChange={(e) => set('cohort', e.target.value)} placeholder={t('student.form.cohortPlaceholder')} />
+              <Input value={form.cohort} onChange={(e) => set('cohort', e.target.value)} placeholder="2022" />
             </Field>
             <Field label={t('student.form.bacDaoTao')}>
               <select
@@ -165,7 +156,7 @@ export default function StudentEdit() {
         </Card>
 
         <div className="flex items-center justify-end gap-3">
-          <Button variant="outline" type="button" onClick={() => navigate('/sis/sinh-vien')}>{t('common.cancelShort')}</Button>
+          <Button variant="outline" type="button" onClick={onSuccess ?? (() => navigate('/sis/sinh-vien'))}>Hủy</Button>
           <Button type="submit" leftIcon={<Save className="h-4 w-4" />}>{t('common.update')}</Button>
         </div>
       </form>

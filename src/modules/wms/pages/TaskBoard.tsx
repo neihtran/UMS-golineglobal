@@ -4,9 +4,10 @@ import {
   Plus, Filter, AlertTriangle, User, Calendar,
   GripVertical, ChevronRight, MoreVertical, Pencil, Trash2,
 } from 'lucide-react';
-import { Button, Input } from '@/components/ui';
+import { Button, Input, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { useNavigate } from 'react-router-dom';
+import { useDetailModal } from '@/hooks';
 
 type Task = {
   id: string;
@@ -36,6 +37,10 @@ export default function TaskBoard() {
   const [columns, setColumns] = useState<Column[]>(INITIAL_COLUMNS(t));
   const [dragOverColId, setDragOverColId] = useState<string | null>(null);
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+
+  const allTasks: Task[] = columns.flatMap((col) => col.tasks);
+  const selectedTask = selectedId ? allTasks.find((task) => task.id === selectedId) : null;
 
   const handleDragStart = useCallback((taskId: string) => {
     setDraggedTaskId(taskId);
@@ -190,7 +195,7 @@ export default function TaskBoard() {
                     >
                       <div className="flex items-center justify-between mb-2">
                         <GripVertical className="h-3.5 w-3.5 text-[rgb(var(--text-muted))] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <TaskActionMenu taskId={task.id} onView={() => navigate(`/wms/cong-viec/${task.id}`)} />
+                        <TaskActionMenu taskId={task.id} onView={() => openDetail(task.id)} />
                       </div>
 
                       <div className="flex items-center gap-1.5 mb-2">
@@ -206,7 +211,7 @@ export default function TaskBoard() {
                       </div>
 
                       <button
-                        onClick={() => navigate(`/wms/cong-viec/${task.id}`)}
+                        onClick={() => openDetail(task.id)}
                         className="text-sm font-medium text-[rgb(var(--text-primary))] leading-tight mb-2 text-left w-full hover:text-[rgb(var(--primary))] transition-colors"
                       >
                         {task.title}
@@ -264,6 +269,33 @@ export default function TaskBoard() {
           );
         })}
       </div>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedTask?.title ?? ''}
+        description={selectedTask ? `#${selectedTask.id} · ${selectedTask.dept}` : ''}
+        size="fullscreen"
+        footer={<div className="flex justify-end"><Button variant="outline" onClick={close}>Đóng</Button></div>}
+      >
+        <div className="space-y-4">
+          {[
+            { label: 'ID', value: selectedTask?.id },
+            { label: t('task.tenCv'), value: selectedTask?.title },
+            { label: t('task.nguoiNhan'), value: selectedTask?.assignee },
+            { label: t('task.donVi'), value: selectedTask?.dept },
+            { label: t('task.doUuTien'), value: t(`task.priority.${selectedTask?.priority ?? ''}`) },
+            { label: t('task.hanChot'), value: selectedTask?.dueDate },
+            { label: t('task.tienDo'), value: selectedTask?.progress !== undefined ? `${selectedTask.progress}%` : undefined },
+            { label: 'Tags', value: selectedTask?.tags.join(', ') },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+              <span className="text-sm text-[rgb(var(--text-secondary))] w-40 shrink-0">{label}</span>
+              <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{value ?? '—'}</span>
+            </div>
+          ))}
+        </div>
+      </DetailModal>
     </div>
   );
 }

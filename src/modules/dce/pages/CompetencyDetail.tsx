@@ -1,7 +1,6 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Download, Trash2, Edit3 } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Download, Trash2, Edit3 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const STANDARDS = [
@@ -35,40 +34,18 @@ const RELATED_STANDARDS = [
   { id: 's5', code: 'CDIO-4.1', name: 'Ứng dụng CNTT trong chuyên môn', dept: 'Khoa CNTT' },
 ];
 
-export default function CompetencyDetail() {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const s = STANDARDS.find((x) => x.id === id);
-  const sc = s ? STATUS_CONFIG[s.status as keyof typeof STATUS_CONFIG] : null;
+interface CompetencyDetailProps {
+  id?: string;
+}
 
-  if (!s) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-xl font-bold text-[rgb(var(--text-primary))]">Không tìm thấy chuẩn đầu ra</p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate('/dce/chuan-dau-ra')}>Quay lại danh sách</Button>
-      </div>
-    );
-  }
+export default function CompetencyDetail({ id }: CompetencyDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const s = STANDARDS.find((x) => x.id === actualId) ?? STANDARDS[0];
+  const sc = STATUS_CONFIG[s.status as keyof typeof STATUS_CONFIG];
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`Chi tiết: ${s.code}`}
-        description={s.name}
-        breadcrumbs={[
-          { label: 'DCE', href: '/dce' },
-          { label: 'Chuẩn đầu ra', href: '/dce/chuan-dau-ra' },
-          { label: s.code },
-        ]}
-        actions={
-          <>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất báo cáo</Button>
-            <Button variant="outline" leftIcon={<Edit3 className="h-4 w-4" />}>Chỉnh sửa</Button>
-            <Button variant="outline" leftIcon={<Trash2 className="h-4 w-4" />}>Xóa</Button>
-          </>
-        }
-      />
-
       <Card>
         <CardContent className="p-6 space-y-4">
           <div className="flex flex-wrap items-center gap-2">
@@ -113,9 +90,9 @@ export default function CompetencyDetail() {
               <p className="text-[10px] uppercase text-[rgb(var(--text-muted))] mb-2">Chuẩn đầu ra liên quan</p>
               <div className="flex flex-wrap gap-2">
                 {RELATED_STANDARDS.map((r) => (
-                  <Button key={r.id} variant="outline" size="sm" onClick={() => navigate(`/dce/chuan-dau-ra/${r.id}`)}>
+                  <Badge key={r.id} variant="neutral" size="sm">
                     {r.code}: {r.name}
-                  </Button>
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -123,10 +100,10 @@ export default function CompetencyDetail() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-start">
-        <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/dce/chuan-dau-ra')}>
-          Quay lại danh sách
-        </Button>
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất báo cáo</Button>
+        <Button variant="outline" leftIcon={<Edit3 className="h-4 w-4" />}>Chỉnh sửa</Button>
+        <Button variant="outline" leftIcon={<Trash2 className="h-4 w-4" />}>Xóa</Button>
       </div>
     </div>
   );

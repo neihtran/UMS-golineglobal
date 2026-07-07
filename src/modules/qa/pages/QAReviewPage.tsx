@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import { Button, Badge, Card, CardContent } from '@/components/ui';
+import { Button, Badge, Card, CardContent, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import ReviewDetail from './ReviewDetail';
 
 const REVIEWS = [
   { id: 'r1', code: 'KD2026001', name: 'Kiểm định chương trình CNTT', type: 'Kiểm định CTĐT', standard: 'AUN-QA', status: 'in-progress', deadline: '2026-09-30', progress: 65 },
@@ -20,7 +22,9 @@ const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'neutral'
 export default function QAReviewPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
   const filtered = REVIEWS.filter((r) => !search || r.name.toLowerCase().includes(search.toLowerCase()) || r.code.toLowerCase().includes(search.toLowerCase()));
+  const selectedReview = selectedId ? REVIEWS.find((r) => r.id === selectedId) : null;
 
   return (
     <div className="space-y-6">
@@ -72,7 +76,7 @@ export default function QAReviewPage() {
                     </div>
                   </div>
                   <div className="flex gap-2 ml-4 shrink-0">
-                    <Button variant="outline" size="sm" onClick={() => navigate(`/qa/kiem-dinh/${r.id}`)}>Xem</Button>
+                    <Button variant="outline" size="sm" onClick={() => openDetail(r.id)}>Xem</Button>
                     <Button variant="ghost" size="sm" onClick={() => navigate(`/qa/kiem-dinh/${r.id}/minh-chung`)}>Minh chứng</Button>
                   </div>
                 </div>
@@ -81,6 +85,16 @@ export default function QAReviewPage() {
           );
         })}
       </div>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedReview ? `${selectedReview.code} — Chi tiết` : ''}
+        description={selectedReview ? selectedReview.name : ''}
+        size="fullscreen"
+      >
+        {selectedId ? <ReviewDetail id={selectedId} /> : null}
+      </DetailModal>
     </div>
   );
 }

@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Plus, Download, AlertTriangle, Scale, Ban } from 'lucide-react';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty, Modal,
+  TableHeadCell, TableCell, TablePagination, TableEmpty, Modal, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 
 const DISCIPLINES = [
   { id: 'dc01', code: 'KL-2026-001', name: 'Nguyen Van Minh', dept: 'Khoa CNTT', type: 'academic', level: 'severe', date: '2026-06-10', status: 'pending', description: 'Sao chép bai tap lon', handler: 'PGS.TS. Le Hoang', handlerDept: 'Phong Dao tao', nextSteps: 'Cho phan hoi tu gia dinh' },
@@ -45,8 +46,9 @@ export default function DisciplineList() {
   const [status, setStatus] = useState('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [quyDinhOpen, setQuyDinhOpen] = useState(false);
-  const [chiTietOpen, setChiTietOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<typeof DISCIPLINES[0] | null>(null);
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedItem = selectedId ? DISCIPLINES.find((d) => d.id === selectedId) ?? null : null;
 
   const filtered = DISCIPLINES.filter((d) => {
     const match = !search || d.name.toLowerCase().includes(search.toLowerCase()) || d.code.toLowerCase().includes(search.toLowerCase());
@@ -136,7 +138,14 @@ export default function DisciplineList() {
               return (
                 <TableRow key={d.id}>
                   <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{d.code}</TableCell>
-                  <TableCell className="font-medium text-[rgb(var(--text-primary))]">{d.name}</TableCell>
+                  <TableCell>
+                    <button
+                      onClick={() => openDetail(d.id)}
+                      className="font-medium text-[rgb(var(--text-primary))] hover:text-[rgb(var(--primary))] transition-colors text-left w-full"
+                    >
+                      {d.name}
+                    </button>
+                  </TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{d.dept}</TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{t(TYPE_CONFIG[d.type])}</TableCell>
                   <TableCell><Badge variant={lc.variant} size="sm">{t(lc.labelKey)}</Badge></TableCell>
@@ -146,7 +155,7 @@ export default function DisciplineList() {
                   <TableCell className="text-[rgb(var(--text-secondary))]">{d.date}</TableCell>
                   <TableCell><Badge variant={sc.variant} dot size="sm">{t(sc.labelKey)}</Badge></TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" onClick={() => { setSelectedItem(d); setChiTietOpen(true); }}>{t('action.detail')}</Button>
+                    <Button variant="ghost" size="sm" onClick={() => openDetail(d.id)}>{t('action.detail')}</Button>
                   </TableCell>
                 </TableRow>
               );
@@ -218,9 +227,9 @@ export default function DisciplineList() {
         footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setQuyDinhOpen(false)}>{t('discipline.btn.close')}</Button></div>}>
         <div className="space-y-3">
           {[
-            { levelKey: 'discipline.level.mild', color: 'rgb(var(--neutral))', descKey: 'discipline.modal.proposedActionPlaceholder' },
-            { levelKey: 'discipline.level.moderate', color: 'rgb(var(--warning))', descKey: 'discipline.modal.proposedActionPlaceholder' },
-            { levelKey: 'discipline.level.severe', color: 'rgb(var(--error))', descKey: 'discipline.modal.proposedActionPlaceholder' },
+            { levelKey: 'discipline.level.mild', color: 'rgb(var(--neutral))' },
+            { levelKey: 'discipline.level.moderate', color: 'rgb(var(--warning))' },
+            { levelKey: 'discipline.level.severe', color: 'rgb(var(--error))' },
           ].map(({ levelKey, color }) => (
             <div key={levelKey} className="rounded-lg border border-[rgb(var(--border))] p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -241,14 +250,15 @@ export default function DisciplineList() {
         </div>
       </Modal>
 
-      {/* Modal 3: Detail */}
-      <Modal open={chiTietOpen} onClose={() => setChiTietOpen(false)} title={t('discipline.modal.detailTitle')} size="lg"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setChiTietOpen(false)}>{t('discipline.btn.close')}</Button>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />} onClick={() => setChiTietOpen(false)}>{t('discipline.modal.downloadRecord')}</Button>
-          </div>
-        }>
+      {/* Detail Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedItem ? `${t('discipline.modal.detailTitle')} — ${selectedItem.name}` : ''}
+        description={selectedItem ? `${selectedItem.code} · ${selectedItem.dept}` : ''}
+        size="fullscreen"
+        onPrint={selectedItem ? () => window.print() : undefined}
+      >
         {selectedItem && (
           <div className="space-y-4">
             <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
@@ -305,7 +315,7 @@ export default function DisciplineList() {
             )}
           </div>
         )}
-      </Modal>
+      </DetailModal>
     </div>
   );
 }

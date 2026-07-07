@@ -9,7 +9,6 @@ import {
   Paperclip,
   MessageSquare,
   Send,
-  ArrowLeft,
   Edit3,
   MoreVertical,
 } from 'lucide-react';
@@ -30,7 +29,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
+
+interface TaskDetailProps {
+  id?: string;
+}
 
 type Subtask = { id: string; title: string; done: boolean };
 type TaskComment = {
@@ -115,8 +117,9 @@ const MODULE_COLORS: Record<string, string> = {
   FIN: '#DC2626',
 };
 
-export default function TaskDetail() {
-  const { id } = useParams<{ id: string }>();
+export default function TaskDetail({ id: propId }: TaskDetailProps = {}) {
+  const params = useParams<{ id: string }>();
+  const id = propId ?? params.id;
   const navigate = useNavigate();
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<TaskComment[]>(TASK.comments);
@@ -152,39 +155,24 @@ export default function TaskDetail() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <PageHeader
-        title="Chi tiết công việc"
-        description={`#${TASK.id} — ${TASK.title}`}
-        breadcrumbs={[
-          { label: 'WMS', href: '/wms' },
-          { label: 'Danh sách', href: '/wms/cong-viec' },
-          { label: 'Chi tiết' },
-        ]}
-        actions={
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              leftIcon={<ArrowLeft className="h-4 w-4" />}
-              onClick={() => navigate('/wms/cong-viec')}
-            >
-              Danh sách
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-bold text-[rgb(var(--text-primary))]">{TASK.title}</h1>
+          <p className="text-xs text-[rgb(var(--text-muted))]">#{id ?? TASK.id}</p>
+        </div>
+        <DropdownMenu
+          trigger={
+            <Button variant="ghost" size="sm">
+              <MoreVertical className="h-4 w-4" />
             </Button>
-            <DropdownMenu
-              trigger={
-                <Button variant="ghost" size="sm">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              }
-              items={[
-                { id: 'edit', label: 'Chỉnh sửa', icon: <Edit3 className="h-3.5 w-3.5" />, onClick: () => navigate(`/wms/tao-cv?edit=${TASK.id}`) },
-                { id: 'del', label: 'Xóa công việc', icon: <X className="h-3.5 w-3.5" />, danger: true, onClick: () => console.log('Xóa', TASK.id) },
-              ]}
-              closeOnItemClick
-            />
-          </div>
-        }
-      />
+          }
+          items={[
+            { id: 'edit', label: 'Chỉnh sửa', icon: <Edit3 className="h-3.5 w-3.5" />, onClick: () => navigate(`/wms/tao-cv?edit=${TASK.id}`) },
+            { id: 'del', label: 'Xóa công việc', icon: <X className="h-3.5 w-3.5" />, danger: true, onClick: () => console.log('Xóa', TASK.id) },
+          ]}
+          closeOnItemClick
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main content */}

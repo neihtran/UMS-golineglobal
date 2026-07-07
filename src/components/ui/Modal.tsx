@@ -8,7 +8,7 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   description?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'fullscreen';
   children: React.ReactNode;
   footer?: React.ReactNode;
   closeOnOverlayClick?: boolean;
@@ -22,7 +22,7 @@ const sizeClasses = {
   md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-2xl',
-  full: 'max-w-4xl',
+  fullscreen: 'max-w-[95vw] max-h-[95vh]',
 };
 
 export const Modal = ({
@@ -40,7 +40,6 @@ export const Modal = ({
 }: ModalProps) => {
   const overlayRef = React.useRef<HTMLDivElement>(null);
 
-  // Close on Escape
   React.useEffect(() => {
     if (!open || !closeOnEsc) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -50,7 +49,6 @@ export const Modal = ({
     return () => document.removeEventListener('keydown', handleKey);
   }, [open, closeOnEsc, onClose]);
 
-  // Lock body scroll
   React.useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
@@ -64,13 +62,12 @@ export const Modal = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
       aria-describedby={description ? 'modal-description' : undefined}
     >
-      {/* Backdrop */}
       <div
         ref={overlayRef}
         className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
@@ -78,19 +75,19 @@ export const Modal = ({
         aria-hidden="true"
       />
 
-      {/* Panel */}
       <div
         className={clsx(
-          'relative w-full rounded-[var(--radius-lg)] bg-[rgb(var(--bg-card))] shadow-[var(--shadow-xl)]',
+          'relative rounded-[var(--radius-lg)] bg-[rgb(var(--bg-card))] shadow-[var(--shadow-xl)]',
           'animate-in zoom-in-95 fade-in duration-200',
-          'max-h-[90vh] flex flex-col',
+          size === 'fullscreen'
+            ? 'flex flex-col w-full h-full overflow-hidden'
+            : 'max-h-[90vh] flex flex-col',
           sizeClasses[size],
           className,
         )}
       >
-        {/* Header */}
         {(title || !hideCloseButton) && (
-          <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-[rgb(var(--border)/0.6)]">
+          <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-[rgb(var(--border)/0.6)] shrink-0">
             <div className="flex-1 min-w-0">
               {title && (
                 <h2 id="modal-title" className="text-base font-semibold text-[rgb(var(--text-primary))] truncate">
@@ -118,14 +115,15 @@ export const Modal = ({
           </div>
         )}
 
-        {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className={clsx(
+          'flex-1 overflow-y-auto',
+          size === 'fullscreen' ? 'px-6 py-4' : 'px-6 py-4'
+        )}>
           {children}
         </div>
 
-        {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-[rgb(var(--border)/0.6)]">
+          <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-[rgb(var(--border)/0.6)] shrink-0">
             {footer}
           </div>
         )}
@@ -234,18 +232,16 @@ export const Drawer = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex"
+      className="fixed inset-0 z-[9999] flex"
       role="dialog"
       aria-modal="true"
     >
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Panel */}
       <div
         className={clsx(
           'relative bg-[rgb(var(--bg-card))] shadow-[var(--shadow-xl)] flex flex-col',
@@ -260,7 +256,6 @@ export const Drawer = ({
           animationName: isRight ? 'slideInFromRight' : 'slideInFromLeft',
         }}
       >
-        {/* Header */}
         {(title || !hideCloseButton) && (
           <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-[rgb(var(--border)/0.6)] shrink-0">
             <div className="flex-1 min-w-0">
@@ -279,12 +274,10 @@ export const Drawer = ({
           </div>
         )}
 
-        {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {children}
         </div>
 
-        {/* Footer */}
         {footer && (
           <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-[rgb(var(--border)/0.6)] shrink-0">
             {footer}

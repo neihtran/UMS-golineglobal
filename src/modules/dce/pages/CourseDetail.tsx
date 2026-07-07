@@ -1,11 +1,10 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Download, Trash2, Edit3,
+  Download, Trash2, Edit3,
   Users, CheckCircle2, Award, Target,
   Star,
 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const COURSE = {
@@ -32,6 +31,14 @@ const COURSE = {
   avgScore: 85,
   createdAt: '2026-01-15',
   updatedAt: '2026-06-10',
+};
+
+const COURSES_MAP: Record<string, typeof COURSE> = {
+  dc1: { ...COURSE, id: 'dc1', code: 'DCE-ICT-01', title: 'Kỹ năng số cơ bản' },
+  dc2: { ...COURSE, id: 'dc2', code: 'DCE-EDU-01', title: 'Ứng dụng AI trong giảng dạy' },
+  dc3: { ...COURSE, id: 'dc3', code: 'DCE-DATA-01', title: 'Phân tích dữ liệu với Python' },
+  dc4: { ...COURSE, id: 'dc4', code: 'DCE-SOFT-01', title: 'Kỹ năng mềm cho nhà giáo dục' },
+  dc5: { ...COURSE, id: 'dc5', code: 'DCE-CLOUD-01', title: 'Điện toán đám mây cơ bản' },
 };
 
 const WEEKLY_PROGRESS = [
@@ -72,32 +79,19 @@ const ASSESS_TYPE: Record<string, { label: string; variant: 'info' | 'warning' |
   project: { label: 'Đồ án', variant: 'success' },
 };
 
-export default function CourseDetail() {
-  const navigate = useNavigate();
-  const { id: _id } = useParams<{ id: string }>();
-  const course = COURSE;
+interface CourseDetailProps {
+  id?: string;
+}
+
+export default function CourseDetail({ id }: CourseDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const course = COURSES_MAP[actualId] ?? COURSE;
   const sc = STATUS_CONFIG[course.status];
   const completionRate = Math.round((course.completed / course.enrolled) * 100);
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`Chi tiết khóa học: ${course.code}`}
-        description={course.title}
-        breadcrumbs={[
-          { label: 'DCE', href: '/dce' },
-          { label: 'Khóa đào tạo', href: '/dce/khoa-dao-tao' },
-          { label: course.code },
-        ]}
-        actions={
-          <>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất báo cáo</Button>
-            <Button variant="outline" leftIcon={<Edit3 className="h-4 w-4" />} onClick={() => {}}>Chỉnh sửa</Button>
-            <Button variant="outline" leftIcon={<Trash2 className="h-4 w-4" />} onClick={() => {}}>Xóa</Button>
-          </>
-        }
-      />
-
       {/* Info card */}
       <Card>
         <CardContent className="p-6 space-y-4">
@@ -271,10 +265,10 @@ export default function CourseDetail() {
       </div>
 
       {/* Back */}
-      <div className="flex justify-start">
-        <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/dce/khoa-dao-tao/ds')}>
-          Quay lại danh sách
-        </Button>
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất báo cáo</Button>
+        <Button variant="outline" leftIcon={<Edit3 className="h-4 w-4" />} onClick={() => {}}>Chỉnh sửa</Button>
+        <Button variant="outline" leftIcon={<Trash2 className="h-4 w-4" />} onClick={() => {}}>Xóa</Button>
       </div>
     </div>
   );

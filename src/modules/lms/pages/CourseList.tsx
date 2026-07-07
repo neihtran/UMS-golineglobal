@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Download, Search, Plus, Star, Edit2, Eye } from 'lucide-react';
-import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
+import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import CourseDetail from './CourseDetail';
+import CourseEdit from './CourseEdit';
 
 const COURSES = [
   { id: 'c1', code: 'CS101', name: 'Nhập môn Lập trình Python', instructor: 'TS. Nguyễn Văn Minh', dept: 'Khoa CNTT', semester: '2026-1', credits: 4, students: 312, enrolled: 298, completion: 78, rating: 4.8, status: 'published' },
@@ -26,6 +28,9 @@ export default function CourseList() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
   const [dept, setDept] = useState('Tất cả');
+
+  const { selectedId, openDetail, openEdit, close, isEditMode } = useDetailModal<string>({ size: 'fullscreen' });
+  const selectedCourse = selectedId ? COURSES.find((c) => c.id === selectedId) : null;
 
   const filtered = COURSES.filter((c) => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase());
@@ -94,12 +99,15 @@ export default function CourseList() {
             return (
               <TableRow key={course.id}>
                 <TableCell>
-                  <Link to={`/lms/khoa-hoc/${course.id}`} className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))]">
+                  <button
+                    onClick={() => openDetail(course.id)}
+                    className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] transition-colors text-left"
+                  >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary)/0.1)] text-xs font-bold text-[rgb(var(--primary))]">
                       {course.code.slice(0, 2)}
                     </div>
                     <span className="font-medium text-[rgb(var(--text-primary))]">{course.name}</span>
-                  </Link>
+                  </button>
                 </TableCell>
                 <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{course.code}</TableCell>
                 <TableCell className="text-[rgb(var(--text-secondary))]">{course.instructor}</TableCell>
@@ -128,8 +136,8 @@ export default function CourseList() {
                 <TableCell><Badge variant={sc.variant} size="sm">{sc.label}</Badge></TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => window.location.href = `/lms/khoa-hoc/${course.id}`}>Xem</Button>
-                    <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={() => window.location.href = `/lms/khoa-hoc/${course.id}/sua`}>Sửa</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(course.id)}>Xem</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={() => openEdit(course.id)}>Sửa</Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -146,6 +154,28 @@ export default function CourseList() {
         onPageSizeChange={(size: number) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      {/* Detail / Edit Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedCourse ? selectedCourse.name : ''}
+        description={selectedCourse ? `${selectedCourse.code} · ${selectedCourse.dept}` : ''}
+        size="fullscreen"
+        onEdit={() => selectedId && openEdit(selectedId)}
+      >
+        {selectedCourse ? (
+          isEditMode ? (
+            <CourseEdit
+              id={selectedCourse.id}
+              onCancel={close}
+              onSubmit={() => close()}
+            />
+          ) : (
+            <CourseDetail id={selectedCourse.id} onEdit={() => openEdit(selectedCourse.id)} />
+          )
+        ) : null}
+      </DetailModal>
     </div>
   );
 }

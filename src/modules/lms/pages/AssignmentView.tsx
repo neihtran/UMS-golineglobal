@@ -1,26 +1,73 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Edit2, FileText, Users, CheckCircle2, Clock, AlertTriangle, Eye } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Edit2, FileText, Users, CheckCircle2, Clock, AlertTriangle, Eye } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
-const ASSIGNMENT = {
-  id: 'a1',
-  courseCode: 'CS101',
-  courseName: 'Nhập môn Lập trình Python',
-  title: 'Bài tập tuần 3 — Vòng lặp',
-  type: 'individual',
-  instructor: 'TS. Nguyễn Văn Minh',
-  due: '2026-06-30T23:59:00',
-  maxScore: 10,
-  status: 'open',
-  instructions: 'Sinh viên hoàn thành các bài tập về vòng lặp for, while và đệ quy. Nộp file .py qua hệ thống.',
-  submitted: 245,
-  studentCount: 298,
-  graded: 240,
+const ASSIGNMENTS_MAP: Record<string, {
+  id: string;
+  courseCode: string;
+  courseName: string;
+  title: string;
+  type: 'individual' | 'group';
+  instructor: string;
+  due: string;
+  maxScore: number;
+  status: 'open' | 'closed' | 'draft';
+  instructions: string;
+  submitted: number;
+  studentCount: number;
+  graded: number;
+}> = {
+  a1: {
+    id: 'a1',
+    courseCode: 'CS101',
+    courseName: 'Nhập môn Lập trình Python',
+    title: 'Bài tập tuần 3 — Vòng lặp',
+    type: 'individual',
+    instructor: 'TS. Nguyễn Văn Minh',
+    due: '2026-06-30T23:59:00',
+    maxScore: 10,
+    status: 'open',
+    instructions: 'Sinh viên hoàn thành các bài tập về vòng lặp for, while và đệ quy. Nộp file .py qua hệ thống.',
+    submitted: 245,
+    studentCount: 298,
+    graded: 240,
+  },
+  a2: {
+    id: 'a2',
+    courseCode: 'MATH201',
+    courseName: 'Giải tích 2',
+    title: 'Bài tập Tích phân xác định',
+    type: 'individual',
+    instructor: 'PGS.TS. Lê Thị Lan',
+    due: '2026-06-28T23:59:00',
+    maxScore: 10,
+    status: 'closed',
+    instructions: 'Sinh viên giải các bài tập về tích phân xác định và ứng dụng.',
+    submitted: 268,
+    studentCount: 265,
+    graded: 260,
+  },
+  a3: {
+    id: 'a3',
+    courseCode: 'CS101',
+    courseName: 'Nhập môn Lập trình Python',
+    title: 'Dự án nhóm — Xây dựng ứng dụng Todo',
+    type: 'group',
+    instructor: 'TS. Nguyễn Văn Minh',
+    due: '2026-07-05T23:59:00',
+    maxScore: 30,
+    status: 'open',
+    instructions: 'Sinh viên làm việc theo nhóm để xây dựng một ứng dụng Todo hoàn chỉnh với React + Tailwind.',
+    submitted: 72,
+    studentCount: 298,
+    graded: 0,
+  },
 };
 
-const SUBMISSIONS = [
+type SubmissionStatus = 'graded' | 'submitted' | 'missing';
+
+const SUBMISSIONS: { id: string; studentId: string; studentName: string; submittedAt: string; status: SubmissionStatus; score: number | null; feedback: string }[] = [
   { id: 's1', studentId: 'SV001', studentName: 'Nguyễn Văn An', submittedAt: '2026-06-29 14:22', status: 'graded', score: 8.5, feedback: 'Bài làm tốt, thiếu comment' },
   { id: 's2', studentId: 'SV002', studentName: 'Trần Thị Bình', submittedAt: '2026-06-29 16:05', status: 'graded', score: 9.0, feedback: 'Xuất sắc' },
   { id: 's3', studentId: 'SV003', studentName: 'Lê Minh Cường', submittedAt: '2026-06-30 08:45', status: 'graded', score: 7.5, feedback: 'Cần cải thiện phần đệ quy' },
@@ -37,9 +84,14 @@ const STATUS_CONFIG = {
   missing: { variant: 'error' as const, label: 'Chưa nộp', icon: <AlertTriangle className="h-3.5 w-3.5" /> },
 };
 
-export default function AssignmentView() {
-  const { id } = useParams();
-  const navigate = useNavigate();
+interface AssignmentViewProps {
+  id?: string;
+}
+
+export default function AssignmentView({ id }: AssignmentViewProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const ASSIGNMENT = ASSIGNMENTS_MAP[actualId] ?? ASSIGNMENTS_MAP['a1'];
   const [tab, setTab] = useState<'info' | 'submissions'>('info');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -51,29 +103,14 @@ export default function AssignmentView() {
   });
 
   const submitRate = Math.round((ASSIGNMENT.submitted / ASSIGNMENT.studentCount) * 100);
-  const gradeRate = Math.round((ASSIGNMENT.graded / ASSIGNMENT.submitted) * 100);
-  const avgScore = SUBMISSIONS.filter(s => s.status === 'graded').reduce((a, b) => a + (b.score || 0), 0)
-    / SUBMISSIONS.filter(s => s.status === 'graded').length;
+  const gradeRate = ASSIGNMENT.submitted > 0 ? Math.round((ASSIGNMENT.graded / ASSIGNMENT.submitted) * 100) : 0;
+  const gradedSubmissions = SUBMISSIONS.filter(s => s.status === 'graded');
+  const avgScore = gradedSubmissions.length > 0
+    ? gradedSubmissions.reduce((a, b) => a + (b.score || 0), 0) / gradedSubmissions.length
+    : 0;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={ASSIGNMENT.title}
-        description={`${ASSIGNMENT.courseCode} · ${ASSIGNMENT.courseName}`}
-        breadcrumbs={[
-          { label: 'LMS', href: '/lms' },
-          { label: 'Bài tập SV', href: '/lms/bai-tap-sinh-vien' },
-          { label: ASSIGNMENT.title },
-        ]}
-        actions={
-          <div className="flex gap-2">
-          <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất danh sách</Button>
-          <Button variant="outline" leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => navigate(`/lms/bai-tap/${id}/cham`)}>Chấm bài</Button>
-            <Button leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/lms/bai-tap-sinh-vien')}>Quay lại</Button>
-          </div>
-        }
-      />
-
       {/* Assignment info card */}
       <Card>
         <CardContent className="p-6">
@@ -105,7 +142,7 @@ export default function AssignmentView() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-[rgb(var(--success))]">{avgScore.toFixed(1)}</p>
-                <p className="text-xs text-[rgb(var(--text-muted))]">�iểm TB</p>
+                <p className="text-xs text-[rgb(var(--text-muted))]">Điểm TB</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-[rgb(var(--text-primary))]">{ASSIGNMENT.maxScore}</p>
@@ -229,7 +266,7 @@ export default function AssignmentView() {
               </thead>
               <tbody className="divide-y divide-[rgb(var(--border)/0.4)]">
                 {filtered.map((s) => {
-                  const sc = STATUS_CONFIG[s.status as keyof typeof STATUS_CONFIG];
+                  const sc = STATUS_CONFIG[s.status];
                   return (
                     <tr key={s.id} className="hover:bg-[rgb(var(--bg-hover))] transition-colors">
                       <td className="px-4 py-3 text-xs font-mono text-[rgb(var(--text-secondary))]">{s.studentId}</td>
@@ -258,10 +295,10 @@ export default function AssignmentView() {
                       <td className="px-4 py-3">
                         <div className="flex gap-1">
                           <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />}
-                            onClick={() => navigate(`/lms/bai-tap/${id}/xem/${s.id}`)}>Xem</Button>
+                            onClick={() => window.location.href = `/lms/bai-tap/${id}/xem/${s.id}`}>Xem</Button>
                           {s.status !== 'missing' && (
                             <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />}
-                              onClick={() => navigate(`/lms/bai-tap/${id}/cham`)}>Chấm</Button>
+                              onClick={() => window.location.href = `/lms/bai-tap/${id}/cham`}>Chấm</Button>
                           )}
                         </div>
                       </td>

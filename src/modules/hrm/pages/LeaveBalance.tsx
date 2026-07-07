@@ -1,8 +1,9 @@
-import { CalendarPlus } from 'lucide-react';
+import { ArrowLeft, CalendarPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, CartesianGrid, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const BALANCES = [
   { type: 'annual', label: 'Nghỉ phép năm', total: 12, used: 6, remaining: 6, color: '#16A34A' },
@@ -24,8 +25,17 @@ const TYPE_LABELS: Record<string, string> = {
 
 export default function LeaveBalance() {
   const { t } = useTranslation('hrm');
+  const navigate = useNavigate();
   const pieData = BALANCES.filter((b) => b.remaining > 0).map((b) => ({ name: b.label, value: b.remaining, color: b.color }));
   const currentYear = new Date().getFullYear();
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      navigate('/hrm');
+    }
+  };
 
   const statusVariant = (s: string) =>
     s === 'approved' ? 'success' : s === 'rejected' ? 'error' : 'warning';
@@ -44,7 +54,12 @@ export default function LeaveBalance() {
           { label: t('leaveBalance.breadcrumb') },
         ]}
         actions={
-          <Button leftIcon={<CalendarPlus className="h-4 w-4" />}>{t('leaveBalance.addBalance')}</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={handleBack}>
+              {t('common.back')}
+            </Button>
+            <Button leftIcon={<CalendarPlus className="h-4 w-4" />}>{t('leaveBalance.addBalance')}</Button>
+          </div>
         }
       />
 

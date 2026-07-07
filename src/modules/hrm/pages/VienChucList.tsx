@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   UserPlus,
@@ -19,9 +19,13 @@ import {
   TablePagination,
   TableEmpty,
   Modal,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import VienChucDetail from './VienChucDetail';
+import VienChucForm from './VienChucForm';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -64,7 +68,10 @@ export default function VienChucList() {
   const [status, setStatus] = useState<Status | 'all'>('all');
   const [contract, setContract] = useState<ContractType | 'all'>('all');
   const [importOpen, setImportOpen] = useState(false);
-  const [, setEditingStaff] = useState<typeof MOCK_STAFF[0] | null>(null);
+
+  const { selectedId, openDetail, openEdit, close, isEditMode } = useDetailModal({ size: 'fullscreen' });
+
+  const selectedStaff = selectedId ? MOCK_STAFF.find((s) => s.id === selectedId) : null;
 
   const filtered = MOCK_STAFF.filter((s) => {
     const matchSearch = !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.code.toLowerCase().includes(search.toLowerCase()) || s.dept.toLowerCase().includes(search.toLowerCase());
@@ -167,9 +174,9 @@ export default function VienChucList() {
                     {(pagination.page - 1) * pagination.pageSize + i + 1}
                   </TableCell>
                   <TableCell>
-                    <Link
-                      to={`/hrm/vien-chuc/${s.id}`}
-                      className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] transition-colors"
+                    <button
+                      onClick={() => openDetail(s.id)}
+                      className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] transition-colors text-left w-full"
                     >
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-semibold text-[rgb(var(--primary))]">
                         {s.name.split(' ').slice(-2).map((n) => n[0]).join('')}
@@ -178,7 +185,7 @@ export default function VienChucList() {
                         <p className="font-medium">{s.name}</p>
                         <p className="text-xs text-[rgb(var(--text-muted))]">{s.title}</p>
                       </div>
-                    </Link>
+                    </button>
                   </TableCell>
                   <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{s.code}</TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{s.position}</TableCell>
@@ -190,10 +197,8 @@ export default function VienChucList() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Link to={`/hrm/vien-chuc/${s.id}`}>
-                        <Button variant="ghost" size="sm">{t('action.detail')}</Button>
-                      </Link>
-                      <Button variant="ghost" size="sm" onClick={() => setEditingStaff(s)}>{t('action.edit')}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(s.id)}>{t('action.detail')}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openEdit(s.id)}>{t('action.edit')}</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -258,6 +263,42 @@ export default function VienChucList() {
         </div>
       </Modal>
 
+      {/* Detail / Edit Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedStaff ? selectedStaff.name : ''}
+        description={selectedStaff ? `${selectedStaff.code} · ${selectedStaff.title} · ${selectedStaff.dept}` : ''}
+        size="fullscreen"
+        onEdit={() => openEdit(selectedId!)}
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={close}>Đóng</Button>
+          </div>
+        }
+      >
+        {isEditMode ? (
+          <VienChucForm
+            initialValues={selectedStaff ? {
+              code: selectedStaff.code,
+              name: selectedStaff.name,
+              dob: selectedStaff.dob,
+              dept: selectedStaff.dept,
+              title: selectedStaff.title,
+              position: selectedStaff.position,
+              contractType: selectedStaff.contract,
+              salary: selectedStaff.salary.toString(),
+            } : {}}
+            onSubmit={(values) => { console.log('Saving:', values); close(); }}
+            onCancel={close}
+            submitLabel="Lưu thay đổi"
+          />
+        ) : (
+          selectedStaff ? (
+            <VienChucDetail id={selectedStaff.id} />
+          ) : null
+        )}
+      </DetailModal>
     </div>
   );
 }

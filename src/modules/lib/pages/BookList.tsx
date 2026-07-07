@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, Search, Plus, BookOpen, Star, Eye, BookMarked as BorrowIcon, CheckCircle2 } from 'lucide-react';
-import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
+import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import BookDetailPage from './BookDetailPage';
 
 const BOOKS = [
   { id: 'b1', title: 'Introduction to Algorithms (CLRS)', author: 'Cormen, Leiserson, Rivest, Stein', isbn: '978-0262033848', category: 'CNTT', copies: 8, available: 3, borrowed: 5, rating: 4.9, location: 'Kệ A1-03', status: 'available' },
@@ -45,6 +47,9 @@ export default function BookList() {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('Tất cả');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedBook = selectedId ? BOOKS.find((b) => b.id === selectedId) : null;
 
   const filtered = BOOKS.filter((b) => {
     const matchSearch = !search ||
@@ -147,7 +152,7 @@ export default function BookList() {
                 <TableCell><Badge variant={sc.variant} size="sm">{sc.label}</Badge></TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate(`/lib/tai-lieu/${b.id}`)}>Xem</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(b.id)}>Xem</Button>
                     {b.available > 0 && (
                       <Button variant="ghost" size="sm" leftIcon={<BorrowIcon className="h-3.5 w-3.5" />} onClick={() => setBorrowModal(b.id)}>Mượn</Button>
                     )}
@@ -174,6 +179,16 @@ export default function BookList() {
           onClose={() => setBorrowModal(null)}
         />
       )}
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedBook ? selectedBook.title : ''}
+        description={selectedBook ? `${selectedBook.author} · ISBN: ${selectedBook.isbn}` : ''}
+        size="fullscreen"
+      >
+        {selectedBook ? <BookDetailPage id={selectedBook.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

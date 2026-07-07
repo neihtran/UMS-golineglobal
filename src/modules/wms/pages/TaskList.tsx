@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Download, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Badge, Button, Card } from '@/components/ui';
+import { Badge, Button, Card, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useDetailModal } from '@/hooks';
+import TaskDetail from './TaskDetail';
 
 const TASKS = [
   { id: 't1', title: 'Soạn thảo báo cáo công tác tuyển sinh 2026', assignee: 'Nguyễn Văn Long', dept: 'Phòng Tuyển sinh', priority: 'high', status: 'in_progress', due: '2026-06-28', progress: 65, module: 'SIS' },
@@ -23,6 +24,8 @@ const TASKS = [
 export default function TaskList() {
   const { t } = useTranslation('wms');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedTask = selectedId ? TASKS.find((task) => task.id === selectedId) : null;
 
   const filtered = TASKS.filter((task) => {
     if (statusFilter !== 'all' && task.status !== statusFilter) return false;
@@ -162,10 +165,8 @@ export default function TaskList() {
                       <Badge variant={sc.variant} size="sm">{sc.label}</Badge>
                     </td>
                     <td className="px-4 py-2.5">
-                      <Button variant="ghost" size="sm">
-                        <Link to={`/wms/cong-viec/${task.id}`}>
-                          <ChevronRight className="h-4 w-4" />
-                        </Link>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(task.id)}>
+                        <ChevronRight className="h-4 w-4" />
                       </Button>
                     </td>
                   </tr>
@@ -180,6 +181,16 @@ export default function TaskList() {
           </div>
         )}
       </Card>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedTask?.title ?? ''}
+        description={selectedTask ? `#${selectedTask.id} · ${selectedTask.module}` : ''}
+        size="fullscreen"
+      >
+        {selectedId ? <TaskDetail id={selectedId} /> : null}
+      </DetailModal>
     </div>
   );
 }

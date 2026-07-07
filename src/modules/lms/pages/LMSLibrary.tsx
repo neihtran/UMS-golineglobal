@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Download, Eye, Edit2, Play, FileText, Video, BookOpen, FileArchive, FolderOpen, Grid3X3, List } from 'lucide-react';
-import { Button, Badge, Card, CardContent } from '@/components/ui';
+import { Button, Badge, Card, CardContent, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import MaterialDetailPage from './MaterialDetailPage';
 
 const MATERIALS = [
   { id: 'm1', title: 'Bài giảng tuần 1 — Giới thiệu Python', course: 'CS101', type: 'video', duration: '45 phút', size: '320 MB', updated: '2026-06-10', views: 1245, status: 'published' },
@@ -23,11 +24,13 @@ const TYPE_CONFIG = {
 };
 
 export default function LMSLibrary() {
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [courseFilter, setCourseFilter] = useState('Tất cả');
   const [view, setView] = useState<'grid' | 'list'>('grid');
+
+  const { selectedId, openDetail, close } = useDetailModal<string>({ size: 'fullscreen' });
+  const selectedMaterial = selectedId ? MATERIALS.find((m) => m.id === selectedId) : null;
 
   const courses = ['Tất cả', ...Array.from(new Set(MATERIALS.map((m) => m.course)))];
   const types = ['all', 'video', 'pdf', 'document', 'zip'];
@@ -49,7 +52,7 @@ export default function LMSLibrary() {
         actions={
           <div className="flex gap-2">
             <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất danh sách</Button>
-            <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => navigate('/lms/thu-vien-hoc-lieu/them')}>Thêm học liệu</Button>
+            <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => window.location.href = '/lms/thu-vien-hoc-lieu/them'}>Thêm học liệu</Button>
           </div>
         }
       />
@@ -151,8 +154,8 @@ export default function LMSLibrary() {
                     <span>💾 {m.size}</span>
                   </div>
                   <div className="flex gap-1 mt-3 pt-3 border-t border-[rgb(var(--border)/0.4)]">
-                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} className="flex-1" onClick={() => navigate(`/lms/thu-vien-hoc-lieu/${m.id}`)}>Xem</Button>
-                    <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={(e) => { e.stopPropagation(); navigate(`/lms/thu-vien-hoc-lieu/${m.id}/sua`); }}>Sửa</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} className="flex-1" onClick={() => openDetail(m.id)}>Xem</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={(e) => { e.stopPropagation(); window.location.href = `/lms/thu-vien-hoc-lieu/${m.id}/sua`; }}>Sửa</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -201,8 +204,8 @@ export default function LMSLibrary() {
                     <td className="px-4 py-3 text-xs text-[rgb(var(--text-secondary))]">{m.updated}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
-                        <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate(`/lms/thu-vien-hoc-lieu/${m.id}`)}>Xem</Button>
-                        <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={() => navigate(`/lms/thu-vien-hoc-lieu/${m.id}/sua`)}>Sửa</Button>
+                        <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(m.id)}>Xem</Button>
+                        <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={() => window.location.href = `/lms/thu-vien-hoc-lieu/${m.id}/sua`}>Sửa</Button>
                       </div>
                     </td>
                   </tr>
@@ -220,6 +223,19 @@ export default function LMSLibrary() {
           <p className="text-xs text-[rgb(var(--text-muted))] mt-1">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
         </div>
       )}
+
+      {/* Detail Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedMaterial ? selectedMaterial.title : ''}
+        description={selectedMaterial ? selectedMaterial.course : ''}
+        size="fullscreen"
+      >
+        {selectedMaterial ? (
+          <MaterialDetailPage id={selectedMaterial.id} />
+        ) : null}
+      </DetailModal>
     </div>
   );
 }

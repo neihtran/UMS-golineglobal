@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DollarSign, TrendingUp, Users, FileText, Calculator, CreditCard,
-  FileDown, Edit3, Save,
+  FileDown, Eye, Save,
 } from 'lucide-react';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TableEmpty, Modal,
+  TableHeadCell, TableCell, TableEmpty, Modal, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useDetailModal } from '@/hooks/useDetailModal';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const PAYROLLS = [
@@ -45,8 +46,6 @@ export default function SalarySheet() {
   const [search, setSearch] = useState('');
   const [dept, setDept] = useState('');
   const [, setTemplateOpen] = useState(false);
-  const [salaryAdjustOpen, setSalaryAdjustOpen] = useState(false);
-  const [selectedPayroll, setSelectedPayroll] = useState<(typeof PAYROLLS)[0] | null>(null);
   const [adjustForm, setAdjustForm] = useState({ salary: 0, allowance: 0, reason: '' });
 
   const [calcModalOpen, setCalcModalOpen] = useState(false);
@@ -54,16 +53,18 @@ export default function SalarySheet() {
   const [calcForm, setCalcForm] = useState({ month: '06/2026', dept: '', note: '' });
   const [disburseForm, setDisburseForm] = useState({ method: 'Chuyển khoản', bank: 'Vietcombank', accountNo: '', accountName: '', date: '', note: '' });
 
+  const { selectedId, openDetail, openEdit, close, isEditMode } = useDetailModal({ size: 'fullscreen' });
+  const selectedPayroll = selectedId ? PAYROLLS.find((p) => p.id === selectedId) ?? null : null;
+
   const filtered = PAYROLLS.filter((p) => {
     const match = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.code.toLowerCase().includes(search.toLowerCase());
     const matchDept = dept === '' || p.dept === dept;
     return match && matchDept;
   });
 
-  const openAdjust = (p: (typeof PAYROLLS)[0]) => {
-    setSelectedPayroll(p);
+  const openAdjust = (p: typeof PAYROLLS[0]) => {
     setAdjustForm({ salary: p.salary, allowance: p.allowance, reason: '' });
-    setSalaryAdjustOpen(true);
+    openEdit(p.id);
   };
 
   const pipelineTotal = PIPELINE_STAGES.reduce((s, st) => s + st.count, 0);
@@ -202,7 +203,14 @@ export default function SalarySheet() {
           ) : (
             filtered.map((p) => (
               <TableRow key={p.id}>
-                <TableCell className="font-medium text-[rgb(var(--text-primary))]">{p.name}</TableCell>
+                <TableCell>
+                  <button
+                    onClick={() => openDetail(p.id)}
+                    className="font-medium text-[rgb(var(--text-primary))] hover:text-[rgb(var(--primary))] transition-colors text-left w-full"
+                  >
+                    {p.name}
+                  </button>
+                </TableCell>
                 <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{p.code}</TableCell>
                 <TableCell>
                   <p className="text-[rgb(var(--text-secondary))]">{p.dept}</p>
@@ -219,7 +227,9 @@ export default function SalarySheet() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <Button variant="ghost" size="sm" leftIcon={<Edit3 className="h-3.5 w-3.5" />} onClick={() => openAdjust(p)}>{t('salary.table.adjust')}</Button>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(p.id)}>{t('action.detail')}</Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))
@@ -227,69 +237,103 @@ export default function SalarySheet() {
         </TableBody>
       </Table>
 
-      {/* Modal: Điều chỉnh lương */}
-      <Modal
-        open={salaryAdjustOpen}
-        onClose={() => setSalaryAdjustOpen(false)}
-        title={t('salary.modal.adjustTitle')}
-        size="lg"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setSalaryAdjustOpen(false)}>{t('cancel')}</Button>
-            <Button leftIcon={<Save className="h-4 w-4" />} onClick={() => { setSalaryAdjustOpen(false); }}>{t('contract.modal.saveChanges')}</Button>
-          </div>
-        }
+      {/* Detail / Edit Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedPayroll ? selectedPayroll.name : ''}
+        description={selectedPayroll ? `${selectedPayroll.code} · ${selectedPayroll.dept} · ${selectedPayroll.position}` : ''}
+        size="fullscreen"
+        onEdit={selectedPayroll && !isEditMode ? () => openAdjust(selectedPayroll) : undefined}
+        onPrint={selectedPayroll && !isEditMode ? () => window.print() : undefined}
       >
         {selectedPayroll && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))]">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))] text-lg font-bold">
-                {selectedPayroll.name.split(' ').slice(-2).map(n => n[0]).join('')}
+          isEditMode ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))] text-lg font-bold">
+                  {selectedPayroll.name.split(' ').slice(-2).map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedPayroll.name}</p>
+                  <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedPayroll.code} · {selectedPayroll.dept} · {selectedPayroll.position}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('salary.modal.salaryNewLabel')}</label>
+                  <Input type="number" value={adjustForm.salary} onChange={(e) => setAdjustForm(f => ({ ...f, salary: Number(e.target.value) }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('salary.modal.salaryOldLabel')}</label>
+                  <Input type="number" value={adjustForm.allowance} onChange={(e) => setAdjustForm(f => ({ ...f, allowance: Number(e.target.value) }))} />
+                </div>
               </div>
               <div>
-                <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedPayroll.name}</p>
-                <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedPayroll.code} · {selectedPayroll.dept} · {selectedPayroll.position}</p>
+                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('salary.modal.note')}</label>
+                <textarea
+                  className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none"
+                  rows={3}
+                  placeholder={t('contract.form.notePlaceholder')}
+                  value={adjustForm.reason}
+                  onChange={(e) => setAdjustForm(f => ({ ...f, reason: e.target.value }))}
+                />
+              </div>
+              <div className="p-4 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))] space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-[rgb(var(--text-secondary))]">{t('salary.modal.salaryOld')}</span>
+                  <span className="font-mono font-semibold text-[rgb(var(--text-primary))]">{fmt(selectedPayroll.salary)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[rgb(var(--text-secondary))]">{t('salary.modal.salaryNew')}</span>
+                  <span className="font-mono font-semibold text-[rgb(var(--success))]">{fmt(adjustForm.salary)}</span>
+                </div>
+                <div className="flex justify-between border-t border-[rgb(var(--border)/0.5)] pt-2">
+                  <span className="text-[rgb(var(--text-secondary))]">{t('salary.modal.difference')}</span>
+                  <span className={`font-mono font-bold ${adjustForm.salary > selectedPayroll.salary ? 'text-[rgb(var(--success))]' : adjustForm.salary < selectedPayroll.salary ? 'text-[rgb(var(--error))]' : 'text-[rgb(var(--text-muted))]'}`}>
+                    {adjustForm.salary >= selectedPayroll.salary ? '+' : ''}{fmt(adjustForm.salary - selectedPayroll.salary)}
+                  </span>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button variant="outline" onClick={close}>{t('cancel')}</Button>
+                <Button leftIcon={<Save className="h-4 w-4" />} onClick={close}>{t('contract.modal.saveChanges')}</Button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('salary.modal.salaryNewLabel')}</label>
-                <Input type="number" value={adjustForm.salary} onChange={(e) => setAdjustForm(f => ({ ...f, salary: Number(e.target.value) }))} />
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-white text-lg font-bold">
+                  {selectedPayroll.name.split(' ').slice(-2).map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedPayroll.name}</p>
+                  <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedPayroll.code} · {selectedPayroll.dept} · {selectedPayroll.position}</p>
+                </div>
+                <Badge variant={selectedPayroll.status === 'paid' ? 'success' : 'warning'} dot className="ml-auto">
+                  {selectedPayroll.status === 'paid' ? t('salary.table.paid') : t('salary.table.pending')}
+                </Badge>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('salary.modal.salaryOldLabel')}</label>
-                <Input type="number" value={adjustForm.allowance} onChange={(e) => setAdjustForm(f => ({ ...f, allowance: Number(e.target.value) }))} />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('salary.modal.note')}</label>
-              <textarea
-                className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none"
-                rows={3}
-                placeholder={t('contract.form.notePlaceholder')}
-                value={adjustForm.reason}
-                onChange={(e) => setAdjustForm(f => ({ ...f, reason: e.target.value }))}
-              />
-            </div>
-            <div className="p-4 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))] space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-[rgb(var(--text-secondary))]">{t('salary.modal.salaryOld')}</span>
-                <span className="font-mono font-semibold text-[rgb(var(--text-primary))]">{fmt(selectedPayroll.salary)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[rgb(var(--text-secondary))]">{t('salary.modal.salaryNew')}</span>
-                <span className="font-mono font-semibold text-[rgb(var(--success))]">{fmt(adjustForm.salary)}</span>
-              </div>
-              <div className="flex justify-between border-t border-[rgb(var(--border)/0.5)] pt-2">
-                <span className="text-[rgb(var(--text-secondary))]">{t('salary.modal.difference')}</span>
-                <span className={`font-mono font-bold ${adjustForm.salary > selectedPayroll.salary ? 'text-[rgb(var(--success))]' : adjustForm.salary < selectedPayroll.salary ? 'text-[rgb(var(--error))]' : 'text-[rgb(var(--text-muted))]'}`}>
-                  {adjustForm.salary >= selectedPayroll.salary ? '+' : ''}{fmt(adjustForm.salary - selectedPayroll.salary)}
-                </span>
+
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {[
+                  { label: t('salary.table.luongCoBan'), value: fmt(selectedPayroll.salary) },
+                  { label: t('salary.table.allowance'), value: `+${fmt(selectedPayroll.allowance)}` },
+                  { label: t('salary.table.deduction'), value: `-${fmt(selectedPayroll.deduction)}` },
+                  { label: t('salary.table.netPay'), value: fmt(selectedPayroll.net), highlight: true },
+                  { label: t('salary.table.month'), value: selectedPayroll.month },
+                  { label: t('salary.table.status'), value: selectedPayroll.status === 'paid' ? t('salary.table.paid') : t('salary.table.pending') },
+                ].map(({ label, value, highlight }) => (
+                  <div key={label} className={`flex gap-3 border-b border-[rgb(var(--border)/0.4)] pb-2 ${highlight ? 'bg-[rgb(var(--primary)/0.04)] -mx-2 px-2 rounded' : ''}`}>
+                    <span className="shrink-0 text-[rgb(var(--text-muted))] w-32">{label}:</span>
+                    <span className={`font-mono font-medium ${highlight ? 'text-[rgb(var(--primary))]' : 'text-[rgb(var(--text-primary))]'}`}>{value}</span>
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )
         )}
-      </Modal>
+      </DetailModal>
 
       {/* Modal: Tính lương */}
       <Modal

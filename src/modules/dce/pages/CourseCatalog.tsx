@@ -1,7 +1,9 @@
 import { Award, Download, Plus } from 'lucide-react';
-import { Card, CardContent, Badge, Button, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell } from '@/components/ui';
+import { Card, CardContent, Badge, Button, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { useNavigate } from 'react-router-dom';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import CourseDetail from './CourseDetail';
 
 const COURSES = [
   { id: 'dc1', code: 'DCE-ICT-01', name: 'Kỹ năng số cơ bản', category: 'CNTT', instructor: 'TS. Nguyễn Văn A', enrolled: 245, completed: 198, avgScore: 85, level: 'level1', status: 'active', duration: '6 tuần' },
@@ -20,6 +22,8 @@ const LEVEL_CONFIG: Record<string, { label: string; variant: 'info' | 'warning' 
 
 export default function CourseCatalog() {
   const navigate = useNavigate();
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedCourse = selectedId ? COURSES.find((c) => c.id === selectedId) : null;
   return (
     <div className="space-y-6">
       <PageHeader
@@ -75,7 +79,7 @@ export default function CourseCatalog() {
             {COURSES.map((c) => {
               const lc = LEVEL_CONFIG[c.level];
               return (
-                <TableRow key={c.id} className="hover:bg-[rgb(var(--bg-hover))] cursor-pointer">
+                <TableRow key={c.id} className="hover:bg-[rgb(var(--bg-hover))] cursor-pointer" onClick={() => openDetail(c.id)}>
                   <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{c.code}</TableCell>
                   <TableCell>
                     <p className="font-medium text-[rgb(var(--text-primary))]">{c.name}</p>
@@ -98,6 +102,16 @@ export default function CourseCatalog() {
           </TableBody>
         </Table>
       </Card>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedCourse ? selectedCourse.name : ''}
+        description={selectedCourse ? `${selectedCourse.code} · ${selectedCourse.category} · ${selectedCourse.instructor}` : ''}
+        size="fullscreen"
+      >
+        {selectedCourse ? <CourseDetail id={selectedCourse.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

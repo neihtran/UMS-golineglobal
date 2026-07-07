@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Search, FileText, Download, Eye } from 'lucide-react';
-import { Button, Badge, Card, CardContent } from '@/components/ui';
+import { Button, Badge, Card, CardContent, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import ReportDetailPage from './ReportDetailPage';
 
 const REPORTS = [
   { id: 'r1', title: 'Báo cáo công tác Đảng Q1/2026', type: 'Báo cáo quý', date: '2026-04-10', author: 'PMS-01', status: 'approved' },
@@ -13,9 +14,11 @@ const REPORTS = [
 ];
 
 export default function PMSReportListPage() {
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const filtered = REPORTS.filter((r) => !search || r.title.toLowerCase().includes(search.toLowerCase()));
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedReport = selectedId ? REPORTS.find((r) => r.id === selectedId) : null;
   return (
     <div className="space-y-6">
       <PageHeader
@@ -46,11 +49,21 @@ export default function PMSReportListPage() {
               <Badge variant={r.status === 'approved' ? 'success' : r.status === 'pending' ? 'warning' : 'neutral'} dot size="sm">
                 {r.status === 'approved' ? 'Đã duyệt' : r.status === 'pending' ? 'Chờ duyệt' : 'Nháp'}
               </Badge>
-              <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate(`/pms/bao-cao/chi-tiet/${r.id}`)}>Chi tiết</Button>
+              <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(r.id)}>Chi tiết</Button>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedReport ? selectedReport.title : ''}
+        description={selectedReport ? `${selectedReport.type} · ${selectedReport.author} · ${selectedReport.date}` : ''}
+        size="fullscreen"
+      >
+        {selectedReport ? <ReportDetailPage id={selectedReport.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

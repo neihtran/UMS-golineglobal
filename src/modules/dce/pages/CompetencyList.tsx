@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, Search, Plus, BarChart3 } from 'lucide-react';
-import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
+import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import CompetencyDetail from './CompetencyDetail';
 
 const STANDARDS = [
   { id: 's1', code: 'CDIO-1.1', name: 'Thiết kế hệ thống phần mềm', dept: 'Khoa CNTT', level: 'Cấp 4', target: 3.8, avgScore: 3.72, n: 124, lastAssess: '2026-05-15', status: 'active' },
@@ -37,6 +39,9 @@ export default function CompetencyList() {
   const [search, setSearch] = useState('');
   const [deptFilter, setDeptFilter] = useState('Tất cả');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedStandard = selectedId ? STANDARDS.find((s) => s.id === selectedId) : null;
 
   const filtered = STANDARDS.filter((s) => {
     const matchSearch = !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.code.toLowerCase().includes(search.toLowerCase());
@@ -120,7 +125,7 @@ export default function CompetencyList() {
                 <TableCell><Badge variant={sc.variant} size="sm">{sc.label}</Badge></TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" leftIcon={<BarChart3 className="h-3.5 w-3.5" />} onClick={() => navigate(`/dce/chuan-dau-ra/${s.id}`)}>Chi tiết</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<BarChart3 className="h-3.5 w-3.5" />} onClick={() => openDetail(s.id)}>Chi tiết</Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -137,6 +142,16 @@ export default function CompetencyList() {
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedStandard ? selectedStandard.name : ''}
+        description={selectedStandard ? `${selectedStandard.code} · ${selectedStandard.dept} · ${selectedStandard.level}` : ''}
+        size="fullscreen"
+      >
+        {selectedStandard ? <CompetencyDetail id={selectedStandard.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

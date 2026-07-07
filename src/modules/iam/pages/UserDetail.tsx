@@ -1,24 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  Save,
-  FileText,
-  History,
-  Shield,
-  Smartphone,
-} from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { History, Shield, Smartphone } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
-const MOCK_USER = {
-  id: 'u001',
-  displayName: 'PGS.TS. Nguyễn Hoàng Long',
-  email: 'long.nguyen@truong.edu.vn',
-  role: 'TRUONG_KHOA',
-  mfaEnabled: true,
-  mfaMethod: 'Authenticator App',
-  lastLogin: '2026-06-25T08:32:15',
-  lastMFA: '2026-06-25T08:32:10',
+const USER_MAP: Record<string, {
+  id: string; displayName: string; email: string; role: string;
+  mfaEnabled: boolean; mfaMethod: string; lastLogin: string; lastMFA: string;
+}> = {
+  u001: { id: 'u001', displayName: 'PGS.TS. Nguyễn Hoàng Long', email: 'long.nguyen@truong.edu.vn', role: 'TRUONG_KHOA', mfaEnabled: true, mfaMethod: 'Authenticator App', lastLogin: '2026-06-25T08:32:15', lastMFA: '2026-06-25T08:32:10' },
+  u002: { id: 'u002', displayName: 'Thảo Nguyễn', email: 'thao.nguyen@truong.edu.vn', role: 'GIANG_VIEN', mfaEnabled: true, mfaMethod: 'Authenticator App', lastLogin: '2026-06-25T08:30:00', lastMFA: '2026-06-25T08:29:55' },
+  u003: { id: 'u003', displayName: 'Nguyễn Văn An', email: 'an.nguyen@truong.edu.vn', role: 'SINH_VIEN', mfaEnabled: false, mfaMethod: '', lastLogin: '2026-06-24T22:10:00', lastMFA: '' },
 };
 
 const PERMISSION_MATRIX = [
@@ -75,40 +66,32 @@ function CheckIcon({ checked }: { checked: boolean }) {
   );
 }
 
-export default function UserDetail() {
-  const navigate = useNavigate();
+interface UserDetailProps {
+  id?: string;
+}
+
+export default function UserDetail({ id }: UserDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const [activeTab, setActiveTab] = useState('permissions');
+  const user = USER_MAP[actualId] ?? USER_MAP['u001'];
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={MOCK_USER.displayName}
-        description={`${MOCK_USER.role} · ${MOCK_USER.email}`}
-        breadcrumbs={[{ label: 'IAM', href: '/iam' }, { label: 'Tài khoản', href: '/iam/tai-khoan' }, { label: MOCK_USER.displayName }]}
-        actions={
-          <>
-            <Button variant="outline" onClick={() => navigate('/iam/tai-khoan')}>Quay lại</Button>
-            <Button variant="outline" leftIcon={<FileText className="h-4 w-4" />}>Lịch sử chỉnh sửa</Button>
-            <Button leftIcon={<Save className="h-4 w-4" />}>Lưu thay đổi</Button>
-          </>
-        }
-      />
-
-      {/* Profile card */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-1">
           <CardContent className="flex flex-col items-center p-6">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-2xl font-bold text-white mb-4 ring-4 ring-[rgb(var(--primary)/0.2)]">
-              {MOCK_USER.displayName.split(' ').slice(-2).map((n) => n[0]).join('')}
+              {user.displayName.split(' ').slice(-2).map((n) => n[0]).join('')}
             </div>
-            <h2 className="text-lg font-bold text-[rgb(var(--text-primary))]">{MOCK_USER.displayName}</h2>
-            <p className="text-sm text-[rgb(var(--text-secondary))]">{MOCK_USER.role}</p>
+            <h2 className="text-lg font-bold text-[rgb(var(--text-primary))]">{user.displayName}</h2>
+            <p className="text-sm text-[rgb(var(--text-secondary))]">{user.role}</p>
             <Badge variant="success" dot className="mt-2">Đang hoạt động</Badge>
             <div className="mt-6 w-full space-y-3">
               {[
-                { label: 'Email', value: MOCK_USER.email },
-                { label: 'MFA', value: MOCK_USER.mfaEnabled ? `${MOCK_USER.mfaMethod} ✓` : 'Chưa bật' },
-                { label: 'Đăng nhập lần cuối', value: MOCK_USER.lastLogin.replace('T', ' ').slice(0, 16) },
+                { label: 'Email', value: user.email },
+                { label: 'MFA', value: user.mfaEnabled ? `${user.mfaMethod} ✓` : 'Chưa bật' },
+                { label: 'Đăng nhập lần cuối', value: user.lastLogin.replace('T', ' ').slice(0, 16) },
               ].map(({ label, value }) => (
                 <div key={label} className="border-b border-[rgb(var(--border)/0.4)] pb-2 last:border-0 last:pb-0">
                   <p className="text-[10px] uppercase tracking-wide text-[rgb(var(--text-muted))]">{label}</p>
@@ -141,12 +124,11 @@ export default function UserDetail() {
             </div>
 
             <div className="p-5">
-              {/* Permissions matrix */}
               {activeTab === 'permissions' && (
                 <div>
                   <div className="mb-3 flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Ma trận quyền RBAC</h3>
-                    <Badge variant="neutral">{MOCK_USER.role}</Badge>
+                    <Badge variant="neutral">{user.role}</Badge>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
@@ -179,7 +161,6 @@ export default function UserDetail() {
                 </div>
               )}
 
-              {/* Audit log */}
               {activeTab === 'audit' && (
                 <div>
                   <div className="mb-3 flex items-center justify-between">
@@ -189,7 +170,7 @@ export default function UserDetail() {
                   <div className="space-y-0">
                     {AUDIT_LOG.map((log) => (
                       <div key={log.id} className="flex items-start gap-3 border-b border-[rgb(var(--border)/0.4)] py-3 last:border-0">
-                        <Badge variant={ACTION_COLORS[log.action] as 'success' | 'error' | 'info' | 'warning' | 'accent' | 'primary' | 'neutral' ?? 'neutral'} size="sm">
+                        <Badge variant={(ACTION_COLORS[log.action] as 'success' | 'error' | 'info' | 'warning' | 'accent' | 'primary' | 'neutral') ?? 'neutral'} size="sm">
                           {log.action}
                         </Badge>
                         <div className="flex-1">
@@ -207,7 +188,6 @@ export default function UserDetail() {
                 </div>
               )}
 
-              {/* MFA config */}
               {activeTab === 'mfa' && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between rounded-lg border border-[rgb(var(--success)/0.3)] bg-[rgb(var(--success)/0.05)] p-4">

@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  ArrowLeft, CheckCircle2, XCircle, Printer, Download,
+  CheckCircle2, XCircle, Printer, Download,
   FileText, Clock, ShieldCheck, CreditCard, AlertTriangle,
 } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const EXPENSE_DETAIL = {
   id: 'e1',
@@ -39,11 +38,16 @@ function fmt(v: number) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v);
 }
 
-export default function ChiTieuDetailPage() {
+interface ChiTieuDetailPageProps {
+  id?: string;
+}
+
+export default function ChiTieuDetailPage({ id }: ChiTieuDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const { t } = useTranslation('fin');
-  const navigate = useNavigate();
   const [showReject, setShowReject] = useState(false);
-  const d = EXPENSE_DETAIL;
+  const d = { ...EXPENSE_DETAIL, id: actualId };
 
   const STATUS_CONFIG: Record<string, { variant: 'info' | 'success' | 'warning' | 'error'; label: string; icon: React.ReactNode }> = {
     draft: { variant: 'info', label: t('expenditure.status.draft') || 'Bản nháp', icon: <FileText className="h-3.5 w-3.5" /> },
@@ -56,30 +60,16 @@ export default function ChiTieuDetailPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={d.title}
-        description={`FIN-01 · ${d.code} · ${d.category}`}
-        breadcrumbs={[
-          { label: 'FIN', href: '/fin' },
-          { label: t('expenditure.title'), href: '/fin/chi-tieu' },
-          { label: d.code },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/fin/chi-tieu')}>
-              {t('detail.expenditure.back')}
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Printer className="h-4 w-4" />}>{t('detail.expenditure.print')}</Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>{t('detail.expenditure.download')}</Button>
-            {d.status === 'pending' && (
-              <>
-                <Button size="sm" leftIcon={<CheckCircle2 className="h-4 w-4" />}>{t('detail.expenditure.approve')}</Button>
-                <Button variant="outline" size="sm" className="!text-[rgb(var(--error))]" leftIcon={<XCircle className="h-4 w-4" />} onClick={() => setShowReject(true)}>{t('detail.expenditure.reject')}</Button>
-              </>
-            )}
-          </div>
-        }
-      />
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" size="sm" leftIcon={<Printer className="h-4 w-4" />}>{t('detail.expenditure.print')}</Button>
+        <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>{t('detail.expenditure.download')}</Button>
+        {d.status === 'pending' && (
+          <>
+            <Button size="sm" leftIcon={<CheckCircle2 className="h-4 w-4" />}>{t('detail.expenditure.approve')}</Button>
+            <Button variant="outline" size="sm" className="!text-[rgb(var(--error))]" leftIcon={<XCircle className="h-4 w-4" />} onClick={() => setShowReject(true)}>{t('detail.expenditure.reject')}</Button>
+          </>
+        )}
+      </div>
 
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))]">
         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-[rgb(var(--${sc.variant})/0.1)] text-[rgb(var(--${sc.variant}))]`}>
@@ -271,7 +261,7 @@ export default function ChiTieuDetailPage() {
             <p className="text-sm text-[rgb(var(--text-secondary))] mb-5">{t('detail.expenditure.rejectMsg')}</p>
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => setShowReject(false)}>{t('detail.expenditure.cancel')}</Button>
-              <Button className="flex-1 !bg-[rgb(var(--error))] hover:!bg-[rgb(var(--error-light))]" onClick={() => { setShowReject(false); navigate('/fin/chi-tieu'); }}>
+              <Button className="flex-1 !bg-[rgb(var(--error))] hover:!bg-[rgb(var(--error-light))]" onClick={() => setShowReject(false)}>
                 {t('detail.expenditure.confirm')}
               </Button>
             </div>

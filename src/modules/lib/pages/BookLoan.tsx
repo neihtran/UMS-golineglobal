@@ -6,10 +6,12 @@ import {
 } from 'lucide-react';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty,
+  TableHeadCell, TableCell, TablePagination, TableEmpty, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import LoanDetailPage from './LoanDetailPage';
 
 const LOANS = [
   { id: 'l01', bookCode: 'ISBN-978-030640615', bookTitle: 'Artificial Intelligence: A Modern Approach', borrower: 'Nguyễn Văn An', borrowerId: 'SV-2024-0142', class: 'CNTT-K24', borrowDate: '2026-06-10', dueDate: '2026-06-25', returnDate: null, status: 'overdue', librarian: 'Nguyễn Thị Bích' },
@@ -34,6 +36,9 @@ export default function BookLoan() {
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedLoan = selectedId ? LOANS.find((l) => l.id === selectedId) : null;
 
   const filtered = LOANS.filter((l) => {
     const match = !search || l.bookTitle.toLowerCase().includes(search.toLowerCase()) || l.borrower.toLowerCase().includes(search.toLowerCase());
@@ -141,7 +146,7 @@ export default function BookLoan() {
                   <TableCell><Badge variant={sc.variant} dot size="sm">{sc.label}</Badge></TableCell>
                   <TableCell>
                     {l.returnDate ? (
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/lib/muon/${l.id}`)}>Chi tiết</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(l.id)}>Chi tiết</Button>
                     ) : (
                       <Button variant="ghost" size="sm" leftIcon={<CheckCircle2 className="h-3.5 w-3.5" />} onClick={() => setReturnModal(l.id)}>Trả sách</Button>
                     )}
@@ -165,6 +170,16 @@ export default function BookLoan() {
           onClose={() => setReturnModal(null)}
         />
       )}
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedLoan ? selectedLoan.bookTitle : ''}
+        description={selectedLoan ? `${selectedLoan.borrower} · ${selectedLoan.borrowerId}` : ''}
+        size="fullscreen"
+      >
+        {selectedLoan ? <LoanDetailPage id={selectedLoan.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

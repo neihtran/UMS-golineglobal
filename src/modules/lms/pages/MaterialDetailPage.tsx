@@ -1,9 +1,25 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Download, Edit2, Play, FileText, BookOpen, Video, FileArchive, Tag } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Download, Edit2, Play, FileText, BookOpen, Video, FileArchive, Tag } from 'lucide-react';
 import { Button, Card, CardContent, Badge } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
-const MATERIALS = {
+const MATERIALS_MAP: Record<string, {
+  id: string;
+  title: string;
+  course: string;
+  courseName: string;
+  instructor: string;
+  type: 'video' | 'pdf' | 'document' | 'zip';
+  duration?: string;
+  pages?: number;
+  items?: number;
+  size: string;
+  updated: string;
+  views: number;
+  status: 'published' | 'draft';
+  description: string;
+  topics: string[];
+  tags: string[];
+}> = {
   m1: { id: 'm1', title: 'Bài giảng tuần 1 — Giới thiệu Python', course: 'CS101', courseName: 'Nhập môn Lập trình Python', instructor: 'TS. Nguyễn Văn Minh', type: 'video', duration: '45 phút', size: '320 MB', updated: '2026-06-10', views: 1245, status: 'published', description: 'Bài giảng giới thiệu tổng quan về ngôn ngữ lập trình Python cho người mới bắt đầu. Nội dung bao gồm: lịch sử Python, cài đặt môi trường, các khái niệm cơ bản về biến, kiểu dữ liệu, và cách chạy chương trình đầu tiên.', topics: ['Bài giảng', 'Giáo trình'], tags: ['python', 'giới thiệu', 'lập trình'] },
   m2: { id: 'm2', title: 'Slide bài giảng Chương 2 — Biến & Kiểu dữ liệu', course: 'CS101', courseName: 'Nhập môn Lập trình Python', instructor: 'TS. Nguyễn Văn Minh', type: 'pdf', pages: 28, size: '5.2 MB', updated: '2026-06-12', views: 890, status: 'published', description: 'Slide bài giảng chi tiết về các biến và kiểu dữ liệu trong Python. Bao gồm số nguyên, số thực, chuỗi, danh sách, tuple, dictionary.', topics: ['Bài giảng'], tags: ['python', 'biến', 'kiểu dữ liệu'] },
   m3: { id: 'm3', title: 'Tài liệu tham khảo — Python for Everybody', course: 'CS101', courseName: 'Nhập môn Lập trình Python', instructor: 'TS. Nguyễn Văn Minh', type: 'document', pages: 156, size: '12.8 MB', updated: '2026-05-20', views: 567, status: 'published', description: 'Tài liệu tham khảo toàn diện về Python, phù hợp cho người mới bắt đầu. Được biên soạn bởi Dr. Charles Severance.', topics: ['Tài liệu tham khảo'], tags: ['python', 'tài liệu', 'ebook'] },
@@ -21,43 +37,18 @@ const TYPE_CONFIG: Record<string, { icon: React.ReactNode; color: string; label:
   zip: { icon: <FileArchive className="h-6 w-6" />, color: 'warning', label: 'File nén' },
 };
 
-export default function MaterialDetailPage() {
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const mat = id ? MATERIALS[id as keyof typeof MATERIALS] : undefined;
-  const tc = mat ? TYPE_CONFIG[mat.type] : TYPE_CONFIG.pdf;
+interface MaterialDetailPageProps {
+  id?: string;
+}
 
-  if (!mat) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <FileText className="h-16 w-16 text-[rgb(var(--text-muted))] mb-4" />
-        <h2 className="text-xl font-bold text-[rgb(var(--text-primary))]">Không tìm thấy học liệu</h2>
-        <Button variant="outline" className="mt-4" onClick={() => navigate('/lms/thu-vien-hoc-lieu')}>
-          Quay lại thư viện
-        </Button>
-      </div>
-    );
-  }
+export default function MaterialDetailPage({ id }: MaterialDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const mat = MATERIALS_MAP[actualId] ?? MATERIALS_MAP['m1'];
+  const tc = TYPE_CONFIG[mat.type] ?? TYPE_CONFIG.pdf;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={mat.title}
-        description={`${mat.course} · ${mat.courseName} · ${mat.instructor}`}
-        breadcrumbs={[
-          { label: 'LMS', href: '/lms' },
-          { label: 'Thư viện học liệu', href: '/lms/thu-vien-hoc-lieu' },
-          { label: mat.course },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/lms/thu-vien-hoc-lieu')}>Quay lại</Button>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Tải xuống</Button>
-            <Button leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => navigate(`/lms/thu-vien-hoc-lieu/${mat.id}/sua`)}>Chỉnh sửa</Button>
-          </div>
-        }
-      />
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main content */}
         <div className="lg:col-span-2 space-y-4">
@@ -120,9 +111,9 @@ export default function MaterialDetailPage() {
                 { label: 'Giảng viên', value: mat.instructor },
                 { label: 'Loại', value: tc.label },
                 { label: 'Dung lượng', value: mat.size },
-                ...('duration' in mat ? [{ label: 'Thời lượng', value: mat.duration }] : []),
-                ...('pages' in mat ? [{ label: 'Số trang', value: `${mat.pages} trang` }] : []),
-                ...('items' in mat ? [{ label: 'Số file', value: `${mat.items} files` }] : []),
+                ...(mat.duration ? [{ label: 'Thời lượng', value: mat.duration }] : []),
+                ...(mat.pages ? [{ label: 'Số trang', value: `${mat.pages} trang` }] : []),
+                ...(mat.items ? [{ label: 'Số file', value: `${mat.items} files` }] : []),
                 { label: 'Cập nhật', value: mat.updated },
                 { label: 'Lượt xem', value: mat.views.toLocaleString() },
               ].map(({ label, value }) => (
@@ -144,7 +135,7 @@ export default function MaterialDetailPage() {
               <Button className="w-full" leftIcon={mat.type === 'video' ? <Play className="h-4 w-4" /> : <Download className="h-4 w-4" />}>
                 {mat.type === 'video' ? 'Phát video' : 'Tải xuống'}
               </Button>
-              <Button variant="outline" className="w-full" leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => navigate(`/lms/thu-vien-hoc-lieu/${mat.id}/sua`)}>
+              <Button variant="outline" className="w-full" leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => window.location.href = `/lms/thu-vien-hoc-lieu/${mat.id}/sua`}>
                 Chỉnh sửa
               </Button>
             </CardContent>

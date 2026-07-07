@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Wrench, Clock, CheckCircle2, UserPlus, Wifi, Wind,
-  Refrigerator, WashingMachine, Printer, Download, BedDouble,
+  Wrench, Clock, CheckCircle2, UserPlus, Wifi, Wind,
+  Refrigerator, WashingMachine, Download, BedDouble, Printer,
 } from 'lucide-react';
 import { Button, Badge, Card, CardContent, Modal, Input, Select } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const ROOM_DETAIL = {
   id: 'A102',
@@ -45,34 +44,19 @@ function fmt(v: number) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(v);
 }
 
-export default function RoomDetailPage() {
-  const navigate = useNavigate();
+interface RoomDetailPageProps {
+  id?: string;
+}
+
+export default function RoomDetailPage({ id }: RoomDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const [addModal, setAddModal] = useState(false);
-  const d = ROOM_DETAIL;
+  const d = { ...ROOM_DETAIL, id: actualId };
   const pct = Math.round((d.occupied / d.capacity) * 100);
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`Phòng ${d.id}`}
-        description={`${d.block} · Tầng ${d.floor} · ${d.gender}`}
-        breadcrumbs={[
-          { label: 'KTX', href: '/ktx' },
-          { label: 'Phòng', href: '/ktx/phong' },
-          { label: `Phòng ${d.id}` },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/ktx/phong')}>
-              Quay lại
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Printer className="h-4 w-4" />}>In DS cư dân</Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>Tải file</Button>
-            <Button size="sm" leftIcon={<UserPlus className="h-4 w-4" />} onClick={() => setAddModal(true)}>Thêm cư dân</Button>
-          </div>
-        }
-      />
-
       {/* Status strip */}
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))]">
         <Badge variant={pct === 100 ? 'success' : 'warning'} dot size="sm">

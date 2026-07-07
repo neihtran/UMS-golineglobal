@@ -1,8 +1,20 @@
 import { FileText, Plus, Download } from 'lucide-react';
-import { Card, Badge, Button, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell } from '@/components/ui';
+import {
+  Card,
+  Badge,
+  Button,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeadCell,
+  TableCell,
+  DetailModal,
+} from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { useNavigate } from 'react-router-dom';
+import { useDetailModal } from '@/hooks/useDetailModal';
 import { useTranslation } from 'react-i18next';
+import BanNhapDetailPage from './BanNhapDetailPage';
 
 const DRAFTS = [
   { id: 'd1', number: 'CV-2026-001', title: 'Quy chế đào tạo thạc sĩ ngành CNTT', type: 'cv', urgency: 'thường', from: 'Phòng Đào tạo', date: '25/06/2026', status: 'draft', content: 'Quy chế đào tạo thạc sĩ...' },
@@ -32,7 +44,9 @@ const TABLE_HEADERS = [
 
 export default function DraftList() {
   const { t } = useTranslation('dms');
-  const navigate = useNavigate();
+  const { selectedId, openDetail, close } = useDetailModal<string>({ size: 'fullscreen' });
+
+  const selectedDraft = selectedId ? DRAFTS.find((d) => d.id === selectedId) : null;
 
   return (
     <div className="space-y-6">
@@ -67,7 +81,7 @@ export default function DraftList() {
               const sc = STATUS_CONFIG[d.status];
               const urgencyKey = d.urgency === 'khẩn' ? 'khan' : d.urgency === 'mật' ? 'mat' : 'thuong';
               return (
-                <TableRow key={d.id} className="cursor-pointer hover:bg-[rgb(var(--bg-hover))]" onClick={() => navigate(`/dms/ban-nhap/${d.id}`)}>
+                <TableRow key={d.id} className="cursor-pointer hover:bg-[rgb(var(--bg-hover))]" onClick={() => openDetail(d.id)}>
                   <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{d.number}</TableCell>
                   <TableCell className="font-medium text-[rgb(var(--text-primary))] max-w-xs truncate">{d.title}</TableCell>
                   <TableCell><Badge variant="neutral" size="sm">{TYPE_LABELS[d.type]}</Badge></TableCell>
@@ -77,8 +91,8 @@ export default function DraftList() {
                   <TableCell><Badge variant={sc.variant} dot size="sm">{t(sc.labelKey)}</Badge></TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/dms/ban-nhap/${d.id}`)}>{t('common.edit')}</Button>
-                      <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} onClick={() => navigate('/dms/cho-ky')}>{t('common.send')}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(d.id)}>{t('common.edit')}</Button>
+                      <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} onClick={() => window.location.href = '/dms/cho-ky'}>{t('common.send')}</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -87,6 +101,16 @@ export default function DraftList() {
           </TableBody>
         </Table>
       </Card>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedDraft ? `${selectedDraft.number} — ${t('common.detail')}` : t('common.detail')}
+        description={selectedDraft?.title}
+        size="fullscreen"
+      >
+        {selectedId && <BanNhapDetailPage id={selectedId} />}
+      </DetailModal>
     </div>
   );
 }

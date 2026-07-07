@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, FileText, Search } from 'lucide-react';
-import { Button, Badge } from '@/components/ui';
+import { Button, Badge, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import MemberDetailPage from './MemberDetailPage';
 
 const MEMBERS = [
   { id: 'm1', idCard: '025086001234', name: 'Nguyễn Văn Minh', birth: '1975-03-15', unit: 'Chi bộ Khoa CNTT', role: ' Bí thư', joinDate: '2005-06-01', status: 'active' },
@@ -17,6 +19,9 @@ export default function PMSMemberListPage() {
   const navigate = useNavigate();
   const { pagination, setPage } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedMember = selectedId ? MEMBERS.find((m) => m.id === selectedId) : null;
 
   const filtered = MEMBERS.filter((m) =>
     !search || m.name.toLowerCase().includes(search.toLowerCase()) || m.idCard.includes(search),
@@ -65,13 +70,23 @@ export default function PMSMemberListPage() {
                 <td className="px-4 py-3 text-sm text-[rgb(var(--text-secondary))]">{m.joinDate}</td>
                 <td className="px-4 py-3"><Badge variant={m.status === 'active' ? 'success' : 'neutral'} dot size="sm">{m.status === 'active' ? 'Hoạt động' : 'Tạm khóa'}</Badge></td>
                 <td className="px-4 py-3">
-                  <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} onClick={() => navigate(`/pms/dang-vien/${m.id}`)}>Chi tiết</Button>
+                  <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} onClick={() => openDetail(m.id)}>Chi tiết</Button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedMember ? selectedMember.name : ''}
+        description={selectedMember ? `${selectedMember.idCard} · ${selectedMember.unit} · ${selectedMember.role}` : ''}
+        size="fullscreen"
+      >
+        {selectedMember ? <MemberDetailPage id={selectedMember.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

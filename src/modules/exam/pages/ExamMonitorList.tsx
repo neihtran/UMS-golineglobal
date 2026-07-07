@@ -3,10 +3,10 @@ import { Plus, Monitor, Eye, BarChart3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty,
+  TableHeadCell, TableCell, TablePagination, TableEmpty, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
-import { usePagination } from '@/hooks';
+import { usePagination, useDetailModal } from '@/hooks';
 
 const MONITORS = [
   { id: 'mo01', examCode: 'THI-2026-001', examName: 'Thi giữa kỳ — Nhập môn Tin học', course: 'INT1005', scheduledAt: '2026-06-28 08:00', duration: 90, totalStudents: 156, present: 148, absent: 8, cheating: 0, status: 'active', room: 'Phòng A101', supervisor: 'Nguyễn Hoàng Long' },
@@ -21,6 +21,8 @@ export default function ExamMonitorList() {
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedMonitor = selectedId ? MONITORS.find((m) => m.id === selectedId) : null;
 
   const STATUS_CONFIG: Record<string, { variant: 'success' | 'info' | 'neutral' | 'error'; label: string }> = {
     active: { variant: 'success', label: t('examMonitorList.status.active') },
@@ -149,7 +151,7 @@ export default function ExamMonitorList() {
                   </TableCell>
                   <TableCell><Badge variant={sc.variant} dot size="sm">{sc.label}</Badge></TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />}>
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(m.id)}>
                       {m.status === 'active' ? t('common.monitor') : t('common.view')}
                     </Button>
                   </TableCell>
@@ -165,6 +167,36 @@ export default function ExamMonitorList() {
         onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedMonitor?.examName ?? ''}
+        description={selectedMonitor?.examCode ?? ''}
+        size="fullscreen"
+        footer={<div className="flex justify-end"><Button variant="outline" onClick={close}>{t('common.close')}</Button></div>}
+      >
+        <div className="space-y-4">
+          {[
+            { label: t('examMonitorList.detail.examCode'), value: selectedMonitor?.examCode },
+            { label: t('examMonitorList.detail.course'), value: selectedMonitor?.course },
+            { label: t('examMonitorList.detail.room'), value: selectedMonitor?.room },
+            { label: t('examMonitorList.detail.scheduledAt'), value: selectedMonitor?.scheduledAt },
+            { label: t('examMonitorList.detail.duration'), value: selectedMonitor ? `${selectedMonitor.duration} ${t('examSession.card.minutes')}` : undefined },
+            { label: t('examMonitorList.detail.supervisor'), value: selectedMonitor?.supervisor },
+            { label: t('examMonitorList.detail.registered'), value: selectedMonitor?.totalStudents },
+            { label: t('examMonitorList.detail.present'), value: selectedMonitor?.present },
+            { label: t('examMonitorList.detail.absent'), value: selectedMonitor?.absent },
+            { label: t('examMonitorList.detail.cheating'), value: selectedMonitor?.cheating },
+            { label: t('common.trangThai'), value: selectedMonitor ? STATUS_CONFIG[selectedMonitor.status]?.label : undefined },
+          ].map(({ label, value }) => (
+            <div key={label} className="flex gap-4 border-b border-[rgb(var(--border)/0.4)] pb-2">
+              <span className="text-sm text-[rgb(var(--text-secondary))] w-40 shrink-0">{label}</span>
+              <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{value ?? '—'}</span>
+            </div>
+          ))}
+        </div>
+      </DetailModal>
     </div>
   );
 }

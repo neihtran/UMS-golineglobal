@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Download,
   Search,
@@ -18,10 +17,13 @@ import {
   TableHeadCell,
   TableCell,
   TablePagination,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 import { useTranslation } from 'react-i18next';
+import SignedDocumentDetail from './SignedDocumentDetail';
 
 const SIGNED_DOCS = [
   { id: 's1', number: 'QĐ-2026-0156', title: 'Quyết định công nhận tốt nghiệp đợt 1/2026', signer: 'PGS.TS. Nguyễn Văn Hiệu', signedAt: '2026-06-25 14:32', type: 'qđ', typeLabelKey: 'docType.qd', level: 'Trường', verifyCode: 'VBS-2026-00789' },
@@ -62,10 +64,12 @@ const TABLE_HEADERS = [
 
 export default function SignedDocuments() {
   const { t } = useTranslation('dms');
-  const navigate = useNavigate();
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
+  const { selectedId, openDetail, close } = useDetailModal<string>({ size: 'fullscreen' });
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+
+  const selectedDoc = selectedId ? SIGNED_DOCS.find((d) => d.id === selectedId) : null;
 
   const filtered = SIGNED_DOCS.filter((d) => {
     const matchSearch =
@@ -193,8 +197,8 @@ export default function SignedDocuments() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/dms/van-ban-da-ky/${d.id}`)}>{t('signed.view')}</Button>
-                      <Button variant="ghost" size="sm" onClick={() => navigate(`/dms/van-ban-da-ky/${d.id}?verify=1`)}>{t('signed.verify')}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(d.id)}>{t('signed.view')}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(d.id)}>{t('signed.verify')}</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -211,6 +215,16 @@ export default function SignedDocuments() {
           pageSizeOptions={[10, 25, 50]}
         />
       </Card>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedDoc ? `${selectedDoc.number} — ${t('common.detail')}` : t('common.detail')}
+        description={selectedDoc?.title}
+        size="fullscreen"
+      >
+        {selectedId && <SignedDocumentDetail id={selectedId} />}
+      </DetailModal>
     </div>
   );
 }

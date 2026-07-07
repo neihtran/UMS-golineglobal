@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, BookOpen, CheckCircle2, Clock,
+  BookOpen, CheckCircle2, Clock,
   Printer, Download, RefreshCw, Calendar, User,
 } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const LOAN_DETAIL = {
   id: 'l03',
@@ -47,10 +46,15 @@ const HISTORY = [
   { version: '2.0', time: '2026-06-18 14:30', user: 'Trần Văn Minh', action: 'Trả sách', detail: 'Sách còn mới, không phạt' },
 ];
 
-export default function LoanDetailPage() {
-  const navigate = useNavigate();
+interface LoanDetailPageProps {
+  id?: string;
+}
+
+export default function LoanDetailPage({ id }: LoanDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const [showReturn, setShowReturn] = useState(false);
-  const d = LOAN_DETAIL;
+  const d = { ...LOAN_DETAIL, id: actualId };
   const sc = STATUS_CONFIG[d.status];
   const daysOverdue = d.returnDate
     ? Math.max(0, Math.ceil((new Date(d.returnDate).getTime() - new Date(d.dueDate).getTime()) / 86400000))
@@ -58,29 +62,15 @@ export default function LoanDetailPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`Phiếu mượn ${d.code}`}
-        description={`${d.borrower.name} · ${d.book.title}`}
-        breadcrumbs={[
-          { label: 'LIB', href: '/lib' },
-          { label: 'Mượn trả', href: '/lib/muon-tra' },
-          { label: d.code },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/lib/muon-tra')}>
-              Quay lại
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Printer className="h-4 w-4" />}>In phiếu</Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>Tải file</Button>
-            {d.status !== 'returned_on_time' && d.status !== 'returned_late' && (
-              <Button size="sm" leftIcon={<CheckCircle2 className="h-4 w-4" />} onClick={() => setShowReturn(true)}>
-                Trả sách
-              </Button>
-            )}
-          </div>
-        }
-      />
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" size="sm" leftIcon={<Printer className="h-4 w-4" />}>In phiếu</Button>
+        <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>Tải file</Button>
+        {d.status !== 'returned_on_time' && d.status !== 'returned_late' && (
+          <Button size="sm" leftIcon={<CheckCircle2 className="h-4 w-4" />} onClick={() => setShowReturn(true)}>
+            Trả sách
+          </Button>
+        )}
+      </div>
 
       {/* Status strip */}
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))]">
@@ -280,7 +270,7 @@ export default function LoanDetailPage() {
       </div>
 
       {showReturn && (
-        <ReturnModal loan={d} onClose={() => setShowReturn(false)} onSuccess={() => navigate('/lib/muon-tra')} />
+        <ReturnModal loan={d} onClose={() => setShowReturn(false)} onSuccess={() => setShowReturn(false)} />
       )}
     </div>
   );

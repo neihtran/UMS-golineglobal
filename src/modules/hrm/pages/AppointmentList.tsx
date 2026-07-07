@@ -4,16 +4,17 @@ import { useTranslation } from 'react-i18next';
 import { Plus, Download, Clock, CheckCircle2, FileText, XCircle, CheckCircle } from 'lucide-react';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty, ConfirmModal, Modal,
+  TableHeadCell, TableCell, TablePagination, TableEmpty, ConfirmModal, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 
 const APPOINTMENTS = [
   { id: 'a01', code: 'BN-2026-001', name: 'Nguyen Hoang Long', dept: 'Khoa CNTT', from: 'Truong khoa', to: 'Pho Hieu truong', date: '2026-08-01', type: 'Bo nhiem lai', status: 'pending', requester: 'TS. Tran Thi Lan', reason: 'Bo nhiem giu chuc vu Pho Hieu truong' },
   { id: 'a02', code: 'BN-2026-002', name: 'Tran Thi Mai Lan', dept: 'Khoa Kinh te', from: 'Giang vien', to: 'Pho truong khoa', date: '2026-07-15', type: 'Bo nhiem moi', status: 'pending', requester: 'TS. Tran Thi Lan', reason: 'Bo nhiem giu chuc vu Pho truong khoa Kinh te' },
   { id: 'a03', code: 'BN-2025-015', name: 'Le Van Minh', dept: 'Khoa Luat', from: 'Thac si', to: 'Truong bo mon', date: '2025-09-01', type: 'Bo nhiem lai', status: 'approved', requester: 'TS. Tran Thi Lan', reason: 'Bo nhiem giu chuc Truong bo mon Luat hinh su' },
-  { id: 'a04', code: 'BN-2025-016', name: 'Pham Thu Ha', dept: 'Phong To chuc', from: 'Nhan vien', to: 'Truong phong', date: '2025-10-01', type: 'Bo nhiem moi', status: 'approved', requester: 'TS. Tran Thi Lan', reason: 'Bo nhiem giu chuc Truong phong To chuc - Hanh chinh' },
+  { id: 'a04', code: 'BN-2025-016', name: 'Pham Thi Ha', dept: 'Phong To chuc', from: 'Nhan vien', to: 'Truong phong', date: '2025-10-01', type: 'Bo nhiem moi', status: 'approved', requester: 'TS. Tran Thi Lan', reason: 'Bo nhiem giu chuc Truong phong To chuc - Hanh chinh' },
   { id: 'a05', code: 'BN-2024-030', name: 'Hoang Thi Lan', dept: 'Ban Giam hieu', from: 'Pho Hieu truong', to: 'Hieu truong', date: '2024-10-01', type: 'Bo nhiem lai', status: 'approved', requester: 'PGS.TS. Ly Van Hung', reason: 'Bo nhiem giu chuc Hieu truong nhiem ky 2024-2029' },
   { id: 'a06', code: 'BN-2026-003', name: 'Bui Dinh Nam', dept: 'Khoa Ngoai ngu', from: 'Tro giang', to: 'Giang vien', date: '2026-09-01', type: 'Thang chuc', status: 'rejected', requester: 'TS. Tran Thi Lan', reason: 'Thang chuc tu Tro giang len Giang vien chinh' },
 ];
@@ -32,8 +33,9 @@ export default function AppointmentList() {
   const [status, setStatus] = useState('all');
   const [appointments, setAppointments] = useState(APPOINTMENTS);
   const [confirmAction, setConfirmAction] = useState<{ id: string; type: 'approve' | 'reject' } | null>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<typeof APPOINTMENTS[0] | null>(null);
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedAppointment = selectedId ? appointments.find((a) => a.id === selectedId) ?? null : null;
 
   const filtered = appointments.filter((a) => {
     const match = !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.code.toLowerCase().includes(search.toLowerCase());
@@ -135,8 +137,13 @@ export default function AppointmentList() {
                 <TableRow key={a.id}>
                   <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{a.code}</TableCell>
                   <TableCell>
-                    <p className="font-medium text-[rgb(var(--text-primary))]">{a.name}</p>
-                    <p className="text-xs text-[rgb(var(--text-muted))]">{t('appointment.table.requester')}: {a.requester}</p>
+                    <button
+                      onClick={() => openDetail(a.id)}
+                      className="text-left w-full hover:text-[rgb(var(--primary))] transition-colors"
+                    >
+                      <p className="font-medium text-[rgb(var(--text-primary))]">{a.name}</p>
+                      <p className="text-xs text-[rgb(var(--text-muted))]">{t('appointment.table.requester')}: {a.requester}</p>
+                    </button>
                   </TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{a.dept}</TableCell>
                   <TableCell><Badge variant={tc.color as 'info' | 'primary' | 'success'} size="sm">{t(tc.labelKey)}</Badge></TableCell>
@@ -165,7 +172,7 @@ export default function AppointmentList() {
                         </Button>
                       </div>
                     ) : (
-                      <Button variant="ghost" size="sm" onClick={() => { setSelectedAppointment(a); setDetailOpen(true); }}>{t('action.viewDetail')}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(a.id)}>{t('action.viewDetail')}</Button>
                     )}
                   </TableCell>
                 </TableRow>
@@ -176,28 +183,27 @@ export default function AppointmentList() {
       </Table>
 
       <TablePagination
-        page={pagination.page} pageSize={pagination.pageSize} total={filtered.length}
-        onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        total={filtered.length}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
 
-      {/* Modal Chi tiet ho so bo nhiem */}
-      <Modal
-        open={detailOpen}
-        onClose={() => setDetailOpen(false)}
-        title={t('appointment.modal.detailTitle')}
-        size="lg"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setDetailOpen(false)}>{t('close')}</Button>
-            <Button variant="primary" leftIcon={<Download className="h-4 w-4" />} onClick={() => setDetailOpen(false)}>{t('appointment.modal.downloadQD')}</Button>
-          </div>
-        }
+      {/* Detail Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedAppointment ? `${t('appointment.modal.detailTitle')} — ${selectedAppointment.name}` : ''}
+        description={selectedAppointment ? `${selectedAppointment.code} · ${selectedAppointment.dept}` : ''}
+        size="fullscreen"
+        onPrint={selectedAppointment ? () => window.print() : undefined}
       >
         {selectedAppointment && (
           <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04] border border-[rgb(var(--primary)/0.2]">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)) text-lg font-bold text-white">
+            <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-lg font-bold text-white">
                 {selectedAppointment.name.split(' ').slice(-2).map((n) => n[0]).join('')}
               </div>
               <div>
@@ -216,7 +222,7 @@ export default function AppointmentList() {
                 { label: t('appointment.table.requester'), value: selectedAppointment.requester },
                 { label: t('table.trangThai'), value: statusLabel(selectedAppointment.status) },
               ].map(({ label, value }) => (
-                <div key={label} className="flex gap-3 border-b border-[rgb(var(--border)/0.4] pb-2">
+                <div key={label} className="flex gap-3 border-b border-[rgb(var(--border)/0.4)] pb-2">
                   <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">{label}:</span>
                   <span className="font-medium text-[rgb(var(--text-primary))]">{value}</span>
                 </div>
@@ -237,7 +243,7 @@ export default function AppointmentList() {
             </div>
           </div>
         )}
-      </Modal>
+      </DetailModal>
 
       <ConfirmModal
         open={!!confirmAction}

@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Clock, AlertTriangle, CheckCircle2, FileText, Download, XCircle, CheckCircle, Search } from 'lucide-react';
-import { Card, CardContent, Badge, Button, Select, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TableEmpty, TablePagination, Modal, ConfirmModal } from '@/components/ui';
+import { Card, CardContent, Badge, Button, Select, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TableEmpty, TablePagination, DetailModal, ConfirmModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 
 const REQUESTS = [
   { id: 'l1', code: 'NP-2026-001', employee: 'Nguyễn Văn Long', dept: 'Phòng Tuyển sinh', type: 'Nghỉ phép năm', from: '2026-07-01', to: '2026-07-05', days: 5, reason: 'Nghỉ du lịch cùng gia đình', status: 'approved', approver: 'TS. Trần Thị Lan', approvedAt: '2026-06-20' },
@@ -39,8 +40,9 @@ export default function LeaveRequestList() {
   const [status, setStatus] = useState('all');
   const [requests, setRequests] = useState(REQUESTS);
   const [confirmAction, setConfirmAction] = useState<{ id: string; type: 'approve' | 'reject' } | null>(null);
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<typeof REQUESTS[0] | null>(null);
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedRequest = selectedId ? requests.find((r) => r.id === selectedId) ?? null : null;
 
   const filtered = requests.filter((r) => {
     const matchSearch = !search || r.employee.toLowerCase().includes(search.toLowerCase()) || r.code.toLowerCase().includes(search.toLowerCase());
@@ -177,7 +179,7 @@ export default function LeaveRequestList() {
                           </Button>
                         </div>
                       ) : (
-                        <Button variant="ghost" size="sm" onClick={() => { setSelectedRequest(r); setDetailOpen(true); }}>{t('action.viewDetail')}</Button>
+                        <Button variant="ghost" size="sm" onClick={() => openDetail(r.id)}>{t('action.viewDetail')}</Button>
                       )}
                     </TableCell>
                   </TableRow>
@@ -190,17 +192,15 @@ export default function LeaveRequestList() {
         </CardContent>
       </Card>
 
-      {/* Modal Chi tiết */}
-      <Modal
-        open={detailOpen}
-        onClose={() => setDetailOpen(false)}
-        title={t('leave.modal.detailTitle')}
-        size="lg"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setDetailOpen(false)}>{t('close')}</Button>
-          </div>
-        }
+      {/* Detail Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedRequest ? `${t('leave.modal.detailTitle')} — ${selectedRequest.employee}` : ''}
+        description={selectedRequest ? `${selectedRequest.code} · ${selectedRequest.dept}` : ''}
+        size="fullscreen"
+        onEdit={selectedRequest?.status === 'pending' ? () => {/* could open edit form */} : undefined}
+        onPrint={selectedRequest ? () => window.print() : undefined}
       >
         {selectedRequest && (
           <div className="space-y-4">
@@ -239,7 +239,7 @@ export default function LeaveRequestList() {
             </div>
           </div>
         )}
-      </Modal>
+      </DetailModal>
 
       <ConfirmModal
         open={!!confirmAction}

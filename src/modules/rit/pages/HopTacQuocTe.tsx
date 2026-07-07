@@ -19,9 +19,12 @@ import {
   CardContent,
   Select,
   Modal,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import NckhDetailPage from './NckhDetailPage';
 
 const COUNTRIES = ['Tất cả', 'Nhật Bản', 'Hàn Quốc', 'Đức', 'Pháp', 'Mỹ', 'Úc', 'Thái Lan'];
 const TYPES = ['Tất cả', 'Trao đổi sinh viên', 'Hợp tác nghiên cứu', 'Hội thảo quốc tế', 'Chương trình đào tạo', 'Dự án liên kết'];
@@ -71,8 +74,10 @@ export default function HopTacQuocTe() {
   const [country, setCountry] = useState('Tất cả');
   const [type, setType] = useState('Tất cả');
   const [status, setStatus] = useState('Tất cả');
-  const [detailModal, setDetailModal] = useState<typeof PARTNERS[0] | null>(null);
   const [createModal, setCreateModal] = useState(false);
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedPartner = selectedId ? PARTNERS.find((p) => p.id === selectedId) : null;
 
   const filtered = PARTNERS.filter((p) => {
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.field.toLowerCase().includes(search.toLowerCase());
@@ -225,7 +230,7 @@ export default function HopTacQuocTe() {
                           </TableCell>
                           <TableCell><Badge variant={sc.variant} size="sm" dot>{sc.label}</Badge></TableCell>
                           <TableCell>
-                            <Button variant="ghost" size="sm" onClick={() => setDetailModal(p)}>Chi tiết</Button>
+                            <Button variant="ghost" size="sm" onClick={() => openDetail(p.id)}>Chi tiết</Button>
                           </TableCell>
                         </TableRow>
                       );
@@ -287,63 +292,15 @@ export default function HopTacQuocTe() {
       </div>
 
       {/* Modal: Chi tiết hợp tác */}
-      <Modal open={!!detailModal} onClose={() => setDetailModal(null)} title="Chi tiết hợp tác quốc tế" size="lg">
-        {detailModal && (
-          <div className="space-y-4">
-            <div className="flex items-start gap-3 p-4 rounded-lg bg-[rgb(var(--primary)/0.05)] border border-[rgb(var(--primary)/0.15)]">
-              <span className="text-3xl" role="img" aria-label={detailModal.country}>{detailModal.flag}</span>
-              <div>
-                <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{detailModal.name}</p>
-                <p className="text-sm text-[rgb(var(--text-muted))]">{detailModal.country} · {detailModal.field}</p>
-                <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">Số hiệu: {detailModal.moa}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-[rgb(var(--text-muted))] text-xs">Loại hình</p>
-                <Badge variant={TYPE_CONFIG[detailModal.type].variant} size="sm" className="mt-0.5">{detailModal.type}</Badge>
-              </div>
-              <div>
-                <p className="text-[rgb(var(--text-muted))] text-xs">Trạng thái</p>
-                <Badge variant={STATUS_CONFIG[detailModal.status].variant} size="sm" className="mt-0.5" dot>{STATUS_CONFIG[detailModal.status].label}</Badge>
-              </div>
-              <div>
-                <p className="text-[rgb(var(--text-muted))] text-xs">Ngày bắt đầu</p>
-                <p className="font-medium">{detailModal.startDate}</p>
-              </div>
-              <div>
-                <p className="text-[rgb(var(--text-muted))] text-xs">Ngày kết thúc</p>
-                <p className="font-medium">{detailModal.endDate}</p>
-              </div>
-              <div>
-                <p className="text-[rgb(var(--text-muted))] text-xs">Chủ trì</p>
-                <p className="font-medium">{detailModal.leader}</p>
-              </div>
-              <div>
-                <p className="text-[rgb(var(--text-muted))] text-xs">Thành viên</p>
-                <p className="font-medium">{detailModal.participants} người</p>
-              </div>
-              <div className="col-span-2">
-                <p className="text-[rgb(var(--text-muted))] text-xs">Kinh phí cam kết</p>
-                <p className="text-xl font-bold text-[rgb(var(--error))]">{fmt(detailModal.budget)}</p>
-              </div>
-            </div>
-            <div>
-              <p className="text-[rgb(var(--text-muted))] text-xs mb-1">Tiến độ thực hiện</p>
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-2.5 bg-[rgb(var(--border))] rounded-full overflow-hidden">
-                  <div className="h-full bg-[rgb(var(--primary))] rounded-full transition-all" style={{ width: `${detailModal.progress}%` }} />
-                </div>
-                <span className="text-sm font-bold text-[rgb(var(--primary))]">{detailModal.progress}%</span>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={() => setDetailModal(null)}>Đóng</Button>
-              <Button onClick={() => setDetailModal(null)}>Chỉnh sửa</Button>
-            </div>
-          </div>
-        )}
-      </Modal>
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedPartner ? selectedPartner.name : ''}
+        description={selectedPartner ? `${selectedPartner.country} · ${selectedPartner.field} · ${selectedPartner.moa}` : ''}
+        size="fullscreen"
+      >
+        {selectedPartner ? <NckhDetailPage id={selectedPartner.id} /> : null}
+      </DetailModal>
 
       {/* Modal: Tạo hợp tác mới */}
       <Modal open={createModal} onClose={() => setCreateModal(false)} title="Tạo hợp tác quốc tế mới" size="lg">

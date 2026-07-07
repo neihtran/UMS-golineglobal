@@ -1,10 +1,9 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Shield, Download, CheckCircle2 } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Download, CheckCircle2, Shield } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 import { useTranslation } from 'react-i18next';
 
-const DOCS: Record<string, {
+interface SignedDocRecord {
   number: string;
   title: string;
   signer: string;
@@ -15,7 +14,9 @@ const DOCS: Record<string, {
   verifyCode: string;
   org: string;
   summary: string;
-}> = {
+}
+
+const MOCK_MAP: Record<string, SignedDocRecord> = {
   s1: {
     number: 'QĐ-2026-0156', title: 'Quyết định công nhận tốt nghiệp đợt 1/2026',
     signer: 'PGS.TS. Nguyễn Văn Hiệu', signedAt: '2026-06-25 14:32',
@@ -28,6 +29,42 @@ const DOCS: Record<string, {
     type: 'cv', typeLabelKey: 'docType.cv', level: 'Trường', verifyCode: 'VBS-2026-00788',
     org: 'Phòng Đào tạo', summary: 'Triển khai kế hoạch học kỳ 2/2025-2026, phân công giảng dạy và lịch thi.',
   },
+  s3: {
+    number: 'TB-2026-0112', title: 'Thông báo lịch thi học kỳ 2 năm học 2025-2026',
+    signer: 'TS. Trần Thị Hương', signedAt: '2026-06-23 16:45',
+    type: 'tb', typeLabelKey: 'docType.tb', level: 'Khoa', verifyCode: 'VBS-2026-00787',
+    org: 'Phòng Đào tạo', summary: 'Lịch thi học kỳ 2 năm học 2025-2026 cho tất cả các khoa.',
+  },
+  s4: {
+    number: 'QĐ-2026-0155', title: 'Quyết định bổ nhiệm Trưởng khoa Công nghệ thông tin',
+    signer: 'PGS.TS. Nguyễn Văn Hiệu', signedAt: '2026-06-22 11:20',
+    type: 'qđ', typeLabelKey: 'docType.qd', level: 'Trường', verifyCode: 'VBS-2026-00786',
+    org: 'Phòng Tổ chức', summary: 'Bổ nhiệm Trưởng khoa Công nghệ thông tin nhiệm kỳ 2026-2031.',
+  },
+  s5: {
+    number: 'CV-2026-0228', title: 'Công văn về đăng ký đề tài NCKH cấp trường năm 2026',
+    signer: 'PGS.TS. Nguyễn Văn Hiệu', signedAt: '2026-06-21 08:30',
+    type: 'cv', typeLabelKey: 'docType.cv', level: 'Trường', verifyCode: 'VBS-2026-00785',
+    org: 'Phòng NCKH', summary: 'Đăng ký đề tài NCKH cấp trường năm 2026, hạn chót 30/07/2026.',
+  },
+  s6: {
+    number: 'QĐ-2026-0154', title: 'Quyết định khen thưởng CBGV nhân ngày Nhà giáo Việt Nam 20/11',
+    signer: 'PGS.TS. Nguyễn Văn Hiệu', signedAt: '2026-06-20 15:00',
+    type: 'qđ', typeLabelKey: 'docType.qd', level: 'Trường', verifyCode: 'VBS-2026-00784',
+    org: 'Phòng Tổ chức', summary: 'Khen thưởng CBGV nhân ngày Nhà giáo Việt Nam 20/11 năm 2026.',
+  },
+  s7: {
+    number: 'CV-2026-0225', title: 'Công văn về việc thay đổi lịch thi cuối kỳ',
+    signer: 'TS. Trần Thị Hương', signedAt: '2026-06-19 10:00',
+    type: 'cv', typeLabelKey: 'docType.cv', level: 'Khoa', verifyCode: 'VBS-2026-00783',
+    org: 'Khoa Kinh tế', summary: 'Thay đổi lịch thi cuối kỳ các môn thuộc khoa Kinh tế.',
+  },
+  s8: {
+    number: 'TT-2026-0034', title: 'Tờ trình đề nghị phê duyệt kinh phí mua sắm thiết bị',
+    signer: 'PGS.TS. Nguyễn Văn Hiệu', signedAt: '2026-06-18 14:00',
+    type: 'tt', typeLabelKey: 'soanthaoMoi.typeTt', level: 'Trường', verifyCode: 'VBS-2026-00782',
+    org: 'Phòng Tài chính', summary: 'Đề nghị phê duyệt kinh phí mua sắm thiết bị phòng thí nghiệm CNTT.',
+  },
 };
 
 const INFO_ITEMS = [
@@ -37,17 +74,20 @@ const INFO_ITEMS = [
   { labelKey: 'signed.detail.verifyCode' },
 ] as const;
 
-export default function SignedDocumentDetail() {
+interface SignedDocumentDetailProps {
+  id?: string;
+}
+
+export default function SignedDocumentDetail({ id }: SignedDocumentDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const { t } = useTranslation('dms');
-  const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const doc = DOCS[id ?? ''];
+  const doc = MOCK_MAP[actualId];
 
   if (!doc) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{t('signed.detail.notFound')}</p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate('/dms/van-ban-da-ky')}>{t('common.backToList')}</Button>
       </div>
     );
   }
@@ -56,23 +96,6 @@ export default function SignedDocumentDetail() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={`${doc.number} — ${t('common.detail')}`}
-        description={doc.title}
-        breadcrumbs={[
-          { label: 'DMS', href: '/dms' },
-          { label: t('signed.detail.breadcrumbSigned'), href: '/dms/van-ban-da-ky' },
-          { label: doc.number },
-        ]}
-        actions={
-          <>
-            <Button variant="outline" leftIcon={<Shield className="h-4 w-4" />}>{t('signed.detail.verifySign')}</Button>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('signed.detail.downloadPdf')}</Button>
-            <Button leftIcon={<CheckCircle2 className="h-4 w-4" />}>{t('signed.detail.confirmReceived')}</Button>
-          </>
-        }
-      />
-
       <Card>
         <CardContent className="p-6 space-y-4">
           <div className="flex flex-wrap items-center gap-2">
@@ -101,10 +124,10 @@ export default function SignedDocumentDetail() {
         </CardContent>
       </Card>
 
-      <div className="flex justify-start">
-        <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/dms/van-ban-da-ky')}>
-          {t('common.backToList')}
-        </Button>
+      <div className="flex justify-start gap-2">
+        <Button variant="outline" leftIcon={<Shield className="h-4 w-4" />}>{t('signed.detail.verifySign')}</Button>
+        <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('signed.detail.downloadPdf')}</Button>
+        <Button leftIcon={<CheckCircle2 className="h-4 w-4" />}>{t('signed.detail.confirmReceived')}</Button>
       </div>
     </div>
   );

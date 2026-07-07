@@ -1,7 +1,6 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Eye, CheckCircle2, Edit, Download, FileText, Clock } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Eye, CheckCircle2, Edit, Download, FileText, Clock } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const ALL_DOCS: Record<string, {
   name: string; type: string; pages: number; size: string;
@@ -66,10 +65,14 @@ const ALL_DOCS: Record<string, {
   },
 };
 
-export default function ScanDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const doc = ALL_DOCS[id ?? 'd1'] ?? ALL_DOCS['d1'];
+interface ScanDetailProps {
+  id?: string;
+}
+
+export default function ScanDetail({ id }: ScanDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const doc = ALL_DOCS[actualId] ?? ALL_DOCS['d1'];
   const s = doc;
 
   const statusBadge = s.status === 'done'
@@ -82,29 +85,15 @@ export default function ScanDetail() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={s.name}
-        description={`${s.docType} · ${s.pages} trang · ${s.size} · Nguồn: ${s.source}`}
-        breadcrumbs={[
-          { label: 'OCR', href: '/ocr' },
-          { label: 'Tài liệu số hóa', href: '/ocr/danh-sach' },
-          { label: s.name },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/ocr/danh-sach')}>
-              Quay lại
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>Tải file gốc</Button>
-            {s.status !== 'processing' && (
-              <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa dữ liệu</Button>
-            )}
-            {s.status === 'review' && (
-              <Button size="sm" leftIcon={<CheckCircle2 className="h-4 w-4" />}>Xác nhận & Lưu</Button>
-            )}
-          </div>
-        }
-      />
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>Tải file gốc</Button>
+        {s.status !== 'processing' && (
+          <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa dữ liệu</Button>
+        )}
+        {s.status === 'review' && (
+          <Button size="sm" leftIcon={<CheckCircle2 className="h-4 w-4" />}>Xác nhận & Lưu</Button>
+        )}
+      </div>
 
       {/* Status cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

@@ -6,10 +6,12 @@ import {
 } from 'lucide-react';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty,
+  TableHeadCell, TableCell, TablePagination, TableEmpty, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import MemberDetailPage from './MemberDetailPage';
 
 const MEMBERS = [
   { id: 'm01', name: 'PGS.TS. Lý Văn Hùng', code: 'NCV-2015-001', degree: 'Tiến sĩ', field: 'Khoa học máy tính', dept: 'Khoa CNTT', projects: 12, publications: 45, hIndex: 8, status: 'active', type: 'capped', since: 2015 },
@@ -37,6 +39,9 @@ export default function MemberList() {
   const [search, setSearch] = useState('');
   const [dept, setDept] = useState('Tất cả');
   const [type, setType] = useState('all');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedMember = selectedId ? MEMBERS.find((m) => m.id === selectedId) : null;
 
   const filtered = MEMBERS
     .filter((m) => {
@@ -151,7 +156,7 @@ export default function MemberList() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} onClick={() => navigate(`/rit/ncv/${m.id}`)}>Chi tiết</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} onClick={() => openDetail(m.id)}>Chi tiết</Button>
                   </TableCell>
                 </TableRow>
               );
@@ -165,6 +170,16 @@ export default function MemberList() {
         onPageChange={setPage} onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedMember ? selectedMember.name : ''}
+        description={selectedMember ? `${selectedMember.code} · ${selectedMember.degree} · ${selectedMember.dept}` : ''}
+        size="fullscreen"
+      >
+        {selectedMember ? <MemberDetailPage id={selectedMember.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

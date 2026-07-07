@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Plus, Download, Eye, Edit3, FileText, Clock } from 'lucide-react';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty, Modal,
+  TableHeadCell, TableCell, TablePagination, TableEmpty, Modal, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 
 const CONTRACTS = [
   { id: 'c01', code: 'HD-2020-001', staff: 'Nguyễn Hoàng Long', dept: 'Khoa CNTT', position: 'Trưởng khoa', type: 'Cơ hữu', salary: 18500000, startDate: '2020-03-15', endDate: '', status: 'active', file: 'HD_NguyenHoangLong_2020.pdf' },
@@ -42,9 +43,6 @@ export default function ContractList() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [expiringOpen, setExpiringOpen] = useState(false);
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [selectedContract, setSelectedContract] = useState<typeof CONTRACTS[0] | null>(null);
 
   const [createForm, setCreateForm] = useState({
     staff: '', dept: '', position: '', type: 'Cơ hữu',
@@ -56,6 +54,9 @@ export default function ContractList() {
     salary: '', startDate: '', endDate: '', note: '',
   });
 
+  const { selectedId, openDetail, openEdit, close, isEditMode } = useDetailModal({ size: 'fullscreen' });
+  const selectedContract = selectedId ? CONTRACTS.find((c) => c.id === selectedId) ?? null : null;
+
   const filtered = CONTRACTS.filter((c) => {
     const match = !search || c.staff.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase());
     const matchStatus = status === 'all' || c.status === status;
@@ -66,14 +67,12 @@ export default function ContractList() {
   const paged = filtered.slice((pagination.page - 1) * pagination.pageSize, pagination.page * pagination.pageSize);
   const expiringList = CONTRACTS.filter(c => c.status === 'expiring');
 
-  const openDetail = (c: typeof CONTRACTS[0]) => { setSelectedContract(c); setDetailOpen(true); };
-  const openEdit = (c: typeof CONTRACTS[0]) => {
-    setSelectedContract(c);
+  const handleOpenEdit = (c: typeof CONTRACTS[0]) => {
     setEditForm({
       staff: c.staff, dept: c.dept, position: c.position, type: c.type,
       salary: c.salary.toString(), startDate: c.startDate, endDate: c.endDate, note: '',
     });
-    setEditOpen(true);
+    openEdit(c.id);
   };
 
   const statusVariant = (s: string) => s === 'active' ? 'success' : s === 'expiring' ? 'warning' : 'error';
@@ -156,7 +155,14 @@ export default function ContractList() {
               return (
                 <TableRow key={c.id}>
                   <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{c.code}</TableCell>
-                  <TableCell className="font-medium text-[rgb(var(--text-primary))]">{c.staff}</TableCell>
+                  <TableCell>
+                    <button
+                      onClick={() => openDetail(c.id)}
+                      className="font-medium text-[rgb(var(--text-primary))] hover:text-[rgb(var(--primary))] transition-colors text-left w-full"
+                    >
+                      {c.staff}
+                    </button>
+                  </TableCell>
                   <TableCell>
                     <p className="text-[rgb(var(--text-secondary))]">{c.dept}</p>
                     <p className="text-xs text-[rgb(var(--text-muted))]">{c.position}</p>
@@ -176,9 +182,8 @@ export default function ContractList() {
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(c)}>{t('action.detail')}</Button>
-                      <Button variant="ghost" size="sm" leftIcon={<Edit3 className="h-3.5 w-3.5" />} onClick={() => openEdit(c)}>{t('action.edit')}</Button>
-                      <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} />
+                      <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(c.id)}>{t('action.detail')}</Button>
+                      <Button variant="ghost" size="sm" leftIcon={<Edit3 className="h-3.5 w-3.5" />} onClick={() => handleOpenEdit(c)}>{t('action.edit')}</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -284,124 +289,110 @@ export default function ContractList() {
                   <Badge variant="neutral" size="sm" style={{ color: tc.color, borderColor: tc.color }}>{c.type}</Badge>
                   <p className="text-xs text-[rgb(var(--warning))] mt-1">{t('form.expires')}: <strong>{c.endDate}</strong></p>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => { setExpiringOpen(false); openEdit(c); }}>{t('modal.renew')}</Button>
+                <Button variant="outline" size="sm" onClick={() => { setExpiringOpen(false); handleOpenEdit(c); }}>{t('modal.renew')}</Button>
               </div>
             );
           })}
         </div>
       </Modal>
 
-      {/* MODAL 3: Contract detail */}
-      <Modal
-        open={detailOpen}
-        onClose={() => setDetailOpen(false)}
-        title={t('modal.detailTitle')}
-        size="lg"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setDetailOpen(false)}>{t('close')}</Button>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('modal.downloadFile')}</Button>
-            <Button variant="primary" leftIcon={<Edit3 className="h-4 w-4" />} onClick={() => { setDetailOpen(false); if (selectedContract) openEdit(selectedContract); }}>{t('action.edit')}</Button>
-          </div>
-        }
+      {/* Detail / Edit Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedContract ? selectedContract.staff : ''}
+        description={selectedContract ? `${selectedContract.code} · ${selectedContract.dept} · ${selectedContract.position}` : ''}
+        size="fullscreen"
+        onEdit={selectedContract && !isEditMode ? () => handleOpenEdit(selectedContract) : undefined}
+        onPrint={selectedContract && !isEditMode ? () => window.print() : undefined}
       >
         {selectedContract && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-lg font-bold text-white">
-                {selectedContract.staff.split(' ').slice(-2).map((n) => n[0]).join('')}
-              </div>
-              <div>
-                <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedContract.staff}</p>
-                <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedContract.code} · {selectedContract.dept} · {selectedContract.position}</p>
-              </div>
-              <Badge variant={statusVariant(selectedContract.status) as 'success'|'warning'|'error'} dot className="ml-auto">{statusLabel(selectedContract.status)}</Badge>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              {[
-                { label: t('form.contractType'), value: selectedContract.type },
-                { label: t('form.salary'), value: fmt(selectedContract.salary) },
-                { label: t('form.signDate'), value: selectedContract.startDate },
-                { label: t('form.endDate'), value: selectedContract.endDate || t('contract.indefinite') },
-                { label: t('form.attachFile'), value: selectedContract.file },
-                { label: t('table.trangThai'), value: statusLabel(selectedContract.status) },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex gap-3 border-b border-[rgb(var(--border)/0.4)] pb-2">
-                  <span className="shrink-0 text-[rgb(var(--text-muted))] w-40">{label}:</span>
-                  <span className="font-medium text-[rgb(var(--text-primary))]">{value}</span>
+          isEditMode ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-3 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-sm font-bold text-[rgb(var(--primary))]">
+                  {selectedContract.staff.split(' ').slice(-2).map((n) => n[0]).join('')}
                 </div>
-              ))}
+                <div>
+                  <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedContract.staff}</p>
+                  <p className="text-xs text-[rgb(var(--text-secondary))]">{selectedContract.code}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.dept')}</label>
+                  <Input value={editForm.dept} onChange={(e: InputField) => setEditForm(f => ({ ...f, dept: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.position')}</label>
+                  <Input value={editForm.position} onChange={(e: InputField) => setEditForm(f => ({ ...f, position: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.contractType')}</label>
+                  <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2]" value={editForm.type} onChange={(e: SelectField) => setEditForm(f => ({ ...f, type: e.target.value }))}>
+                    <option>{t('contract.permanent')}</option><option>{t('contract.visiting')}</option><option>{t('contract.probation')}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.salary')} (VNĐ)</label>
+                  <Input type="number" value={editForm.salary} onChange={(e: InputField) => setEditForm(f => ({ ...f, salary: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.signDate')}</label>
+                  <Input type="date" value={editForm.startDate} onChange={(e: InputField) => setEditForm(f => ({ ...f, startDate: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.endDate')}</label>
+                  <Input type="date" value={editForm.endDate} onChange={(e: InputField) => setEditForm(f => ({ ...f, endDate: e.target.value }))} />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.note')}</label>
+                  <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={2} placeholder={t('form.notePlaceholder')} value={editForm.note} onChange={(e: TextareaField) => setEditForm(f => ({ ...f, note: e.target.value }))} />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button variant="outline" onClick={close}>{t('cancel')}</Button>
+                <Button variant="primary" onClick={close}>{t('modal.saveChanges')}</Button>
+              </div>
             </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-lg font-bold text-white">
+                  {selectedContract.staff.split(' ').slice(-2).map((n) => n[0]).join('')}
+                </div>
+                <div>
+                  <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedContract.staff}</p>
+                  <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedContract.code} · {selectedContract.dept} · {selectedContract.position}</p>
+                </div>
+                <Badge variant={statusVariant(selectedContract.status) as 'success'|'warning'|'error'} dot className="ml-auto">{statusLabel(selectedContract.status)}</Badge>
+              </div>
 
-            <div className="p-4 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] text-center text-[rgb(var(--text-muted))]">
-              <FileText className="h-8 w-8 mx-auto mb-2 opacity-40" />
-              <p className="text-sm">{t('modal.contractFile')}: <strong className="font-mono">{selectedContract.file}</strong></p>
-              <p className="text-xs mt-1">{t('modal.downloadHint')}</p>
-            </div>
-          </div>
-        )}
-      </Modal>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {[
+                  { label: t('form.contractType'), value: selectedContract.type },
+                  { label: t('form.salary'), value: fmt(selectedContract.salary) },
+                  { label: t('form.signDate'), value: selectedContract.startDate },
+                  { label: t('form.endDate'), value: selectedContract.endDate || t('contract.indefinite') },
+                  { label: t('form.attachFile'), value: selectedContract.file },
+                  { label: t('table.trangThai'), value: statusLabel(selectedContract.status) },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex gap-3 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                    <span className="shrink-0 text-[rgb(var(--text-muted))] w-40">{label}:</span>
+                    <span className="font-medium text-[rgb(var(--text-primary))]">{value}</span>
+                  </div>
+                ))}
+              </div>
 
-      {/* MODAL 4: Edit contract */}
-      <Modal
-        open={editOpen}
-        onClose={() => setEditOpen(false)}
-        title={t('modal.editTitle')}
-        size="xl"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setEditOpen(false)}>{t('cancel')}</Button>
-            <Button variant="primary" onClick={() => setEditOpen(false)}>{t('modal.saveChanges')}</Button>
-          </div>
-        }
-      >
-        {selectedContract && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-3 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))]">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-sm font-bold text-[rgb(var(--primary))]">
-                {selectedContract.staff.split(' ').slice(-2).map((n) => n[0]).join('')}
-              </div>
-              <div>
-                <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedContract.staff}</p>
-                <p className="text-xs text-[rgb(var(--text-secondary))]">{selectedContract.code}</p>
+              <div className="p-4 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] text-center text-[rgb(var(--text-muted))]">
+                <FileText className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                <p className="text-sm">{t('modal.contractFile')}: <strong className="font-mono">{selectedContract.file}</strong></p>
+                <p className="text-xs mt-1">{t('modal.downloadHint')}</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.dept')}</label>
-                <Input value={editForm.dept} onChange={(e: InputField) => setEditForm(f => ({ ...f, dept: e.target.value }))} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.position')}</label>
-                <Input value={editForm.position} onChange={(e: InputField) => setEditForm(f => ({ ...f, position: e.target.value }))} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.contractType')}</label>
-                <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2]" value={editForm.type} onChange={(e: SelectField) => setEditForm(f => ({ ...f, type: e.target.value }))}>
-                  <option>{t('contract.permanent')}</option><option>{t('contract.visiting')}</option><option>{t('contract.probation')}</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.salary')} (VNĐ)</label>
-                <Input type="number" value={editForm.salary} onChange={(e: InputField) => setEditForm(f => ({ ...f, salary: e.target.value }))} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.signDate')}</label>
-                <Input type="date" value={editForm.startDate} onChange={(e: InputField) => setEditForm(f => ({ ...f, startDate: e.target.value }))} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.endDate')}</label>
-                <Input type="date" value={editForm.endDate} onChange={(e: InputField) => setEditForm(f => ({ ...f, endDate: e.target.value }))} />
-              </div>
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('form.note')}</label>
-                <textarea className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2] resize-none" rows={2} placeholder={t('form.notePlaceholder')} value={editForm.note} onChange={(e: TextareaField) => setEditForm(f => ({ ...f, note: e.target.value }))} />
-              </div>
-            </div>
-          </div>
+          )
         )}
-      </Modal>
+      </DetailModal>
     </div>
   );
 }

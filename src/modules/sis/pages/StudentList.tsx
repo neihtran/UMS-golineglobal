@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Download, Upload, UserPlus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -14,9 +13,13 @@ import {
   TableCell,
   TablePagination,
   TableEmpty,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import StudentDetail from './StudentDetail';
+import StudentEdit from './StudentEdit';
 
 type Status = 'studying' | 'reserved' | 'suspended' | 'graduated' | 'quit';
 
@@ -42,6 +45,9 @@ export default function StudentList() {
   const [search, setSearch] = useState('');
   const [dept, setDept] = useState('Tất cả');
   const [status, setStatus] = useState<Status | 'all'>('all');
+
+  const { selectedId, openDetail, openEdit, close, isEditMode } = useDetailModal({ size: 'fullscreen' });
+  const selectedStudent = selectedId ? MOCK_STUDENTS.find((s) => s.id === selectedId) : null;
 
   const filtered = MOCK_STUDENTS.filter((s) => {
     const matchSearch = !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.msv.toLowerCase().includes(search.toLowerCase());
@@ -117,12 +123,15 @@ export default function StudentList() {
           ) : (
             <>
             {paged.map((s, i) => (
-              <TableRow key={s.id}>
+                <TableRow key={s.id}>
                 <TableCell className="text-[rgb(var(--text-muted))] tabular-nums">
                   {(pagination.page - 1) * pagination.pageSize + i + 1}
                 </TableCell>
                 <TableCell>
-                  <Link to={`/sis/sinh-vien/${s.id}`} className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))]">
+                  <button
+                    onClick={() => openDetail(s.id)}
+                    className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] text-left w-full"
+                  >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-semibold text-[rgb(var(--primary))]">
                       {s.name.split(' ').slice(-2).map((n) => n[0]).join('')}
                     </div>
@@ -130,7 +139,7 @@ export default function StudentList() {
                       <p className="font-medium">{s.name}</p>
                       <p className="text-xs text-[rgb(var(--text-muted))]">{s.dob}</p>
                     </div>
-                  </Link>
+                  </button>
                 </TableCell>
                 <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{s.msv}</TableCell>
                 <TableCell className="text-[rgb(var(--text-secondary))]">{s.class}</TableCell>
@@ -148,8 +157,8 @@ export default function StudentList() {
                 <TableCell className="font-mono text-sm">{s.credits}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">
-                    <Link to={`/sis/sinh-vien/${s.id}`}><Button variant="ghost" size="sm">{t('student.action.chiTiet')}</Button></Link>
-                    <Link to={`/sis/sinh-vien/${s.id}/sua`}><Button variant="ghost" size="sm">{t('student.action.sua')}</Button></Link>
+                    <Button variant="ghost" size="sm" onClick={() => openDetail(s.id)}>{t('student.action.chiTiet')}</Button>
+                    <Button variant="ghost" size="sm" onClick={() => openEdit(s.id)}>{t('student.action.sua')}</Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -167,6 +176,26 @@ export default function StudentList() {
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      {/* Detail / Edit Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedStudent?.name ?? ''}
+        description={selectedStudent ? `${selectedStudent.msv} · ${selectedStudent.class}` : ''}
+        size="fullscreen"
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={close}>Đóng</Button>
+          </div>
+        }
+      >
+        {isEditMode ? (
+          selectedStudent ? <StudentEdit id={selectedStudent.id} onSuccess={close} /> : null
+        ) : (
+          selectedStudent ? <StudentDetail id={selectedStudent.id} /> : null
+        )}
+      </DetailModal>
     </div>
   );
 }

@@ -26,6 +26,7 @@ export {
   Drawer,
 } from './Modal';
 export { ConfirmModal } from './ConfirmModal';
+export { DetailModal } from './DetailModal';
 export {
   Tabs,
   TabsList,

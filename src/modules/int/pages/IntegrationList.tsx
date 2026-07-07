@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, RefreshCw, Globe, Eye } from 'lucide-react';
-import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
+import { Button, Badge, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import IntegrationDetail from './IntegrationDetail';
 
 const INTEGRATIONS = [
   { id: 'i1', name: 'HEMIS API', type: 'ERP', direction: 'bidirectional', status: 'active', uptime: 99.8, lastSync: '5 phút trước', eventsToday: 1240, desc: 'Đồng bộ dữ liệu sinh viên, nhân sự, đào tạo', retries: 0 },
@@ -47,6 +49,9 @@ export default function IntegrationList() {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('Tất cả');
   const [statusFilter, setStatusFilter] = useState('all');
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+
+  const selectedIntegration = selectedId ? INTEGRATIONS.find((i) => i.id === selectedId) : null;
 
   const filtered = INTEGRATIONS.filter((i) => {
     const matchSearch = !search || i.name.toLowerCase().includes(search.toLowerCase());
@@ -143,6 +148,7 @@ export default function IntegrationList() {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => openDetail(i.id)}>Chi tiết</Button>
                     <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate('/int/nhat-ky')}>Log</Button>
                   </div>
                 </TableCell>
@@ -160,6 +166,16 @@ export default function IntegrationList() {
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedIntegration ? selectedIntegration.name : ''}
+        description={selectedIntegration ? selectedIntegration.desc : ''}
+        size="fullscreen"
+      >
+        {selectedId ? <IntegrationDetail id={selectedId} /> : null}
+      </DetailModal>
     </div>
   );
 }

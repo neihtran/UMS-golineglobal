@@ -1,30 +1,85 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Edit2, Trash2, Send, Download, Clock,
+  Edit2, Trash2, Download, Clock,
   FileText, CheckCircle2, AlertTriangle, Users, PenLine,
 } from 'lucide-react';
 import { Button, Card, CardContent } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 import { useTranslation } from 'react-i18next';
 
-const DOC_DETAIL = {
-  id: 'd2',
-  number: 'KH-2026-015',
-  type: 'ke-hoach',
-  typeLabel: 'Kế hoạch',
-  title: 'Kế hoạch tuyển sinh HK1 2026-2027',
-  abstract: 'Kế hoạch tuyển sinh hệ đại học chính quy, liên thông, vừa làm vừa học năm học 2026-2027 của Trường Đại học.',
-  urgency: 'thường',
-  internalType: 'Đi nội bộ & ngoài',
-  author: 'ThS. Trần Hoàng Nam',
-  authorRole: 'Phó Trưởng phòng Đào tạo',
-  dept: 'Phòng Đào tạo',
-  createdAt: '15/06/2026 10:00',
-  updatedAt: '18/06/2026 14:30',
-  status: 'pending',
-  statusLabel: 'Chờ ký',
-  content: `<p style="text-align: right;"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></p>
+type DocStatus = 'draft' | 'pending' | 'approved' | 'signed';
+
+interface DocumentRecord {
+  id: string;
+  number: string;
+  type: string;
+  typeLabel: string;
+  title: string;
+  abstract: string;
+  urgency: string;
+  internalType: string;
+  author: string;
+  authorRole: string;
+  dept: string;
+  createdAt: string;
+  updatedAt: string;
+  status: DocStatus;
+  statusLabel: string;
+  content: string;
+  signers: { name: string; role: string; status: 'signed' | 'pending'; signedAt: string | null }[];
+  recipients: string[];
+  history: { version: string; time: string; user: string; action: string }[];
+}
+
+const MOCK_MAP: Record<string, DocumentRecord> = {
+  d1: {
+    id: 'd1',
+    number: 'QĐ-2026-001',
+    type: 'quyet-dinh',
+    typeLabel: 'Quyết định',
+    title: 'Quyết định thành lập Hội đồng Tuyển sinh',
+    abstract: 'Thành lập Hội đồng Tuyển sinh năm 2026 gồm 7 thành viên',
+    urgency: 'khẩn',
+    internalType: 'Đi nội bộ & ngoài',
+    author: 'Nguyễn Văn A',
+    authorRole: 'Trưởng phòng Tuyển sinh',
+    dept: 'Phòng Tuyển sinh',
+    createdAt: '20/06/2026 09:00',
+    updatedAt: '22/06/2026 14:30',
+    status: 'pending',
+    statusLabel: 'Chờ ký',
+    content: `<p style="text-align: center;"><strong>QUYẾT ĐỊNH</strong></p>
+<p style="text-align: center;"><strong>Về việc thành lập Hội đồng Tuyển sinh năm 2026</strong></p>
+<p>&nbsp;</p>
+<p><strong>Điều 1.</strong> Thành lập Hội đồng Tuyển sinh năm 2026 gồm 7 thành viên.</p>
+<p><strong>Điều 2.</strong> Hội đồng có nhiệm vụ tổ chức tuyển sinh đại học chính quy năm 2026.</p>`,
+    signers: [
+      { name: 'PGS.TS. Nguyễn Văn Hiệu', role: 'Hiệu trưởng', status: 'pending', signedAt: null },
+      { name: 'PGS.TS. Trần Thị Hương', role: 'Phó Hiệu trưởng', status: 'pending', signedAt: null },
+    ],
+    recipients: ['Hiệu trưởng', 'Phó Hiệu trưởng', 'Phòng Tuyển sinh', 'Khoa CNTT', 'Phòng HC'],
+    history: [
+      { version: '1.0', time: '20/06/2026 09:00', user: 'Nguyễn Văn A', action: 'Tạo mới' },
+      { version: '1.1', time: '22/06/2026 14:30', user: 'Nguyễn Văn A', action: 'Gửi rà soát' },
+    ],
+  },
+  d2: {
+    id: 'd2',
+    number: 'KH-2026-015',
+    type: 'ke-hoach',
+    typeLabel: 'Kế hoạch',
+    title: 'Kế hoạch tuyển sinh HK1 2026-2027',
+    abstract: 'Kế hoạch tuyển sinh hệ đại học chính quy, liên thông, vừa làm vừa học năm học 2026-2027 của Trường Đại học.',
+    urgency: 'thường',
+    internalType: 'Đi nội bộ & ngoài',
+    author: 'ThS. Trần Hoàng Nam',
+    authorRole: 'Phó Trưởng phòng Đào tạo',
+    dept: 'Phòng Đào tạo',
+    createdAt: '15/06/2026 10:00',
+    updatedAt: '18/06/2026 14:30',
+    status: 'pending',
+    statusLabel: 'Chờ ký',
+    content: `<p style="text-align: right;"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></p>
 <p style="text-align: right;"><strong>Độc lập - Tự do - Hạnh phúc</strong></p>
 <hr style="border: none; border-top: 1px solid #ccc; margin: 16px 0;" />
 <p style="text-align: center;"><strong>SỐ: KH-2026-015/ĐT-ĐH</strong></p>
@@ -60,32 +115,126 @@ const DOC_DETAIL = {
 <li>- Như trên;</li>
 <li>- Lưu.</li>
 </ul>`,
-  signers: [
-    { name: 'PGS.TS. Lê Thị Lan', role: 'Trưởng phòng Đào tạo', status: 'signed', signedAt: '18/06/2026' },
-    { name: 'PGS.TS. Nguyễn Văn Minh', role: 'Trưởng khoa', status: 'pending', signedAt: null },
-  ],
-  recipients: ['Hiệu trưởng', 'Phó Hiệu trưởng', 'Khoa CNTT', 'Khoa Sư phạm', 'Phòng HC'],
-  history: [
-    { version: '1.0', time: '15/06/2026 10:00', user: 'ThS. Trần Hoàng Nam', action: 'Tạo mới' },
-    { version: '1.1', time: '16/06/2026 11:30', user: 'ThS. Trần Hoàng Nam', action: 'Cập nhật chỉ tiêu tuyển sinh' },
-    { version: '1.2', time: '18/06/2026 14:30', user: 'ThS. Trần Hoàng Nam', action: 'Gửi rà soát' },
-  ],
+    signers: [
+      { name: 'PGS.TS. Lê Thị Lan', role: 'Trưởng phòng Đào tạo', status: 'signed', signedAt: '18/06/2026' },
+      { name: 'PGS.TS. Nguyễn Văn Minh', role: 'Trưởng khoa', status: 'pending', signedAt: null },
+    ],
+    recipients: ['Hiệu trưởng', 'Phó Hiệu trưởng', 'Khoa CNTT', 'Khoa Sư phạm', 'Phòng HC'],
+    history: [
+      { version: '1.0', time: '15/06/2026 10:00', user: 'ThS. Trần Hoàng Nam', action: 'Tạo mới' },
+      { version: '1.1', time: '16/06/2026 11:30', user: 'ThS. Trần Hoàng Nam', action: 'Cập nhật chỉ tiêu tuyển sinh' },
+      { version: '1.2', time: '18/06/2026 14:30', user: 'ThS. Trần Hoàng Nam', action: 'Gửi rà soát' },
+    ],
+  },
+  d3: {
+    id: 'd3',
+    number: 'KH-2026-016',
+    type: 'ke-hoach',
+    typeLabel: 'Kế hoạch',
+    title: 'Kế hoạch bảo trì hệ thống tháng 7/2026',
+    abstract: 'Bảo trì định kỳ hệ thống LMS và Portal',
+    urgency: 'thường',
+    internalType: 'Nội bộ',
+    author: 'Lê Văn C',
+    authorRole: 'Trưởng phòng CNTT',
+    dept: 'Phòng CNTT',
+    createdAt: '15/06/2026 10:00',
+    updatedAt: '15/06/2026 10:00',
+    status: 'pending',
+    statusLabel: 'Chờ ký',
+    content: `<p style="text-align: center;"><strong>KẾ HOẠCH BẢO TRÌ HỆ THỐNG THÁNG 7/2026</strong></p>
+<p>&nbsp;</p>
+<p>Bảo trì định kỳ hệ thống LMS và Portal.</p>`,
+    signers: [
+      { name: 'PGS.TS. Nguyễn Văn Hiệu', role: 'Hiệu trưởng', status: 'pending', signedAt: null },
+    ],
+    recipients: ['Phòng CNTT', 'Phòng Đào tạo', 'Các Khoa'],
+    history: [
+      { version: '1.0', time: '15/06/2026 10:00', user: 'Lê Văn C', action: 'Tạo mới' },
+    ],
+  },
+  d4: {
+    id: 'd4',
+    number: 'BC-2026-012',
+    type: 'bao-cao',
+    typeLabel: 'Báo cáo',
+    title: 'Báo cáo tổng kết công tác tuyển sinh năm 2026',
+    abstract: 'Tổng kết tuyển sinh 2026 với 1,850 chỉ tiêu',
+    urgency: 'thường',
+    internalType: 'Nội bộ',
+    author: 'Phạm Thu D',
+    authorRole: 'Trưởng phòng Tuyển sinh',
+    dept: 'Phòng Tuyển sinh',
+    createdAt: '10/06/2026 14:00',
+    updatedAt: '10/06/2026 14:00',
+    status: 'approved',
+    statusLabel: 'Đã duyệt',
+    content: `<p style="text-align: center;"><strong>BÁO CÁO TỔNG KẾT CÔNG TÁC TUYỂN SINH NĂM 2026</strong></p>
+<p>&nbsp;</p>
+<p>Tổng kết tuyển sinh 2026 với 1,850 chỉ tiêu.</p>`,
+    signers: [
+      { name: 'PGS.TS. Nguyễn Văn Hiệu', role: 'Hiệu trưởng', status: 'signed', signedAt: '10/06/2026' },
+    ],
+    recipients: ['Phòng Tuyển sinh', 'Ban Giám hiệu'],
+    history: [
+      { version: '1.0', time: '10/06/2026 14:00', user: 'Phạm Thu D', action: 'Tạo mới' },
+    ],
+  },
+  d5: {
+    id: 'd5',
+    number: 'HD-2026-008',
+    type: 'huong-dan',
+    typeLabel: 'Hướng dẫn',
+    title: 'Hướng dẫn đăng ký học phần kỳ 3 năm học 2025-2026',
+    abstract: 'Đăng ký HP từ 01/07 đến 10/07/2026',
+    urgency: 'khẩn',
+    internalType: 'Nội bộ',
+    author: 'Hoàng Văn E',
+    authorRole: 'Phó Trưởng phòng Đào tạo',
+    dept: 'Phòng Đào tạo',
+    createdAt: '22/06/2026 11:00',
+    updatedAt: '22/06/2026 11:00',
+    status: 'pending',
+    statusLabel: 'Từ chối',
+    content: `<p style="text-align: center;"><strong>HƯỚNG DẪN ĐĂNG KÝ HỌC PHẦN KỲ 3</strong></p>
+<p>&nbsp;</p>
+<p>Đăng ký HP từ 01/07 đến 10/07/2026.</p>`,
+    signers: [
+      { name: 'PGS.TS. Lê Thị Lan', role: 'Trưởng phòng Đào tạo', status: 'pending', signedAt: null },
+    ],
+    recipients: ['Sinh viên', 'Các Khoa', 'Phòng Đào tạo'],
+    history: [
+      { version: '1.0', time: '22/06/2026 11:00', user: 'Hoàng Văn E', action: 'Tạo mới' },
+    ],
+  },
 };
 
-const STATUS_CONFIG: Record<string, { variant: 'info' | 'success' | 'warning' | 'neutral'; statusKey: string; icon: React.ReactNode }> = {
+const STATUS_CONFIG: Record<DocStatus, { variant: 'info' | 'success' | 'warning' | 'neutral'; statusKey: string; icon: React.ReactNode }> = {
   draft: { variant: 'info', statusKey: 'status.draft', icon: <PenLine className="h-3.5 w-3.5" /> },
   pending: { variant: 'warning', statusKey: 'status.pending', icon: <Clock className="h-3.5 w-3.5" /> },
   approved: { variant: 'success', statusKey: 'status.approved', icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
   signed: { variant: 'success', statusKey: 'status.signed', icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
 };
 
-export default function DocumentDetailPage() {
+interface DocumentDetailPageProps {
+  id?: string;
+}
+
+export default function DocumentDetailPage({ id }: DocumentDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const { t } = useTranslation('dms');
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const d = DOC_DETAIL;
-  const sc = STATUS_CONFIG[d.status as keyof typeof STATUS_CONFIG];
+  const d = MOCK_MAP[actualId];
+  const sc = d ? STATUS_CONFIG[d.status] : undefined;
   const [showDelete, setShowDelete] = useState(false);
+
+  if (!d || !sc) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{t('document.detail.notFound')}</p>
+      </div>
+    );
+  }
 
   const urgencyKey = d.urgency === 'khẩn' ? 'khan' : d.urgency === 'mật' ? 'mat' : 'thuong';
 
@@ -109,31 +258,6 @@ export default function DocumentDetailPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={t('document.detail.title')}
-        description={`${d.number} · ${d.typeLabel}`}
-        breadcrumbs={[
-          { label: 'DMS', href: '/dms' },
-          { label: t('document.detail.breadcrumbPending'), href: '/dms/cho-ky' },
-          { label: d.number },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/dms/cho-ky')}>
-              {t('common.back')}
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>{t('common.downloadFile')}</Button>
-            <Button variant="outline" size="sm" leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => navigate(`/dms/soan-thao/${id}`)}>{t('common.edit')}</Button>
-            <Button variant="outline" size="sm" leftIcon={<Trash2 className="h-4 w-4" />} className="!text-[rgb(var(--error))]" onClick={() => setShowDelete(true)}>
-              {t('common.delete')}
-            </Button>
-            <Button size="sm" leftIcon={<Send className="h-4 w-4" />}>
-              {t('action.sendSign')}
-            </Button>
-          </div>
-        }
-      />
-
       {/* Status strip */}
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))]">
         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold bg-[rgb(var(--${sc.variant})/0.1)] text-[rgb(var(--${sc.variant}))]`}>
@@ -300,7 +424,7 @@ export default function DocumentDetailPage() {
             <p className="text-sm text-[rgb(var(--text-secondary))] mb-5">{t('document.detail.deleteConfirmDesc')}</p>
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => setShowDelete(false)}>{t('common.cancel')}</Button>
-              <Button className="flex-1 !bg-[rgb(var(--error))] hover:!bg-[rgb(var(--error-light))]" onClick={() => { setShowDelete(false); navigate('/dms/cho-ky'); }}>
+              <Button className="flex-1 !bg-[rgb(var(--error))] hover:!bg-[rgb(var(--error-light))]" onClick={() => setShowDelete(false)}>
                 {t('common.delete')}
               </Button>
             </div>

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { UserPlus, Download, Upload, Lock, Unlock } from 'lucide-react';
 import {
   Button,
@@ -13,10 +12,13 @@ import {
   TableCell,
   TableEmpty,
   TablePagination,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 import { toast } from '@/components/ui/Toast';
+import UserDetail from './UserDetail';
 
 const MOCK_USERS = [
   { id: 'u001', name: 'Nguyễn Văn Admin', email: 'admin@truong.edu.vn', role: 'admin', unit: 'Phòng CNTT', status: 'active', lastLogin: '2026-06-25 09:15' },
@@ -67,6 +69,9 @@ export default function UserList() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedUser = selectedId ? MOCK_USERS.find((u) => u.id === selectedId) : null;
+
   const handleToggleLock = async (user: typeof MOCK_USERS[0]) => {
     setActionLoading(user.id);
     await new Promise(r => setTimeout(r, 600));
@@ -98,20 +103,13 @@ export default function UserList() {
         ]}
         actions={
           <>
-            <Button variant="outline" leftIcon={<Upload className="h-4 w-4" />}>
-              Import Excel
-            </Button>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>
-              Xuất Excel
-            </Button>
-            <Button leftIcon={<UserPlus className="h-4 w-4" />}>
-              Tạo tài khoản
-            </Button>
+            <Button variant="outline" leftIcon={<Upload className="h-4 w-4" />}>Import Excel</Button>
+            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>Xuất Excel</Button>
+            <Button leftIcon={<UserPlus className="h-4 w-4" />}>Tạo tài khoản</Button>
           </>
         }
       />
 
-      {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
         <Input
           placeholder="Tìm tên hoặc email..."
@@ -147,7 +145,6 @@ export default function UserList() {
         </select>
       </div>
 
-      {/* Table */}
       <Table>
         <TableHead>
           <TableRow>
@@ -169,12 +166,15 @@ export default function UserList() {
               return (
                 <TableRow key={u.id}>
                   <TableCell>
-                    <Link to={`/iam/tai-khoan/${u.id}`} className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] transition-colors">
+                    <button
+                      onClick={() => openDetail(u.id)}
+                      className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] transition-colors text-left w-full"
+                    >
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-semibold text-[rgb(var(--primary))]">
                         {u.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
                       </div>
                       <span className="font-medium">{u.name}</span>
-                    </Link>
+                    </button>
                   </TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{u.email}</TableCell>
                   <TableCell><Badge variant={ROLE_VARIANT(u.role)}>{ROLE_LABELS[u.role]}</Badge></TableCell>
@@ -183,10 +183,14 @@ export default function UserList() {
                   <TableCell className="text-[rgb(var(--text-secondary))] tabular-nums text-xs">{u.lastLogin}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Link to={`/iam/tai-khoan/${u.id}`}>
-                        <Button variant="ghost" size="sm">Chi tiết</Button>
-                      </Link>
-                      <Button variant="ghost" size="sm" leftIcon={u.status === 'locked' ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />} loading={actionLoading === u.id} onClick={() => handleToggleLock(u)}>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(u.id)}>Chi tiết</Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        leftIcon={u.status === 'locked' ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+                        loading={actionLoading === u.id}
+                        onClick={() => handleToggleLock(u)}
+                      >
                         {u.status === 'locked' ? 'Mở khóa' : 'Khóa'}
                       </Button>
                     </div>
@@ -206,6 +210,22 @@ export default function UserList() {
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50, 100]}
       />
+
+      {/* Detail Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedUser?.name ?? ''}
+        description={selectedUser?.email}
+        size="fullscreen"
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={close}>Đóng</Button>
+          </div>
+        }
+      >
+        {selectedUser ? <UserDetail id={selectedUser.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

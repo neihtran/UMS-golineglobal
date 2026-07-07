@@ -1,14 +1,41 @@
 import { useState } from 'react';
-import {
-  BookOpen,
-  Award,
-  ArrowLeft,
-  Download,
-  Edit2,
-} from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { BookOpen, Award, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button, Badge, Card, CardContent, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
+
+const STUDENT_MAP: Record<string, {
+  id: string; msv: string; name: string; dob: string;
+  class: string; major: string; dept: string; cohort: string;
+  gpa: number; credits: number; status: string;
+  address: string; phone: string; email: string;
+  enrollmentDate: string; expectedGraduation: string;
+}> = {
+  sv001: {
+    id: 'sv001', msv: 'SV-2022-0001', name: 'Nguyễn Văn An', dob: '2004-05-12',
+    class: 'CNTT-K60A', major: 'Công nghệ thông tin', dept: 'Khoa CNTT', cohort: '2022',
+    gpa: 3.45, credits: 98, status: 'studying',
+    address: '48/5 Đường Lê Văn Việt, Quận 9, TP.HCM', phone: '0912 345 678',
+    email: 'an.nguyen@student.truong.edu.vn',
+    enrollmentDate: '2022-09-01', expectedGraduation: '2026-06-30',
+  },
+  sv002: {
+    id: 'sv002', msv: 'SV-2022-0002', name: 'Trần Thị Bình', dob: '2004-08-20',
+    class: 'KT-K60A', major: 'Kinh tế', dept: 'Khoa Kinh tế', cohort: '2022',
+    gpa: 3.72, credits: 102, status: 'studying',
+    address: '12 Đường Nguyễn Trãi, Quận 1, TP.HCM', phone: '0913 456 789',
+    email: 'binh.tran@student.truong.edu.vn',
+    enrollmentDate: '2022-09-01', expectedGraduation: '2026-06-30',
+  },
+  sv003: {
+    id: 'sv003', msv: 'SV-2023-0001', name: 'Lê Hoàng Nam', dob: '2005-03-05',
+    class: 'CNTT-K61A', major: 'Công nghệ thông tin', dept: 'Khoa CNTT', cohort: '2023',
+    gpa: 2.89, credits: 48, status: 'studying',
+    address: '88 Đường Trần Hưng Đạo, Quận 5, TP.HCM', phone: '0914 567 890',
+    email: 'nam.le@student.truong.edu.vn',
+    enrollmentDate: '2023-09-01', expectedGraduation: '2027-06-30',
+  },
+};
 
 const SUBJECTS = [
   { id: 's1', code: 'CS101', name: 'Nhập môn Lập trình Python', credits: 4, semester: 1, type: 'Bắt buộc', dept: 'Khoa CNTT', hours: 60 },
@@ -30,24 +57,21 @@ const GRADE_RECORDS = [
   { subjectCode: 'CS201', name: 'Cơ sở dữ liệu', semester: '2023-1', theory: 8.0, practice: 8.5, final: 8.2, grade: 'A', credits: 3 },
 ];
 
-const STUDENT = {
-  id: 'sv001', msv: 'SV-2022-0001', name: 'Nguyễn Văn An', dob: '2004-05-12',
-  class: 'CNTT-K60A', major: 'Công nghệ thông tin', dept: 'Khoa CNTT',
-  cohort: '2022', gpa: 3.45, credits: 98, status: 'studying',
-  address: '48/5 Đường Lê Văn Việt, Quận 9, TP.HCM', phone: '0912 345 678',
-  email: 'an.nguyen@student.truong.edu.vn',
-  enrollmentDate: '2022-09-01', expectedGraduation: '2026-06-30',
-};
-
 const TYPE_BADGE: Record<string, 'primary' | 'accent' | 'neutral'> = {
   'Bắt buộc': 'primary',
   'Tự chọn': 'accent',
 };
 
-export default function StudentDetail() {
+interface StudentDetailProps {
+  id?: string;
+}
+
+export default function StudentDetail({ id }: StudentDetailProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const { t } = useTranslation('sis');
   const [activeTab, setActiveTab] = useState('profile');
-  const s = STUDENT;
+  const s = STUDENT_MAP[actualId] ?? STUDENT_MAP['sv001'];
 
   const tabs = [
     { id: 'profile', label: t('student.detail.profile') },
@@ -74,23 +98,6 @@ export default function StudentDetail() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={s.name}
-        description={`${s.msv} · ${s.major} · ${s.class}`}
-        breadcrumbs={[
-          { label: 'SIS', href: '/sis' },
-          { label: t('student.breadcrumb.list'), href: '/sis/sinh-vien' },
-          { label: s.name },
-        ]}
-        actions={
-          <>
-            <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => history.back()}>{t('student.detail.back')}</Button>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('student.detail.exportProfile')}</Button>
-            <Button leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => window.location.href = `/sis/sinh-vien/${s.id}/sua`}>{t('student.detail.edit')}</Button>
-          </>
-        }
-      />
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Profile sidebar */}
         <div className="space-y-4">

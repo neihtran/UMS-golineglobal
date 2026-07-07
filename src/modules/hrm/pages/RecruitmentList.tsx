@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Plus, Download, Upload, Eye, FileText, Users, CheckCircle2, Clock, Building2, Edit3 } from 'lucide-react';
 import {
   Button, Input, Badge, Table, TableHead, TableBody, TableRow,
-  TableHeadCell, TableCell, TablePagination, TableEmpty, Modal,
+  TableHeadCell, TableCell, TablePagination, TableEmpty, Modal, DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 
 const PIPELINE_STAGES = [
   { id: 'new', count: 28, color: '#1E3A5F' },
@@ -70,12 +71,12 @@ export default function RecruitmentList() {
   const [search, setSearch] = useState('');
   const [dept, setDept] = useState('all');
   const [status, setStatus] = useState('all');
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<(typeof RECRUITMENTS)[0] | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
   const [hoSoOpen, setHoSoOpen] = useState(false);
   const [editForm, setEditForm] = useState({ title: '', dept: '', position: '', level: '', slots: '', deadline: '', method: '', description: '' });
+
+  const { selectedId, openDetail, openEdit, close, isEditMode } = useDetailModal({ size: 'fullscreen' });
+  const selectedItem = selectedId ? RECRUITMENTS.find((r) => r.id === selectedId) ?? null : null;
 
   const filtered = RECRUITMENTS.filter((r) => {
     const match = !search || r.title.toLowerCase().includes(search.toLowerCase()) || r.code.toLowerCase().includes(search.toLowerCase());
@@ -242,8 +243,13 @@ export default function RecruitmentList() {
                 <TableRow key={r.id} className="group">
                   <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{r.code}</TableCell>
                   <TableCell>
-                    <p className="font-medium text-[rgb(var(--text-primary))]">{r.title}</p>
-                    <p className="text-xs text-[rgb(var(--text-muted))]">{r.method}</p>
+                    <button
+                      onClick={() => openDetail(r.id)}
+                      className="text-left w-full hover:text-[rgb(var(--primary))] transition-colors"
+                    >
+                      <p className="font-medium text-[rgb(var(--text-primary))]">{r.title}</p>
+                      <p className="text-xs text-[rgb(var(--text-muted))]">{r.method}</p>
+                    </button>
                   </TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{r.dept}</TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{r.level}</TableCell>
@@ -257,9 +263,9 @@ export default function RecruitmentList() {
                   <TableCell><Badge variant={sc.variant} dot size="sm">{t(sc.labelKey)}</Badge></TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => { setSelectedItem(r); setDetailOpen(true); }}>{t('recruitment.modal.profileTitle')}</Button>
+                      <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(r.id)}>{t('recruitment.modal.profileTitle')}</Button>
                       <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} onClick={() => setHoSoOpen(true)}>{t('recruitment.btn.profiles')}</Button>
-                      <Button variant="ghost" size="sm" leftIcon={<Edit3 className="h-3.5 w-3.5" />} onClick={() => { setSelectedItem(r); setEditForm({ title: r.title, dept: r.dept, position: r.position, level: r.level, slots: r.slots.toString(), deadline: r.deadline, method: r.method, description: '' }); setEditOpen(true); }}>{t('action.edit')}</Button>
+                      <Button variant="ghost" size="sm" leftIcon={<Edit3 className="h-3.5 w-3.5" />} onClick={() => { openEdit(r.id); setEditForm({ title: r.title, dept: r.dept, position: r.position, level: r.level, slots: r.slots.toString(), deadline: r.deadline, method: r.method, description: '' }); }}>{t('action.edit')}</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -323,76 +329,135 @@ export default function RecruitmentList() {
         </div>
       </Modal>
 
-      {/* Modal Detail */}
-      <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title={t('recruitment.modal.detailTitle')} size="xl"
-        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setDetailOpen(false)}>{t('recruitment.btn.close')}</Button><Button variant="outline" leftIcon={<FileText className="h-4 w-4" />} onClick={() => setDetailOpen(false)}>{t('action.edit')}</Button></div>}>
+      {/* Detail / Edit Modal */}
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedItem ? selectedItem.title : ''}
+        description={selectedItem ? `${selectedItem.code} · ${selectedItem.dept} · ${selectedItem.position}` : ''}
+        size="fullscreen"
+        onEdit={selectedItem && !isEditMode ? () => openEdit(selectedItem.id) : undefined}
+      >
         {selectedItem && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary))] text-white"><Building2 className="h-6 w-6" /></div>
-              <div>
-                <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedItem.title}</p>
-                <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedItem.code} · {selectedItem.dept} · {selectedItem.position}</p>
-              </div>
-              <Badge variant={STATUS_CONFIG[selectedItem.status].variant} dot className="ml-auto">{t(STATUS_CONFIG[selectedItem.status].labelKey)}</Badge>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              {[
-                { label: t('recruitment.modal.position'), value: selectedItem.position },
-                { label: t('recruitment.modal.level'), value: selectedItem.level },
-                { label: t('recruitment.table.slots'), value: `${selectedItem.slots} nguoi` },
-                { label: t('recruitment.table.deadline'), value: selectedItem.deadline },
-                { label: t('recruitment.modal.method'), value: selectedItem.method },
-                { label: t('recruitment.table.candidates'), value: `${selectedItem.applicants} ho so` },
-              ].map(({ label, value }) => (
-                <div key={label} className="flex gap-3 border-b border-[rgb(var(--border)/0.4)] pb-2">
-                  <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">{label}:</span>
-                  <span className="font-medium text-[rgb(var(--text-primary))]">{value}</span>
+          isEditMode ? (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))]">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]"><Building2 className="h-4 w-4" /></div>
+                <div>
+                  <p className="text-xs text-[rgb(var(--text-muted))]">{t('recruitment.modal.editing')}:</p>
+                  <p className="font-medium text-[rgb(var(--text-primary))]">{selectedItem.title}</p>
                 </div>
-              ))}
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-muted))] mb-1.5">{t('recruitment.modal.jobDesc')} & {t('recruitment.modal.benefits')}</p>
-              <div className="rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] p-4 text-sm text-[rgb(var(--text-secondary))] space-y-2">
-                <p>Yeu cau tot nghiep {selectedItem.level} tro len chuyen nganh lien quan.</p>
-                <p>Co kha nang lam viec doc lap va theo nhom.</p>
-                <p>Duoc huong luong theo nang luc, phu cap, bao hiem day du.</p>
-                <p>Co hoi dao tao va phat trien nghe nghiep.</p>
+                <Badge variant={STATUS_CONFIG[selectedItem.status].variant} dot className="ml-auto">{t(STATUS_CONFIG[selectedItem.status].labelKey)}</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.jobTitle')}</label>
+                  <Input value={editForm.title} onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.dept')}</label>
+                  <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2)]" value={editForm.dept} onChange={(e) => setEditForm(f => ({ ...f, dept: e.target.value }))}>
+                    {['Khoa CNTT', 'Khoa Ngoai ngu', 'Khoa Luat', 'Khoa Kinh te', 'Phong Tai chinh', 'Ban Giam hieu'].map(d => <option key={d}>{d}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.position')}</label>
+                  <Input value={editForm.position} onChange={(e) => setEditForm(f => ({ ...f, position: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.level')}</label>
+                  <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2)]" value={editForm.level} onChange={(e) => setEditForm(f => ({ ...f, level: e.target.value }))}>
+                    {['Dai hoc', 'Thac si', 'Tien si', 'Cao dang', 'Sinh vien'].map(l => <option key={l}>{l}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.slots')}</label>
+                  <Input type="number" min="1" value={editForm.slots} onChange={(e) => setEditForm(f => ({ ...f, slots: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.deadline')}</label>
+                  <Input type="date" value={editForm.deadline} onChange={(e) => setEditForm(f => ({ ...f, deadline: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.method')}</label>
+                  <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2)]" value={editForm.method} onChange={(e) => setEditForm(f => ({ ...f, method: e.target.value }))}>
+                    {['Xet ho so', 'Xet ho so + Phong van', 'Thi viet + Phong van', 'Thi thuc hanh'].map(m => <option key={m}>{m}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button variant="outline" onClick={close}>{t('recruitment.btn.cancel')}</Button>
+                <Button variant="primary" onClick={close}>{t('recruitment.btn.saveChanges')}</Button>
               </div>
             </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-muted))] mb-3">{t('recruitment.modal.applicantList')} ({PIPELINE_APPLICANTS.length} ho so)</p>
-              <div className="rounded-lg border border-[rgb(var(--border))] overflow-hidden">
-                <Table>
-                  <TableHead><TableRow>
-                    <TableHeadCell>{t('recruitment.pipeline.table.candidate')}</TableHeadCell>
-                    <TableHeadCell>{t('recruitment.pipeline.table.appliedDate')}</TableHeadCell>
-                    <TableHeadCell>{t('recruitment.pipeline.table.stage')}</TableHeadCell>
-                    <TableHeadCell>{t('recruitment.pipeline.table.status')}</TableHeadCell>
-                  </TableRow></TableHead>
-                  <TableBody>
-                    {PIPELINE_APPLICANTS.slice(0, 3).map((a) => (
-                      <TableRow key={a.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-bold text-[rgb(var(--primary))]">
-                              {a.name.split(' ').slice(-2).map(n => n[0]).join('')}
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-4 rounded-lg bg-[rgb(var(--primary)/0.04)] border border-[rgb(var(--primary)/0.2)]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary))] text-white"><Building2 className="h-6 w-6" /></div>
+                <div>
+                  <p className="font-semibold text-[rgb(var(--text-primary))]">{selectedItem.title}</p>
+                  <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedItem.code} · {selectedItem.dept} · {selectedItem.position}</p>
+                </div>
+                <Badge variant={STATUS_CONFIG[selectedItem.status].variant} dot className="ml-auto">{t(STATUS_CONFIG[selectedItem.status].labelKey)}</Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {[
+                  { label: t('recruitment.modal.position'), value: selectedItem.position },
+                  { label: t('recruitment.modal.level'), value: selectedItem.level },
+                  { label: t('recruitment.table.slots'), value: `${selectedItem.slots} nguoi` },
+                  { label: t('recruitment.table.deadline'), value: selectedItem.deadline },
+                  { label: t('recruitment.modal.method'), value: selectedItem.method },
+                  { label: t('recruitment.table.candidates'), value: `${selectedItem.applicants} ho so` },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex gap-3 border-b border-[rgb(var(--border)/0.4)] pb-2">
+                    <span className="shrink-0 text-[rgb(var(--text-muted))] w-36">{label}:</span>
+                    <span className="font-medium text-[rgb(var(--text-primary))]">{value}</span>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-muted))] mb-1.5">{t('recruitment.modal.jobDesc')} & {t('recruitment.modal.benefits')}</p>
+                <div className="rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] p-4 text-sm text-[rgb(var(--text-secondary))] space-y-2">
+                  <p>Yeu cau tot nghiep {selectedItem.level} tro len chuyen nganh lien quan.</p>
+                  <p>Co kha nang lam viec doc lap va theo nhom.</p>
+                  <p>Duoc huong luong theo nang luc, phu cap, bao hiem day du.</p>
+                  <p>Co hoi dao tao va phat trien nghe nghiep.</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-muted))] mb-3">{t('recruitment.modal.applicantList')} ({PIPELINE_APPLICANTS.length} ho so)</p>
+                <div className="rounded-lg border border-[rgb(var(--border))] overflow-hidden">
+                  <Table>
+                    <TableHead><TableRow>
+                      <TableHeadCell>{t('recruitment.pipeline.table.candidate')}</TableHeadCell>
+                      <TableHeadCell>{t('recruitment.pipeline.table.appliedDate')}</TableHeadCell>
+                      <TableHeadCell>{t('recruitment.pipeline.table.stage')}</TableHeadCell>
+                      <TableHeadCell>{t('recruitment.pipeline.table.status')}</TableHeadCell>
+                    </TableRow></TableHead>
+                    <TableBody>
+                      {PIPELINE_APPLICANTS.slice(0, 3).map((a) => (
+                        <TableRow key={a.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-bold text-[rgb(var(--primary))]">
+                                {a.name.split(' ').slice(-2).map(n => n[0]).join('')}
+                              </div>
+                              <p className="font-medium text-[rgb(var(--text-primary))]">{a.name}</p>
                             </div>
-                            <p className="font-medium text-[rgb(var(--text-primary))]">{a.name}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-[rgb(var(--text-secondary))]">{a.appliedAt}</TableCell>
-                        <TableCell><Badge variant={PIPELINE_APPLICANT_STYLE[a.status].variant} size="sm">{t(PIPELINE_APPLICANT_LABEL[a.status])}</Badge></TableCell>
-                        <TableCell><Badge variant={STATUS_CONFIG[selectedItem.status].variant} dot size="sm">{t(STATUS_CONFIG[selectedItem.status].labelKey)}</Badge></TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                          </TableCell>
+                          <TableCell className="text-[rgb(var(--text-secondary))]">{a.appliedAt}</TableCell>
+                          <TableCell><Badge variant={PIPELINE_APPLICANT_STYLE[a.status].variant} size="sm">{t(PIPELINE_APPLICANT_LABEL[a.status])}</Badge></TableCell>
+                          <TableCell><Badge variant={STATUS_CONFIG[selectedItem.status].variant} dot size="sm">{t(STATUS_CONFIG[selectedItem.status].labelKey)}</Badge></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
             </div>
-          </div>
+          )
         )}
-      </Modal>
+      </DetailModal>
 
       {/* Modal Profiles */}
       <Modal open={hoSoOpen} onClose={() => setHoSoOpen(false)} title={t('recruitment.modal.profilesTitle')} size="xl"
@@ -416,59 +481,6 @@ export default function RecruitmentList() {
             </div>
           ))}
         </div>
-      </Modal>
-
-      {/* Modal Edit */}
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title={t('recruitment.modal.editTitle')} size="xl"
-        footer={<div className="flex justify-end gap-3"><Button variant="outline" onClick={() => setEditOpen(false)}>{t('recruitment.btn.cancel')}</Button><Button variant="primary" onClick={() => setEditOpen(false)}>{t('recruitment.btn.saveChanges')}</Button></div>}>
-        {selectedItem && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-[rgb(var(--bg-base))] border border-[rgb(var(--border))]">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]"><Building2 className="h-4 w-4" /></div>
-              <div>
-                <p className="text-xs text-[rgb(var(--text-muted))]">{t('recruitment.modal.editing')}:</p>
-                <p className="font-medium text-[rgb(var(--text-primary))]">{selectedItem.title}</p>
-              </div>
-              <Badge variant={STATUS_CONFIG[selectedItem.status].variant} dot className="ml-auto">{t(STATUS_CONFIG[selectedItem.status].labelKey)}</Badge>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.jobTitle')}</label>
-                <Input value={editForm.title} onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.dept')}</label>
-                <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2)]" value={editForm.dept} onChange={(e) => setEditForm(f => ({ ...f, dept: e.target.value }))}>
-                  {['Khoa CNTT', 'Khoa Ngoai ngu', 'Khoa Luat', 'Khoa Kinh te', 'Phong Tai chinh', 'Ban Giam hieu'].map(d => <option key={d}>{d}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.position')}</label>
-                <Input value={editForm.position} onChange={(e) => setEditForm(f => ({ ...f, position: e.target.value }))} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.level')}</label>
-                <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2)]" value={editForm.level} onChange={(e) => setEditForm(f => ({ ...f, level: e.target.value }))}>
-                  {['Dai hoc', 'Thac si', 'Tien si', 'Cao dang', 'Sinh vien'].map(l => <option key={l}>{l}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.slots')}</label>
-                <Input type="number" min="1" value={editForm.slots} onChange={(e) => setEditForm(f => ({ ...f, slots: e.target.value }))} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.deadline')}</label>
-                <Input type="date" value={editForm.deadline} onChange={(e) => setEditForm(f => ({ ...f, deadline: e.target.value }))} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('recruitment.modal.method')}</label>
-                <select className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light)/0.2)]" value={editForm.method} onChange={(e) => setEditForm(f => ({ ...f, method: e.target.value }))}>
-                  {['Xet ho so', 'Xet ho so + Phong van', 'Thi viet + Phong van', 'Thi thuc hanh'].map(m => <option key={m}>{m}</option>)}
-                </select>
-              </div>
-            </div>
-          </div>
-        )}
       </Modal>
     </div>
   );

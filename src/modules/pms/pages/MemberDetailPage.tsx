@@ -1,10 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Edit, Users, Award, Calendar, Phone, Mail,
+  Edit, Users, Award, Calendar, Phone, Mail,
   ShieldCheck, Star, FileText, CheckCircle2, TrendingUp,
 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const MEMBER = {
   id: 'pm1',
@@ -40,30 +39,27 @@ const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'neutral'
   suspended: { variant: 'neutral', label: 'Tạm đình chỉ' },
 };
 
-export default function MemberDetailPage() {
-  const navigate = useNavigate();
-  const m = MEMBER;
+const MEMBERS_MAP: Record<string, typeof MEMBER> = {
+  pm1: MEMBER,
+  pm2: { ...MEMBER, id: 'pm2', code: 'DV-2008-002', name: 'Lê Thị Lan', branch: 'Chi bộ Phòng HC', role: 'Đảng viên' },
+  pm3: { ...MEMBER, id: 'pm3', code: 'DV-2006-003', name: 'Trần Hoàng Nam', branch: 'Chi bộ Khoa CNTT', role: 'Phó Bí thư' },
+};
+
+interface MemberDetailPageProps {
+  id?: string;
+}
+
+export default function MemberDetailPage({ id }: MemberDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const m = MEMBERS_MAP[actualId] ?? MEMBER;
   const sc = STATUS_CONFIG[m.status];
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={m.name}
-        description={`${m.code} · ${m.branch} · ${m.role}`}
-        breadcrumbs={[
-          { label: 'PMS', href: '/pms' },
-          { label: 'Đảng viên', href: '/pms/dang-vien' },
-          { label: m.code },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/pms/dang-vien')}>
-              Quay lại
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
-          </div>
-        }
-      />
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" size="sm" leftIcon={<Edit className="h-4 w-4" />}>Chỉnh sửa</Button>
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

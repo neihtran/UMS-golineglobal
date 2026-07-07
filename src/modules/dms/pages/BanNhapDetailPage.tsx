@@ -1,32 +1,56 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Edit2, Trash2, Send, Download, Clock,
+  Edit2, Trash2, Send, Download, Clock,
   FileText, CheckCircle2, AlertTriangle,
 } from 'lucide-react';
 import { Button, Card, CardContent } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 import { useTranslation } from 'react-i18next';
 
-const DRAFT_DETAIL = {
-  id: 'd1',
-  number: 'CV-2026-001',
-  type: 'cv',
-  typeLabel: 'Công văn',
-  title: 'Quy chế đào tạo thạc sĩ ngành CNTT',
-  abstract: 'Quy định về quy chế đào tạo thạc sĩ ngành Công nghệ Thông tin, bao gồm điều kiện tuyển sinh, chương trình đào tạo, đánh giá và cấp bằng.',
-  urgency: 'thường',
-  urgencyColor: 'neutral',
-  internalType: 'Đi nội bộ & ngoài',
-  author: 'ThS. Trần Hoàng Nam',
-  authorRole: 'Phó Trưởng phòng Đào tạo',
-  dept: 'Phòng Đào tạo',
-  createdAt: '25/06/2026 14:30',
-  updatedAt: '26/06/2026 09:15',
-  status: 'draft',
-  statusLabel: 'Bản nháp',
-  recipients: ['Hiệu trưởng', 'Phó Hiệu trưởng', 'Khoa CNTT', 'Khoa Toán', 'Phòng HC'],
-  content: `<p style="text-align: right;"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></p>
+type DraftStatus = 'draft' | 'review' | 'submitted';
+
+interface DraftRecord {
+  id: string;
+  number: string;
+  type: string;
+  typeLabel: string;
+  title: string;
+  abstract: string;
+  urgency: string;
+  urgencyColor: string;
+  internalType: string;
+  author: string;
+  authorRole: string;
+  dept: string;
+  createdAt: string;
+  updatedAt: string;
+  status: DraftStatus;
+  statusLabel: string;
+  recipients: string[];
+  content: string;
+  history: { version: string; time: string; user: string; action: string }[];
+}
+
+const MOCK_MAP: Record<string, DraftRecord> = {
+  d1: {
+    id: 'd1',
+    number: 'CV-2026-001',
+    type: 'cv',
+    typeLabel: 'Công văn',
+    title: 'Quy chế đào tạo thạc sĩ ngành CNTT',
+    abstract: 'Quy định về quy chế đào tạo thạc sĩ ngành Công nghệ Thông tin, bao gồm điều kiện tuyển sinh, chương trình đào tạo, đánh giá và cấp bằng.',
+    urgency: 'thường',
+    urgencyColor: 'neutral',
+    internalType: 'Đi nội bộ & ngoài',
+    author: 'ThS. Trần Hoàng Nam',
+    authorRole: 'Phó Trưởng phòng Đào tạo',
+    dept: 'Phòng Đào tạo',
+    createdAt: '25/06/2026 14:30',
+    updatedAt: '26/06/2026 09:15',
+    status: 'draft',
+    statusLabel: 'Bản nháp',
+    recipients: ['Hiệu trưởng', 'Phó Hiệu trưởng', 'Khoa CNTT', 'Khoa Toán', 'Phòng HC'],
+    content: `<p style="text-align: right;"><strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong></p>
 <p style="text-align: right;"><strong>Độc lập - Tự do - Hạnh phúc</strong></p>
 <hr style="border: none; border-top: 1px solid #ccc; margin: 16px 0;" />
 <p style="text-align: center;"><strong>SỐ: CV-2026-001/ĐT-ĐH</strong></p>
@@ -51,26 +75,115 @@ const DRAFT_DETAIL = {
 <li>- Như trên;</li>
 <li>- Lưu.</li>
 </ul>`,
-  history: [
-    { version: '1.0', time: '25/06/2026 14:30', user: 'ThS. Trần Hoàng Nam', action: 'Tạo mới' },
-    { version: '1.1', time: '25/06/2026 16:45', user: 'ThS. Trần Hoàng Nam', action: 'Cập nhật nội dung Điều 3-4' },
-    { version: '1.2', time: '26/06/2026 09:15', user: 'ThS. Trần Hoàng Nam', action: 'Bổ sung Điều 5 về cấp bằng' },
-  ],
+    history: [
+      { version: '1.0', time: '25/06/2026 14:30', user: 'ThS. Trần Hoàng Nam', action: 'Tạo mới' },
+      { version: '1.1', time: '25/06/2026 16:45', user: 'ThS. Trần Hoàng Nam', action: 'Cập nhật nội dung Điều 3-4' },
+      { version: '1.2', time: '26/06/2026 09:15', user: 'ThS. Trần Hoàng Nam', action: 'Bổ sung Điều 5 về cấp bằng' },
+    ],
+  },
+  d2: {
+    id: 'd2',
+    number: 'QD-2026-012',
+    type: 'qd',
+    typeLabel: 'Quyết định',
+    title: 'Ban hành danh mục học liệu năm học 2026-2027',
+    abstract: 'Danh mục học liệu năm học 2026-2027 cho tất cả các ngành đào tạo.',
+    urgency: 'khẩn',
+    urgencyColor: 'error',
+    internalType: 'Nội bộ',
+    author: 'Phòng Tổ chức',
+    authorRole: 'Trưởng phòng',
+    dept: 'Phòng Tổ chức',
+    createdAt: '24/06/2026 10:00',
+    updatedAt: '24/06/2026 15:30',
+    status: 'draft',
+    statusLabel: 'Bản nháp',
+    recipients: ['Phòng Đào tạo', 'Các Khoa', 'Thư viện'],
+    content: `<p style="text-align: center;"><strong>QUYẾT ĐỊNH</strong></p>
+<p style="text-align: center;"><strong>Về việc ban hành danh mục học liệu năm học 2026-2027</strong></p>
+<p>&nbsp;</p>
+<p>Ban hành danh mục học liệu năm học 2026-2027.</p>`,
+    history: [
+      { version: '1.0', time: '24/06/2026 10:00', user: 'Phòng Tổ chức', action: 'Tạo mới' },
+    ],
+  },
+  d3: {
+    id: 'd3',
+    number: 'TB-2026-003',
+    type: 'tb',
+    typeLabel: 'Thông báo',
+    title: 'Thông báo lịch thi giữa kỳ HK2/2025-2026',
+    abstract: 'Lịch thi giữa kỳ học kỳ 2 năm học 2025-2026.',
+    urgency: 'thường',
+    urgencyColor: 'neutral',
+    internalType: 'Nội bộ',
+    author: 'Phòng Khảo thí',
+    authorRole: 'Trưởng phòng',
+    dept: 'Phòng Khảo thí',
+    createdAt: '23/06/2026 09:00',
+    updatedAt: '23/06/2026 09:00',
+    status: 'draft',
+    statusLabel: 'Bản nháp',
+    recipients: ['Sinh viên', 'Các Khoa', 'Phòng Đào tạo'],
+    content: `<p style="text-align: center;"><strong>THÔNG BÁO LỊCH THI GIỮA KỲ HK2/2025-2026</strong></p>
+<p>&nbsp;</p>
+<p>Lịch thi giữa kỳ học kỳ 2 năm học 2025-2026.</p>`,
+    history: [
+      { version: '1.0', time: '23/06/2026 09:00', user: 'Phòng Khảo thí', action: 'Tạo mới' },
+    ],
+  },
+  d4: {
+    id: 'd4',
+    number: 'HD-2026-001',
+    type: 'hd',
+    typeLabel: 'Hướng dẫn',
+    title: 'Hướng dẫn đăng ký học phần HK2/2025-2026',
+    abstract: 'Hướng dẫn đăng ký học phần học kỳ 2 năm học 2025-2026.',
+    urgency: 'thường',
+    urgencyColor: 'neutral',
+    internalType: 'Nội bộ',
+    author: 'Phòng Đào tạo',
+    authorRole: 'Trưởng phòng',
+    dept: 'Phòng Đào tạo',
+    createdAt: '22/06/2026 14:00',
+    updatedAt: '22/06/2026 14:00',
+    status: 'review',
+    statusLabel: 'Đang rà soát',
+    recipients: ['Sinh viên', 'Các Khoa', 'Phòng Đào tạo'],
+    content: `<p style="text-align: center;"><strong>HƯỚNG DẪN ĐĂNG KÝ HỌC PHẦN HK2/2025-2026</strong></p>
+<p>&nbsp;</p>
+<p>Hướng dẫn đăng ký học phần học kỳ 2 năm học 2025-2026.</p>`,
+    history: [
+      { version: '1.0', time: '22/06/2026 14:00', user: 'Phòng Đào tạo', action: 'Tạo mới' },
+    ],
+  },
 };
 
-const STATUS_CONFIG: Record<string, { variant: 'info' | 'success' | 'warning'; labelKey: string; icon: React.ReactNode }> = {
+const STATUS_CONFIG: Record<DraftStatus, { variant: 'info' | 'success' | 'warning'; labelKey: string; icon: React.ReactNode }> = {
   draft: { variant: 'info', labelKey: 'status.draft', icon: <FileText className="h-3.5 w-3.5" /> },
   review: { variant: 'warning', labelKey: 'status.review', icon: <Clock className="h-3.5 w-3.5" /> },
   submitted: { variant: 'success', labelKey: 'status.submitted', icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
 };
 
-export default function BanNhapDetailPage() {
+interface BanNhapDetailPageProps {
+  id?: string;
+}
+
+export default function BanNhapDetailPage({ id }: BanNhapDetailPageProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
   const { t } = useTranslation('dms');
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const d = DRAFT_DETAIL;
-  const sc = STATUS_CONFIG[d.status as keyof typeof STATUS_CONFIG];
+  const d = MOCK_MAP[actualId];
+  const sc = d ? STATUS_CONFIG[d.status] : undefined;
   const [showDelete, setShowDelete] = useState(false);
+
+  if (!d || !sc) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <p className="text-xl font-bold text-[rgb(var(--text-primary))]">{t('banNhap.detail.notFound')}</p>
+      </div>
+    );
+  }
 
   const urgencyKey = d.urgency === 'khẩn' ? 'khan' : d.urgency === 'mật' ? 'mat' : 'thuong';
 
@@ -94,32 +207,16 @@ export default function BanNhapDetailPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={d.title}
-        description={`${t('moduleCode')} · ${d.number} · ${d.typeLabel}`}
-        breadcrumbs={[
-          { label: 'DMS', href: '/dms' },
-          { label: t('draft.breadcrumb'), href: '/dms/ban-nhap' },
-          { label: d.number },
-        ]}
-        actions={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/dms/ban-nhap')}>
-              {t('common.back')}
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>{t('common.downloadFile')}</Button>
-            <Button variant="outline" size="sm" leftIcon={<Edit2 className="h-4 w-4" />} onClick={() => navigate(`/dms/ban-nhap/${id}/sua`)}>
-              {t('common.edit')}
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Trash2 className="h-4 w-4" />} className="!text-[rgb(var(--error))]" onClick={() => setShowDelete(true)}>
-              {t('common.delete')}
-            </Button>
-            <Button size="sm" leftIcon={<Send className="h-4 w-4" />} onClick={() => navigate('/dms/cho-ky')}>
-              {t('banNhap.detail.sendSign')}
-            </Button>
-          </div>
-        }
-      />
+      <div className="flex gap-2 justify-end">
+        <Button variant="outline" size="sm" leftIcon={<Download className="h-4 w-4" />}>{t('common.downloadFile')}</Button>
+        <Button variant="outline" size="sm" leftIcon={<Edit2 className="h-4 w-4" />}>{t('common.edit')}</Button>
+        <Button variant="outline" size="sm" leftIcon={<Trash2 className="h-4 w-4" />} className="!text-[rgb(var(--error))]" onClick={() => setShowDelete(true)}>
+          {t('common.delete')}
+        </Button>
+        <Button size="sm" leftIcon={<Send className="h-4 w-4" />}>
+          {t('banNhap.detail.sendSign')}
+        </Button>
+      </div>
 
       {/* Status + urgency strip */}
       <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))]">
@@ -175,7 +272,7 @@ export default function BanNhapDetailPage() {
               <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('banNhap.detail.contentTitle')}</h3>
               <div className="flex gap-1">
                 <Button variant="ghost" size="sm" leftIcon={<Download className="h-3.5 w-3.5" />}>{t('banNhap.detail.download')}</Button>
-                <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={() => navigate(`/dms/ban-nhap/${id}/sua`)}>{t('common.edit')}</Button>
+                <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />}>{t('common.edit')}</Button>
               </div>
             </div>
             <CardContent className="p-8 bg-white min-h-96">
@@ -210,10 +307,10 @@ export default function BanNhapDetailPage() {
               <h3 className="font-semibold text-[rgb(var(--text-primary))] text-sm">{t('banNhap.detail.actionsTitle')}</h3>
             </div>
             <CardContent className="p-3 space-y-2">
-              <Button className="w-full" size="sm" leftIcon={<Send className="h-3.5 w-3.5" />} onClick={() => navigate('/dms/cho-ky')}>
+              <Button className="w-full" size="sm" leftIcon={<Send className="h-3.5 w-3.5" />}>
                 {t('banNhap.detail.sendSign')}
               </Button>
-              <Button variant="outline" className="w-full" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={() => navigate(`/dms/ban-nhap/${id}/sua`)}>
+              <Button variant="outline" className="w-full" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />}>
                 {t('banNhap.detail.edit')}
               </Button>
               <Button variant="outline" className="w-full" size="sm" leftIcon={<Download className="h-3.5 w-3.5" />}>
@@ -280,7 +377,7 @@ export default function BanNhapDetailPage() {
             <p className="text-sm text-[rgb(var(--text-secondary))] mb-5">{t('banNhap.detail.deleteConfirmDesc')}</p>
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => setShowDelete(false)}>{t('common.cancel')}</Button>
-              <Button className="flex-1 !bg-[rgb(var(--error))] hover:!bg-[rgb(var(--error-light))]" onClick={() => { setShowDelete(false); navigate('/dms/ban-nhap'); }}>
+              <Button className="flex-1 !bg-[rgb(var(--error))] hover:!bg-[rgb(var(--error-light))]" onClick={() => setShowDelete(false)}>
                 {t('common.delete')}
               </Button>
             </div>

@@ -8,9 +8,10 @@ import {
   Edit2,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Badge, Card, CardContent, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination } from '@/components/ui';
+import { Button, Badge, Card, CardContent, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell, TablePagination, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 
 const QUESTIONS = [
   { id: 'q2', course: 'CS101', type: 'multiple_choice', content: 'Kết quả của len([1, [2, 3], 4]) là bao nhiêu?', difficulty: 'medium', tags: ['Python', 'Built-in'], usage: 8, score: 1, status: 'active' },
@@ -30,6 +31,9 @@ export default function QuestionBank() {
   const [course, setCourse] = useState('Tất cả');
   const [difficulty, setDifficulty] = useState('Tất cả');
   const [type, setType] = useState('Tất cả');
+
+  const { selectedId, openDetail, openEdit, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedQuestion = selectedId ? QUESTIONS.find((q) => q.id === selectedId) : null;
 
   const DIFFICULTY_CONFIG = {
     easy: { variant: 'success' as const, label: t('difficulty.easy') },
@@ -155,8 +159,8 @@ export default function QuestionBank() {
                 <TableCell><Badge variant={sc.variant} size="sm">{sc.label}</Badge></TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate(`/exam/ngan-hang-cau-hoi/${q.id}`)}>{t('common.view')}</Button>
-                    <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={() => navigate(`/exam/ngan-hang-cau-hoi/${q.id}/sua`)}>{t('common.edit')}</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => openDetail(q.id)}>{t('common.view')}</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={() => openEdit(q.id)}>{t('common.edit')}</Button>
                   </div>
                 </TableCell>
               </TableRow>
@@ -173,6 +177,53 @@ export default function QuestionBank() {
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedQuestion?.content.slice(0, 80) ?? ''}
+        description={selectedQuestion ? `${selectedQuestion.course} · ${TYPE_CONFIG[selectedQuestion.type]}` : ''}
+        size="fullscreen"
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={close}>Đóng</Button>
+          </div>
+        }
+      >
+        {selectedQuestion && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { label: 'Môn học', value: selectedQuestion.course },
+                { label: 'Loại', value: TYPE_CONFIG[selectedQuestion.type] },
+                { label: 'Độ khó', value: DIFFICULTY_CONFIG[selectedQuestion.difficulty as keyof typeof DIFFICULTY_CONFIG]?.label ?? selectedQuestion.difficulty },
+                { label: 'Điểm', value: `${selectedQuestion.score}` },
+                { label: 'Số lần sử dụng', value: `${selectedQuestion.usage}` },
+                { label: 'Trạng thái', value: STATUS_CONFIG[selectedQuestion.status as keyof typeof STATUS_CONFIG]?.label ?? selectedQuestion.status },
+              ].map(({ label, value }) => (
+                <div key={label} className="rounded-lg border border-[rgb(var(--border))] p-3">
+                  <p className="text-xs text-[rgb(var(--text-muted))]">{label}</p>
+                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{value}</p>
+                </div>
+              ))}
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-medium text-[rgb(var(--text-secondary))]">Nội dung câu hỏi</p>
+              <div className="rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] p-4">
+                <p className="text-sm text-[rgb(var(--text-primary)]">{selectedQuestion.content}</p>
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-medium text-[rgb(var(--text-secondary))]">Tags</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedQuestion.tags.map((tag) => (
+                  <span key={tag} className="rounded border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] px-2 py-1 text-xs text-[rgb(var(--text-secondary))]">{tag}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </DetailModal>
     </div>
   );
 }

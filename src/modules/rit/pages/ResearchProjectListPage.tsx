@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Users, FileText } from 'lucide-react';
-import { Button, Badge } from '@/components/ui';
+import { Button, Badge, DetailModal } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
 import { TablePagination } from '@/components/ui';
+import ResearchDetail from './ResearchDetail';
 
 const PROJECTS = [
   { id: 'p1', code: 'NCKH001', title: 'Nghiên cứu ứng dụng AI trong giáo dục', type: 'NCKH', field: 'CNTT', leader: 'TS. Nguyễn Văn Minh', members: 4, budget: 200000000, status: 'active', start: '2026-01-15', end: '2026-12-30' },
@@ -31,6 +33,9 @@ export default function ResearchProjectListPage() {
   const navigate = useNavigate();
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedProject = selectedId ? PROJECTS.find((p) => p.id === selectedId) : null;
 
   const filtered = PROJECTS.filter((p) =>
     !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.code.toLowerCase().includes(search.toLowerCase()),
@@ -79,7 +84,7 @@ export default function ResearchProjectListPage() {
                 <td className="px-4 py-3"><Badge variant={STATUS_CONFIG[p.status].variant} dot size="sm">{STATUS_CONFIG[p.status].label}</Badge></td>
                 <td className="px-4 py-3">
                   <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} onClick={() => navigate(`/rit/de-tai/${p.id}`)}>Chi tiết</Button>
+                    <Button variant="ghost" size="sm" leftIcon={<FileText className="h-3.5 w-3.5" />} onClick={() => openDetail(p.id)}>Chi tiết</Button>
                   </div>
                 </td>
               </tr>
@@ -96,6 +101,16 @@ export default function ResearchProjectListPage() {
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
       />
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedProject ? selectedProject.title : ''}
+        description={selectedProject ? `${selectedProject.code} · ${selectedProject.field} · ${selectedProject.leader}` : ''}
+        size="fullscreen"
+      >
+        {selectedProject ? <ResearchDetail id={selectedProject.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

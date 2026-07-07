@@ -24,9 +24,12 @@ import {
   Card,
   CardContent,
   Select,
+  DetailModal,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
+import { useDetailModal } from '@/hooks/useDetailModal';
+import HocPhiDetailPage from './HocPhiDetailPage';
 
 const PAYMENTS = [
   { id: 'th001', code: 'TH-2026-HK2-001', student: 'Nguyễn Văn An', class: 'K60-CNTT', semester: 'HK2-2025/2026', amount: '12,500,000', paid: '12,500,000', method: 'Chuyển khoản', date: '2026-06-20', status: 'paid', due: '2026-07-15' },
@@ -52,6 +55,9 @@ export default function HocPhiList() {
   const [search, setSearch] = useState('');
   const [semester, setSemester] = useState('Tất cả');
   const [status, setStatus] = useState('Tất cả');
+
+  const { selectedId, openDetail, close } = useDetailModal({ size: 'fullscreen' });
+  const selectedPayment = selectedId ? PAYMENTS.find((p) => p.id === selectedId) : null;
 
   const filtered = PAYMENTS.filter((p) => {
     const matchSearch = !search || p.student.toLowerCase().includes(search.toLowerCase()) || p.code.toLowerCase().includes(search.toLowerCase());
@@ -153,7 +159,7 @@ export default function HocPhiList() {
                       <TableCell className="text-sm">{p.method}</TableCell>
                       <TableCell className="text-sm text-[rgb(var(--text-secondary))]">{p.due}</TableCell>
                       <TableCell><Badge variant={STATUSES[p.status]?.variant ?? 'neutral'} size="sm">{STATUSES[p.status]?.label}</Badge></TableCell>
-                      <TableCell><Button variant="ghost" size="sm" onClick={() => navigate(`/fin/hoc-phi/${p.id}`)}>Chi tiết</Button></TableCell>
+                      <TableCell><Button variant="ghost" size="sm" onClick={() => openDetail(p.id)}>Chi tiết</Button></TableCell>
                     </TableRow>
                   );
                 })
@@ -164,6 +170,16 @@ export default function HocPhiList() {
           <TablePagination page={pagination.page} pageSize={pagination.pageSize} total={filtered.length} onPageChange={setPage} onPageSizeChange={setPageSize} />
         </CardContent>
       </Card>
+
+      <DetailModal
+        open={!!selectedId}
+        onClose={close}
+        title={selectedPayment ? selectedPayment.student : ''}
+        description={selectedPayment ? `${selectedPayment.code} · ${selectedPayment.semester}` : ''}
+        size="fullscreen"
+      >
+        {selectedPayment ? <HocPhiDetailPage id={selectedPayment.id} /> : null}
+      </DetailModal>
     </div>
   );
 }

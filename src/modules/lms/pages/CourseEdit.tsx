@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
 
 const SEMESTERS = ['HK1/2025-2026', 'HK2/2025-2026', 'HK1/2026-2027'];
 const DEPARTMENTS = ['Khoa CNTT', 'Khoa Kinh tế', 'Khoa Luật', 'Khoa Ngoại ngữ', 'Khoa Sư phạm', 'Khoa Y dược', 'Khoa Khoa học'];
@@ -10,6 +9,62 @@ const INSTRUCTORS = [
   'TS. Nguyễn Văn Minh', 'PGS.TS. Lê Thị Lan', 'ThS. Trần Hoàng Nam',
   'TS. Bùi Minh Tuấn', 'PGS.TS. Đặng Văn Minh', 'TS. Hoàng Thu Lan',
 ];
+
+const COURSES_MAP: Record<string, {
+  code: string;
+  name: string;
+  instructor: string;
+  dept: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  maxStudents: string;
+  status: string;
+  credits: string;
+}> = {
+  c1: {
+    code: 'CS101', name: 'Nhập môn Lập trình Python',
+    instructor: 'TS. Nguyễn Văn Minh', dept: 'Khoa CNTT',
+    description: 'Môn học giới thiệu về lập trình Python cho sinh viên năm nhất, bao gồm các khái niệm cơ bản về biến, vòng lặp, hàm, cấu trúc dữ liệu và lập trình hướng đối tượng.',
+    startDate: '2026-01-15', endDate: '2026-05-30', maxStudents: '312',
+    credits: '4', status: 'published',
+  },
+  c2: {
+    code: 'MATH201', name: 'Giải tích 2',
+    instructor: 'PGS.TS. Lê Thị Lan', dept: 'Khoa CNTT',
+    description: 'Học phần Giải tích 2 cung cấp kiến thức về tích phân, chuỗi và phương trình vi phân.',
+    startDate: '2026-01-15', endDate: '2026-05-30', maxStudents: '280',
+    credits: '4', status: 'published',
+  },
+  c3: {
+    code: 'ENG301', name: 'Tiếng Anh Học thuật',
+    instructor: 'ThS. Trần Hoàng Nam', dept: 'Khoa Ngoại ngữ',
+    description: 'Phát triển kỹ năng đọc, viết và thuyết trình học thuật bằng tiếng Anh.',
+    startDate: '2026-01-15', endDate: '2026-05-30', maxStudents: '245',
+    credits: '3', status: 'published',
+  },
+  c4: {
+    code: 'PHYS101', name: 'Vật lý Đại cương',
+    instructor: 'TS. Bùi Minh Tuấn', dept: 'Khoa Khoa học',
+    description: 'Các khái niệm nền tảng về cơ học, nhiệt học và điện từ học.',
+    startDate: '2026-01-15', endDate: '2026-05-30', maxStudents: '198',
+    credits: '4', status: 'published',
+  },
+  c5: {
+    code: 'CHEM101', name: 'Hóa học Đại cương',
+    instructor: 'PGS.TS. Đặng Văn Minh', dept: 'Khoa Khoa học',
+    description: 'Khám phá các nguyên lý cơ bản của hóa học: cấu tạo nguyên tử, liên kết hóa học và phản ứng.',
+    startDate: '2026-01-15', endDate: '2026-05-30', maxStudents: '165',
+    credits: '3', status: 'published',
+  },
+  c6: {
+    code: 'CS201', name: 'Cơ sở dữ liệu',
+    instructor: 'TS. Hoàng Thu Lan', dept: 'Khoa CNTT',
+    description: 'Học phần Cơ sở dữ liệu cung cấp nền tảng về mô hình quan hệ, SQL và thiết kế CSDL.',
+    startDate: '', endDate: '', maxStudents: '120',
+    credits: '3', status: 'draft',
+  },
+};
 
 function Field({ label, required, error, children }: { label: string; required?: boolean; error?: string; children: React.ReactNode }) {
   return (
@@ -23,13 +78,28 @@ function Field({ label, required, error, children }: { label: string; required?:
   );
 }
 
-export default function CourseEdit() {
-  const navigate = useNavigate();
+interface CourseEditProps {
+  id?: string;
+  onSubmit?: () => void;
+  onCancel?: () => void;
+}
+
+export default function CourseEdit({ id, onSubmit, onCancel }: CourseEditProps) {
+  const params = useParams();
+  const actualId = id ?? (params.id ?? '');
+  const source = COURSES_MAP[actualId] ?? COURSES_MAP['c1'];
   const [form, setForm] = useState({
-    code: 'CS101', name: 'Nhập môn Lập trình Python',
-    instructor: 'TS. Nguyễn Văn Minh', dept: 'Khoa CNTT',
-    semester: 'HK1/2025-2026', credits: '4', description: 'Môn học giới thiệu về lập trình Python cho sinh viên năm nhất, bao gồm các khái niệm cơ bản về biến, vòng lặp, hàm, cấu trúc dữ liệu và lập trình hướng đối tượng.',
-    startDate: '2026-01-15', endDate: '2026-05-30', maxStudents: '312', status: 'published',
+    code: source.code,
+    name: source.name,
+    instructor: source.instructor,
+    dept: source.dept,
+    semester: 'HK1/2025-2026',
+    credits: source.credits,
+    description: source.description,
+    startDate: source.startDate,
+    endDate: source.endDate,
+    maxStudents: source.maxStudents,
+    status: source.status,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -48,24 +118,11 @@ export default function CourseEdit() {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    navigate('/lms/khoa-hoc');
+    onSubmit?.();
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title={`Chỉnh sửa: ${form.name}`}
-        description={`${form.code} — Cập nhật thông tin khóa học`}
-        breadcrumbs={[
-          { label: 'LMS', href: '/lms' },
-          { label: 'Khóa học', href: '/lms/khoa-hoc' },
-          { label: form.code },
-          { label: 'Chỉnh sửa' },
-        ]}
-        actions={<Button variant="outline" onClick={() => navigate('/lms/khoa-hoc')}>Hủy bỏ</Button>}
-      />
-
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
 
         <Card>
           <div className="px-5 py-4 border-b border-[rgb(var(--border)/0.6)]">
@@ -157,10 +214,9 @@ export default function CourseEdit() {
         </Card>
 
         <div className="flex items-center justify-end gap-3">
-          <Button variant="outline" type="button" onClick={() => navigate('/lms/khoa-hoc')}>Hủy bỏ</Button>
+          <Button variant="outline" type="button" onClick={onCancel}>Hủy bỏ</Button>
           <Button type="submit" leftIcon={<Save className="h-4 w-4" />}>Lưu thay đổi</Button>
         </div>
       </form>
-    </div>
   );
 }
