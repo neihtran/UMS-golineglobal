@@ -1,6 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate, Outlet, useParams } from 'react-router-dom';
-import { useAuth } from './providers';
+import { useAuthStore } from '@/stores/authStore';
 import type { User } from '@/types/auth.types';
 import { Sidebar, Header } from '@/components/layout';
 import { useUIStore } from '@/stores/uiStore';
@@ -400,9 +400,9 @@ function PageLoader() {
 
 // ─── Auth guard ─────────────────────────────────────────────────────────────
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuthStore();
   if (isLoading) return <PageLoader />;
-  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
   return <>{children}</>;
 }
 
@@ -416,7 +416,12 @@ function getRoleDashboard(role?: string): string {
 }
 
 function RoleRoute({ children, roles }: { children: React.ReactNode; roles?: User['role'][] }) {
-  const { user, hasRole, isLoading } = useAuth();
+  const { user, isLoading } = useAuthStore();
+  const hasRole = (checkRoles: User['role'] | User['role'][]): boolean => {
+    if (!user) return false;
+    const list = Array.isArray(checkRoles) ? checkRoles : [checkRoles];
+    return list.includes(user.role);
+  };
   if (isLoading) return <PageLoader />;
   if (roles && !hasRole(roles)) return <Navigate to={getRoleDashboard(user?.role)} replace />;
   return <>{children}</>;

@@ -1,26 +1,31 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/app/providers';
+import { Zap, CheckCircle2 } from 'lucide-react';
+import { useLogin } from '@/hooks/useAuth';
 import { Button, Input } from '@/components/ui';
+import { cn } from '@/lib/utils';
 
 export default function Login() {
   const { t } = useTranslation('common');
-  const { login } = useAuth();
+  const loginMutation = useLogin();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const QUICK_ACCOUNTS = [
-    { role: 'Quản trị viên', email: 'admin@truong-dhcn.vn' },
-    { role: 'Hiệu trưởng', email: 'tran.dinh.long@truong.edu.vn' },
-    { role: 'Phó Hiệu trưởng', email: 'nguyen.thi.lan.huong@truong.edu.vn' },
-    { role: 'Trưởng khoa', email: 'truong.minh.tuan@truong.edu.vn' },
-    { role: 'Giảng viên', email: 'nguyen.hoang.long@truong.edu.vn' },
-    { role: 'Nhân viên', email: 'hoang.thi.tan@truong.edu.vn' },
-    { role: 'Sinh viên', email: 'sv-2025-0001@sinhvien.truong.edu.vn' },
+    { role: 'Quản trị viên',   name: 'Quản trị viên',             email: 'admin@truong.edu.vn',             password: 'Admin@123' },
+    { role: 'Hiệu trưởng',     name: 'GS.TS. Hoàng Tuấn Anh',     email: 'hieutruong@truong.edu.vn',        password: 'Ht@123' },
+    { role: 'Phó Hiệu trưởng', name: 'PGS.TS. Trần Lan Hương',   email: 'phohieutruong@truong.edu.vn',     password: 'Pht@123' },
+    { role: 'Trưởng khoa',     name: 'TS. Nguyễn Hoàng Long',     email: 'truongkhoa@truong.edu.vn',        password: 'Tk@123' },
+    { role: 'Giảng viên',      name: 'ThS. Lê Văn Minh',          email: 'giaovien1@truong.edu.vn',         password: 'Gv1@123' },
+    { role: 'Nhân viên',       name: 'CN. Hoàng Thị Tân',          email: 'nhanvien@truong.edu.vn',          password: 'Nv@123' },
+    { role: 'Sinh viên',       name: 'Nguyễn Văn An',              email: 'sinhvien1@truong.edu.vn',         password: 'Sv@123' },
   ];
+
+  const [selectedQuickEmail, setSelectedQuickEmail] = useState<string | null>(null);
 
   const validate = () => {
     const errs: typeof errors = {};
@@ -36,13 +41,25 @@ export default function Login() {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
-    setLoading(true);
+    setApiError(null);
+    
     try {
-      await login(email, password);
-    } finally {
-      setLoading(false);
+      await loginMutation.mutateAsync({ email, password });
+      // Navigation is handled by the login mutation callback in useLogin
+    } catch (error: any) {
+      setApiError(error?.response?.data?.error?.message || error?.message || 'Đăng nhập thất bại');
     }
   };
+
+  const handleQuickLogin = (account: typeof QUICK_ACCOUNTS[number]) => {
+    setEmail(account.email);
+    setPassword(account.password);
+    setSelectedQuickEmail(account.email);
+    setErrors({});
+    setApiError(null);
+  };
+
+  const isLoading = loginMutation.isPending;
 
   return (
     <div className="flex min-h-screen">
@@ -119,6 +136,13 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            {/* API Error */}
+            {apiError && (
+              <div className="rounded-lg bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-500">
+                {apiError}
+              </div>
+            )}
+
             <Input
               label={t('login.emailLabel')}
               type="email"
@@ -154,7 +178,7 @@ export default function Login() {
               </Link>
             </div>
 
-            <Button type="submit" fullWidth loading={loading} size="lg">
+            <Button type="submit" fullWidth loading={isLoading} size="lg">
               {t('login.submit')}
             </Button>
           </form>
@@ -175,29 +199,51 @@ export default function Login() {
             {t('login.ssoButton')}
           </Button>
 
-          {/* ─── Dev bypass quick login ──────────────────────────────────── */}
-          <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-4 space-y-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-red-400 text-sm">⚠</span>
-              <p className="text-sm font-semibold text-red-400">DEV BYPASS — ĐĂNG NHẬP NHANH</p>
+          {/* Quick login accounts */}
+          <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-blue-400" />
+                <p className="text-sm font-semibold text-blue-400">ĐĂNG NHẬP NHANH</p>
+              </div>
+              <span className="text-[10px] text-[rgb(var(--text-muted))] italic">Click để điền</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {QUICK_ACCOUNTS.map((account) => (
-                <button
-                  key={account.email}
-                  type="button"
-                  onClick={() => {
-                    setEmail(account.email);
-                    setPassword('dev123456');
-                    setErrors({});
-                  }}
-                  className="flex flex-col items-start rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-elevated))] px-3 py-2 text-left transition-colors hover:border-[rgb(var(--primary))]/50 hover:bg-[rgb(var(--primary))]/5 cursor-pointer w-full"
-                >
-                  <span className="text-xs font-semibold text-[rgb(var(--text-primary))] leading-tight">{account.role}</span>
-                  <span className="text-[10px] text-[rgb(var(--text-muted))] leading-tight mt-0.5 break-all">{account.email}</span>
-                </button>
-              ))}
+              {QUICK_ACCOUNTS.map((account) => {
+                const isSelected = selectedQuickEmail === account.email;
+                return (
+                  <button
+                    key={account.email}
+                    type="button"
+                    onClick={() => handleQuickLogin(account)}
+                    className={cn(
+                      'flex flex-col items-start rounded-lg border px-3 py-2 text-left transition-all w-full',
+                      isSelected
+                        ? 'border-[rgb(var(--primary))] bg-[rgb(var(--primary))]/10 ring-1 ring-[rgb(var(--primary))]/30'
+                        : 'border-[rgb(var(--border))] bg-[rgb(var(--bg-elevated))] hover:border-[rgb(var(--primary))]/50 hover:bg-[rgb(var(--primary))]/5'
+                    )}
+                  >
+                    <span className="flex w-full items-center justify-between gap-1">
+                      <span className="text-xs font-semibold text-[rgb(var(--text-primary))] leading-tight">
+                        {account.role}
+                      </span>
+                      {isSelected && (
+                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[rgb(var(--primary))]" />
+                      )}
+                    </span>
+                    <span className="text-[11px] font-medium text-[rgb(var(--text-secondary))] leading-tight mt-0.5 line-clamp-1">
+                      {account.name}
+                    </span>
+                    <span className="text-[10px] text-[rgb(var(--text-muted))] leading-tight mt-0.5 break-all">
+                      {account.email}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
+            <p className="text-[10px] text-[rgb(var(--text-muted))] italic">
+              Tài khoản demo — tự động điền mật khẩu tương ứng. Nhấn "Đăng nhập" để vào hệ thống.
+            </p>
           </div>
 
           <p className="text-center text-xs text-[rgb(var(--text-muted))]">

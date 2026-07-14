@@ -1,0 +1,16 @@
+# Ignore unnecessary files
+.git
+.github
+node_modules
+server
+server/**
+docs
+*.md
+.env*
+docker-compose*
+Dockerfile*
+.gitignore*
+README.md
+
+# Skip large pre-built frontend files when using full build stage
+# dist/ will be rebuilt inside Docker if needed

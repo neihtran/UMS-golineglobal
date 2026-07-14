@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui';
+import { useVerifyMfa } from '@/hooks/useAuth';
+import { useAuthStore } from '@/stores/authStore';
 
 const TOTAL_DIGITS = 6;
 
@@ -82,8 +84,17 @@ export default function MFA() {
   const navigate = useNavigate();
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(300); // 5 minutes
+  
+  const tempToken = useAuthStore((state) => state.tempToken);
+  const verifyMfa = useVerifyMfa();
+
+  // Redirect if no temp token
+  useEffect(() => {
+    if (!tempToken) {
+      navigate('/auth/login');
+    }
+  }, [tempToken, navigate]);
 
   // Countdown timer
   useEffect(() => {
@@ -107,13 +118,12 @@ export default function MFA() {
       return;
     }
     setError('');
-    setLoading(true);
+    
     try {
-      // Demo: accept any 6-digit code
-      await new Promise((r) => setTimeout(r, 1000));
-      navigate('/dashboard');
-    } finally {
-      setLoading(false);
+      await verifyMfa.mutateAsync({ tempToken: tempToken!, code });
+      // Navigation is handled by the hook on success
+    } catch (err: any) {
+      setError(err?.response?.data?.error?.message || 'Mã xác thực không hợp lệ');
     }
   };
 
@@ -122,6 +132,8 @@ export default function MFA() {
     setCode('');
     setError('');
   };
+
+  const isLoading = verifyMfa.isPending;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[rgb(var(--bg-base))] p-4">
@@ -171,7 +183,7 @@ export default function MFA() {
               )}
             </div>
 
-            <Button type="submit" fullWidth size="lg" loading={loading}>
+            <Button type="submit" fullWidth size="lg" loading={isLoading}>
               Xác nhận
             </Button>
           </form>

@@ -24,36 +24,37 @@ import {
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
 import { useDetailModal } from '@/hooks/useDetailModal';
+import { useVienChucList, useVienChucStats } from '@/hooks/useHrm';
 import VienChucDetail from './VienChucDetail';
 import VienChucForm from './VienChucForm';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type ContractType = 'Cơ hữu' | 'Thỉnh giảng' | 'Thử việc';
-type Status = 'active' | 'trial' | 'leave' | 'inactive';
+type VCStatus = 'active' | 'trial' | 'leave' | 'inactive';
 
-const MOCK_STAFF = [
-  { id: 'vc001', code: 'VC-2020-001', name: 'Nguyễn Hoàng Long', dob: '1985-03-15', title: 'PGS.TS', position: 'Trưởng khoa', dept: 'Khoa CNTT', contract: 'Cơ hữu' as ContractType, salary: 18500000, status: 'active' as Status, joinDate: '2015-09-01' },
-  { id: 'vc002', code: 'VC-2018-042', name: 'Trần Thị Mai Lan', dob: '1990-07-22', title: 'TS', position: 'Phó trưởng khoa', dept: 'Khoa Kinh tế', contract: 'Cơ hữu' as ContractType, salary: 15200000, status: 'active' as Status, joinDate: '2013-09-01' },
-  { id: 'vc003', code: 'VC-2022-108', name: 'Lê Văn Minh', dob: '1995-11-08', title: 'ThS', position: 'Giảng viên', dept: 'Khoa Luật', contract: 'Thử việc' as ContractType, salary: 9800000, status: 'trial' as Status, joinDate: '2026-01-15' },
-  { id: 'vc004', code: 'VC-2019-067', name: 'Phạm Thu Hà', dob: '1988-04-30', title: 'ThS', position: 'Chuyên viên', dept: 'Phòng Tổ chức', contract: 'Cơ hữu' as ContractType, salary: 11200000, status: 'active' as Status, joinDate: '2017-03-20' },
-  { id: 'vc005', code: 'VC-2021-089', name: 'Bùi Đình Nam', dob: '1992-09-12', title: 'TS', position: 'Giảng viên', dept: 'Khoa Ngoại ngữ', contract: 'Thỉnh giảng' as ContractType, salary: 8500000, status: 'active' as Status, joinDate: '2021-09-01' },
-  { id: 'vc006', code: 'VC-2017-031', name: 'Đặng Thị Oanh', dob: '1982-12-05', title: 'PGS', position: 'Trưởng bộ môn', dept: 'Khoa Sư phạm', contract: 'Cơ hữu' as ContractType, salary: 17200000, status: 'leave' as Status, joinDate: '2010-09-01' },
-  { id: 'vc007', code: 'VC-2023-115', name: 'Vũ Minh Tuấn', dob: '1997-06-18', title: 'CN', position: 'Kỹ thuật viên', dept: 'Phòng CNTT', contract: 'Thử việc' as ContractType, salary: 7200000, status: 'trial' as Status, joinDate: '2026-03-01' },
-  { id: 'vc008', code: 'VC-2016-022', name: 'Hoàng Thị Lan', dob: '1978-01-25', title: 'PGS.TS', position: 'Phó Hiệu trưởng', dept: 'Ban Giám hiệu', contract: 'Cơ hữu' as ContractType, salary: 22000000, status: 'active' as Status, joinDate: '2008-09-01' },
-  { id: 'vc009', code: 'VC-2020-074', name: 'Ngô Thanh Sơn', dob: '1991-08-14', title: 'ThS', position: 'Giảng viên', dept: 'Khoa Y dược', contract: 'Cơ hữu' as ContractType, salary: 13200000, status: 'active' as Status, joinDate: '2019-09-01' },
-  { id: 'vc010', code: 'VC-2024-120', name: 'Trịnh Thu Phương', dob: '1998-03-09', title: 'ThS', position: 'Chuyên viên', dept: 'Phòng Tài chính', contract: 'Cơ hữu' as ContractType, salary: 10500000, status: 'active' as Status, joinDate: '2024-06-01' },
-  { id: 'vc011', code: 'VC-2015-011', name: 'Lý Văn Hùng', dob: '1975-10-20', title: 'GS.TS', position: 'Hiệu trưởng', dept: 'Ban Giám hiệu', contract: 'Cơ hữu' as ContractType, salary: 28000000, status: 'active' as Status, joinDate: '2005-09-01' },
-  { id: 'vc012', code: 'VC-2022-099', name: 'Đào Thị Lan', dob: '1994-05-17', title: 'ThS', position: 'Thư ký', dept: 'Phòng Tổ chức', contract: 'Thỉnh giảng' as ContractType, salary: 7800000, status: 'active' as Status, joinDate: '2022-09-01' },
-];
+interface VienChucItem {
+  _id: string;
+  code: string;
+  name: string;
+  dob?: string;
+  title?: string;
+  position?: string;
+  contractType?: ContractType;
+  salary?: number;
+  status?: VCStatus;
+  department?: {
+    _id: string;
+    name: string;
+    code?: string;
+  };
+}
 
 const CONTRACT_BADGE: Record<ContractType, 'primary' | 'accent' | 'warning'> = {
   'Cơ hữu': 'primary',
   'Thỉnh giảng': 'accent',
   'Thử việc': 'warning',
 };
-
-const DEPARTMENTS = ['Khoa CNTT', 'Khoa Kinh tế', 'Khoa Luật', 'Khoa Ngoại ngữ', 'Khoa Sư phạm', 'Khoa Y dược', 'Khoa Khoa học', 'Phòng Tổ chức', 'Phòng Tài chính', 'Phòng CNTT', 'Ban Giám hiệu'];
 
 function formatCurrency(v: number) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(v);
@@ -65,29 +66,40 @@ export default function VienChucList() {
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
   const [dept, setDept] = useState('');
-  const [status, setStatus] = useState<Status | 'all'>('all');
+  const [status, setStatus] = useState<VCStatus | ''>('');
   const [contract, setContract] = useState<ContractType | 'all'>('all');
   const [importOpen, setImportOpen] = useState(false);
 
   const { selectedId, openDetail, openEdit, close, isEditMode } = useDetailModal({ size: 'fullscreen' });
 
-  const selectedStaff = selectedId ? MOCK_STAFF.find((s) => s.id === selectedId) : null;
-
-  const filtered = MOCK_STAFF.filter((s) => {
-    const matchSearch = !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.code.toLowerCase().includes(search.toLowerCase()) || s.dept.toLowerCase().includes(search.toLowerCase());
-    const matchDept = !dept || s.dept === dept;
-    const matchStatus = status === 'all' || s.status === status;
-    const matchContract = contract === 'all' || s.contract === contract;
-    return matchSearch && matchDept && matchStatus && matchContract;
+  // Fetch VienChuc data from API
+  const { data: listData, isLoading, isError } = useVienChucList({
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    search,
+    status: status,
+    department: dept,
   });
 
-  const paged = filtered.slice((pagination.page - 1) * pagination.pageSize, pagination.page * pagination.pageSize);
+  // Fetch stats for the header
+  const { data: statsData } = useVienChucStats();
+
+  const staffList: VienChucItem[] = listData?.data || [];
+  const paginationInfo = listData?.pagination || { total: 0, page: 1, pageSize: 10, totalPages: 0 };
+  const totalCount = statsData?.data?.total || paginationInfo.total || staffList.length;
+
+  const selectedStaff = selectedId ? staffList.find((s) => s._id === selectedId) : null;
+
+  const handleDetail = (id: string) => {
+    // Navigate to detail page instead of modal for API data
+    navigate(`/hrm/vien-chuc/${id}`);
+  };
 
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('title')}
-        description={t('description', { count: filtered.length })}
+        description={t('description', { count: totalCount })}
         breadcrumbs={[{ label: 'HRM', href: '/hrm' }, { label: t('breadcrumb.list') }]}
         actions={
           <>
@@ -112,14 +124,16 @@ export default function VienChucList() {
           className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
         >
           <option value="">{t('filter.departmentAll')}</option>
-          {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
+          {statsData?.data?.byDepartment?.map((d: any) => (
+            <option key={d._id} value={d.name}>{d.name}</option>
+          ))}
         </select>
         <select
           value={status}
-          onChange={(e) => { setStatus(e.target.value as Status | 'all'); setPage(1); }}
+          onChange={(e) => { setStatus(e.target.value as VCStatus | ''); setPage(1); }}
           className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
         >
-          <option value="all">{t('filter.statusAll')}</option>
+          <option value="">{t('filter.statusAll')}</option>
           <option value="active">{t('status.active')}</option>
           <option value="trial">{t('status.trial')}</option>
           <option value="leave">{t('status.leave')}</option>
@@ -153,33 +167,37 @@ export default function VienChucList() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {paged.length === 0 ? (
+          {isLoading ? (
+            <TableEmpty colSpan={9} message={t('common:common.loading')} />
+          ) : isError ? (
+            <TableEmpty colSpan={9} message="Đã xảy ra lỗi khi tải dữ liệu" />
+          ) : staffList.length === 0 ? (
             <TableEmpty colSpan={9} message={t('empty.title')} description={t('empty.description')} />
           ) : (
-            paged.map((s, i) => {
+            staffList.map((s, i) => {
               const sc = {
                 active: { variant: 'success' as const, label: t('status.active') },
                 trial: { variant: 'warning' as const, label: t('status.trial') },
                 leave: { variant: 'error' as const, label: t('status.leave') },
                 inactive: { variant: 'neutral' as const, label: t('status.inactive') },
-              }[s.status];
+              }[s.status as VCStatus] || { variant: 'neutral' as const, label: s.status || '' };
               const contractLabel = {
                 'Cơ hữu': t('contract.permanent'),
                 'Thỉnh giảng': t('contract.visiting'),
                 'Thử việc': t('contract.probation'),
-              }[s.contract];
+              }[s.contractType as ContractType] || s.contractType || '';
               return (
-                <TableRow key={s.id}>
+                <TableRow key={s._id}>
                   <TableCell className="text-[rgb(var(--text-muted))] tabular-nums">
                     {(pagination.page - 1) * pagination.pageSize + i + 1}
                   </TableCell>
                   <TableCell>
                     <button
-                      onClick={() => openDetail(s.id)}
+                      onClick={() => handleDetail(s._id)}
                       className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] transition-colors text-left w-full"
                     >
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-semibold text-[rgb(var(--primary))]">
-                        {s.name.split(' ').slice(-2).map((n) => n[0]).join('')}
+                        {s.name?.split(' ').slice(-2).map((n) => n[0]).join('') || '?'}
                       </div>
                       <div>
                         <p className="font-medium">{s.name}</p>
@@ -189,16 +207,16 @@ export default function VienChucList() {
                   </TableCell>
                   <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{s.code}</TableCell>
                   <TableCell className="text-[rgb(var(--text-secondary))]">{s.position}</TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))]">{s.dept}</TableCell>
-                  <TableCell><Badge variant={CONTRACT_BADGE[s.contract]}>{contractLabel}</Badge></TableCell>
-                  <TableCell className="text-right font-mono text-sm">{formatCurrency(s.salary)}</TableCell>
+                  <TableCell className="text-[rgb(var(--text-secondary))]">{s.department?.name || '-'}</TableCell>
+                  <TableCell><Badge variant={CONTRACT_BADGE[s.contractType as ContractType] || 'primary'}>{contractLabel}</Badge></TableCell>
+                  <TableCell className="text-right font-mono text-sm">{formatCurrency(s.salary || 0)}</TableCell>
                   <TableCell>
                     <Badge variant={sc.variant} dot>{sc.label}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => openDetail(s.id)}>{t('action.detail')}</Button>
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(s.id)}>{t('action.edit')}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleDetail(s._id)}>{t('action.detail')}</Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(s._id)}>{t('action.edit')}</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -211,7 +229,7 @@ export default function VienChucList() {
       <TablePagination
         page={pagination.page}
         pageSize={pagination.pageSize}
-        total={filtered.length}
+        total={paginationInfo.total}
         onPageChange={setPage}
         onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
         pageSizeOptions={[10, 25, 50]}
@@ -265,10 +283,10 @@ export default function VienChucList() {
 
       {/* Detail / Edit Modal */}
       <DetailModal
-        open={!!selectedId}
+        open={!!selectedId && !isEditMode}
         onClose={close}
-        title={selectedStaff ? selectedStaff.name : ''}
-        description={selectedStaff ? `${selectedStaff.code} · ${selectedStaff.title} · ${selectedStaff.dept}` : ''}
+        title={selectedStaff?.name || ''}
+        description={selectedStaff ? `${selectedStaff.code} · ${selectedStaff.title} · ${selectedStaff.department?.name || ''}` : ''}
         size="fullscreen"
         onEdit={() => openEdit(selectedId!)}
         footer={
@@ -277,26 +295,40 @@ export default function VienChucList() {
           </div>
         }
       >
-        {isEditMode ? (
+        {selectedStaff && (
+          <VienChucDetail id={selectedStaff._id} />
+        )}
+      </DetailModal>
+
+      {/* Edit Modal */}
+      <DetailModal
+        open={isEditMode}
+        onClose={close}
+        title={t('action.edit')}
+        description={selectedStaff ? `${selectedStaff.code} · ${selectedStaff.name}` : ''}
+        size="fullscreen"
+        footer={
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={close}>Đóng</Button>
+          </div>
+        }
+      >
+        {isEditMode && selectedStaff && (
           <VienChucForm
-            initialValues={selectedStaff ? {
-              code: selectedStaff.code,
-              name: selectedStaff.name,
-              dob: selectedStaff.dob,
-              dept: selectedStaff.dept,
-              title: selectedStaff.title,
-              position: selectedStaff.position,
-              contractType: selectedStaff.contract,
-              salary: selectedStaff.salary.toString(),
-            } : {}}
+            initialValues={{
+              code: selectedStaff.code || '',
+              name: selectedStaff.name || '',
+              dob: selectedStaff.dob || '',
+              dept: selectedStaff.department?.name || '',
+              title: selectedStaff.title || '',
+              position: selectedStaff.position || '',
+              contractType: selectedStaff.contractType || 'Cơ hữu',
+              salary: selectedStaff.salary?.toString() || '0',
+            }}
             onSubmit={(values) => { console.log('Saving:', values); close(); }}
             onCancel={close}
             submitLabel="Lưu thay đổi"
           />
-        ) : (
-          selectedStaff ? (
-            <VienChucDetail id={selectedStaff.id} />
-          ) : null
         )}
       </DetailModal>
     </div>

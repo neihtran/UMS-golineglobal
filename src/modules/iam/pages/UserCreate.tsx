@@ -3,24 +3,42 @@ import { useNavigate } from 'react-router-dom';
 import { Save, UserPlus, Shield } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { useCreateUser } from '@/hooks/useIam';
+import { ROLES } from '@/constants/modules';
 
-const DEPARTMENTS = ['Phòng Tổ chức', 'Phòng Tài chính', 'Phòng Đào tạo', 'Phòng KH-CN', 'Khoa CNTT', 'Khoa Kinh tế', 'Khoa Luật', 'Khoa Ngoại ngữ'];
-const ROLES = [
-  { value: 'admin', label: 'Quản trị hệ thống', color: 'primary' },
-  { value: 'giang-vien', label: 'Giảng viên', color: 'accent' },
-  { value: 'sinh-vien', label: 'Sinh viên', color: 'info' },
-  { value: 'nhan-vien', label: 'Nhân viên hành chính', color: 'neutral' },
-];
+const ROLE_OPTIONS = Object.entries(ROLES).map(([value, label]) => ({ value, label }));
 
 export default function UserCreate() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    email: '', displayName: '', role: 'sinh-vien', dept: '', mfaRequired: true, sendWelcome: true,
+    email: '',
+    displayName: '',
+    role: 'SINH_VIEN',
+    title: '',
+    phone: '',
+    mfaRequired: true,
+    sendWelcome: true,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const createUserMutation = useCreateUser();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/iam/tai-khoan');
+    
+    try {
+      await createUserMutation.mutateAsync({
+        email: form.email,
+        displayName: form.displayName,
+        role: form.role,
+        title: form.title,
+        phone: form.phone,
+        mfaRequired: form.mfaRequired,
+        sendWelcome: form.sendWelcome,
+      });
+      navigate('/iam/tai-khoan');
+    } catch (error) {
+      // Error handled by hook
+    }
   };
 
   return (
@@ -69,23 +87,25 @@ export default function UserCreate() {
                     onChange={(e) => setForm({ ...form, role: e.target.value })}
                     className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
                   >
-                    {ROLES.map((r) => (
+                    {ROLE_OPTIONS.map((r) => (
                       <option key={r.value} value={r.value}>{r.label}</option>
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="mb-1.5 block text-sm font-medium text-[rgb(var(--text-secondary))]">Khoa / Phòng ban</label>
-                  <select
-                    value={form.dept}
-                    onChange={(e) => setForm({ ...form, dept: e.target.value })}
-                    className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
-                  >
-                    <option value="">-- Chọn đơn vị --</option>
-                    {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
-                  </select>
-                </div>
+                <Input
+                  label="Chức danh"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  placeholder="VD: Giảng viên, Trưởng khoa..."
+                />
               </div>
+              <Input
+                label="Số điện thoại"
+                type="tel"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder="0xxx xxx xxx"
+              />
             </CardContent>
           </Card>
 
@@ -99,14 +119,14 @@ export default function UserCreate() {
                 { key: 'sendWelcome', label: 'Gửi email chào mừng', desc: 'Gửi thông tin đăng nhập qua email cho người dùng mới' },
               ].map(({ key, label, desc }) => (
                 <div key={key} className="flex items-center justify-between py-2 border-b border-[rgb(var(--border)/0.4)] last:border-0">
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{label}</p>
                     <p className="text-xs text-[rgb(var(--text-muted))]">{desc}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, [key]: !form[key as keyof typeof form] })}
-                    className={`relative h-6 w-11 rounded-full transition-colors ${form[key as keyof typeof form] ? 'bg-[rgb(var(--primary))]' : 'bg-[rgb(var(--border))]'}`}
+                    className={`relative h-6 w-11 shrink-0 ml-4 rounded-full transition-colors ${form[key as keyof typeof form] ? 'bg-[rgb(var(--primary))]' : 'bg-[rgb(var(--border))]'}`}
                   >
                     <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${form[key as keyof typeof form] ? 'translate-x-5' : 'translate-x-0.5'}`} />
                   </button>
@@ -123,7 +143,7 @@ export default function UserCreate() {
               <h3 className="font-semibold text-[rgb(var(--text-primary))]">Xem trước vai trò</h3>
             </div>
             <CardContent className="space-y-3 pt-4">
-              {ROLES.map((r) => (
+              {ROLE_OPTIONS.map((r) => (
                 <div
                   key={r.value}
                   className={`flex items-center gap-3 rounded-lg border p-3 transition-all cursor-pointer ${
@@ -137,7 +157,9 @@ export default function UserCreate() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{r.label}</p>
                   </div>
-                  <div className={`h-2 w-2 rounded-full bg-[rgb(var(--${r.color}))]`} />
+                  {form.role === r.value && (
+                    <div className="h-2 w-2 rounded-full bg-[rgb(var(--primary))]" />
+                  )}
                 </div>
               ))}
             </CardContent>
@@ -154,7 +176,12 @@ export default function UserCreate() {
                   <p className="text-xs text-[rgb(var(--text-muted))]">Mật khẩu ngẫu nhiên 12 ký tự</p>
                 </div>
               </div>
-              <Button type="submit" className="w-full" leftIcon={<Save className="h-4 w-4" />}>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                leftIcon={<Save className="h-4 w-4" />}
+                loading={createUserMutation.isPending}
+              >
                 Tạo tài khoản
               </Button>
               <p className="text-center text-xs text-[rgb(var(--text-muted))]">

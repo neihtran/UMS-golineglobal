@@ -1,0 +1,12 @@
+# .gitignore
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Never commit these
+*.pem
+*.key
+credentials.json
+secrets.json

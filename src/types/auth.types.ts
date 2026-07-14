@@ -20,10 +20,18 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  username?: string;
+  displayName?: string;
   role: (typeof ROLES)[keyof typeof ROLES];
   avatar: string | null;
   permissions: string[];
   unit?: string;
+  department?: string;
+  title?: string;
+  phone?: string;
+  status?: string;
   lastLogin?: string;
   mfaEnabled?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }

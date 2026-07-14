@@ -13,12 +13,13 @@ import {
   Sun,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/app/providers';
+import { useAuthStore } from '@/stores/authStore';
 import { useThemeStore } from '@/stores/themeStore';
 import { ROLE_LABELS } from '@/constants/modules';
 import type { Role } from '@/constants/modules';
 import { GlobalSearch, useKeyboardShortcut } from './GlobalSearch';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { useLogout } from '@/hooks/useAuth';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -140,9 +141,15 @@ function NotificationDropdown({ onClose }: { onClose: () => void }) {
 
 function UserDropdown({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation('common');
-  const { user, logout } = useAuth();
+  const user = useAuthStore((state) => state.user);
+  const logoutMutation = useLogout();
 
   const roleLabel = user?.role ? ROLE_LABELS[user.role as Role] : '';
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+    onClose();
+  };
 
   return (
     <div
@@ -151,7 +158,7 @@ function UserDropdown({ onClose }: { onClose: () => void }) {
     >
       {/* User info */}
       <div className="px-4 py-3 border-b border-[rgb(var(--border)/0.6)]">
-        <p className="truncate font-semibold text-[rgb(var(--text-primary))]">{user?.name}</p>
+        <p className="truncate font-semibold text-[rgb(var(--text-primary))]">{user?.displayName || user?.name || user?.username}</p>
         <p className="truncate text-xs text-[rgb(var(--text-muted))]">{user?.email}</p>
         <span className="mt-1.5 inline-flex rounded-full bg-[rgb(var(--primary)/0.1)] px-2 py-0.5 text-[10px] font-bold text-[rgb(var(--primary))] capitalize">
           {roleLabel}
@@ -180,7 +187,7 @@ function UserDropdown({ onClose }: { onClose: () => void }) {
       {/* Logout */}
       <div className="border-t border-[rgb(var(--border)/0.6)] py-1">
         <button
-          onClick={() => { logout(); onClose(); }}
+          onClick={handleLogout}
           className="flex w-full items-center gap-3 px-4 py-2 text-sm text-[rgb(var(--error))] hover:bg-red-50 transition-colors"
           role="menuitem"
         >
@@ -200,7 +207,7 @@ interface HeaderProps {
 
 export function Header({ onMenuToggle }: HeaderProps) {
   const { t } = useTranslation('common');
-  const { user } = useAuth();
+  const user = useAuthStore((state) => state.user);
   const { mode, setMode } = useThemeStore();
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);

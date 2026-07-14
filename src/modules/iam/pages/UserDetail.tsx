@@ -1,16 +1,8 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { History, Shield, Smartphone } from 'lucide-react';
+import { History, Shield, Smartphone, Lock, Unlock, Trash2, Mail, Plus } from 'lucide-react';
 import { Button, Badge, Card, CardContent } from '@/components/ui';
-
-const USER_MAP: Record<string, {
-  id: string; displayName: string; email: string; role: string;
-  mfaEnabled: boolean; mfaMethod: string; lastLogin: string; lastMFA: string;
-}> = {
-  u001: { id: 'u001', displayName: 'PGS.TS. Nguyễn Hoàng Long', email: 'long.nguyen@truong.edu.vn', role: 'TRUONG_KHOA', mfaEnabled: true, mfaMethod: 'Authenticator App', lastLogin: '2026-06-25T08:32:15', lastMFA: '2026-06-25T08:32:10' },
-  u002: { id: 'u002', displayName: 'Thảo Nguyễn', email: 'thao.nguyen@truong.edu.vn', role: 'GIANG_VIEN', mfaEnabled: true, mfaMethod: 'Authenticator App', lastLogin: '2026-06-25T08:30:00', lastMFA: '2026-06-25T08:29:55' },
-  u003: { id: 'u003', displayName: 'Nguyễn Văn An', email: 'an.nguyen@truong.edu.vn', role: 'SINH_VIEN', mfaEnabled: false, mfaMethod: '', lastLogin: '2026-06-24T22:10:00', lastMFA: '' },
-};
+import { useUserDetail, useDisableMfa, useEnableMfa } from '@/hooks/useIam';
 
 const PERMISSION_MATRIX = [
   { module: 'IAM', create: true, read: true, update: true, delete: false, approve: false, export: true },
@@ -30,21 +22,27 @@ const PERMISSION_MATRIX = [
   { module: 'INT', create: false, read: true, update: false, delete: false, approve: false, export: false },
 ];
 
-const AUDIT_LOG = [
-  { id: 'a1', action: 'LOGIN', resource: 'Hệ thống', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-25 08:32:15', details: 'Đăng nhập thành công qua MFA' },
-  { id: 'a2', action: 'UPDATE', resource: 'Hồ sơ viên chức', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-24 16:45:22', details: 'Cập nhật chức danh TS. Lê Văn Minh' },
-  { id: 'a3', action: 'CREATE', resource: 'Tài khoản', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-24 14:12:08', details: 'Tạo tài khoản mới: sv2026001@truong.edu.vn' },
-  { id: 'a4', action: 'LOGIN_FAILED', resource: 'Hệ thống', status: 'failure', ip: '192.xx.xx.8', timestamp: '2026-06-24 09:05:33', details: 'Mật khẩu sai (lần thử 3)' },
-  { id: 'a5', action: 'EXPORT', resource: 'Danh sách sinh viên', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-23 11:22:10', details: 'Xuất Excel: DS sinh viên K62 CNTT' },
-  { id: 'a6', action: 'APPROVE', resource: 'Nghỉ phép', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-22 15:08:44', details: 'Duyệt nghỉ phép 5 ngày cho VC Lê Thị Lan' },
-  { id: 'a7', action: 'DISABLE_MFA', resource: 'Tài khoản', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-06-20 10:30:00', details: 'Tắt MFA tài khoản nhân viên mới' },
-];
+const ROLE_LABELS: Record<string, string> = {
+  SUPER_ADMIN: 'Quản trị cao cấp',
+  ADMIN: 'Quản trị',
+  HIEU_TRUONG: 'Hiệu trưởng',
+  PHO_HIEU_TRUONG: 'Phó Hiệu trưởng',
+  TRUONG_KHOA: 'Trưởng khoa',
+  PHO_TRUONG_KHOA: 'Phó trưởng khoa',
+  GIAO_VIEN: 'Giảng viên',
+  CAN_BO_PHAN_CONG: 'Cán bộ phân công',
+  CHUYEN_VIEN: 'Chuyên viên',
+  NHAN_VIEN: 'Nhân viên',
+  SINH_VIEN: 'Sinh viên',
+  KHAI_THA: 'Khai thác',
+};
 
-const TABS = [
-  { id: 'permissions', label: 'Ma trận quyền', icon: <Shield className="h-4 w-4" /> },
-  { id: 'audit', label: 'Nhật ký hoạt động', icon: <History className="h-4 w-4" /> },
-  { id: 'mfa', label: 'Cấu hình MFA', icon: <Smartphone className="h-4 w-4" /> },
-];
+const STATUS_CONFIG = {
+  active: { variant: 'success' as const, label: 'Hoạt động' },
+  locked: { variant: 'error' as const, label: 'Bị khóa' },
+  inactive: { variant: 'neutral' as const, label: 'Không hoạt động' },
+  pending: { variant: 'warning' as const, label: 'Chờ kích hoạt' },
+};
 
 const ACTION_COLORS: Record<string, string> = {
   LOGIN: 'success', LOGOUT: 'neutral', LOGIN_FAILED: 'error',
@@ -53,6 +51,12 @@ const ACTION_COLORS: Record<string, string> = {
   DISABLE_MFA: 'warning', ENABLE_MFA: 'success', LOCK: 'error',
   UNLOCK: 'success', VIEW: 'neutral', DOWNLOAD: 'accent',
 };
+
+const TABS = [
+  { id: 'permissions', label: 'Ma trận quyền', icon: <Shield className="h-4 w-4" /> },
+  { id: 'audit', label: 'Nhật ký hoạt động', icon: <History className="h-4 w-4" /> },
+  { id: 'mfa', label: 'Cấu hình MFA', icon: <Smartphone className="h-4 w-4" /> },
+];
 
 function CheckIcon({ checked }: { checked: boolean }) {
   return checked ? (
@@ -66,6 +70,16 @@ function CheckIcon({ checked }: { checked: boolean }) {
   );
 }
 
+interface MfaMethod {
+  id: string;
+  type: 'totp' | 'email' | 'sms';
+  label: string;
+  value: string;
+  addedAt: string;
+  lastUsed?: string;
+  isPrimary: boolean;
+}
+
 interface UserDetailProps {
   id?: string;
 }
@@ -74,24 +88,55 @@ export default function UserDetail({ id }: UserDetailProps) {
   const params = useParams();
   const actualId = id ?? (params.id ?? '');
   const [activeTab, setActiveTab] = useState('permissions');
-  const user = USER_MAP[actualId] ?? USER_MAP['u001'];
+  const [mfaMethods, setMfaMethods] = useState<MfaMethod[]>([
+    { id: '1', type: 'totp', label: 'Authenticator App (Microsoft)', value: 'Microsoft Authenticator', addedAt: '2025-03-15', lastUsed: '2026-07-09 10:30:15', isPrimary: true },
+    { id: '2', type: 'email', label: 'Email', value: 'long.nguyen@truong.edu.vn', addedAt: '2025-01-10', lastUsed: '2026-05-12 14:20:00', isPrimary: false },
+  ]);
+  const [showAddMfa, setShowAddMfa] = useState(false);
+
+  // Fetch user data from backend
+  const { data, isLoading } = useUserDetail(actualId);
+  const disableMfaMutation = useDisableMfa();
+  const enableMfaMutation = useEnableMfa();
+
+  const user = data?.data;
+  const statusConfig = user ? STATUS_CONFIG[user.status as keyof typeof STATUS_CONFIG] || { variant: 'neutral' as const, label: user.status } : { variant: 'neutral' as const, label: '—' };
+
+  const handleSetPrimaryMfa = async (methodId: string) => {
+    setMfaMethods(prev => prev.map(m => ({
+      ...m,
+      isPrimary: m.id === methodId
+    })));
+  };
+
+  const handleAddMfaMethod = () => {
+    setShowAddMfa(true);
+  };
+
+  const handleDeleteMfaMethod = (methodId: string) => {
+    setMfaMethods(prev => prev.filter(m => m.id !== methodId));
+  };
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left sidebar - User info */}
         <Card className="lg:col-span-1">
           <CardContent className="flex flex-col items-center p-6">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[rgb(var(--primary))] text-2xl font-bold text-white mb-4 ring-4 ring-[rgb(var(--primary)/0.2)]">
-              {user.displayName.split(' ').slice(-2).map((n) => n[0]).join('')}
+              {(user?.displayName || user?.email || 'U').split(' ').slice(-2).map((n: string) => n?.[0]).join('')}
             </div>
-            <h2 className="text-lg font-bold text-[rgb(var(--text-primary))]">{user.displayName}</h2>
-            <p className="text-sm text-[rgb(var(--text-secondary))]">{user.role}</p>
-            <Badge variant="success" dot className="mt-2">Đang hoạt động</Badge>
+            <h2 className="text-lg font-bold text-[rgb(var(--text-primary))]">{user?.displayName || '—'}</h2>
+            <p className="text-sm text-[rgb(var(--text-secondary))]">{ROLE_LABELS[user?.role || ''] || user?.role || '—'}</p>
+            <Badge variant={statusConfig.variant} dot className="mt-2">
+              {statusConfig.label}
+            </Badge>
             <div className="mt-6 w-full space-y-3">
               {[
-                { label: 'Email', value: user.email },
-                { label: 'MFA', value: user.mfaEnabled ? `${user.mfaMethod} ✓` : 'Chưa bật' },
-                { label: 'Đăng nhập lần cuối', value: user.lastLogin.replace('T', ' ').slice(0, 16) },
+                { label: 'Email', value: user?.email },
+                { label: 'MFA', value: user?.mfaEnabled ? 'Đã bật ✓' : 'Chưa bật' },
+                { label: 'Đăng nhập cuối', value: user?.lastLogin ? new Date(user.lastLogin).toLocaleString('vi-VN') : '—' },
+                { label: 'Số lần đăng nhập sai', value: user?.failedLoginAttempts || 0 },
               ].map(({ label, value }) => (
                 <div key={label} className="border-b border-[rgb(var(--border)/0.4)] pb-2 last:border-0 last:pb-0">
                   <p className="text-[10px] uppercase tracking-wide text-[rgb(var(--text-muted))]">{label}</p>
@@ -102,6 +147,7 @@ export default function UserDetail({ id }: UserDetailProps) {
           </CardContent>
         </Card>
 
+        {/* Right content - Tabs */}
         <div className="lg:col-span-2">
           <Card>
             <div className="border-b border-[rgb(var(--border)/0.6)]">
@@ -128,7 +174,7 @@ export default function UserDetail({ id }: UserDetailProps) {
                 <div>
                   <div className="mb-3 flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Ma trận quyền RBAC</h3>
-                    <Badge variant="neutral">{user.role}</Badge>
+                    <Badge variant="neutral">{ROLE_LABELS[user?.role || ''] || user?.role}</Badge>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
@@ -168,7 +214,14 @@ export default function UserDetail({ id }: UserDetailProps) {
                     <Button variant="outline" size="sm">Xuất log</Button>
                   </div>
                   <div className="space-y-0">
-                    {AUDIT_LOG.map((log) => (
+                    {[
+                      { id: 'a1', action: 'LOGIN', resource: 'Hệ thống', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-07-09 10:32:15', details: 'Đăng nhập thành công qua MFA' },
+                      { id: 'a2', action: 'UPDATE', resource: 'Hồ sơ viên chức', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-07-08 16:45:22', details: 'Cập nhật chức danh TS. Lê Văn Minh' },
+                      { id: 'a3', action: 'CREATE', resource: 'Tài khoản', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-07-08 14:12:08', details: 'Tạo tài khoản mới: sv2026001@truong.edu.vn' },
+                      { id: 'a4', action: 'LOGIN_FAILED', resource: 'Hệ thống', status: 'failure', ip: '192.xx.xx.8', timestamp: '2026-07-08 09:05:33', details: 'Mật khẩu sai (lần thử 3)' },
+                      { id: 'a5', action: 'EXPORT', resource: 'Danh sách sinh viên', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-07-07 11:22:10', details: 'Xuất Excel: DS sinh viên K62 CNTT' },
+                      { id: 'a6', action: 'APPROVE', resource: 'Nghỉ phép', status: 'success', ip: '103.xx.xx.42', timestamp: '2026-07-06 15:08:44', details: 'Duyệt nghỉ phép 5 ngày cho VC Lê Thị Lan' },
+                    ].map((log) => (
                       <div key={log.id} className="flex items-start gap-3 border-b border-[rgb(var(--border)/0.4)] py-3 last:border-0">
                         <Badge variant={(ACTION_COLORS[log.action] as 'success' | 'error' | 'info' | 'warning' | 'accent' | 'primary' | 'neutral') ?? 'neutral'} size="sm">
                           {log.action}
@@ -190,44 +243,137 @@ export default function UserDetail({ id }: UserDetailProps) {
 
               {activeTab === 'mfa' && (
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between rounded-lg border border-[rgb(var(--success)/0.3)] bg-[rgb(var(--success)/0.05)] p-4">
+                  {/* MFA Status */}
+                  <div className={`flex items-center justify-between rounded-lg border p-4 ${
+                    user?.mfaEnabled 
+                      ? 'border-[rgb(var(--success)/0.3)] bg-[rgb(var(--success)/0.05)]' 
+                      : 'border-[rgb(var(--warning)/0.3)] bg-[rgb(var(--warning)/0.05)]'
+                  }`}>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgb(var(--success)/0.1)]">
-                        <Smartphone className="h-5 w-5 text-[rgb(var(--success))]" />
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                        user?.mfaEnabled 
+                          ? 'bg-[rgb(var(--success)/0.1)]' 
+                          : 'bg-[rgb(var(--warning)/0.1)]'
+                      }`}>
+                        <Smartphone className={`h-5 w-5 ${
+                          user?.mfaEnabled 
+                            ? 'text-[rgb(var(--success))]' 
+                            : 'text-[rgb(var(--warning))]'
+                        }`} />
                       </div>
                       <div>
-                        <p className="font-semibold text-[rgb(var(--text-primary))]">MFA đang bật</p>
-                        <p className="text-xs text-[rgb(var(--text-secondary))]">Qua Authenticator App — cặp khóa RSA-2048</p>
+                        <p className="font-semibold text-[rgb(var(--text-primary))]">
+                          {user?.mfaEnabled ? 'MFA đang bật' : 'MFA chưa bật'}
+                        </p>
+                        <p className="text-xs text-[rgb(var(--text-secondary))]">
+                          {user?.mfaEnabled 
+                            ? 'Đã xác thực qua Authenticator App — cặp khóa RSA-2048' 
+                            : 'Bật MFA để tăng cường bảo mật tài khoản'}
+                        </p>
                       </div>
                     </div>
-                    <Badge variant="success">Bật</Badge>
+                    <div className="flex items-center gap-2">
+                      {user?.mfaEnabled ? (
+                        <Badge variant="success">Bật</Badge>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          onClick={() => enableMfaMutation.mutate(actualId)}
+                          loading={enableMfaMutation.isPending}
+                        >
+                          Bật MFA
+                        </Button>
+                      )}
+                    </div>
                   </div>
 
+                  {/* MFA Methods List */}
                   <div className="space-y-4">
                     <h4 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Phương thức đã đăng ký</h4>
                     <div className="space-y-3">
-                      {[
-                        { method: 'Authenticator App (Microsoft)', added: '2025-03-15', lastUsed: '2026-06-25 08:32:10', primary: true },
-                        { method: 'Email (long.nguyen@truong.edu.vn)', added: '2025-01-10', lastUsed: '2026-05-12 14:20:00', primary: false },
-                      ].map((mfa) => (
-                        <div key={mfa.method} className={`flex items-center justify-between rounded-lg border p-4 ${
-                          mfa.primary ? 'border-[rgb(var(--success)/0.3)] bg-[rgb(var(--bg-base))]' : 'border-[rgb(var(--border))]'
+                      {mfaMethods.map((mfa) => (
+                        <div key={mfa.id} className={`flex items-center justify-between rounded-lg border p-4 ${
+                          mfa.isPrimary 
+                            ? 'border-[rgb(var(--success)/0.3)] bg-[rgb(var(--success)/0.02)]' 
+                            : 'border-[rgb(var(--border))]'
                         }`}>
                           <div>
                             <div className="flex items-center gap-2">
                               <Smartphone className="h-4 w-4 text-[rgb(var(--text-muted))]" />
-                              <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{mfa.method}</p>
-                              {mfa.primary && <Badge variant="success" size="sm">Chính</Badge>}
+                              <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+                                {mfa.type === 'totp' ? 'Authenticator App' : 'Email OTP'}
+                              </p>
+                              {mfa.isPrimary && <Badge variant="success" size="sm">Chính</Badge>}
                             </div>
-                            <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">Thêm: {mfa.added} · Dùng lần cuối: {mfa.lastUsed}</p>
+                            <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">
+                              {mfa.value}
+                            </p>
+                            <p className="text-[10px] text-[rgb(var(--text-muted))] mt-1">
+                              Thêm: {new Date(mfa.addedAt).toLocaleDateString('vi-VN')} 
+                              {mfa.lastUsed && ` · Dùng lần cuối: ${mfa.lastUsed}`}
+                            </p>
                           </div>
-                          {!mfa.primary && (
-                            <Button variant="outline" size="sm">Đặt làm chính</Button>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {!mfa.isPrimary && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleSetPrimaryMfa(mfa.id)}
+                              >
+                                Đặt làm chính
+                              </Button>
+                            )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteMfaMethod(mfa.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-[rgb(var(--error))]" />
+                            </Button>
+                          </div>
                         </div>
                       ))}
                     </div>
-                    <Button variant="outline" size="sm">Thêm phương thức MFA mới</Button>
+                    
+                    {/* Add MFA Method Button */}
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      leftIcon={<Plus className="h-4 w-4" />}
+                      onClick={handleAddMfaMethod}
+                    >
+                      Thêm phương thức MFA mới
+                    </Button>
+
+                    {/* Add MFA Modal/Form */}
+                    {showAddMfa && (
+                      <Card className="border-[rgb(var(--primary)/0.3)]">
+                        <CardContent className="space-y-4 pt-4">
+                          <h4 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Thêm phương thức MFA mới</h4>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3 p-3 rounded-lg border border-[rgb(var(--border))] hover:border-[rgb(var(--primary)/0.4)] cursor-pointer transition-colors">
+                              <Smartphone className="h-5 w-5 text-[rgb(var(--text-muted))]" />
+                              <div>
+                                <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Authenticator App</p>
+                                <p className="text-xs text-[rgb(var(--text-muted))]">Quét mã QR hoặc nhập khóa bí mật</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 p-3 rounded-lg border border-[rgb(var(--border))] hover:border-[rgb(var(--primary)/0.4)] cursor-pointer transition-colors">
+                              <Mail className="h-5 w-5 text-[rgb(var(--text-muted))]" />
+                              <div>
+                                <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Email OTP</p>
+                                <p className="text-xs text-[rgb(var(--text-muted))]">Nhận mã qua email đã đăng ký</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex justify-end gap-2 pt-2">
+                            <Button variant="outline" size="sm" onClick={() => setShowAddMfa(false)}>
+                              Hủy
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
                 </div>
               )}
