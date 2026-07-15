@@ -361,9 +361,12 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
   const visibleGroups = useMemo(() => {
     return NAV_GROUPS.map((g) => ({
       ...g,
-      modules: g.modules.filter(
-        (m) => !m.requiredRoles || m.requiredRoles.some((r) => user?.role === r),
-      ),
+      modules: g.modules.filter((m) => {
+        if (!m.requiredRoles) return true;
+        // DEMO MODE — SUPER_ADMIN sees everything
+        if (user?.role === 'SUPER_ADMIN') return true;
+        return m.requiredRoles.some((r) => user?.role === r);
+      }),
     })).filter((g) => g.modules.length > 0);
   }, [user?.role ?? null]);
 
