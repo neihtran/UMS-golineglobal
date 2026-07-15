@@ -41,7 +41,6 @@ const StudentProfileSchema = new Schema<IStudentProfile>(
       ref: 'Student',
       required: true,
       unique: true,
-      index: true,
     },
     fatherName: { type: String, trim: true },
     fatherPhone: { type: String, trim: true },
@@ -75,8 +74,7 @@ const StudentProfileSchema = new Schema<IStudentProfile>(
   { timestamps: true }
 );
 
-// Indexes
-StudentProfileSchema.index({ student: 1 }, { unique: true });
+// Indexes (student unique auto-created via `unique: true`)
 StudentProfileSchema.index({ nationality: 1, ethnicity: 1 });
 
 export const StudentProfile = mongoose.model<IStudentProfile>('StudentProfile', StudentProfileSchema);

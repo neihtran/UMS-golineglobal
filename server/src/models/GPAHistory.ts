@@ -34,13 +34,11 @@ const GPAHistorySchema = new Schema<IGPAHistory>(
       type: Schema.Types.ObjectId,
       ref: 'Student',
       required: true,
-      index: true,
     },
     academicTerm: {
       type: Schema.Types.ObjectId,
       ref: 'AcademicTerm',
       required: true,
-      index: true,
     },
     registeredCredit: {
       type: Number,

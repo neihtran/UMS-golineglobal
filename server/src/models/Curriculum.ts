@@ -184,7 +184,6 @@ const CurriculumSchema = new Schema<ICurriculum>(
       type: String,
       enum: ['draft', 'active', 'archived'],
       default: 'draft',
-      index: true,
     },
     // Sync
     externalId: {
@@ -211,8 +210,7 @@ const CurriculumSchema = new Schema<ICurriculum>(
   { timestamps: true }
 );
 
-// Indexes
-CurriculumSchema.index({ code: 1 }, { unique: true });
+// Indexes (code unique auto-created via `unique: true`)
 CurriculumSchema.index({ department: 1, status: 1, year: -1 });
 CurriculumSchema.index({ major: 1, status: 1 });
 CurriculumSchema.index({ externalSource: 1, externalId: 1 }, { sparse: true });

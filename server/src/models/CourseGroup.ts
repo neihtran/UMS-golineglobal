@@ -35,7 +35,6 @@ const CourseGroupSchema = new Schema<ICourseGroup>(
     parent: {
       type: Schema.Types.ObjectId,
       ref: 'CourseGroup',
-      index: true,
     },
     description: String,
     order: {
@@ -55,7 +54,6 @@ const CourseGroupSchema = new Schema<ICourseGroup>(
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
     },
   },
   { timestamps: true }

@@ -29,12 +29,12 @@ export interface IInternship extends Document {
 
 const InternshipSchema = new Schema<IInternship>(
   {
-    student: { type: Schema.Types.ObjectId, ref: 'Student', required: false, index: true },
+    student: { type: Schema.Types.ObjectId, ref: 'Student', required: false },
     studentCode: { type: String, required: true, trim: true },
     studentName: { type: String, required: true, trim: true },
     className: { type: String, trim: true },
     major: { type: String, trim: true },
-    department: { type: Schema.Types.ObjectId, ref: 'Department', index: true },
+    department: { type: Schema.Types.ObjectId, ref: 'Department' },
     company: { type: String, required: true, trim: true },
     position: { type: String, required: true, trim: true },
     location: { type: String, trim: true },
@@ -47,7 +47,6 @@ const InternshipSchema = new Schema<IInternship>(
       type: String,
       enum: ['registered', 'in_progress', 'pending_report', 'completed', 'rejected'],
       default: 'registered',
-      index: true,
     },
     progress: { type: Number, default: 0, min: 0, max: 100 },
     reportSubmitted: { type: Boolean, default: false },

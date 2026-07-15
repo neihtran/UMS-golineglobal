@@ -43,19 +43,16 @@ const EnrollmentSchema = new Schema<IEnrollment>(
       type: Schema.Types.ObjectId,
       ref: 'Student',
       required: true,
-      index: true,
     },
     course: {
       type: Schema.Types.ObjectId,
       ref: 'Course',
       required: true,
-      index: true,
     },
     academicTerm: {
       type: Schema.Types.ObjectId,
       ref: 'AcademicTerm',
       required: true,
-      index: true,
     },
     // Registration
     registeredAt: { type: Date, default: Date.now },
@@ -64,7 +61,6 @@ const EnrollmentSchema = new Schema<IEnrollment>(
       type: String,
       enum: ['registered', 'cancelled', 'completed'],
       default: 'registered',
-      index: true,
     },
     // Scores (0-10 scale)
     attendanceScore: { type: Number, min: 0, max: 10 },
@@ -82,7 +78,7 @@ const EnrollmentSchema = new Schema<IEnrollment>(
     gradedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     gradedAt: Date,
     // Lock mechanism
-    isLocked: { type: Boolean, default: false, index: true },
+    isLocked: { type: Boolean, default: false },
     lockedAt: Date,
     lockedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     // Legacy

@@ -30,8 +30,8 @@ export interface ISalarySheet extends Document {
 
 const SalarySheetSchema = new Schema<ISalarySheet>(
   {
-    month: { type: Number, required: true, min: 1, max: 12, index: true },
-    year: { type: Number, required: true, min: 2000, max: 2100, index: true },
+    month: { type: Number, required: true, min: 1, max: 12 },
+    year: { type: Number, required: true, min: 2000, max: 2100 },
     department: { type: Schema.Types.ObjectId, ref: 'Department' },
     items: [{
       employee: { type: Schema.Types.ObjectId, ref: 'VienChuc', required: true },
@@ -49,7 +49,6 @@ const SalarySheetSchema = new Schema<ISalarySheet>(
       type: String,
       enum: ['draft', 'pending', 'approved', 'paid', 'cancelled'],
       default: 'draft',
-      index: true,
     },
     approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     approvedAt: Date,

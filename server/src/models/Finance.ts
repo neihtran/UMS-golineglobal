@@ -20,7 +20,7 @@ export interface ITuition extends Document {
 
 const TuitionSchema = new Schema<ITuition>(
   {
-    student: { type: Schema.Types.ObjectId, ref: 'Student', required: true, index: true },
+    student: { type: Schema.Types.ObjectId, ref: 'Student', required: true },
     semester: { type: Number, required: true, min: 1, max: 12 },
     academicYear: { type: String, required: true },
     amount: { type: Number, required: true, min: 0 },
@@ -29,7 +29,6 @@ const TuitionSchema = new Schema<ITuition>(
       type: String,
       enum: ['unpaid', 'partial', 'paid', 'exempt', 'deferred'],
       default: 'unpaid',
-      index: true,
     },
     dueDate: { type: Date, required: true },
     paidAt: Date,
@@ -78,7 +77,6 @@ const ExpenseSchema = new Schema<IExpense>(
       type: String,
       enum: ['pending', 'approved', 'rejected', 'paid'],
       default: 'pending',
-      index: true,
     },
     approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     approvedAt: Date,
@@ -120,7 +118,7 @@ const BudgetSchema = new Schema<IBudget>(
     allocated: { type: Number, default: 0 },
     spent: { type: Number, default: 0 },
     remaining: { type: Number, default: 0 },
-    status: { type: String, enum: ['draft', 'active', 'closed'], default: 'draft', index: true },
+    status: { type: String, enum: ['draft', 'active', 'closed'], default: 'draft' },
     items: [{
       category: String,
       allocated: { type: Number, default: 0 },

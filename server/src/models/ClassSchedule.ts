@@ -27,13 +27,11 @@ const ClassScheduleSchema = new Schema<IClassSchedule>(
       type: Schema.Types.ObjectId,
       ref: 'Course',
       required: true,
-      index: true,
     },
     lecturer: {
       type: Schema.Types.ObjectId,
       ref: 'VienChuc',
       required: true,
-      index: true,
     },
     room: {
       type: Schema.Types.ObjectId,
@@ -44,7 +42,6 @@ const ClassScheduleSchema = new Schema<IClassSchedule>(
       required: true,
       min: 1,
       max: 7,
-      index: true,
     },
     lessonFrom: {
       type: Number,
@@ -64,7 +61,6 @@ const ClassScheduleSchema = new Schema<IClassSchedule>(
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
     },
     createdBy: {
       type: Schema.Types.ObjectId,

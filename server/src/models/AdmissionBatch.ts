@@ -47,13 +47,11 @@ const AdmissionBatchSchema = new Schema<IAdmissionBatch>(
     year: {
       type: Number,
       required: true,
-      index: true,
     },
     admissionType: {
       type: String,
       enum: ['regular', 'transfer', 'second_degree'],
       required: true,
-      index: true,
     },
     startDate: Date,
     endDate: Date,
@@ -64,7 +62,6 @@ const AdmissionBatchSchema = new Schema<IAdmissionBatch>(
       type: String,
       enum: ['draft', 'open', 'closed', 'enrolled'],
       default: 'draft',
-      index: true,
     },
     totalCandidates: {
       type: Number,
@@ -98,8 +95,7 @@ const AdmissionBatchSchema = new Schema<IAdmissionBatch>(
   { timestamps: true }
 );
 
-// Indexes
-AdmissionBatchSchema.index({ code: 1 }, { unique: true });
+// Indexes (code unique auto-created via `unique: true`)
 AdmissionBatchSchema.index({ year: 1, admissionType: 1 });
 AdmissionBatchSchema.index({ status: 1 });
 

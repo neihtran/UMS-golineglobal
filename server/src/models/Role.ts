@@ -26,7 +26,7 @@ const RoleSchema = new Schema<IRole>(
     },
     name: { type: String, required: true, trim: true },
     description: { type: String, trim: true },
-    level: { type: Number, required: true, index: true },
+    level: { type: Number, required: true },
     permissions: { type: [String], default: [] },
     isSystem: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },

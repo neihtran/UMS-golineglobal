@@ -40,19 +40,16 @@ const StudentClassSchema = new Schema<IStudentClass>(
     cohort: {
       type: String,
       required: true,
-      index: true,
     },
     faculty: {
       type: Schema.Types.ObjectId,
       ref: 'Department',
       required: true,
-      index: true,
     },
     major: {
       type: Schema.Types.ObjectId,
       ref: 'Major',
       required: true,
-      index: true,
     },
     academicAdvisor: {
       type: Schema.Types.ObjectId,
@@ -62,7 +59,6 @@ const StudentClassSchema = new Schema<IStudentClass>(
       type: String,
       enum: ['disbanded', 'active', 'graduated'],
       default: 'active',
-      index: true,
     },
     studentCount: {
       type: Number,

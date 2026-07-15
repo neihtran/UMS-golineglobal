@@ -33,7 +33,6 @@ const StudentMajorChangeSchema = new Schema<IStudentMajorChange>(
       type: Schema.Types.ObjectId,
       ref: 'Student',
       required: true,
-      index: true,
     },
     fromMajor: {
       type: Schema.Types.ObjectId,
@@ -77,7 +76,6 @@ const StudentMajorChangeSchema = new Schema<IStudentMajorChange>(
       type: String,
       enum: ['pending', 'approved', 'cancelled'],
       default: 'pending',
-      index: true,
     },
     approvedBy: {
       type: Schema.Types.ObjectId,

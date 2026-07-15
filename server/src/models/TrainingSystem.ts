@@ -45,12 +45,10 @@ const TrainingSystemSchema = new Schema<ITrainingSystem>(
       type: String,
       enum: ['draft', 'pending', 'published', 'archived'],
       default: 'draft',
-      index: true,
     },
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
     },
     externalId: {
       type: Number,
@@ -75,8 +73,7 @@ const TrainingSystemSchema = new Schema<ITrainingSystem>(
   { timestamps: true }
 );
 
-// Indexes
-TrainingSystemSchema.index({ code: 1 }, { unique: true });
+// Indexes (code unique auto-created via `unique: true`)
 TrainingSystemSchema.index({ name: 'text', code: 'text' });
 TrainingSystemSchema.index({ isActive: 1, status: 1 });
 

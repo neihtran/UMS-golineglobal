@@ -23,13 +23,11 @@ const SubjectPrerequisiteSchema = new Schema<ISubjectPrerequisite>(
       type: Schema.Types.ObjectId,
       ref: 'Subject',
       required: true,
-      index: true,
     },
     prerequisite: {
       type: Schema.Types.ObjectId,
       ref: 'Subject',
       required: true,
-      index: true,
     },
     type: {
       type: String,

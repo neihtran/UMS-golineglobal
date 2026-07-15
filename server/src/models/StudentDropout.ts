@@ -29,12 +29,10 @@ const StudentDropoutSchema = new Schema<IStudentDropout>(
       type: Schema.Types.ObjectId,
       ref: 'Student',
       required: true,
-      index: true,
     },
     dropoutDate: {
       type: Date,
       required: true,
-      index: true,
     },
     decisionNo: {
       type: String,
@@ -51,7 +49,6 @@ const StudentDropoutSchema = new Schema<IStudentDropout>(
       type: String,
       enum: ['pending', 'approved', 'cancelled'],
       default: 'pending',
-      index: true,
     },
     approvedBy: {
       type: Schema.Types.ObjectId,

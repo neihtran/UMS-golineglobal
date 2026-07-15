@@ -34,8 +34,8 @@ export interface IGraduation extends Document {
 
 const GraduationSchema = new Schema<IGraduation>(
   {
-    student: { type: Schema.Types.ObjectId, ref: 'Student', required: true, index: true },
-    session: { type: Schema.Types.ObjectId, ref: 'GraduationSession', required: true, index: true },
+    student: { type: Schema.Types.ObjectId, ref: 'Student', required: true },
+    session: { type: Schema.Types.ObjectId, ref: 'GraduationSession', required: true },
     cohort: { type: String, required: true, trim: true },
     enrollmentDate: { type: Date, required: true },
     graduationYear: { type: Number, required: true, min: 2000, max: 2100 },
@@ -50,7 +50,6 @@ const GraduationSchema = new Schema<IGraduation>(
       type: String,
       enum: ['Xuất sắc', 'Giỏi', 'Khá', 'Trung bình'],
       required: true,
-      index: true,
     },
     diplomaNo: { type: String, sparse: true, unique: true },
     diplomaDate: Date,
@@ -58,7 +57,6 @@ const GraduationSchema = new Schema<IGraduation>(
       type: String,
       enum: ['pending_review', 'approved', 'graduated', 'diploma_issued', 'not_met'],
       default: 'pending_review',
-      index: true,
     },
     conditions: [
       {
@@ -78,6 +76,5 @@ const GraduationSchema = new Schema<IGraduation>(
 
 GraduationSchema.index({ student: 1, session: 1 }, { unique: true });
 GraduationSchema.index({ status: 1, graduationYear: -1 });
-GraduationSchema.index({ diplomaNo: 1 }, { unique: true, sparse: true });
 
 export const Graduation = mongoose.model<IGraduation>('Graduation', GraduationSchema);

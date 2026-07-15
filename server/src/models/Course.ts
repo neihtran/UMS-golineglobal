@@ -45,7 +45,6 @@ const CourseSchema = new Schema<ICourse>(
     subject: {
       type: Schema.Types.ObjectId,
       ref: 'Subject',
-      index: true,
     },
     semester: {
       type: Number,
@@ -60,7 +59,6 @@ const CourseSchema = new Schema<ICourse>(
     lecturer: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      index: true,
     },
     department: {
       type: Schema.Types.ObjectId,
@@ -80,7 +78,6 @@ const CourseSchema = new Schema<ICourse>(
       type: String,
       enum: ['draft', 'open', 'closed', 'cancelled'],
       default: 'draft',
-      index: true,
     },
     startDate: Date,
     endDate: Date,
@@ -107,8 +104,7 @@ const CourseSchema = new Schema<ICourse>(
   { timestamps: true }
 );
 
-// Indexes
-CourseSchema.index({ code: 1 }, { unique: true });
+// Indexes (code unique auto-created via `unique: true`)
 CourseSchema.index({ name: 'text', code: 'text' });
 CourseSchema.index({ semester: 1, academicYear: 1 });
 CourseSchema.index({ status: 1, semester: 1 });

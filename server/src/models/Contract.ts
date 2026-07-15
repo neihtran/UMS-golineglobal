@@ -23,7 +23,7 @@ export interface IContract extends Document {
 const ContractSchema = new Schema<IContract>(
   {
     code: { type: String, required: true, unique: true, trim: true },
-    employee: { type: Schema.Types.ObjectId, ref: 'VienChuc', required: true, index: true },
+    employee: { type: Schema.Types.ObjectId, ref: 'VienChuc', required: true },
     type: {
       type: String,
       enum: ['Cơ hữu', 'Thỉnh giảng', 'Thử việc', 'Cộng tác viên'],
@@ -36,7 +36,6 @@ const ContractSchema = new Schema<IContract>(
       type: String,
       enum: ['active', 'expired', 'terminated', 'pending'],
       default: 'active',
-      index: true,
     },
     signedAt: Date,
     signedBy: { type: Schema.Types.ObjectId, ref: 'User' },

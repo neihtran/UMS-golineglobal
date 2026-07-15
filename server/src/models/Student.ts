@@ -46,7 +46,6 @@ const StudentSchema = new Schema<IStudent>(
       unique: true,
       trim: true,
       uppercase: true,
-      index: true,
     },
     name: {
       type: String,
@@ -65,11 +64,11 @@ const StudentSchema = new Schema<IStudent>(
     nationality: { type: String, default: 'Việt Nam' },
     // Relations
     user: { type: Schema.Types.ObjectId, ref: 'User' },
-    department: { type: Schema.Types.ObjectId, ref: 'Department', index: true },
-    class: { type: Schema.Types.ObjectId, ref: 'StudentClass', index: true },
-    specialization: { type: Schema.Types.ObjectId, ref: 'Specialization', index: true },
-    trainingSystem: { type: Schema.Types.ObjectId, ref: 'TrainingSystem', index: true },
-    course: { type: Schema.Types.ObjectId, ref: 'Course', index: true },
+    department: { type: Schema.Types.ObjectId, ref: 'Department' },
+    class: { type: Schema.Types.ObjectId, ref: 'StudentClass' },
+    specialization: { type: Schema.Types.ObjectId, ref: 'Specialization' },
+    trainingSystem: { type: Schema.Types.ObjectId, ref: 'TrainingSystem' },
+    course: { type: Schema.Types.ObjectId, ref: 'Course' },
     admissionStudent: { type: Schema.Types.ObjectId, ref: 'AdmissionStudent' },
     // Academic
     enrollmentDate: Date,
@@ -80,7 +79,6 @@ const StudentSchema = new Schema<IStudent>(
       type: String,
       enum: ['studying', 'reserved', 'graduated', 'dropped', 'transferred'],
       default: 'studying',
-      index: true,
     },
     // Audit
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -89,8 +87,7 @@ const StudentSchema = new Schema<IStudent>(
   { timestamps: true }
 );
 
-// Indexes
-StudentSchema.index({ code: 1 }, { unique: true });
+// Indexes (code unique index auto-created via `unique: true`)
 StudentSchema.index({ name: 'text', code: 'text', email: 'text' });
 StudentSchema.index({ class: 1, status: 1 });
 StudentSchema.index({ specialization: 1, status: 1 });

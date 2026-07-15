@@ -23,7 +23,7 @@ export interface IExam extends Document {
 const ExamSchema = new Schema<IExam>({
   code: { type: String, required: true, unique: true, trim: true },
   title: { type: String, required: true, trim: true },
-  course: { type: Schema.Types.ObjectId, ref: 'Course', index: true },
+  course: { type: Schema.Types.ObjectId, ref: 'Course' },
   semester: { type: Number, min: 1, max: 12 },
   academicYear: { type: String },
   type: { type: String, enum: ['midterm', 'final', 'quiz', 'practical', 'other'], default: 'final' },
@@ -32,7 +32,7 @@ const ExamSchema = new Schema<IExam>({
   passingScore: { type: Number, default: 5 },
   scheduledAt: Date,
   room: String,
-  status: { type: String, enum: ['draft', 'scheduled', 'ongoing', 'completed', 'cancelled'], default: 'draft', index: true },
+  status: { type: String, enum: ['draft', 'scheduled', 'ongoing', 'completed', 'cancelled'], default: 'draft' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 
@@ -54,10 +54,10 @@ export interface IExamSubmission extends Document {
 }
 
 const ExamSubmissionSchema = new Schema<IExamSubmission>({
-  exam: { type: Schema.Types.ObjectId, ref: 'Exam', required: true, index: true },
-  student: { type: Schema.Types.ObjectId, ref: 'Student', required: true, index: true },
+  exam: { type: Schema.Types.ObjectId, ref: 'Exam', required: true },
+  student: { type: Schema.Types.ObjectId, ref: 'Student', required: true },
   score: { type: Number, min: 0 },
-  status: { type: String, enum: ['absent', 'submitted', 'graded'], default: 'submitted', index: true },
+  status: { type: String, enum: ['absent', 'submitted', 'graded'], default: 'submitted' },
   submittedAt: Date,
   gradedAt: Date,
   gradedBy: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -92,9 +92,9 @@ const ResearchProjectSchema = new Schema<IResearchProject>({
   startDate: Date,
   endDate: Date,
   budget: { type: Number, default: 0 },
-  leader: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  leader: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   members: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  status: { type: String, enum: ['proposal', 'approved', 'ongoing', 'completed', 'cancelled'], default: 'proposal', index: true },
+  status: { type: String, enum: ['proposal', 'approved', 'ongoing', 'completed', 'cancelled'], default: 'proposal' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 
@@ -125,7 +125,7 @@ const KPISchema = new Schema<IKPI>({
   unit: { type: String, default: 'count' },
   period: { type: String, enum: ['monthly', 'quarterly', 'yearly'], default: 'yearly' },
   year: { type: Number, min: 2000 },
-  status: { type: String, enum: ['active', 'achieved', 'failed'], default: 'active', index: true },
+  status: { type: String, enum: ['active', 'achieved', 'failed'], default: 'active' },
 }, { timestamps: true });
 
 export const KPI = mongoose.model<IKPI>('KPI', KPISchema);
@@ -155,7 +155,7 @@ const KtxRoomSchema = new Schema<IKtxRoom>({
   currentOccupancy: { type: Number, default: 0 },
   pricePerMonth: { type: Number, default: 0 },
   facilities: [String],
-  status: { type: String, enum: ['available', 'full', 'maintenance', 'closed'], default: 'available', index: true },
+  status: { type: String, enum: ['available', 'full', 'maintenance', 'closed'], default: 'available' },
 }, { timestamps: true });
 
 KtxRoomSchema.index({ building: 1, floor: 1 });
@@ -182,7 +182,7 @@ const QaEvidenceSchema = new Schema<IQaEvidence>({
   description: String,
   fileUrls: [String],
   uploadedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  status: { type: String, enum: ['draft', 'submitted', 'approved', 'rejected'], default: 'draft', index: true },
+  status: { type: String, enum: ['draft', 'submitted', 'approved', 'rejected'], default: 'draft' },
 }, { timestamps: true });
 
 QaEvidenceSchema.index({ standard: 1, criteria: 1 });
@@ -209,10 +209,10 @@ const WmsTaskSchema = new Schema<IWmsTask>({
   code: { type: String, required: true, unique: true, trim: true },
   title: { type: String, required: true, trim: true },
   description: String,
-  project: { type: Schema.Types.ObjectId, ref: 'Project', index: true },
-  assignee: { type: Schema.Types.ObjectId, ref: 'User', index: true },
+  project: { type: Schema.Types.ObjectId, ref: 'Project' },
+  assignee: { type: Schema.Types.ObjectId, ref: 'User' },
   priority: { type: String, enum: ['low', 'medium', 'high', 'critical'], default: 'medium' },
-  status: { type: String, enum: ['todo', 'in_progress', 'review', 'done', 'cancelled'], default: 'todo', index: true },
+  status: { type: String, enum: ['todo', 'in_progress', 'review', 'done', 'cancelled'], default: 'todo' },
   dueDate: Date,
   completedAt: Date,
   createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },

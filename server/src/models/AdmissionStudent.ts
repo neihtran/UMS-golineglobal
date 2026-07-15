@@ -41,7 +41,6 @@ const AdmissionStudentSchema = new Schema<IAdmissionStudent>(
       type: Schema.Types.ObjectId,
       ref: 'AdmissionBatch',
       required: true,
-      index: true,
     },
     candidateCode: {
       type: String,
@@ -87,7 +86,6 @@ const AdmissionStudentSchema = new Schema<IAdmissionStudent>(
       type: String,
       enum: ['pending', 'accepted', 'enrolled', 'cancelled'],
       default: 'pending',
-      index: true,
     },
     enrollmentDate: Date,
     studentCode: {
@@ -98,7 +96,6 @@ const AdmissionStudentSchema = new Schema<IAdmissionStudent>(
     student: {
       type: Schema.Types.ObjectId,
       ref: 'Student',
-      index: true,
     },
     notes: String,
     externalId: Number,
@@ -120,8 +117,7 @@ const AdmissionStudentSchema = new Schema<IAdmissionStudent>(
   { timestamps: true }
 );
 
-// Indexes
-AdmissionStudentSchema.index({ candidateCode: 1 }, { unique: true });
+// Indexes (candidateCode unique auto-created via `unique: true`)
 AdmissionStudentSchema.index({ batch: 1, status: 1 });
 AdmissionStudentSchema.index({ student: 1 }, { sparse: true });
 AdmissionStudentSchema.index({ batch: 1, admissionScore: -1 });

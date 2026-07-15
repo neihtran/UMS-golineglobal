@@ -12,12 +12,12 @@ export interface IIntegrationLog extends Document {
 }
 
 const IntegrationLogSchema = new Schema<IIntegrationLog>({
-  source: { type: String, required: true, index: true },
+  source: { type: String, required: true },
   event: { type: String, required: true },
   payload: { type: Schema.Types.Mixed, default: {} },
-  status: { type: String, enum: ['pending', 'success', 'failed'], default: 'pending', index: true },
+  status: { type: String, enum: ['pending', 'success', 'failed'], default: 'pending' },
   error: String,
-  timestamp: { type: Date, default: Date.now, index: true },
+  timestamp: { type: Date, default: Date.now },
 }, { timestamps: false });
 
 IntegrationLogSchema.index({ timestamp: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });
@@ -39,7 +39,7 @@ export interface IOcrJob extends Document {
 const OcrJobSchema = new Schema<IOcrJob>({
   code: { type: String, required: true, unique: true, trim: true },
   fileUrl: { type: String, required: true },
-  status: { type: String, enum: ['queued', 'processing', 'completed', 'failed'], default: 'queued', index: true },
+  status: { type: String, enum: ['queued', 'processing', 'completed', 'failed'], default: 'queued' },
   result: { type: Schema.Types.Mixed },
   extractedText: String,
   createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -98,7 +98,7 @@ const PmsMeetingSchema = new Schema<IPmsMeeting>({
   content: String,
   decisions: String,
   minutesUrl: String,
-  status: { type: String, enum: ['scheduled', 'held', 'cancelled'], default: 'scheduled', index: true },
+  status: { type: String, enum: ['scheduled', 'held', 'cancelled'], default: 'scheduled' },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 
@@ -180,12 +180,12 @@ export interface ILibLoan extends Document {
 }
 
 const LibLoanSchema = new Schema<ILibLoan>({
-  book: { type: Schema.Types.ObjectId, ref: 'LibBook', required: true, index: true },
-  student: { type: Schema.Types.ObjectId, ref: 'Student', required: true, index: true },
+  book: { type: Schema.Types.ObjectId, ref: 'LibBook', required: true },
+  student: { type: Schema.Types.ObjectId, ref: 'Student', required: true },
   borrowDate: { type: Date, default: Date.now },
   dueDate: { type: Date, required: true },
   returnDate: Date,
-  status: { type: String, enum: ['borrowed', 'returned', 'overdue', 'lost'], default: 'borrowed', index: true },
+  status: { type: String, enum: ['borrowed', 'returned', 'overdue', 'lost'], default: 'borrowed' },
 }, { timestamps: true });
 
 LibLoanSchema.index({ student: 1, status: 1 });

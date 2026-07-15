@@ -80,7 +80,6 @@ const VienChucSchema = new Schema<IVienChuc>(
     department: {
       type: Schema.Types.ObjectId,
       ref: 'Department',
-      index: true,
     },
     contractType: {
       type: String,

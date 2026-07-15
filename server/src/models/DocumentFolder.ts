@@ -15,7 +15,7 @@ export interface IDocumentFolder extends Document {
 const DocumentFolderSchema = new Schema<IDocumentFolder>(
   {
     name: { type: String, required: true, trim: true },
-    parent: { type: Schema.Types.ObjectId, ref: 'DocumentFolder', index: true },
+    parent: { type: Schema.Types.ObjectId, ref: 'DocumentFolder' },
     type: { type: String, default: 'general' },
     description: String,
     isPublic: { type: Boolean, default: true },

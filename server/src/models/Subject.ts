@@ -72,7 +72,6 @@ const SubjectSchema = new Schema<ISubject>(
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
     },
     externalId: {
       type: Number,
@@ -88,8 +87,7 @@ const SubjectSchema = new Schema<ISubject>(
   { timestamps: true }
 );
 
-// Indexes
-SubjectSchema.index({ code: 1 }, { unique: true });
+// Indexes (code unique auto-created via `unique: true`)
 SubjectSchema.index({ name: 'text', code: 'text' });
 SubjectSchema.index({ isActive: 1 });
 SubjectSchema.index({ externalSource: 1, externalId: 1 }, { sparse: true });

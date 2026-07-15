@@ -42,7 +42,6 @@ const SubjectTypeSchema = new Schema<ISubjectType>(
       type: String,
       enum: ['general', 'foundation', 'specialization', 'internship', 'thesis', 'military', 'physical'],
       required: true,
-      index: true,
     },
     displayOrder: {
       type: Number,
@@ -75,8 +74,7 @@ const SubjectTypeSchema = new Schema<ISubjectType>(
   { timestamps: true }
 );
 
-// Indexes
-SubjectTypeSchema.index({ code: 1 }, { unique: true });
+// Indexes (code unique auto-created via `unique: true`)
 SubjectTypeSchema.index({ category: 1, displayOrder: 1 });
 SubjectTypeSchema.index({ isActive: 1 });
 

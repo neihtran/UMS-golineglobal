@@ -39,19 +39,16 @@ const SpecializationSchema = new Schema<ISpecialization>(
       type: Schema.Types.ObjectId,
       ref: 'Major',
       required: true,
-      index: true,
     },
     description: String,
     status: {
       type: String,
       enum: ['draft', 'pending', 'published', 'archived'],
       default: 'draft',
-      index: true,
     },
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
     },
     externalId: {
       type: Number,
@@ -76,8 +73,7 @@ const SpecializationSchema = new Schema<ISpecialization>(
   { timestamps: true }
 );
 
-// Indexes
-SpecializationSchema.index({ code: 1 }, { unique: true });
+// Indexes (code unique auto-created via `unique: true`)
 SpecializationSchema.index({ name: 'text', code: 'text' });
 SpecializationSchema.index({ major: 1, isActive: 1 });
 SpecializationSchema.index({ externalSource: 1, externalId: 1 }, { sparse: true });

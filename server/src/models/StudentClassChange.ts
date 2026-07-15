@@ -24,7 +24,6 @@ const StudentClassChangeSchema = new Schema<IStudentClassChange>(
       type: Schema.Types.ObjectId,
       ref: 'Student',
       required: true,
-      index: true,
     },
     fromClass: {
       type: Schema.Types.ObjectId,

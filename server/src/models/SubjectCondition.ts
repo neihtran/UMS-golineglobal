@@ -24,7 +24,6 @@ const SubjectConditionSchema = new Schema<ISubjectCondition>(
       type: Schema.Types.ObjectId,
       ref: 'Subject',
       required: true,
-      index: true,
     },
     minGpa: {
       type: Number,

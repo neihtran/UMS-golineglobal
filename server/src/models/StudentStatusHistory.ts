@@ -26,18 +26,15 @@ const StudentStatusHistorySchema = new Schema<IStudentStatusHistory>(
       type: Schema.Types.ObjectId,
       ref: 'Student',
       required: true,
-      index: true,
     },
     status: {
       type: String,
       enum: ['studying', 'reserved', 'graduated', 'dropped', 'transferred_major', 'transferred_class'],
       required: true,
-      index: true,
     },
     effectiveDate: {
       type: Date,
       required: true,
-      index: true,
     },
     decisionNo: {
       type: String,

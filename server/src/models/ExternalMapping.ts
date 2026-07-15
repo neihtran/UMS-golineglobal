@@ -39,12 +39,10 @@ const ExternalMappingSchema = new Schema<IExternalMapping>(
       type: String,
       enum: ['hqnhat', 'hemis', 'vneid', 'manual'],
       required: true,
-      index: true,
     },
     entity: {
       type: String,
       required: true,
-      index: true,
     },
     externalId: {
       type: Number,

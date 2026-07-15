@@ -39,7 +39,6 @@ const ScheduleChangeSchema = new Schema<IScheduleChange>(
       type: Schema.Types.ObjectId,
       ref: 'ClassSchedule',
       required: true,
-      index: true,
     },
     changeType: {
       type: String,
@@ -67,7 +66,6 @@ const ScheduleChangeSchema = new Schema<IScheduleChange>(
       type: String,
       enum: ['pending', 'approved', 'rejected'],
       default: 'pending',
-      index: true,
     },
     approvedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     approvedAt: Date,

@@ -20,13 +20,12 @@ export interface ISyncFailure extends Document {
 
 const SyncFailureSchema = new Schema<ISyncFailure>(
   {
-    entity: { type: String, required: true, index: true },
-    source: { type: String, required: true, default: 'hqnhat', index: true },
+    entity: { type: String, required: true },
+    source: { type: String, required: true, default: 'hqnhat' },
     status: {
       type: String,
       enum: ['pending', 'retrying', 'resolved', 'dead_letter'],
       default: 'pending',
-      index: true,
     },
     attempts: { type: Number, default: 0 },
     maxAttempts: { type: Number, default: 5 },

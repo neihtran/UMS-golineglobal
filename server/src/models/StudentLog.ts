@@ -40,7 +40,6 @@ const StudentLogSchema = new Schema<IStudentLog>(
       type: Schema.Types.ObjectId,
       ref: 'Student',
       required: true,
-      index: true,
     },
     action: {
       type: String,
@@ -62,7 +61,6 @@ const StudentLogSchema = new Schema<IStudentLog>(
         'WARNING_RESOLVED',
       ],
       required: true,
-      index: true,
     },
     referenceType: {
       type: String,

@@ -64,17 +64,14 @@ const AcademicTermSchema = new Schema<IAcademicTerm>(
       type: String,
       enum: ['planning', 'registration', 'studying', 'grading', 'finished'],
       default: 'planning',
-      index: true,
     },
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
     },
     isCurrent: {
       type: Boolean,
       default: false,
-      index: true,
     },
     externalId: {
       type: Number,
@@ -99,8 +96,7 @@ const AcademicTermSchema = new Schema<IAcademicTerm>(
   { timestamps: true }
 );
 
-// Indexes
-AcademicTermSchema.index({ code: 1 }, { unique: true });
+// Indexes (code unique auto-created via `unique: true`)
 AcademicTermSchema.index({ academicYear: 1, semester: 1 }, { unique: true });
 AcademicTermSchema.index({ status: 1, isCurrent: 1 });
 AcademicTermSchema.index({ registrationStart: 1, registrationEnd: 1 });

@@ -23,13 +23,13 @@ export interface IAssignment extends Document {
 
 const AssignmentSchema = new Schema<IAssignment>(
   {
-    course: { type: Schema.Types.ObjectId, ref: 'Course', required: true, index: true },
+    course: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
     title: { type: String, required: true, trim: true, text: true },
     description: String,
     type: { type: String, enum: ['individual', 'group', 'quiz', 'project'], default: 'individual' },
     maxScore: { type: Number, default: 10, min: 0 },
     weight: { type: Number, default: 1, min: 0 },
-    dueDate: { type: Date, required: true, index: true },
+    dueDate: { type: Date, required: true },
     openDate: Date,
     allowLateSubmission: { type: Boolean, default: false },
     maxLateDays: Number,
@@ -40,7 +40,6 @@ const AssignmentSchema = new Schema<IAssignment>(
       type: String,
       enum: ['draft', 'published', 'closed', 'graded'],
       default: 'draft',
-      index: true,
     },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
@@ -70,8 +69,8 @@ export interface ISubmission extends Document {
 
 const SubmissionSchema = new Schema<ISubmission>(
   {
-    assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true, index: true },
-    student: { type: Schema.Types.ObjectId, ref: 'Student', required: true, index: true },
+    assignment: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true },
+    student: { type: Schema.Types.ObjectId, ref: 'Student', required: true },
     content: String,
     fileUrls: [String],
     score: { type: Number, min: 0 },
@@ -81,7 +80,6 @@ const SubmissionSchema = new Schema<ISubmission>(
       type: String,
       enum: ['submitted', 'late', 'graded', 'returned'],
       default: 'submitted',
-      index: true,
     },
     submittedAt: { type: Date, default: Date.now },
     gradedAt: Date,

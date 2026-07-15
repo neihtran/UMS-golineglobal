@@ -43,7 +43,6 @@ const MajorSchema = new Schema<IMajor>(
       type: Schema.Types.ObjectId,
       ref: 'Department',
       required: true,
-      index: true,
     },
     degreeLevel: {
       type: Number,
@@ -53,18 +52,15 @@ const MajorSchema = new Schema<IMajor>(
     trainingSystem: {
       type: Schema.Types.ObjectId,
       ref: 'TrainingSystem',
-      index: true,
     },
     specialization: {
       type: Schema.Types.ObjectId,
       ref: 'Specialization',
-      index: true,
     },
     status: {
       type: String,
       enum: ['draft', 'pending', 'published', 'archived'],
       default: 'draft',
-      index: true,
     },
     externalId: {
       type: Number,
@@ -79,7 +75,6 @@ const MajorSchema = new Schema<IMajor>(
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
     },
   },
   { timestamps: true }

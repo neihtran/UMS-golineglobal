@@ -42,12 +42,10 @@ const SyncConfigSchema = new Schema<ISyncConfig>(
       type: String,
       required: true,
       default: 'hqnhat',
-      index: true,
     },
     entity: {
       type: String,
       required: true,
-      index: true,
     },
     mode: {
       type: String,

@@ -33,19 +33,16 @@ const AcademicWarningSchema = new Schema<IAcademicWarning>(
       type: Schema.Types.ObjectId,
       ref: 'Student',
       required: true,
-      index: true,
     },
     academicTerm: {
       type: Schema.Types.ObjectId,
       ref: 'AcademicTerm',
       required: true,
-      index: true,
     },
     warningType: {
       type: String,
       enum: ['low_gpa', 'failed_subject', 'insufficient_credit', 'academic_warning'],
       required: true,
-      index: true,
     },
     warningLevel: {
       type: Number,
@@ -77,7 +74,6 @@ const AcademicWarningSchema = new Schema<IAcademicWarning>(
     isActive: {
       type: Boolean,
       default: true,
-      index: true,
     },
     createdBy: {
       type: Schema.Types.ObjectId,

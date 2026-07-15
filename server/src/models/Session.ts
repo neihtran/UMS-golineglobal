@@ -20,16 +20,16 @@ export interface ISession extends Document {
 // ─── Session Schema ─────────────────────────────────────────────────────────
 const SessionSchema = new Schema<ISession>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     token: { type: String, required: true, unique: true },
     refreshToken: String,
     ip: String,
     userAgent: String,
     device: String,
     location: String,
-    isActive: { type: Boolean, default: true, index: true },
+    isActive: { type: Boolean, default: true },
     lastActivityAt: { type: Date, default: Date.now },
-    expiresAt: { type: Date, required: true, index: true },
+    expiresAt: { type: Date, required: true },
   },
   { timestamps: true }
 );

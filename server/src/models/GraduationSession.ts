@@ -29,7 +29,6 @@ const GraduationSessionSchema = new Schema<IGraduationSession>(
       type: String,
       enum: ['draft', 'open', 'closed', 'reviewed'],
       default: 'draft',
-      index: true,
     },
     description: String,
     totalCandidates: { type: Number, default: 0 },

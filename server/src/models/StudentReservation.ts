@@ -28,7 +28,6 @@ const StudentReservationSchema = new Schema<IStudentReservation>(
       type: Schema.Types.ObjectId,
       ref: 'Student',
       required: true,
-      index: true,
     },
     fromDate: {
       type: Date,
@@ -56,7 +55,6 @@ const StudentReservationSchema = new Schema<IStudentReservation>(
       type: String,
       enum: ['pending', 'approved', 'cancelled'],
       default: 'pending',
-      index: true,
     },
     approvedBy: {
       type: Schema.Types.ObjectId,

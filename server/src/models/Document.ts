@@ -24,16 +24,15 @@ const DocumentSchema = new Schema<IDocument>(
     code: { type: String, required: true, unique: true, trim: true },
     title: { type: String, required: true, trim: true, text: true },
     type: { type: String, required: true },
-    folder: { type: Schema.Types.ObjectId, ref: 'DocumentFolder', index: true },
+    folder: { type: Schema.Types.ObjectId, ref: 'DocumentFolder' },
     content: String,
     fileUrl: String,
-    author: { type: Schema.Types.ObjectId, ref: 'User', index: true },
+    author: { type: Schema.Types.ObjectId, ref: 'User' },
     department: { type: Schema.Types.ObjectId, ref: 'Department' },
     status: {
       type: String,
       enum: ['draft', 'pending', 'approved', 'rejected', 'signed', 'archived'],
       default: 'draft',
-      index: true,
     },
     priority: {
       type: String,

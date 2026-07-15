@@ -42,7 +42,6 @@ const TenantSchema = new Schema<ITenant>(
       type: String,
       enum: ['active', 'trial', 'suspended', 'expired'],
       default: 'trial',
-      index: true,
     },
     plan: {
       type: String,
