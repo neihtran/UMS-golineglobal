@@ -117,4 +117,30 @@ export const authController = {
       data: result,
     });
   }),
+
+  // POST /api/auth/register - Create new user (admin only or signup)
+  register: asyncHandler(async (req: Request, res: Response) => {
+    const { email, password, username, displayName, fullName, role } = req.body;
+    const name = displayName || fullName || username || email.split('@')[0];
+
+    const user = await authService.register({
+      email,
+      password,
+      username: username || email.split('@')[0],
+      displayName: name,
+      role: role || 'SINH_VIEN',
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Đăng ký thành công',
+      data: {
+        id: user._id,
+        email: user.email,
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role,
+      },
+    });
+  }),
 };

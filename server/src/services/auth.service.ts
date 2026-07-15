@@ -318,6 +318,37 @@ export class AuthService {
     }
   }
 
+  // Register new user
+  async register(data: {
+    email: string;
+    password: string;
+    username: string;
+    displayName: string;
+    role?: string;
+  }) {
+    const { User } = await import('../models/User.js');
+
+    // Check duplicate
+    const existing = await User.findOne({ email: data.email });
+    if (existing) {
+      const err: any = new Error('Email đã tồn tại');
+      err.statusCode = 409;
+      err.code = 'EMAIL_EXISTS';
+      throw err;
+    }
+
+    const user = await User.create({
+      email: data.email,
+      username: data.username,
+      displayName: data.displayName,
+      password: data.password,  // User.pre('save') will hash automatically
+      role: data.role || 'SINH_VIEN',
+      isActive: true,
+    });
+
+    return user;
+  }
+
   private async logFailedLogin(email: string, ip?: string, userAgent?: string, reason?: string) {
     const { User } = await import('../models/User.js');
     const { AuditLog } = await import('../models/AuditLog.js');
