@@ -12,22 +12,34 @@ export function createApp(): Express {
 
   // ─── Security Middleware ──────────────────────────────────────────────────────
   
-  // Set security HTTP headers
-  app.use(helmet());
-
-  // Enable CORS
+  // Enable CORS — must run BEFORE helmet so security headers don't override
   app.use(cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
       if (!origin) return callback(null, true);
-      if (env.NODE_ENV === 'development' || ALLOWED_ORIGINS.includes(origin)) {
+      // In development, allow all origins (Vite proxies etc.)
+      if (env.NODE_ENV === 'development') return callback(null, true);
+      // Production: check against explicit allowlist
+      if (ALLOWED_ORIGINS.includes(origin) || ALLOWED_ORIGINS.includes('*')) {
         return callback(null, true);
       }
       callback(new Error(`CORS policy violation: origin ${origin} not allowed`));
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
+    maxAge: 86400,
   }));
+
+  // Set security HTTP headers — relax cross-origin policies to allow the API
+  // to be consumed by the Vite dev server and other frontends on different ports
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      crossOriginEmbedderPolicy: false,
+    })
+  );
 
   // ─── Body Parsing ────────────────────────────────────────────────────────────
 
