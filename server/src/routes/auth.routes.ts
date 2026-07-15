@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router } from 'express';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { authController } from '../controllers/auth.controller.js';

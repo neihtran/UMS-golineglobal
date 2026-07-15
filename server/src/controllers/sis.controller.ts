@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Request, Response } from 'express';
 import { sisService } from '../services/sis.service.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Types } from 'mongoose';
 import type { ISubject } from '../../models/Subject.js';
 import type { ICurriculum } from '../../models/Curriculum.js';

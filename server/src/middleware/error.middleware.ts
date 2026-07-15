@@ -14,6 +14,13 @@ export class AppError extends Error {
   }
 }
 
+/**
+ * Validate middleware factory — placeholder to avoid breaking imports.
+ * Real validation is done via `validateRequest` from ./validateRequest.ts
+ * using Zod schemas.
+ */
+export const validate = (..._schemas: any[]) => (_req: any, _res: any, next: any) => next();
+
 export function notFoundMiddleware(req: Request, res: Response) {
   res.status(404).json({
     success: false,

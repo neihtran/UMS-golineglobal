@@ -21,7 +21,7 @@ export function validateRequest(schema: ZodSchema) {
           },
         });
       }
-      next(error);
+      return next(error);
     }
   };
 }

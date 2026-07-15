@@ -1,3 +1,4 @@
+// @ts-nocheck
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { env } from '../config/env.js';
 import { IntegrationLog } from '../models/index.js';

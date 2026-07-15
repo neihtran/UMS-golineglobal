@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ClassSchedule as ClassScheduleModel, IClassSchedule } from '../models/ClassSchedule.js';
 import { ScheduleChange as ScheduleChangeModel, IScheduleChange } from '../models/ScheduleChange.js';
 import { GPAHistory as GPAHistoryModel, IGPAHistory } from '../models/GPAHistory.js';

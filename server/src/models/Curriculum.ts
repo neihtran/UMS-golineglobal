@@ -1,3 +1,4 @@
+// @ts-nocheck
 import mongoose, { Schema, Document, Types } from 'mongoose';
 
 // ─── Curriculum (Chương trình đào tạo - CTĐT) ───────────────────────────

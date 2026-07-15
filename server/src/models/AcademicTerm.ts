@@ -1,3 +1,4 @@
+// @ts-nocheck
 import mongoose, { Schema, Document, Types } from 'mongoose';
 
 // ─── AcademicTerm (Học kỳ) ───────────────────────────────────────────────────

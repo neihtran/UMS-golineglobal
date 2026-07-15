@@ -47,6 +47,10 @@ export const env = {
   HQNHAT_SYNC_CURRICULUMS_CRON: process.env.HQNHAT_SYNC_CURRICULUMS_CRON || '0 5 * * *',
   HQNHAT_SYNC_CLASSES_CRON: process.env.HQNHAT_SYNC_CLASSES_CRON || '*/30 * * * *',
   HQNHAT_SYNC_STUDENTS_CRON: process.env.HQNHAT_SYNC_STUDENTS_CRON || '*/30 * * * *',
+
+  // Alert configuration
+  HQNHAT_ALERT_CONSECUTIVE_FAILURES: parseInt(process.env.HQNHAT_ALERT_CONSECUTIVE_FAILURES || '5', 10),
+  HQNHAT_ALERT_EMAIL: process.env.HQNHAT_ALERT_EMAIL || '',
 };
 
 // Named exports for compatibility

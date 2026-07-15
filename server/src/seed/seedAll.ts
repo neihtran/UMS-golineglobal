@@ -145,7 +145,7 @@ const LETTER_GRADES: Array<'A+'|'A'|'B+'|'B'|'C+'|'C'|'D+'|'D'|'F'> = ['A', 'B+'
 
 function generateStudentData(deptIds: mongoose.Types.ObjectId[], userIds: mongoose.Types.ObjectId[], adminId: mongoose.Types.ObjectId) {
   const names = ['Nguyễn Văn An', 'Trần Thị Bình', 'Lê Hoàng Cường', 'Phạm Thị Dung', 'Hoàng Văn Em', 'Ngô Thị Phượng', 'Đặng Văn Giang', 'Bùi Thị Hoa', 'Cao Văn Inh', 'Đỗ Thị Jun', 'Phan Văn Kha', 'Trương Thị Lan', 'Vũ Văn Minh', 'Đinh Thị Ngọc', 'Lý Văn Phong', 'Mai Thị Quỳnh', 'Nguyễn Văn Rùa', 'Phạm Thị Sương', 'Trần Văn Tài', 'Võ Thị Uyên', 'Trịnh Văn Vang', 'Nguyễn Thị Xuyến', 'Lê Văn Yến', 'Trần Thị Zí', 'Phạm Văn Âu', 'Hoàng Thị Ê', 'Nguyễn Văn Ô', 'Trần Thị Ơ', 'Lê VănƯ', 'Phạm Thị Văn'];
-  const statuses: Array<'studying'|'graduated'|'suspended'|'reserved'> = ['studying', 'studying', 'studying', 'studying', 'graduated', 'suspended', 'reserved'];
+  const statuses: Array<'studying'|'graduated'|'suspended'|'reserved'> = ['studying', 'studying', 'studying', 'studying', 'graduated', 'reserved', 'reserved'];
   const years = [2023, 2024, 2025, 2026];
   return names.map((name, i) => {
     const year = years[i % years.length];
@@ -187,6 +187,7 @@ function generateEnrollmentData(studentIds: mongoose.Types.ObjectId[], courseIds
       const total = parseFloat((midterm * 0.3 + finalScore * 0.7).toFixed(1));
       data.push({
         student: studentIds[studentIdx], course: courseIds[c],
+        academicTerm: 'HK1-2025-2026',
         status: statuses[(c + s) % statuses.length],
         enrollmentDate: new Date('2025-09-01'),
         midtermScore: midterm, finalScore, totalScore: total,

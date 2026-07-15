@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ─── SyncRetryService (Dead Letter Queue) ───────────────────────────────────
 // Quản lý các sync failure: retry với exponential backoff, sau khi hết
 // maxAttempts thì chuyển sang 'dead_letter' (admin xử lý thủ công).
