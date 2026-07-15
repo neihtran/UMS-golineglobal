@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Zap, CheckCircle2 } from 'lucide-react';
+import { Zap, CheckCircle2, Sparkles } from 'lucide-react';
 import { useLogin } from '@/hooks/useAuth';
 import { Button, Input } from '@/components/ui';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function Login() {
   const { t } = useTranslation('common');
   const loginMutation = useLogin();
+  const navigate = useNavigate();
+  const authStore = useAuthStore();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,6 +60,21 @@ export default function Login() {
     setSelectedQuickEmail(account.email);
     setErrors({});
     setApiError(null);
+  };
+
+  // Skip login — bypass authentication with a mock SUPER_ADMIN user
+  const handleSkipLogin = () => {
+    const mockUser = {
+      id: 'demo-user-001',
+      email: 'demo@ums.local',
+      fullName: 'Demo Admin',
+      role: 'SUPER_ADMIN',
+      permissions: ['*'],
+      isActive: true,
+      avatarUrl: undefined,
+    };
+    authStore.login(mockUser, 'demo-access-token', 'demo-refresh-token');
+    navigate('/');
   };
 
   const isLoading = loginMutation.isPending;
@@ -198,6 +216,16 @@ export default function Login() {
             </svg>
             {t('login.ssoButton')}
           </Button>
+
+          {/* Skip login — bypass auth (DEMO MODE) */}
+          <button
+            type="button"
+            onClick={handleSkipLogin}
+            className="w-full rounded-lg border-2 border-dashed border-amber-500/40 bg-amber-500/5 px-4 py-3 text-sm font-semibold text-amber-600 hover:bg-amber-500/10 hover:border-amber-500/60 transition-all flex items-center justify-center gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            Bỏ qua đăng nhập (Demo Mode)
+          </button>
 
           {/* Quick login accounts */}
           <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-4 space-y-3">

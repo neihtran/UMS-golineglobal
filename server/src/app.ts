@@ -46,6 +46,16 @@ export function createApp(): Express {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
 
+  // Explicit OPTIONS handler — ensures preflight returns 204 instead of 405
+  app.options('*', (req, res) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Accept');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '86400');
+    res.sendStatus(204);
+  });
+
   // ─── Raw Body Capture (for webhook signature verification) ──────────────────
   // Must be BEFORE express.json() to capture raw bytes for HMAC verification
   app.use('/api/webhooks', express.json({
