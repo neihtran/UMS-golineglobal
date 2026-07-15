@@ -4,17 +4,10 @@ import { env, PORT } from './config/env.js';
 import { startHqnhatScheduler, stopAllHqnhatJobs } from './jobs/index.js';
 
 async function startServer() {
-  try {
-    // ─── Connect to Database ─────────────────────────────────────────────────
-    console.log('🔄 Connecting to MongoDB...');
-    await connectDatabase();
+  const app = createApp();
 
-    // ─── Create Express App ──────────────────────────────────────────────────
-    const app = createApp();
-
-    // ─── Start Server ─────────────────────────────────────────────────────────
-    const server = app.listen(PORT, () => {
-      console.log(`
+  const server = app.listen(PORT, () => {
+    console.log(`
 ╔═══════════════════════════════════════════════════════════════╗
 ║                                                               ║
 ║   🚀 UMS Backend Server Started Successfully!                ║
@@ -25,52 +18,47 @@ async function startServer() {
 ║   Health:      http://localhost:${PORT}/api/health                ║
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝
-      `);
+    `);
+  });
 
-      // ─── Start Hqnhat Scheduler (nếu enabled) ────────────────────────────
+  connectDatabase()
+    .then(() => {
+      console.log('✅ MongoDB connected');
       startHqnhatScheduler();
+    })
+    .catch((error) => {
+      console.error('⚠️ MongoDB connection failed:', error.message);
+      console.error('⚠️ Server will continue running. Health endpoints available.');
     });
 
-    // ─── Graceful Shutdown ───────────────────────────────────────────────────
-    
-    const shutdown = async (signal: string) => {
-      console.log(`\n📤 Received ${signal}. Shutting down gracefully...`);
-      
-      // Stop scheduler trước
-      stopAllHqnhatJobs();
-      
-      server.close(async () => {
-        console.log('🔒 HTTP server closed');
-        await disconnectDatabase();
-        console.log('👋 Goodbye!');
-        process.exit(0);
-      });
+  const shutdown = async (signal: string) => {
+    console.log(`\n📤 Received ${signal}. Shutting down gracefully...`);
 
-      // Force shutdown after 10 seconds
-      setTimeout(() => {
-        console.error('⚠️ Could not close connections in time, forcefully shutting down');
-        process.exit(1);
-      }, 10000);
-    };
+    stopAllHqnhatJobs();
 
-    process.on('SIGTERM', () => shutdown('SIGTERM'));
-    process.on('SIGINT', () => shutdown('SIGINT'));
-
-    // ─── Unhandled Rejection ─────────────────────────────────────────────────
-    process.on('unhandledRejection', (reason, promise) => {
-      console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+    server.close(async () => {
+      console.log('🔒 HTTP server closed');
+      await disconnectDatabase().catch(() => {});
+      console.log('👋 Goodbye!');
+      process.exit(0);
     });
 
-    // ─── Uncaught Exception ──────────────────────────────────────────────────
-    process.on('uncaughtException', (error) => {
-      console.error('❌ Uncaught Exception:', error);
+    setTimeout(() => {
+      console.error('⚠️ Could not close connections in time, forcefully shutting down');
       process.exit(1);
-    });
+    }, 10000);
+  };
 
-  } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
-  }
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  });
+
+  process.on('uncaughtException', (error) => {
+    console.error('❌ Uncaught Exception:', error);
+  });
 }
 
 startServer();
