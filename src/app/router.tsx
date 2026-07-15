@@ -437,7 +437,13 @@ function PageLoader() {
 
 // ─── Auth guard ─────────────────────────────────────────────────────────────
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuthStore();
+  const { isAuthenticated, isLoading, user } = useAuthStore();
+
+  // DEMO MODE — auto-authenticate SUPER_ADMIN to bypass login
+  if (user && user.role === 'SUPER_ADMIN') {
+    return <>{children}</>;
+  }
+
   if (isLoading) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
   return <>{children}</>;
@@ -454,6 +460,12 @@ function getRoleDashboard(role?: string): string {
 
 function RoleRoute({ children, roles }: { children: React.ReactNode; roles?: User['role'][] }) {
   const { user, isLoading } = useAuthStore();
+
+  // DEMO MODE — SUPER_ADMIN bypasses all role checks
+  if (user && user.role === 'SUPER_ADMIN') {
+    return <>{children}</>;
+  }
+
   const hasRole = (checkRoles: User['role'] | User['role'][]): boolean => {
     if (!user) return false;
     const list = Array.isArray(checkRoles) ? checkRoles : [checkRoles];

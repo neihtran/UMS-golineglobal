@@ -11,7 +11,7 @@ export default function Login() {
   const { t } = useTranslation('common');
   const loginMutation = useLogin();
   const navigate = useNavigate();
-  const authStore = useAuthStore();
+  const login = useAuthStore((s) => s.login);
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -73,8 +73,11 @@ export default function Login() {
       isActive: true,
       avatarUrl: undefined,
     };
-    authStore.login(mockUser, 'demo-access-token', 'demo-refresh-token');
-    navigate('/');
+    login(mockUser, 'demo-access-token', 'demo-refresh-token');
+    // Use setTimeout to ensure zustand state updates before navigation
+    setTimeout(() => {
+      navigate('/dashboard/admin');
+    }, 50);
   };
 
   const isLoading = loginMutation.isPending;
