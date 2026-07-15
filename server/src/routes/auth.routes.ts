@@ -1,16 +1,33 @@
 import { Router } from 'express';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 import { authController } from '../controllers/auth.controller.js';
-import { authRateLimiter } from '../config/rateLimit.js';
-import { validate } from '../middleware/error.middleware.js';
-import { loginSchema, refreshTokenSchema, mfaVerifySchema } from '../validators/auth.validator.js';
+import { validateRequest } from '../middleware/validateRequest.js';
+import { loginSchema, registerSchema } from '../validators/auth.validator.js';
 
 const router = Router();
 
-// Public routes (with rate limiting)
-router.post('/login', authRateLimiter, validate(loginSchema), authController.login);
-router.post('/mfa', authRateLimiter, validate(mfaVerifySchema), authController.verifyMfa);
-router.post('/refresh', authRateLimiter, validate(refreshTokenSchema), authController.refreshToken);
+// POST /api/auth/login
+router.post('/login', validateRequest(loginSchema), asyncHandler(authController.login));
 
-// Protected routes - handled in routes/index.ts with auth middleware
+// POST /api/auth/register
+router.post('/register', validateRequest(registerSchema), asyncHandler(authController.register));
+
+// POST /api/auth/refresh
+router.post('/refresh', asyncHandler(authController.refreshToken));
+
+// POST /api/auth/mfa/verify
+router.post('/mfa/verify', asyncHandler(authController.verifyMfa));
+
+// POST /api/auth/logout
+router.post('/logout', asyncHandler(authController.logout));
+
+// GET /api/auth/me
+router.get('/me', asyncHandler(authController.getCurrentUser));
+
+// POST /api/auth/mfa/setup
+router.post('/mfa/setup', asyncHandler(authController.setupMfa));
+
+// POST /api/auth/mfa/enable
+router.post('/mfa/enable', asyncHandler(authController.enableMfa));
 
 export default router;

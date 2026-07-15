@@ -130,6 +130,11 @@ const integrationFactory = new IntegrationFactory({
   csdlApiKey: process.env.CSDL_API_KEY,
   khoBacUrl: process.env.KHOBAC_URL,
   khoBacApiKey: process.env.KHOBAC_API_KEY,
+  // Hqnhat integration (Sprint 1)
+  hqnhatUrl: process.env.HQNHAT_API_URL,
+  hqnhatToken: process.env.HQNHAT_API_TOKEN,
+  hqnhatUsername: process.env.HQNHAT_API_USERNAME,
+  hqnhatPassword: process.env.HQNHAT_API_PASSWORD,
 });
 
 export const integrationRoutes = {

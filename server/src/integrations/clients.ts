@@ -209,6 +209,11 @@ export interface IntegrationConfig {
   csdlApiKey?: string;
   khoBacUrl?: string;
   khoBacApiKey?: string;
+  // ─── Hqnhat ─────────────────────────────────────────────────────────────
+  hqnhatUrl?: string;
+  hqnhatToken?: string;
+  hqnhatUsername?: string;
+  hqnhatPassword?: string;
 }
 
 export class IntegrationFactory {
@@ -217,6 +222,7 @@ export class IntegrationFactory {
   private vgca?: VGCAClient;
   private csdl?: CSDLVanBangClient;
   private khoBac?: KhoBacClient;
+  private hqnhat?: import('./hqnhat.js').HqnhatApiClient;
 
   constructor(config: IntegrationConfig) {
     if (config.hemisUrl && config.hemisApiKey) {
@@ -234,6 +240,17 @@ export class IntegrationFactory {
     if (config.khoBacUrl && config.khoBacApiKey) {
       this.khoBac = new KhoBacClient(config.khoBacUrl, config.khoBacApiKey);
     }
+    // Hqnhat requires at least URL
+    if (config.hqnhatUrl && (config.hqnhatToken || (config.hqnhatUsername && config.hqnhatPassword))) {
+      // Lazy import để tránh circular dependency
+      const { HqnhatApiClient } = require('./hqnhat.js') as typeof import('./hqnhat.js');
+      this.hqnhat = new HqnhatApiClient({
+        baseUrl: config.hqnhatUrl,
+        token: config.hqnhatToken,
+        username: config.hqnhatUsername,
+        password: config.hqnhatPassword,
+      });
+    }
   }
 
   getHEMIS() { return this.hemis; }
@@ -241,18 +258,20 @@ export class IntegrationFactory {
   getVGCA() { return this.vgca; }
   getCSDLVanBang() { return this.csdl; }
   getKhoBac() { return this.khoBac; }
+  getHqnhat() { return this.hqnhat; }
 
   isConfigured() {
-    return !!(this.hemis || this.vneid || this.vgca || this.csdl || this.khoBac);
+    return !!(this.hemis || this.vneid || this.vgca || this.csdl || this.khoBac || this.hqnhat);
   }
 
   getActiveIntegrations() {
-    const active = [];
+    const active: string[] = [];
     if (this.hemis) active.push('HEMIS');
     if (this.vneid) active.push('VNeID');
     if (this.vgca) active.push('VGCA');
     if (this.csdl) active.push('CSDL_VanBang');
     if (this.khoBac) active.push('KhoBac');
+    if (this.hqnhat) active.push('Hqnhat');
     return active;
   }
 }

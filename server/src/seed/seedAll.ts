@@ -16,6 +16,8 @@ import {
   Course,
   Enrollment,
   Curriculum,
+  GraduationSession,
+  Internship,
   DocumentModel,
   DocumentFolder,
   Tuition,
@@ -126,6 +128,19 @@ const COURSE_DATA = [
   { code: 'EDU1001-2025-1', name: 'Tâm lý học đại cương - HK1 2025-2026', semester: 1, academicYear: '2025-2026', schedule: 'Thứ 6 (07:00-11:00)', room: 'G101', maxStudents: 80, status: 'open', startDate: new Date('2025-09-01'), endDate: new Date('2026-01-15') },
 ];
 
+const GRADUATION_SESSION_DATA = [
+  { name: 'Đợt tốt nghiệp tháng 6/2026', semester: 'HK2', academicYear: '2025-2026', openDate: new Date('2026-05-01'), closeDate: new Date('2026-05-31'), reviewDate: new Date('2026-06-15'), status: 'open', description: 'Đợt tốt nghiệp tháng 6 năm học 2025-2026' },
+  { name: 'Đợt tốt nghiệp tháng 1/2026', semester: 'HK1', academicYear: '2025-2026', openDate: new Date('2025-12-01'), closeDate: new Date('2025-12-31'), reviewDate: new Date('2026-01-10'), status: 'closed', description: 'Đợt tốt nghiệp tháng 1 năm học 2025-2026' },
+  { name: 'Đợt tốt nghiệp tháng 8/2025', semester: 'HK3', academicYear: '2024-2025', openDate: new Date('2025-07-01'), closeDate: new Date('2025-07-31'), reviewDate: new Date('2025-08-10'), status: 'reviewed', description: 'Đợt tốt nghiệp hè năm học 2024-2025' },
+];
+
+const INTERNSHIP_DATA = [
+  { studentCode: 'SV-23-0001', studentName: 'Nguyễn Văn An', className: '21T1', major: 'Công nghệ Thông tin', company: 'FPT Software', position: 'Thực tập sinh Backend', location: 'TP.HCM', startDate: new Date('2026-01-15'), endDate: new Date('2026-06-30'), supervisor: 'Nguyễn Văn Minh', supervisorPhone: '0901234567', supervisorEmail: 'nvminh@fpt.com.vn', status: 'in_progress', progress: 75, reportSubmitted: false, description: 'Thực tập vị trí Backend Developer tại FPT Software' },
+  { studentCode: 'SV-24-0002', studentName: 'Trần Thị Bình', className: '21T1', major: 'Công nghệ Thông tin', company: 'Viettel Solutions', position: 'Thực tập sinh QA', location: 'Hà Nội', startDate: new Date('2026-01-15'), endDate: new Date('2026-06-30'), supervisor: 'Trần Thu Hà', supervisorPhone: '0912345678', supervisorEmail: 'tth@viettel.com.vn', status: 'completed', progress: 100, reportSubmitted: true, grade: 8.5, description: 'Thực tập vị trí QA tại Viettel Solutions' },
+  { studentCode: 'SV-25-0003', studentName: 'Lê Hoàng Cường', className: '22T1', major: 'Công nghệ Thông tin', company: 'VNG Corporation', position: 'Thực tập sinh Game Developer', location: 'TP.HCM', startDate: new Date('2026-02-01'), endDate: new Date('2026-07-31'), supervisor: 'Lê Thị Lan', supervisorPhone: '0923456789', supervisorEmail: 'ltl@vng.com.vn', status: 'in_progress', progress: 40, reportSubmitted: false, description: 'Thực tập vị trí Game Developer tại VNG Corporation' },
+  { studentCode: 'SV-26-0004', studentName: 'Phạm Thị Dung', className: '22T2', major: 'Công nghệ Thông tin', company: 'CMC Corporation', position: 'Thực tập sinh DevOps', location: 'Hà Nội', startDate: new Date('2026-01-01'), endDate: new Date('2026-06-30'), supervisor: 'Phạm Đức Long', supervisorPhone: '0934567890', supervisorEmail: 'pdl@cmc.com.vn', status: 'registered', progress: 0, reportSubmitted: false, description: 'Thực tập vị trí DevOps tại CMC Corporation' },
+];
+
 const LETTER_GRADES: Array<'A+'|'A'|'B+'|'B'|'C+'|'C'|'D+'|'D'|'F'> = ['A', 'B+', 'B', 'C+', 'C', 'D', 'F'];
 
 function generateStudentData(deptIds: mongoose.Types.ObjectId[], userIds: mongoose.Types.ObjectId[], adminId: mongoose.Types.ObjectId) {
@@ -136,7 +151,7 @@ function generateStudentData(deptIds: mongoose.Types.ObjectId[], userIds: mongoo
     const year = years[i % years.length];
     const yearSuffix = year.toString().slice(-2);
     const code = `SV-${yearSuffix}-${String(i + 1).padStart(4, '0')}`;
-    const userId = i < userIds.length ? userIds[i] : adminId;
+    const userId = i < Math.min(userIds.length, names.length) ? userIds[i] : undefined;
     return {
       code, name,
       dob: new Date(`${1998 + (i % 8)}-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}`),
@@ -152,7 +167,9 @@ function generateStudentData(deptIds: mongoose.Types.ObjectId[], userIds: mongoo
       enrollmentDate: new Date(`${year}-09-01`),
       gpa: i % 7 !== 5 ? parseFloat((2.5 + (i % 15) * 0.1).toFixed(2)) : undefined,
       totalCredits: i % 7 !== 5 ? 40 + (i % 60) : undefined,
-      user: userId, createdBy: adminId, updatedBy: adminId,
+      user: userId,
+      createdBy: adminId,
+      updatedBy: adminId,
     };
   });
 }
@@ -410,11 +427,34 @@ async function seedAll() {
     code: 'CTĐT-CNTT-2025', name: 'Chương trình đào tạo Công nghệ Thông tin 2025',
     department: cnnttId, degreeType: 'Cử nhân' as const, durationYears: 4, totalCredits: 120,
     subjects: subjectIds.slice(0, 10).map((sid, i) => ({ subject: sid, semester: Math.floor(i / 3) + 1, isRequired: i < 8 })),
-    effectiveYear: 2025, status: 'active' as const,
+    year: 2025, status: 'active' as const,
     description: 'CTĐT đào tạo cử nhân CNTT theo chuẩn AUN-QA',
     createdBy: adminId, updatedBy: adminId,
   }]);
   console.log('   ✅ 1 curriculum\n');
+
+  // 10b. Graduation Sessions
+  console.log('📦 [10b/22] Graduation Sessions...');
+  await GraduationSession.insertMany(GRADUATION_SESSION_DATA.map((s, i) => ({
+    ...s, totalCandidates: i === 0 ? 15 : 0, createdBy: adminId, updatedBy: adminId,
+  })));
+  console.log(`   ✅ ${GRADUATION_SESSION_DATA.length} graduation sessions\n`);
+
+  // 10c. Internships
+  console.log('📦 [10c/22] Internships...');
+  const internshipDeptIds = [cnnttId, ktId];
+  const internshipRecords = await Promise.all(INTERNSHIP_DATA.map(async (int, i) => {
+    const student = await Student.findOne({ code: int.studentCode });
+    return {
+      ...int,
+      student: student ? student._id : undefined,
+      department: internshipDeptIds[i % internshipDeptIds.length],
+      createdBy: adminId,
+      updatedBy: adminId,
+    };
+  }));
+  await Internship.insertMany(internshipRecords);
+  console.log(`   ✅ ${INTERNSHIP_DATA.length} internships\n`);
 
   // 11. Document Folders + Documents
   console.log('📦 [11/20] Documents & Folders...');
@@ -581,6 +621,8 @@ async function seedAll() {
     ['Students', studentRawData.length],
     ['Enrollments', enrollmentData.length],
     ['Curricula', 1],
+    ['Graduation Sessions', GRADUATION_SESSION_DATA.length],
+    ['Internships', INTERNSHIP_DATA.length],
     ['Document Folders', folders.length],
     ['Documents', DOC_DATA.length],
     ['Tuitions', tuitionData.length],

@@ -1,163 +1,282 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Download, Edit2, Eye } from 'lucide-react';
+import { Download, Plus, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Input, Badge,
-  Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell,
-  TablePagination, TableEmpty,
+  Button,
+  Badge,
+  Card,
+  ConfirmModal,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeadCell,
+  TableCell,
+  TablePagination,
+  ActionButtons,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { LoadingState } from '@/components/data-display/LoadingState';
+import { EmptyState } from '@/components/data-display/EmptyState';
 import { usePagination } from '@/hooks';
-
-type SubjectType = 'theory' | 'practice' | 'project' | 'internship';
-type SubjectStatus = 'active' | 'inactive';
-
-const MOCK_SUBJECTS = [
-  { code: 'INT1005', name: 'Nhập môn Tin học', credits: 3, semester: 1, type: 'theory' as SubjectType, dept: 'Khoa CNTT', status: 'active' as SubjectStatus },
-  { code: 'INT2201', name: 'Cấu trúc dữ liệu', credits: 4, semester: 2, type: 'theory' as SubjectType, dept: 'Khoa CNTT', status: 'active' as SubjectStatus },
-  { code: 'INT3110', name: 'Cơ sở dữ liệu', credits: 4, semester: 3, type: 'theory' as SubjectType, dept: 'Khoa CNTT', status: 'active' as SubjectStatus },
-  { code: 'INT3201', name: 'Mạng máy tính', credits: 3, semester: 3, type: 'practice' as SubjectType, dept: 'Khoa CNTT', status: 'active' as SubjectStatus },
-  { code: 'INT3301', name: 'Lập trình hướng đối tượng', credits: 4, semester: 2, type: 'practice' as SubjectType, dept: 'Khoa CNTT', status: 'active' as SubjectStatus },
-  { code: 'INT3401', name: 'Trí tuệ nhân tạo', credits: 3, semester: 5, type: 'theory' as SubjectType, dept: 'Khoa CNTT', status: 'active' as SubjectStatus },
-  { code: 'INT3501', name: 'An toàn thông tin', credits: 3, semester: 4, type: 'theory' as SubjectType, dept: 'Khoa CNTT', status: 'inactive' as SubjectStatus },
-  { code: 'INT4001', name: 'Đồ án tốt nghiệp', credits: 10, semester: 8, type: 'project' as SubjectType, dept: 'Khoa CNTT', status: 'active' as SubjectStatus },
-  { code: 'GEN1011', name: 'Toán cao cấp A1', credits: 4, semester: 1, type: 'theory' as SubjectType, dept: 'Khoa Khoa học', status: 'active' as SubjectStatus },
-  { code: 'GEN1012', name: 'Tiếng Anh A1', credits: 3, semester: 1, type: 'practice' as SubjectType, dept: 'Khoa Ngoại ngữ', status: 'active' as SubjectStatus },
-  { code: 'GEN2011', name: 'Xác suất thống kê', credits: 3, semester: 3, type: 'theory' as SubjectType, dept: 'Khoa Khoa học', status: 'active' as SubjectStatus },
-  { code: 'INT4002', name: 'Thực tập tốt nghiệp', credits: 5, semester: 8, type: 'internship' as SubjectType, dept: 'Khoa CNTT', status: 'active' as SubjectStatus },
-];
-
-const TYPE_CONFIG: Record<SubjectType, { variant: 'info' | 'accent' | 'warning' | 'primary'; labelKey: string }> = {
-  theory: { variant: 'info', labelKey: 'subject.type.lyThuyet' },
-  practice: { variant: 'accent', labelKey: 'subject.type.thucHanh' },
-  project: { variant: 'warning', labelKey: 'subject.type.doAn' },
-  internship: { variant: 'primary', labelKey: 'subject.type.thucTap' },
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  'theory': 'Lý thuyết',
-  'practice': 'Thực hành',
-  'project': 'Đồ án',
-  'internship': 'Thực tập',
-};
-
-const DEPARTMENTS = ['Tất cả', 'Khoa CNTT', 'Khoa Kinh tế', 'Khoa Luật', 'Khoa Ngoại ngữ', 'Khoa Sư phạm', 'Khoa Y dược', 'Khoa Khoa học'];
-const TYPE_OPTIONS = ['Tất cả', 'Lý thuyết', 'Thực hành', 'Đồ án', 'Thực tập'];
+import { useSubjectList, useDeleteSubject, type Subject } from '@/hooks/useSis';
+import { useDepartmentList } from '@/hooks/useHrm';
+import { useRole } from '@/hooks/usePermission';
+import { ROLES } from '@/constants/modules';
 
 export default function SubjectList() {
   const { t } = useTranslation('sis');
   const navigate = useNavigate();
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
-  const [search, setSearch] = useState('');
-  const [dept, setDept] = useState('Tất cả');
-  const [type, setType] = useState('Tất cả');
 
-  const filtered = MOCK_SUBJECTS.filter((s) => {
-    const matchSearch = !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.code.toLowerCase().includes(search.toLowerCase());
-    const matchDept = dept === 'Tất cả' || s.dept === dept;
-    const typeLabel = TYPE_LABELS[s.type];
-    const matchType = type === 'Tất cả' || typeLabel === type;
-    return matchSearch && matchDept && matchType;
+  const canEdit = useRole([ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]);
+  const canDelete = useRole([ROLES.ADMIN]);
+
+  const [search, setSearch] = useState('');
+  const [department, setDepartment] = useState('');
+  const [status, setStatus] = useState<'active' | 'inactive' | ''>('');
+  const [pendingDelete, setPendingDelete] = useState<Subject | null>(null);
+
+  const { data, isLoading, isError, refetch } = useSubjectList({ pageSize: 200 });
+  const { data: deptResp } = useDepartmentList({ isActive: true });
+  const deleteMutation = useDeleteSubject();
+
+  const items: Subject[] = useMemo(
+    () => ((data as any)?.data ?? []) as Subject[],
+    [data]
+  );
+
+  const departments = useMemo(
+    () => ((deptResp as any)?.data ?? []) as Array<{ _id: string; name: string; code: string }>,
+    [deptResp]
+  );
+
+  const filtered = items.filter((s) => {
+    const q = search.toLowerCase();
+    const matchSearch = !q || s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q);
+    const subjectDeptId =
+      typeof s.department === 'object' && s.department ? (s.department as any)._id : s.department;
+    const matchDept = !department || subjectDeptId === department;
+    const matchStatus = !status || (status === 'active' ? s.isActive : !s.isActive);
+    return matchSearch && matchDept && matchStatus;
   });
 
-  const paged = filtered.slice((pagination.page - 1) * pagination.pageSize, pagination.page * pagination.pageSize);
+  const paged = filtered.slice(
+    (pagination.page - 1) * pagination.pageSize,
+    pagination.page * pagination.pageSize
+  );
+
+  const handleConfirmDelete = () => {
+    if (!pendingDelete) return;
+    deleteMutation.mutate(pendingDelete._id, {
+      onSettled: () => setPendingDelete(null),
+    });
+  };
 
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('subject.title')}
-        description={t('subject.description')}
+        description={t('subject.description', { count: filtered.length })}
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
-          { label: t('curriculum.breadcrumb.list'), href: '/sis/chuong-trinh-dao-tao' },
           { label: t('subject.breadcrumb.list') },
         ]}
         actions={
           <>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('subject.export')}</Button>
-            <Button leftIcon={<Plus className="h-4 w-4" />} onClick={() => window.location.href = '/sis/chuong-trinh-dao-tao/mon-hoc/tao'}>{t('subject.add')}</Button>
+            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>
+              {t('subject.export')}
+            </Button>
+            {canEdit && (
+              <Button
+                leftIcon={<Plus className="h-4 w-4" />}
+                onClick={() => navigate('/sis/chuong-trinh-dao-tao/mon-hoc/tao')}
+              >
+                {t('subject.add')}
+              </Button>
+            )}
           </>
         }
       />
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-end gap-3">
-        <Input
-          placeholder={t('subject.filter.searchPlaceholder')}
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          wrapperClassName="w-64"
+      <Card>
+        <div className="px-5 pt-5 pb-4 border-b border-[rgb(var(--border)/0.6)] flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-[200px]">
+            <label className="mb-1.5 block text-xs font-medium text-[rgb(var(--text-secondary))]">
+              Tìm kiếm
+            </label>
+            <input
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              placeholder={t('subject.filter.searchPlaceholder')}
+              className="h-9 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))]/40"
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-[rgb(var(--text-secondary))]">
+              Khoa phụ trách
+            </label>
+            <select
+              value={department}
+              onChange={(e) => {
+                setDepartment(e.target.value);
+                setPage(1);
+              }}
+              className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))]/40"
+            >
+              <option value="">Tất cả</option>
+              {departments.map((d) => (
+                <option key={d._id} value={d._id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-[rgb(var(--text-secondary))]">
+              Trạng thái
+            </label>
+            <select
+              value={status}
+              onChange={(e) => {
+                setStatus(e.target.value as 'active' | 'inactive' | '');
+                setPage(1);
+              }}
+              className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))]/40"
+            >
+              <option value="">Tất cả</option>
+              <option value="active">Hoạt động</option>
+              <option value="inactive">Ngừng sử dụng</option>
+            </select>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="px-5 py-8">
+            <LoadingState message="Đang tải danh sách môn học..." />
+          </div>
+        ) : isError ? (
+          <div className="px-5 py-10">
+            <EmptyState
+              icon={<BookOpen className="h-12 w-12" />}
+              title="Không thể tải dữ liệu"
+              description="Vui lòng kiểm tra kết nối và thử lại."
+              action={
+                <Button variant="outline" onClick={() => refetch()}>
+                  Thử lại
+                </Button>
+              }
+            />
+          </div>
+        ) : paged.length === 0 ? (
+          <div className="px-5 py-10">
+            <EmptyState
+              icon={<BookOpen className="h-12 w-12" />}
+              title={search || department || status ? 'Không tìm thấy môn học' : 'Chưa có môn học nào'}
+              description={
+                search || department || status
+                  ? 'Thử thay đổi bộ lọc để xem thêm kết quả.'
+                  : 'Bắt đầu bằng cách thêm môn học đầu tiên.'
+              }
+              action={
+                canEdit &&
+                !search &&
+                !department &&
+                !status && (
+                  <Button
+                    leftIcon={<Plus className="h-4 w-4" />}
+                    onClick={() => navigate('/sis/chuong-trinh-dao-tao/mon-hoc/tao')}
+                  >
+                    Thêm môn học
+                  </Button>
+                )
+              }
+            />
+          </div>
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeadCell>Mã môn</TableHeadCell>
+                <TableHeadCell>Tên môn học</TableHeadCell>
+                <TableHeadCell>Tín chỉ</TableHeadCell>
+                <TableHeadCell>Giờ LT</TableHeadCell>
+                <TableHeadCell>Giờ TH</TableHeadCell>
+                <TableHeadCell>Khoa phụ trách</TableHeadCell>
+                <TableHeadCell>Trạng thái</TableHeadCell>
+                <TableHeadCell className="text-right min-w-[120px]">Thao tác</TableHeadCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {paged.map((s) => {
+                const deptName =
+                  typeof s.department === 'object' && s.department
+                    ? (s.department as any).name
+                    : '';
+                return (
+                  <TableRow key={s._id} className="hover:bg-[rgb(var(--bg-hover))]">
+                    <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">
+                      {s.code}
+                    </TableCell>
+                    <TableCell className="font-medium text-[rgb(var(--text-primary))]">
+                      {s.name}
+                    </TableCell>
+                    <TableCell className="text-[rgb(var(--text-secondary))]">{s.credits}</TableCell>
+                    <TableCell className="text-[rgb(var(--text-secondary))]">{s.theoryHours ?? 0}</TableCell>
+                    <TableCell className="text-[rgb(var(--text-secondary))]">{s.practiceHours ?? 0}</TableCell>
+                    <TableCell className="text-[rgb(var(--text-secondary))]">{deptName || '—'}</TableCell>
+                    <TableCell>
+                      <Badge variant={s.isActive ? 'success' : 'neutral'} dot size="sm">
+                        {s.isActive ? 'Hoạt động' : 'Ngừng sử dụng'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right min-w-[120px]">
+                      <div className="flex justify-end">
+                        <ActionButtons
+                          viewHref={`/sis/chuong-trinh-dao-tao/mon-hoc/${s._id}`}
+                          editHref={canEdit ? `/sis/chuong-trinh-dao-tao/mon-hoc/${s._id}/sua` : undefined}
+                          onDelete={canDelete ? () => setPendingDelete(s) : undefined}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
+      </Card>
+
+      {paged.length > 0 && (
+        <TablePagination
+          page={pagination.page}
+          pageSize={pagination.pageSize}
+          total={filtered.length}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPage(1);
+          }}
+          pageSizeOptions={[10, 25, 50]}
         />
-        <select
-          value={dept}
-          onChange={(e) => { setDept(e.target.value); setPage(1); }}
-          className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
-        >
-          {DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
-        </select>
-        <select
-          value={type}
-          onChange={(e) => { setType(e.target.value); setPage(1); }}
-          className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
-        >
-          {TYPE_OPTIONS.map((tOpt) => <option key={tOpt}>{tOpt}</option>)}
-        </select>
-      </div>
+      )}
 
-      {/* Table */}
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeadCell>{t('subject.table.maMon')}</TableHeadCell>
-            <TableHeadCell>{t('subject.table.tenMon')}</TableHeadCell>
-            <TableHeadCell>{t('subject.table.tinChi')}</TableHeadCell>
-            <TableHeadCell>{t('subject.table.hocKy')}</TableHeadCell>
-            <TableHeadCell>{t('subject.table.loai')}</TableHeadCell>
-            <TableHeadCell>{t('subject.table.khoaPhuTrach')}</TableHeadCell>
-            <TableHeadCell>{t('subject.table.trangThai')}</TableHeadCell>
-            <TableHeadCell>{t('subject.table.thaoTac')}</TableHeadCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paged.length === 0 ? (
-            <TableEmpty colSpan={8} message={t('subject.empty.title')} />
-          ) : (
-            paged.map((s) => {
-              const tc = TYPE_CONFIG[s.type];
-              return (
-                <TableRow key={s.code}>
-                  <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{s.code}</TableCell>
-                  <TableCell className="font-medium text-[rgb(var(--text-primary))]">{s.name}</TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))]">{s.credits}</TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))]">{s.semester}</TableCell>
-                  <TableCell><Badge variant={tc.variant} size="sm">{t(tc.labelKey)}</Badge></TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))]">{s.dept}</TableCell>
-                  <TableCell>
-                    <Badge variant={s.status === 'active' ? 'success' : 'neutral'} dot size="sm">
-                      {s.status === 'active' ? t('subject.status.active') : t('subject.status.inactive')}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="sm" leftIcon={<Eye className="h-3.5 w-3.5" />} onClick={() => navigate(`/sis/chuong-trinh-dao-tao/mon-hoc/${s.code}`)}>{t('subject.action.xem')}</Button>
-                      <Button variant="ghost" size="sm" leftIcon={<Edit2 className="h-3.5 w-3.5" />} onClick={() => navigate(`/sis/chuong-trinh-dao-tao/mon-hoc/${s.code}/sua`)}>{t('subject.action.sua')}</Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          )}
-        </TableBody>
-      </Table>
-
-      <TablePagination
-        page={pagination.page}
-        pageSize={pagination.pageSize}
-        total={filtered.length}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
-        pageSizeOptions={[10, 25, 50]}
+      <ConfirmModal
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title="Xóa môn học"
+        description={
+          pendingDelete
+            ? `Bạn có chắc chắn muốn xóa môn học "${pendingDelete.name}" (${pendingDelete.code})? Hành động này không thể hoàn tác.`
+            : ''
+        }
+        confirmText={deleteMutation.isPending ? 'Đang xóa...' : 'Xóa'}
+        variant="danger"
       />
     </div>
   );

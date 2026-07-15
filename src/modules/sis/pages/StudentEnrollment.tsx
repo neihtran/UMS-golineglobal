@@ -1,69 +1,141 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Users, Download, UserPlus, CheckCircle2, XCircle } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { Card, CardContent, Badge, Button, Table, TableHead, TableBody, TableRow, TableHeadCell, TableCell } from '@/components/ui';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Download, Plus, CheckCircle2 } from 'lucide-react';
+import {
+  Button,
+  Card,
+  CardContent,
+  Badge,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeadCell,
+  TableCell,
+  TablePagination,
+  ActionButtons,
+} from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { LoadingState } from '@/components/data-display/LoadingState';
+import { EmptyState } from '@/components/data-display/EmptyState';
+import { usePagination } from '@/hooks';
+import {
+  useEnrollmentList,
+  useUpdateEnrollment,
+  type Enrollment,
+} from '@/hooks/useSis';
 
-const ENROLLMENTS = [
-  { id: 'e1', studentId: 'sv001', name: 'Nguyễn Văn An', class: 'CNTT-K60A', major: 'CNTT', semester: 'HK2/2025-2026', status: 'registered', registeredAt: '15/01/2026', approvedBy: 'ThS. Trần Văn B' },
-  { id: 'e2', studentId: 'sv002', name: 'Trần Thị Bình', class: 'KT-K59B', major: 'Kinh tế', semester: 'HK2/2025-2026', status: 'registered', registeredAt: '16/01/2026', approvedBy: 'TS. Lê Văn C' },
-  { id: 'e3', studentId: 'sv003', name: 'Lê Hoàng Cường', class: 'LUAT-K61A', major: 'Luật', semester: 'HK2/2025-2026', status: 'registered', registeredAt: '17/01/2026', approvedBy: 'PGS.TS. Phạm Văn D' },
-  { id: 'e4', studentId: 'sv004', name: 'Phạm Thị Dung', class: 'NN-K60A', major: 'Ngoại ngữ', semester: 'HK2/2025-2026', status: 'pending', registeredAt: '20/01/2026', approvedBy: '—' },
-  { id: 'e5', studentId: 'sv005', name: 'Đặng Minh Tuấn', class: 'SP-K59A', major: 'Sư phạm', semester: 'HK2/2025-2026', status: 'rejected', registeredAt: '18/01/2026', approvedBy: 'TS. Hoàng Văn E' },
-];
+const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral' | 'info'; label: string }> = {
+  enrolled: { variant: 'success', label: 'Đã đăng ký' },
+  in_progress: { variant: 'warning', label: 'Đang học' },
+  completed: { variant: 'info', label: 'Hoàn thành' },
+  failed: { variant: 'error', label: 'Không đạt' },
+  withdrawn: { variant: 'neutral', label: 'Đã rút' },
+};
 
 export default function StudentEnrollment() {
-  const { t } = useTranslation('sis');
+  const navigate = useNavigate();
+  const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('');
 
-  const filtered = ENROLLMENTS.filter((e) => {
-    const matchSearch = !search || e.name.toLowerCase().includes(search.toLowerCase()) || e.studentId.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === 'all' || e.status === statusFilter;
-    return matchSearch && matchStatus;
+  const { data, isLoading, isError, refetch } = useEnrollmentList({
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    search: search || undefined,
+    status: statusFilter || undefined,
   });
 
-  const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' | 'info'; labelKey: string; icon: React.ReactNode }> = {
-    registered: { variant: 'success', labelKey: 'enrollment.status.registered', icon: <CheckCircle2 className="h-3.5 w-3.5" /> },
-    pending: { variant: 'warning', labelKey: 'enrollment.status.pending', icon: null },
-    rejected: { variant: 'error', labelKey: 'enrollment.status.rejected', icon: <XCircle className="h-3.5 w-3.5" /> },
+  const updateMutation = useUpdateEnrollment();
+
+  const items: Enrollment[] = useMemo(
+    () => ((data as any)?.data ?? []) as Enrollment[],
+    [data]
+  );
+
+  const filtered = items;
+  const total = (data as any)?.total ?? filtered.length;
+
+  const stats = useMemo(() => {
+    const totalCount = items.length;
+    const approved = items.filter((e) => e.status === 'enrolled' || e.status === 'in_progress' || e.status === 'completed').length;
+    const pending = items.filter((e) => e.status === 'enrolled').length;
+    return { totalCount, approved, pending };
+  }, [items]);
+
+  const getStudentName = (e: Enrollment) => {
+    if (typeof e.student === 'object' && e.student) return (e.student as any).name ?? '—';
+    return '—';
   };
 
-  const STATS = [
-    { labelKey: 'enrollment.stats.totalEnrollments', value: '4,521', icon: <Users className="h-5 w-5" />, color: 'primary' },
-    { labelKey: 'enrollment.stats.approved', value: '3,892', icon: <CheckCircle2 className="h-5 w-5" />, color: 'success' },
-    { labelKey: 'enrollment.stats.pending', value: '412', icon: <Users className="h-5 w-5" />, color: 'warning' },
-    { labelKey: 'enrollment.stats.rejected', value: '217', icon: <XCircle className="h-5 w-5" />, color: 'error' },
+  const getStudentCode = (e: Enrollment) => {
+    if (typeof e.student === 'object' && e.student) return (e.student as any).code ?? '—';
+    return '—';
+  };
+
+  const getStudentClass = (e: Enrollment) => {
+    if (typeof e.student === 'object' && e.student) return (e.student as any).className ?? '—';
+    return '—';
+  };
+
+  const getCourseName = (e: Enrollment) => {
+    if (typeof e.course === 'object' && e.course) return (e.course as any).name ?? '—';
+    return '—';
+  };
+
+  const getCourseCode = (e: Enrollment) => {
+    if (typeof e.course === 'object' && e.course) return (e.course as any).code ?? '—';
+    return '—';
+  };
+
+  const handleApprove = (e: Enrollment) => {
+    updateMutation.mutate({ id: e._id, data: { status: 'in_progress' } });
+  };
+
+  const handleReject = (e: Enrollment) => {
+    updateMutation.mutate({ id: e._id, data: { status: 'withdrawn' } });
+  };
+
+  const STATS_CARDS = [
+    { label: 'Tổng đăng ký', value: stats.totalCount, icon: <Download className="h-5 w-5" />, color: 'primary' },
+    { label: 'Đang học / Hoàn thành', value: stats.approved, icon: <CheckCircle2 className="h-5 w-5" />, color: 'success' },
+    { label: 'Chờ duyệt', value: stats.pending, icon: <Download className="h-5 w-5" />, color: 'warning' },
   ];
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={t('enrollment.title')}
-        description={t('enrollment.description')}
+        title="Đăng ký học phần"
+        description={`${total} đăng ký trong hệ thống`}
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
-          { label: t('enrollment.title') },
+          { label: 'Đăng ký học phần' },
         ]}
         actions={
           <>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('enrollment.export')}</Button>
-            <Button leftIcon={<UserPlus className="h-4 w-4" />} onClick={() => window.location.href = '/sis/dang-ky-hoc-phan/tao'}>{t('enrollment.create')}</Button>
+            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>
+              Xuất Excel
+            </Button>
+            <Button
+              leftIcon={<Plus className="h-4 w-4" />}
+              onClick={() => navigate('/sis/dang-ky-hoc-phan/tao')}
+            >
+              Tạo đăng ký
+            </Button>
           </>
         }
       />
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {STATS.map((s) => (
-          <Card key={s.labelKey}>
+        {STATS_CARDS.map((s) => (
+          <Card key={s.label}>
             <CardContent className="flex items-center gap-4 p-5">
               <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--${s.color})/0.1)] text-[rgb(var(--${s.color}))]`}>
                 {s.icon}
               </div>
               <div>
-                <p className="text-xs text-[rgb(var(--text-muted))] uppercase tracking-wide">{t(s.labelKey)}</p>
+                <p className="text-xs text-[rgb(var(--text-muted))] uppercase tracking-wide">{s.label}</p>
                 <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-0.5">{s.value}</p>
               </div>
             </CardContent>
@@ -76,69 +148,157 @@ export default function StudentEnrollment() {
         <div className="px-5 pt-4 pb-3 border-b border-[rgb(var(--border)/0.6)] flex flex-wrap items-center gap-3">
           <input
             type="search"
-            placeholder={t('enrollment.filter.searchStudent')}
+            placeholder="Tìm theo tên sinh viên, mã SV, mã học phần..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="h-9 w-64 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm placeholder:text-[rgb(var(--text-muted))] focus:outline-none focus:ring-1"
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            className="h-9 w-64 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm placeholder:text-[rgb(var(--text-muted))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))]/40"
           />
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
             className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2"
           >
-            <option value="all">{t('enrollment.filter.allStatuses')}</option>
-            <option value="registered">{t('enrollment.status.registered')}</option>
-            <option value="pending">{t('enrollment.status.pending')}</option>
-            <option value="rejected">{t('enrollment.status.rejected')}</option>
+            <option value="">Tất cả trạng thái</option>
+            <option value="enrolled">Đã đăng ký</option>
+            <option value="in_progress">Đang học</option>
+            <option value="completed">Hoàn thành</option>
+            <option value="failed">Không đạt</option>
+            <option value="withdrawn">Đã rút</option>
           </select>
-          <span className="text-sm text-[rgb(var(--text-muted))] ml-auto">{filtered.length} {t('enrollment.empty.title')}</span>
+          <span className="text-sm text-[rgb(var(--text-muted))] ml-auto">
+            {filtered.length} kết quả
+          </span>
         </div>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeadCell>{t('enrollment.table.maSV')}</TableHeadCell>
-              <TableHeadCell>{t('enrollment.table.hoTen')}</TableHeadCell>
-              <TableHeadCell>{t('enrollment.table.lop')}</TableHeadCell>
-              <TableHeadCell>{t('enrollment.table.nganh')}</TableHeadCell>
-              <TableHeadCell>{t('enrollment.table.hocKy')}</TableHeadCell>
-              <TableHeadCell>{t('enrollment.table.trangThai')}</TableHeadCell>
-              <TableHeadCell>{t('enrollment.table.ngayDangKy')}</TableHeadCell>
-              <TableHeadCell>{t('enrollment.table.thaoTac')}</TableHeadCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filtered.map((e) => {
-              const sc = STATUS_CONFIG[e.status];
-              return (
-                <TableRow key={e.id}>
-                  <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{e.studentId}</TableCell>
-                  <TableCell className="font-medium text-[rgb(var(--text-primary))]">{e.name}</TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))]">{e.class}</TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))]">{e.major}</TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))]">{e.semester}</TableCell>
-                  <TableCell>
-                    <Badge variant={sc.variant} dot size="sm">{t(sc.labelKey)}</Badge>
-                  </TableCell>
-                  <TableCell className="text-[rgb(var(--text-secondary))] text-xs">{e.registeredAt}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      {e.status === 'pending' && (
-                        <>
-                          <Button variant="ghost" size="sm" className="text-[rgb(var(--success))]">{t('enrollment.action.duyet')}</Button>
-                          <Button variant="ghost" size="sm" className="text-[rgb(var(--error))]">{t('enrollment.action.tuChoi')}</Button>
-                        </>
-                      )}
-                      <Link to={`/sis/dang-ky-hoc-phan/${e.id}`}>
-                        <Button variant="ghost" size="sm">{t('enrollment.action.chiTiet')}</Button>
-                      </Link>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+
+        {isLoading ? (
+          <div className="px-5 py-8">
+            <LoadingState message="Đang tải danh sách đăng ký..." />
+          </div>
+        ) : isError ? (
+          <div className="px-5 py-10">
+            <EmptyState
+              title="Không thể tải dữ liệu"
+              description="Vui lòng kiểm tra kết nối và thử lại."
+              action={
+                <Button variant="outline" onClick={() => refetch()}>
+                  Thử lại
+                </Button>
+              }
+            />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="px-5 py-10">
+            <EmptyState
+              title={search || statusFilter ? 'Không tìm thấy đăng ký' : 'Chưa có đăng ký nào'}
+              description={
+                search || statusFilter
+                  ? 'Thử thay đổi bộ lọc để xem thêm kết quả.'
+                  : 'Bắt đầu bằng cách tạo đăng ký học phần đầu tiên.'
+              }
+              action={
+                !search && !statusFilter && (
+                  <Button
+                    leftIcon={<Plus className="h-4 w-4" />}
+                    onClick={() => navigate('/sis/dang-ky-hoc-phan/tao')}
+                  >
+                    Tạo đăng ký
+                  </Button>
+                )
+              }
+            />
+          </div>
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeadCell>Mã SV</TableHeadCell>
+                <TableHeadCell>Họ tên</TableHeadCell>
+                <TableHeadCell>Lớp</TableHeadCell>
+                <TableHeadCell>Mã HP</TableHeadCell>
+                <TableHeadCell>Học phần</TableHeadCell>
+                <TableHeadCell>Ngày đăng ký</TableHeadCell>
+                <TableHeadCell>Trạng thái</TableHeadCell>
+                <TableHeadCell className="text-right">Thao tác</TableHeadCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filtered.map((e) => {
+                const sc = STATUS_CONFIG[e.status] ?? STATUS_CONFIG['enrolled'];
+                return (
+                  <TableRow key={e._id} className="hover:bg-[rgb(var(--bg-hover))]">
+                    <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">
+                      {getStudentCode(e)}
+                    </TableCell>
+                    <TableCell className="font-medium text-[rgb(var(--text-primary))]">
+                      {getStudentName(e)}
+                    </TableCell>
+                    <TableCell className="text-[rgb(var(--text-secondary))]">
+                      {getStudentClass(e)}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">
+                      {getCourseCode(e)}
+                    </TableCell>
+                    <TableCell className="text-[rgb(var(--text-secondary))]">
+                      {getCourseName(e)}
+                    </TableCell>
+                    <TableCell className="text-[rgb(var(--text-secondary))] text-xs">
+                      {e.enrollmentDate
+                        ? new Date(e.enrollmentDate).toLocaleDateString('vi-VN')
+                        : '—'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={sc.variant as any} dot size="sm">
+                        {sc.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-end gap-1">
+                        {e.status === 'enrolled' && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-[rgb(var(--success))]"
+                              onClick={() => handleApprove(e)}
+                              disabled={updateMutation.isPending}
+                            >
+                              Duyệt
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-[rgb(var(--error))]"
+                              onClick={() => handleReject(e)}
+                              disabled={updateMutation.isPending}
+                            >
+                              Từ chối
+                            </Button>
+                          </>
+                        )}
+                        <ActionButtons viewHref={`/sis/dang-ky-hoc-phan/${e._id}`} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
       </Card>
+
+      {filtered.length > 0 && (
+        <TablePagination
+          page={pagination.page}
+          pageSize={pagination.pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPage(1);
+          }}
+          pageSizeOptions={[10, 25, 50]}
+        />
+      )}
     </div>
   );
 }

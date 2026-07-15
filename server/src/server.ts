@@ -1,6 +1,7 @@
 import { createApp } from './app.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 import { env, PORT } from './config/env.js';
+import { startHqnhatScheduler, stopAllHqnhatJobs } from './jobs/index.js';
 
 async function startServer() {
   try {
@@ -25,12 +26,18 @@ async function startServer() {
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝
       `);
+
+      // ─── Start Hqnhat Scheduler (nếu enabled) ────────────────────────────
+      startHqnhatScheduler();
     });
 
     // ─── Graceful Shutdown ───────────────────────────────────────────────────
     
     const shutdown = async (signal: string) => {
       console.log(`\n📤 Received ${signal}. Shutting down gracefully...`);
+      
+      // Stop scheduler trước
+      stopAllHqnhatJobs();
       
       server.close(async () => {
         console.log('🔒 HTTP server closed');

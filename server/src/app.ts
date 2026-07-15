@@ -30,9 +30,18 @@ export function createApp(): Express {
   }));
 
   // ─── Body Parsing ────────────────────────────────────────────────────────────
-  
+
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
+
+  // ─── Raw Body Capture (for webhook signature verification) ──────────────────
+  // Must be BEFORE express.json() to capture raw bytes for HMAC verification
+  app.use('/api/webhooks', express.json({
+    limit: '10mb',
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf;
+    },
+  }));
 
   // ─── Logging ─────────────────────────────────────────────────────────────────
   

@@ -12,29 +12,19 @@ import {
   TableHeadCell,
   TableCell,
   TablePagination,
-  TableEmpty,
-  DetailModal,
+  Card,
+  ConfirmModal,
+  ActionButtons,
 } from '@/components/ui';
 import { PageHeader } from '@/components/layout';
+import { LoadingState } from '@/components/data-display/LoadingState';
+import { EmptyState } from '@/components/data-display/EmptyState';
 import { usePagination } from '@/hooks';
-import { useDetailModal } from '@/hooks/useDetailModal';
-import StudentDetail from './StudentDetail';
-import StudentEdit from './StudentEdit';
-
-type Status = 'studying' | 'reserved' | 'suspended' | 'graduated' | 'quit';
-
-const MOCK_STUDENTS = [
-  { id: 'sv001', msv: 'SV-2022-0001', name: 'Nguyễn Văn An', dob: '2004-05-12', class: 'CNTT-K60A', major: 'Công nghệ thông tin', dept: 'Khoa CNTT', cohort: '2022', gpa: 3.45, credits: 98, status: 'studying' as Status },
-  { id: 'sv002', msv: 'SV-2022-0002', name: 'Trần Thị Bình', dob: '2004-08-20', class: 'KT-K60A', major: 'Kinh tế', dept: 'Khoa Kinh tế', cohort: '2022', gpa: 3.72, credits: 102, status: 'studying' as Status },
-  { id: 'sv003', msv: 'SV-2023-0001', name: 'Lê Hoàng Nam', dob: '2005-03-05', class: 'CNTT-K61A', major: 'Công nghệ thông tin', dept: 'Khoa CNTT', cohort: '2023', gpa: 2.89, credits: 48, status: 'studying' as Status },
-  { id: 'sv004', msv: 'SV-2021-0001', name: 'Phạm Thu Lan', dob: '2003-11-18', class: 'LUAT-K59', major: 'Luật', dept: 'Khoa Luật', cohort: '2021', gpa: 3.18, credits: 118, status: 'reserved' as Status },
-  { id: 'sv005', msv: 'SV-2022-0003', name: 'Bùi Đình Sơn', dob: '2004-07-30', class: 'NN-K60A', major: 'Ngôn ngữ Anh', dept: 'Khoa Ngoại ngữ', cohort: '2022', gpa: 3.91, credits: 96, status: 'studying' as Status },
-  { id: 'sv006', msv: 'SV-2020-0001', name: 'Đặng Minh Tuấn', dob: '2002-01-22', class: 'CNTT-K58A', major: 'Công nghệ thông tin', dept: 'Khoa CNTT', cohort: '2020', gpa: 3.65, credits: 128, status: 'graduated' as Status },
-  { id: 'sv007', msv: 'SV-2023-0002', name: 'Vũ Thị Hương', dob: '2005-09-14', class: 'SP-K61A', major: 'Sư phạm Toán', dept: 'Khoa Sư phạm', cohort: '2023', gpa: 3.22, credits: 44, status: 'studying' as Status },
-  { id: 'sv008', msv: 'SV-2022-0004', name: 'Hoàng Phương Linh', dob: '2004-12-01', class: 'CNTT-K60B', major: 'Công nghệ thông tin', dept: 'Khoa CNTT', cohort: '2022', gpa: 2.45, credits: 94, status: 'suspended' as Status },
-  { id: 'sv009', msv: 'SV-2021-0002', name: 'Ngô Thanh Mai', dob: '2003-06-08', class: 'Y-K59', major: 'Y khoa', dept: 'Khoa Y dược', cohort: '2021', gpa: 3.58, credits: 120, status: 'studying' as Status },
-  { id: 'sv010', msv: 'SV-2024-0001', name: 'Trịnh Văn Hùng', dob: '2006-02-28', class: 'CNTT-K62A', major: 'Công nghệ thông tin', dept: 'Khoa CNTT', cohort: '2024', gpa: 0, credits: 0, status: 'studying' as Status },
-];
+import { useStudentList, useDeleteStudent, type Student } from '@/hooks/useSis';
+import { useDepartmentList } from '@/hooks/useHrm';
+import StudentCreateModal from './StudentCreateModal';
+import StudentDetailModal from './StudentDetailModal';
+import StudentEditModal from './StudentEditModal';
 
 const GPA_COLOR = (gpa: number) =>
   gpa >= 3.6 ? 'success' : gpa >= 3.0 ? 'info' : gpa >= 2.0 ? 'warning' : 'error';
@@ -43,26 +33,62 @@ export default function StudentList() {
   const { t } = useTranslation('sis');
   const { pagination, setPage, setPageSize } = usePagination({ initialPage: 1, initialPageSize: 10 });
   const [search, setSearch] = useState('');
-  const [dept, setDept] = useState('Tất cả');
-  const [status, setStatus] = useState<Status | 'all'>('all');
+  const [dept, setDept] = useState('');
+  const [status, setStatus] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
-  const { selectedId, openDetail, openEdit, close, isEditMode } = useDetailModal({ size: 'fullscreen' });
-  const selectedStudent = selectedId ? MOCK_STUDENTS.find((s) => s.id === selectedId) : null;
+  const deleteStudent = useDeleteStudent();
 
-  const filtered = MOCK_STUDENTS.filter((s) => {
-    const matchSearch = !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.msv.toLowerCase().includes(search.toLowerCase());
-    const matchDept = dept === 'Tất cả' || s.dept === dept;
-    const matchStatus = status === 'all' || s.status === status;
-    return matchSearch && matchDept && matchStatus;
+  const { data, isLoading, isError, refetch } = useStudentList({
+    page: pagination.page,
+    pageSize: pagination.pageSize,
+    search: search || undefined,
+    department: dept || undefined,
+    status: status || undefined,
   });
 
-  const paged = filtered.slice((pagination.page - 1) * pagination.pageSize, pagination.page * pagination.pageSize);
+  const { data: deptResp } = useDepartmentList({ isActive: true });
+  const departments = (deptResp as any)?.data ?? [];
+
+  const items: Student[] = ((data as any)?.data ?? []) as Student[];
+  const total = (data as any)?.total ?? items.length;
+
+  const paged = items;
+
+  const handleViewDetail = (student: Student) => {
+    setSelectedStudent(student);
+    setShowDetailModal(true);
+  };
+
+  const handleEdit = (student: Student) => {
+    setSelectedStudent(student);
+    setShowEditModal(true);
+  };
+
+  const handleDelete = (student: Student) => {
+    setSelectedStudent(student);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    if (!selectedStudent?._id) return;
+    deleteStudent.mutate(selectedStudent._id, {
+      onSuccess: () => {
+        setShowDeleteConfirm(false);
+        setSelectedStudent(null);
+      },
+    });
+  };
 
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('student.title')}
-        description={t('student.description', { count: filtered.length })}
+        description={`${total} sinh viên trong hệ thống`}
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
           { label: t('student.breadcrumb.list') },
@@ -71,131 +97,213 @@ export default function StudentList() {
           <>
             <Button variant="outline" leftIcon={<Upload className="h-4 w-4" />}>{t('student.import')}</Button>
             <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>{t('student.export')}</Button>
-            <Button leftIcon={<UserPlus className="h-4 w-4" />}>{t('student.add')}</Button>
+            <Button leftIcon={<UserPlus className="h-4 w-4" />} onClick={() => setShowCreateModal(true)}>
+              {t('student.add')}
+            </Button>
           </>
         }
       />
 
-      <div className="flex flex-wrap items-end gap-3">
-        <Input
-          placeholder={t('student.filter.searchPlaceholder')}
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          wrapperClassName="w-64"
-        />
-        <select
-          value={dept}
-          onChange={(e) => { setDept(e.target.value); setPage(1); }}
-          className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
-        >
-          {[t('student.filter.allDepts'), 'Khoa CNTT', 'Khoa Kinh tế', 'Khoa Luật', 'Khoa Ngoại ngữ', 'Khoa Sư phạm', 'Khoa Y dược'].map((d) => <option key={d}>{d}</option>)}
-        </select>
-        <select
-          value={status}
-          onChange={(e) => { setStatus(e.target.value as Status | 'all'); setPage(1); }}
-          className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
-        >
-          <option value="all">{t('student.filter.allStatuses')}</option>
-          <option value="studying">{t('student.status.studying')}</option>
-          <option value="reserved">{t('student.status.reserved')}</option>
-          <option value="suspended">{t('student.status.suspended')}</option>
-          <option value="graduated">{t('student.status.graduated')}</option>
-          <option value="quit">{t('student.status.quit')}</option>
-        </select>
-      </div>
+      {/* Filters */}
+      <Card>
+        <div className="px-5 pt-4 pb-3 border-b border-[rgb(var(--border)/0.6)] flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-[200px]">
+            <label className="mb-1.5 block text-xs font-medium text-[rgb(var(--text-secondary))]">
+              Tìm kiếm
+            </label>
+            <Input
+              placeholder={t('student.filter.searchPlaceholder')}
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            />
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-[rgb(var(--text-secondary))]">
+              Khoa
+            </label>
+            <select
+              value={dept}
+              onChange={(e) => { setDept(e.target.value); setPage(1); }}
+              className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
+            >
+              <option value="">Tất cả khoa</option>
+              {departments.map((d: any) => (
+                <option key={d._id} value={d._id}>{d.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-xs font-medium text-[rgb(var(--text-secondary))]">
+              Trạng thái
+            </label>
+            <select
+              value={status}
+              onChange={(e) => { setStatus(e.target.value); setPage(1); }}
+              className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
+            >
+              <option value="">Tất cả</option>
+              <option value="studying">{t('student.status.studying')}</option>
+              <option value="reserved">{t('student.status.reserved')}</option>
+              <option value="suspended">{t('student.status.suspended')}</option>
+              <option value="graduated">{t('student.status.graduated')}</option>
+              <option value="expelled">Đình chỉ</option>
+            </select>
+          </div>
+          <span className="text-sm text-[rgb(var(--text-muted))] ml-auto">
+            {total} kết quả
+          </span>
+        </div>
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableHeadCell>{t('student.table.stt')}</TableHeadCell>
-            <TableHeadCell>{t('student.table.sinhVien')}</TableHeadCell>
-            <TableHeadCell>{t('student.table.maSV')}</TableHeadCell>
-            <TableHeadCell>{t('student.table.lop')}</TableHeadCell>
-            <TableHeadCell>{t('student.table.nganhKhoa')}</TableHeadCell>
-            <TableHeadCell>{t('student.table.gpa')}</TableHeadCell>
-            <TableHeadCell>{t('student.table.tinChi')}</TableHeadCell>
-            <TableHeadCell>{t('student.table.thaoTac')}</TableHeadCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paged.length === 0 ? (
-            <TableEmpty colSpan={8} message={t('student.empty.title')} />
-          ) : (
-            <>
-            {paged.map((s, i) => (
-                <TableRow key={s.id}>
-                <TableCell className="text-[rgb(var(--text-muted))] tabular-nums">
-                  {(pagination.page - 1) * pagination.pageSize + i + 1}
-                </TableCell>
-                <TableCell>
-                  <button
-                    onClick={() => openDetail(s.id)}
-                    className="flex items-center gap-2.5 hover:text-[rgb(var(--primary))] text-left w-full"
+        {isLoading ? (
+          <div className="px-5 py-8">
+            <LoadingState message="Đang tải danh sách sinh viên..." />
+          </div>
+        ) : isError ? (
+          <div className="px-5 py-10">
+            <EmptyState
+              title="Không thể tải dữ liệu"
+              description="Vui lòng kiểm tra kết nối và thử lại."
+              action={
+                <Button variant="outline" onClick={() => refetch()}>
+                  Thử lại
+                </Button>
+              }
+            />
+          </div>
+        ) : paged.length === 0 ? (
+          <div className="px-5 py-10">
+            <EmptyState
+              title={search || dept || status ? 'Không tìm thấy sinh viên' : 'Chưa có sinh viên nào'}
+              description={
+                search || dept || status
+                  ? 'Thử thay đổi bộ lọc để xem thêm kết quả.'
+                  : 'Bắt đầu bằng cách thêm sinh viên đầu tiên.'
+              }
+              action={
+                !search && !dept && !status && (
+                  <Button
+                    leftIcon={<UserPlus className="h-4 w-4" />}
+                    onClick={() => setShowCreateModal(true)}
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-semibold text-[rgb(var(--primary))]">
-                      {s.name.split(' ').slice(-2).map((n) => n[0]).join('')}
-                    </div>
-                    <div>
-                      <p className="font-medium">{s.name}</p>
-                      <p className="text-xs text-[rgb(var(--text-muted))]">{s.dob}</p>
-                    </div>
-                  </button>
-                </TableCell>
-                <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{s.msv}</TableCell>
-                <TableCell className="text-[rgb(var(--text-secondary))]">{s.class}</TableCell>
-                <TableCell>
-                  <div>
-                    <p className="text-sm text-[rgb(var(--text-primary))]">{s.major}</p>
-                    <p className="text-xs text-[rgb(var(--text-muted))]">{s.dept}</p>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={GPA_COLOR(s.gpa) as 'success' | 'warning' | 'error' | 'info'} className="font-mono">
-                    {s.gpa > 0 ? s.gpa.toFixed(2) : '—'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="font-mono text-sm">{s.credits}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="sm" onClick={() => openDetail(s.id)}>{t('student.action.chiTiet')}</Button>
-                    <Button variant="ghost" size="sm" onClick={() => openEdit(s.id)}>{t('student.action.sua')}</Button>
-                  </div>
-                </TableCell>
+                    Thêm sinh viên
+                  </Button>
+                )
+              }
+            />
+          </div>
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeadCell>STT</TableHeadCell>
+                <TableHeadCell>Họ tên</TableHeadCell>
+                <TableHeadCell>Mã SV</TableHeadCell>
+                <TableHeadCell>Lớp</TableHeadCell>
+                <TableHeadCell>Khoa</TableHeadCell>
+                <TableHeadCell>GPA</TableHeadCell>
+                <TableHeadCell>Tín chỉ</TableHeadCell>
+                <TableHeadCell>Trạng thái</TableHeadCell>
+                <TableHeadCell className="text-center">Thao tác</TableHeadCell>
               </TableRow>
-            ))}
-            </>
-          )}
-        </TableBody>
-      </Table>
+            </TableHead>
+            <TableBody>
+              {paged.map((s, i) => {
+                const deptName = typeof s.department === 'object' && s.department 
+                  ? (s.department as any).name 
+                  : '';
+                
+                const statusLabels: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral' | 'info'; label: string }> = {
+                  studying: { variant: 'success', label: 'Đang học' },
+                  reserved: { variant: 'warning', label: 'Bảo lưu' },
+                  suspended: { variant: 'warning', label: 'Tạm ngưng' },
+                  graduated: { variant: 'info', label: 'Đã tốt nghiệp' },
+                  expelled: { variant: 'error', label: 'Đình chỉ' },
+                };
+                const sc = statusLabels[s.status] ?? statusLabels['studying'];
 
-      <TablePagination
-        page={pagination.page}
-        pageSize={pagination.pageSize}
-        total={filtered.length}
-        onPageChange={setPage}
-        onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
-        pageSizeOptions={[10, 25, 50]}
+                return (
+                  <TableRow key={s._id} className="hover:bg-[rgb(var(--bg-hover))]">
+                    <TableCell className="text-[rgb(var(--text-muted))] tabular-nums">
+                      {(pagination.page - 1) * pagination.pageSize + i + 1}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-xs font-semibold text-[rgb(var(--primary))]">
+                          {s.name.split(' ').slice(-2).map((n) => n[0]).join('')}
+                        </div>
+                        <span className="font-medium text-[rgb(var(--text-primary))]">{s.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-[rgb(var(--text-secondary))]">{s.code}</TableCell>
+                    <TableCell className="text-[rgb(var(--text-secondary))]">{s.className ?? '—'}</TableCell>
+                    <TableCell className="text-sm text-[rgb(var(--text-secondary))]">{deptName || '—'}</TableCell>
+                    <TableCell>
+                      <Badge variant={GPA_COLOR(s.gpa ?? 0) as 'success' | 'warning' | 'error' | 'info'} className="font-mono">
+                        {s.gpa != null && s.gpa > 0 ? s.gpa.toFixed(2) : '—'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-mono text-sm">{s.totalCredits ?? 0}</TableCell>
+                    <TableCell>
+                      <Badge variant={sc.variant} dot size="sm">{sc.label}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <ActionButtons
+                        onView={() => handleViewDetail(s)}
+                        onEdit={() => handleEdit(s)}
+                        onDelete={() => handleDelete(s)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
+      </Card>
+
+      {paged.length > 0 && (
+        <TablePagination
+          page={pagination.page}
+          pageSize={pagination.pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+          pageSizeOptions={[10, 25, 50]}
+        />
+      )}
+
+      {/* Create Student Modal */}
+      <StudentCreateModal
+        open={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
       />
 
-      {/* Detail / Edit Modal */}
-      <DetailModal
-        open={!!selectedId}
-        onClose={close}
-        title={selectedStudent?.name ?? ''}
-        description={selectedStudent ? `${selectedStudent.msv} · ${selectedStudent.class}` : ''}
-        size="fullscreen"
-        footer={
-          <div className="flex items-center justify-end gap-2">
-            <Button variant="outline" onClick={close}>Đóng</Button>
-          </div>
-        }
-      >
-        {isEditMode ? (
-          selectedStudent ? <StudentEdit id={selectedStudent.id} onSuccess={close} /> : null
-        ) : (
-          selectedStudent ? <StudentDetail id={selectedStudent.id} /> : null
-        )}
-      </DetailModal>
+      {/* Detail Student Modal */}
+      <StudentDetailModal
+        open={showDetailModal}
+        onClose={() => { setShowDetailModal(false); setSelectedStudent(null); }}
+        student={selectedStudent}
+      />
+
+      {/* Edit Student Modal */}
+      <StudentEditModal
+        open={showEditModal}
+        onClose={() => { setShowEditModal(false); setSelectedStudent(null); }}
+        student={selectedStudent}
+      />
+
+      {/* Delete Student Confirm */}
+      <ConfirmModal
+        open={showDeleteConfirm}
+        onClose={() => { setShowDeleteConfirm(false); setSelectedStudent(null); }}
+        onConfirm={confirmDelete}
+        title={`Xóa sinh viên "${selectedStudent?.name ?? ''}"?`}
+        description="Hành động này không thể hoàn tác. Sinh viên sẽ bị xóa vĩnh viễn khỏi hệ thống."
+        confirmLabel="Xóa"
+        cancelLabel="Hủy"
+        variant="danger"
+        loading={deleteStudent.isPending}
+      />
     </div>
   );
 }

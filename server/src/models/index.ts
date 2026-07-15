@@ -1,45 +1,63 @@
-// ─── Models Index ─────────────────────────────────────────────────────────────
-// Models (runtime values) + Types (compile-time only)
-// All I* interfaces are TypeScript-only and use `type` re-export
-
-export { User, ROLES, ROLE_HIERARCHY, type Role, type IUser } from './User.js';
-export type { IDepartment } from './Department.js';
-export { Department } from './Department.js';
-export type { IVienChuc } from './VienChuc.js';
-export { VienChuc } from './VienChuc.js';
-export type { ILeaveRequest } from './LeaveRequest.js';
-export { LeaveRequest } from './LeaveRequest.js';
-export type { IAuditLog } from './AuditLog.js';
-export { AuditLog } from './AuditLog.js';
-export type { IRole } from './Role.js';
-export { RoleModel } from './Role.js';
-export type { ITenant } from './Tenant.js';
+// Core models
+export { User, ROLES } from './User.js';
+export { RoleModel as Role } from './Role.js';
 export { Tenant } from './Tenant.js';
-export type { ISession } from './Session.js';
+export { AuditLog } from './AuditLog.js';
 export { Session } from './Session.js';
-export type { IContract } from './Contract.js';
+
+// Department & HR
+export { Department } from './Department.js';
+export { VienChuc } from './VienChuc.js';
+export { LeaveRequest } from './LeaveRequest.js';
 export { Contract } from './Contract.js';
-export type { ISalarySheet } from './SalarySheet.js';
 export { SalarySheet } from './SalarySheet.js';
-export type { IStudent } from './Student.js';
-export { Student } from './Student.js';
-export type { ISubject } from './Subject.js';
+
+// SIS (Student Information System)
 export { Subject } from './Subject.js';
-export type { ICourse } from './Course.js';
 export { Course } from './Course.js';
-export type { IEnrollment } from './Enrollment.js';
 export { Enrollment } from './Enrollment.js';
-export type { ICurriculum } from './Curriculum.js';
+export { Student } from './Student.js';
+export { StudentProfile } from './StudentProfile.js';
 export { Curriculum } from './Curriculum.js';
-export type { IDocument } from './Document.js';
-export { DocumentModel } from './Document.js';
-export type { IDocumentFolder } from './DocumentFolder.js';
-export { DocumentFolder } from './DocumentFolder.js';
-export type { ITuition, IExpense, IBudget } from './Finance.js';
-export { Tuition, Expense, Budget } from './Finance.js';
-export type { IAssignment, ISubmission } from './Learning.js';
+export { CourseGroup } from './CourseGroup.js';
+export { Major } from './Major.js';
+export { StudentClass } from './StudentClass.js';
+export { GraduationSession } from './GraduationSession.js';
+export { Graduation } from './Graduation.js';
+export { Internship } from './Internship.js';
+export { ExternalMapping } from './ExternalMapping.js';
+export { SyncConfig } from './SyncConfig.js';
+export { TrainingSystem } from './TrainingSystem.js';
+export { Specialization } from './Specialization.js';
+export { AcademicTerm } from './AcademicTerm.js';
+export { ClassSchedule } from './ClassSchedule.js';
+export { ScheduleChange } from './ScheduleChange.js';
+export { GPAHistory } from './GPAHistory.js';
+export { AcademicWarning } from './AcademicWarning.js';
+export { StudentLog, createStudentLog } from './StudentLog.js';
+export { StudentStatusHistory } from './StudentStatusHistory.js';
+export { StudentReservation } from './StudentReservation.js';
+export { StudentDropout } from './StudentDropout.js';
+export { StudentMajorChange } from './StudentMajorChange.js';
+export { StudentClassChange } from './StudentClassChange.js';
+export { AdmissionBatch } from './AdmissionBatch.js';
+export { AdmissionStudent } from './AdmissionStudent.js';
+export { SubjectType } from './SubjectType.js';
+export { SubjectPrerequisite } from './SubjectPrerequisite.js';
+export { SubjectCondition } from './SubjectCondition.js';
+
+// LMS & EXAM
 export { Assignment, Submission } from './Learning.js';
-export type { IExam, IExamSubmission, IResearchProject, IKPI, IKtxRoom, IQaEvidence, IWmsTask } from './Modules.js';
+
+// DMS (Documents)
+export { DocumentModel } from './Document.js';
+export { DocumentFolder } from './DocumentFolder.js';
+
+// FIN (Finance)
+export { Tuition, Expense, Budget } from './Finance.js';
+
+// Additional modules (from Modules.ts)
 export { Exam, ExamSubmission, ResearchProject, KPI, KtxRoom, QaEvidence, WmsTask } from './Modules.js';
-export type { IIntegrationLog, IOcrJob, IDceCompetency, IPmsMeeting, IPortalAnnouncement, ILibBook, ILibLoan } from './Stubs.js';
+
+// Other stubs
 export { IntegrationLog, OcrJob, DceCompetency, PmsMeeting, PortalAnnouncement, LibBook, LibLoan } from './Stubs.js';
