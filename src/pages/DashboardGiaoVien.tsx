@@ -94,7 +94,7 @@ export default function DashboardGiaoVien() {
         <div className="absolute right-20 bottom-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/3" />
         <div className="flex items-start justify-between relative">
           <div>
-            <h1 className="text-2xl font-black">Xin chào, {user.name.split(' ').slice(-1)[0]}</h1>
+            <h1 className="text-2xl font-black">Xin chào, {(user.fullName || user.name || 'User').split(' ').slice(-1)[0]}</h1>
             <p className="mt-1 text-sm font-medium text-white/80">
               {ROLE_LABELS[user.role] ?? user.role} — Bảng điều khiển Giảng viên — Học kỳ 2/2026-2027
             </p>
