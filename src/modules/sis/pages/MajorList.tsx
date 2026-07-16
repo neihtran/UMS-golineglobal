@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, RotateCcw, Edit, Trash2, Eye, GraduationCap, Calendar, Clock, Trash2Icon } from 'lucide-react';
+import { Plus, Search, RotateCcw, Edit, Trash2, Eye, BookOpen, Calendar, Clock } from 'lucide-react';
 import {
   Button,
   Input,
@@ -19,12 +19,19 @@ import { FormField } from '@/components/forms';
 import { PageHeader } from '@/components/layout';
 import { usePagination } from '@/hooks';
 import {
-  useHqnhatTrainingSystems,
-  useCreateHqnhatTrainingSystem,
-  useUpdateHqnhatTrainingSystem,
-  useDeleteHqnhatTrainingSystem,
+  useHqnhatMajors,
+  useCreateHqnhatMajor,
+  useUpdateHqnhatMajor,
+  useDeleteHqnhatMajor,
 } from '@/hooks/useHqnhat';
-import type { HqnhatTrainingSystem, HqnhatTrainingSystemCreatePayload } from '@/types/hqnhat.types';
+import type { HqnhatMajor, HqnhatMajorCreatePayload } from '@/types/hqnhat.types';
+
+const DEGREE_LEVEL_OPTIONS = [
+  { value: '', label: 'Tất cả bậc đào tạo' },
+  { value: '1', label: 'Đại học' },
+  { value: '2', label: 'Thạc sĩ' },
+  { value: '3', label: 'Tiến sĩ' },
+];
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Tất cả trạng thái' },
@@ -32,32 +39,41 @@ const STATUS_OPTIONS = [
   { value: '0', label: 'Ngừng hoạt động' },
 ];
 
-export default function TrainingSystemList() {
+function getDegreeLabel(level: number): string {
+  if (level === 1) return 'Đại học';
+  if (level === 2) return 'Thạc sĩ';
+  if (level === 3) return 'Tiến sĩ';
+  return `Bậc ${level}`;
+}
+
+export default function MajorList() {
   const { pagination, setPage, setPageSize } = usePagination({
     initialPage: 1,
     initialPageSize: 10,
   });
 
   const [search, setSearch] = useState('');
+  const [degreeLevel, setDegreeLevel] = useState('');
   const [status, setStatus] = useState('');
 
   const [formModalOpen, setFormModalOpen] = useState(false);
-  const [editing, setEditing] = useState<HqnhatTrainingSystem | null>(null);
-  const [viewing, setViewing] = useState<HqnhatTrainingSystem | null>(null);
-  const [deleting, setDeleting] = useState<HqnhatTrainingSystem | null>(null);
+  const [editing, setEditing] = useState<HqnhatMajor | null>(null);
+  const [deleting, setDeleting] = useState<HqnhatMajor | null>(null);
+  const [viewing, setViewing] = useState<HqnhatMajor | null>(null);
 
-  const { data, isLoading, isError, error, refetch } = useHqnhatTrainingSystems({
+  const { data, isLoading, isError, error, refetch } = useHqnhatMajors({
     page: pagination.page,
     per_page: pagination.pageSize,
     sort_by: 'id',
     sort_direction: 'desc',
     name: search || undefined,
+    degree_level: degreeLevel ? Number(degreeLevel) : undefined,
     status: status === '' ? undefined : (Number(status) as 0 | 1),
   });
 
-  const createMut = useCreateHqnhatTrainingSystem();
-  const updateMut = useUpdateHqnhatTrainingSystem();
-  const deleteMut = useDeleteHqnhatTrainingSystem();
+  const createMut = useCreateHqnhatMajor();
+  const updateMut = useUpdateHqnhatMajor();
+  const deleteMut = useDeleteHqnhatMajor();
 
   const items = data?.data ?? [];
   const meta = data?.meta;
@@ -65,6 +81,7 @@ export default function TrainingSystemList() {
 
   const resetFilters = () => {
     setSearch('');
+    setDegreeLevel('');
     setStatus('');
     setPage(1);
   };
@@ -77,16 +94,16 @@ export default function TrainingSystemList() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Danh sách hệ đào tạo"
-        description={`${total} hệ đào tạo trong hệ thống`}
+        title="Danh sách ngành học"
+        description={`${total} ngành học trong hệ thống`}
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
           { label: 'Danh mục' },
-          { label: 'Hệ đào tạo' },
+          { label: 'Ngành học' },
         ]}
         actions={
           <Button leftIcon={<Plus className="h-4 w-4" />} onClick={openCreate}>
-            Thêm hệ đào tạo
+            Thêm ngành học
           </Button>
         }
       />
@@ -94,7 +111,7 @@ export default function TrainingSystemList() {
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-3">
         <Input
-          placeholder="Tìm theo tên hệ đào tạo..."
+          placeholder="Tìm theo tên ngành..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -104,6 +121,20 @@ export default function TrainingSystemList() {
           wrapperClassName="w-64"
         />
         <select
+          value={degreeLevel}
+          onChange={(e) => {
+            setDegreeLevel(e.target.value);
+            setPage(1);
+          }}
+          className="h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+        >
+          {DEGREE_LEVEL_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+        <select
           value={status}
           onChange={(e) => {
             setStatus(e.target.value);
@@ -112,7 +143,9 @@ export default function TrainingSystemList() {
           className="h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
         >
           {STATUS_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
           ))}
         </select>
         <Button variant="outline" leftIcon={<RotateCcw className="h-4 w-4" />} onClick={resetFilters}>
@@ -125,8 +158,9 @@ export default function TrainingSystemList() {
         <TableHead>
           <TableRow>
             <TableHeadCell className="w-16">STT</TableHeadCell>
-            <TableHeadCell>Mã hệ</TableHeadCell>
-            <TableHeadCell>Tên hệ đào tạo</TableHeadCell>
+            <TableHeadCell>Mã ngành</TableHeadCell>
+            <TableHeadCell>Tên ngành</TableHeadCell>
+            <TableHeadCell>Bậc đào tạo</TableHeadCell>
             <TableHeadCell>Mô tả</TableHeadCell>
             <TableHeadCell>Trạng thái</TableHeadCell>
             <TableHeadCell className="w-40 text-right">Thao tác</TableHeadCell>
@@ -137,18 +171,22 @@ export default function TrainingSystemList() {
             <TableSkeleton rows={5} />
           ) : isError ? (
             <tr>
-              <td colSpan={6} className="py-12 text-center text-sm text-[rgb(var(--text-muted))]">
+              <td colSpan={7} className="py-12 text-center text-sm text-[rgb(var(--text-muted))]">
                 <div className="space-y-2">
                   <p className="text-red-500">{(error as Error)?.message || 'Lỗi không xác định'}</p>
-                  <Button variant="outline" size="sm" onClick={() => refetch()}>Thử lại</Button>
+                  <Button variant="outline" size="sm" onClick={() => refetch()}>
+                    Thử lại
+                  </Button>
                 </div>
               </td>
             </tr>
           ) : items.length === 0 ? (
-            <tr><td colSpan={6} className="py-12 text-center text-sm text-[rgb(var(--text-muted))]">
-              <GraduationCap className="mx-auto h-12 w-12 mb-3" />
-              <p>Không có hệ đào tạo nào</p>
-            </td></tr>
+            <tr>
+              <td colSpan={7} className="py-12 text-center text-sm text-[rgb(var(--text-muted))]">
+                <BookOpen className="mx-auto h-12 w-12 mb-3 text-[rgb(var(--text-muted))]" />
+                <p>Không có ngành học nào</p>
+              </td>
+            </tr>
           ) : (
             items.map((item, i) => (
               <TableRow key={item.id}>
@@ -157,6 +195,7 @@ export default function TrainingSystemList() {
                 </TableCell>
                 <TableCell className="font-mono">{item.code}</TableCell>
                 <TableCell className="font-medium">{item.name}</TableCell>
+                <TableCell>{getDegreeLabel(item.degree_level)}</TableCell>
                 <TableCell className="max-w-xs truncate text-[rgb(var(--text-secondary))]">
                   {item.description || '—'}
                 </TableCell>
@@ -196,14 +235,14 @@ export default function TrainingSystemList() {
       )}
 
       {/* Detail modal */}
-      <TrainingSystemDetailModal
+      <MajorDetailModal
         open={!!viewing}
         onClose={() => setViewing(null)}
-        item={viewing}
+        major={viewing}
       />
 
       {/* Create / Edit modal */}
-      <TrainingSystemFormModal
+      <MajorFormModal
         open={formModalOpen}
         onClose={() => setFormModalOpen(false)}
         editing={editing}
@@ -232,9 +271,9 @@ export default function TrainingSystemList() {
             setDeleting(null);
           }
         }}
-        title="Xác nhận xóa hệ đào tạo"
-        description={`Bạn có chắc chắn muốn xóa hệ đào tạo "${deleting?.name}" (mã ${deleting?.code})? Hành động này không thể hoàn tác.`}
-        confirmText="Xóa hệ đào tạo"
+        title="Xác nhận xóa ngành học"
+        description={`Bạn có chắc chắn muốn xóa ngành "${deleting?.name}" (mã ${deleting?.code})? Hành động này không thể hoàn tác.`}
+        confirmText="Xóa ngành học"
         loading={deleteMut.isPending}
         variant="danger"
       />
@@ -243,18 +282,18 @@ export default function TrainingSystemList() {
 }
 
 // ─── Detail modal ─────────────────────────────────────────────────────────
-function TrainingSystemDetailModal({
+function MajorDetailModal({
   open,
   onClose,
-  item,
+  major,
 }: {
   open: boolean;
   onClose: () => void;
-  item: HqnhatTrainingSystem | null;
+  major: HqnhatMajor | null;
 }) {
-  if (!item) return null;
+  if (!major) return null;
 
-  const statusCfg = item.status === 1
+  const statusCfg = major.status === 1
     ? { variant: 'success' as const, label: 'Đang hoạt động' }
     : { variant: 'neutral' as const, label: 'Ngừng hoạt động' };
 
@@ -275,23 +314,31 @@ function TrainingSystemDetailModal({
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Chi tiết hệ đào tạo" size="lg">
+    <Modal open={open} onClose={onClose} title="Chi tiết ngành học" size="lg">
       <div className="space-y-5">
         {/* Main info grid */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-4">
           <div className="space-y-1">
             <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">ID</p>
-            <p className="font-mono text-sm">{item.id}</p>
+            <p className="font-mono text-sm">{major.id}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Mã hệ</p>
-            <p className="font-mono text-sm">{item.code}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Mã ngành</p>
+            <p className="font-mono text-sm">{major.code}</p>
           </div>
           <div className="col-span-2 space-y-1">
-            <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Tên hệ đào tạo</p>
-            <p className="text-base font-semibold">{item.name}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Tên ngành</p>
+            <p className="text-base font-semibold">{major.name}</p>
           </div>
-          <div className="col-span-2 space-y-1">
+          <div className="space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Bậc đào tạo</p>
+            <p className="text-sm font-medium">{getDegreeLabel(major.degree_level)}</p>
+          </div>
+          <div className="space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Khoa/Viện</p>
+            <p className="font-mono text-sm">{major.department_id}</p>
+          </div>
+          <div className="space-y-1">
             <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Trạng thái</p>
             <Badge variant={statusCfg.variant} dot>{statusCfg.label}</Badge>
           </div>
@@ -302,7 +349,7 @@ function TrainingSystemDetailModal({
           <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Mô tả</p>
           <div className="rounded-lg bg-[rgb(var(--bg-secondary))] p-4">
             <p className="text-sm text-[rgb(var(--text-secondary))] whitespace-pre-wrap">
-              {item.description || 'Chưa có mô tả'}
+              {major.description || 'Chưa có mô tả'}
             </p>
           </div>
         </div>
@@ -314,22 +361,22 @@ function TrainingSystemDetailModal({
               <Calendar className="mt-0.5 h-4 w-4 text-[rgb(var(--text-muted))]" />
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Ngày tạo</p>
-                <p className="text-sm">{formatDate(item.created_at)}</p>
+                <p className="text-sm">{formatDate(major.created_at)}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <Clock className="mt-0.5 h-4 w-4 text-[rgb(var(--text-muted))]" />
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Cập nhật lần cuối</p>
-                <p className="text-sm">{formatDate(item.updated_at)}</p>
+                <p className="text-sm">{formatDate(major.updated_at)}</p>
               </div>
             </div>
-            {item.deleted_at && (
+            {major.deleted_at && (
               <div className="col-span-2 flex items-start gap-2 text-red-500">
-                <Trash2Icon className="mt-0.5 h-4 w-4" />
+                <Trash2 className="mt-0.5 h-4 w-4" />
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide">Đã xóa</p>
-                  <p className="text-sm">{formatDate(item.deleted_at)}</p>
+                  <p className="text-sm">{formatDate(major.deleted_at)}</p>
                 </div>
               </div>
             )}
@@ -347,7 +394,7 @@ function TrainingSystemDetailModal({
 }
 
 // ─── Form modal ───────────────────────────────────────────────────────────
-function TrainingSystemFormModal({
+function MajorFormModal({
   open,
   onClose,
   editing,
@@ -355,13 +402,15 @@ function TrainingSystemFormModal({
 }: {
   open: boolean;
   onClose: () => void;
-  editing: HqnhatTrainingSystem | null;
-  onSubmit: (payload: HqnhatTrainingSystemCreatePayload) => Promise<unknown>;
+  editing: HqnhatMajor | null;
+  onSubmit: (payload: HqnhatMajorCreatePayload) => Promise<unknown>;
 }) {
   const [form, setForm] = useState({
+    department_id: 1,
     code: '',
     name: '',
     description: '',
+    degree_level: 1,
     status: 1 as 0 | 1,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -371,9 +420,11 @@ function TrainingSystemFormModal({
   useEffect(() => {
     if (open) {
       setForm({
+        department_id: editing?.department_id ?? 1,
         code: editing?.code ?? '',
         name: editing?.name ?? '',
         description: editing?.description ?? '',
+        degree_level: editing?.degree_level ?? 1,
         status: (editing?.status ?? 1) as 0 | 1,
       });
       setErrors({});
@@ -383,8 +434,8 @@ function TrainingSystemFormModal({
 
   const handleSubmit = async () => {
     const e: Record<string, string> = {};
-    if (!form.code.trim()) e.code = 'Mã hệ đào tạo không được để trống';
-    if (!form.name.trim()) e.name = 'Tên hệ đào tạo không được để trống';
+    if (!form.code.trim()) e.code = 'Mã ngành không được để trống';
+    if (!form.name.trim()) e.name = 'Tên ngành không được để trống';
     setErrors(e);
     if (Object.keys(e).length) return;
 
@@ -400,8 +451,9 @@ function TrainingSystemFormModal({
       } else if (err?.message) {
         message = err.message;
       }
+      // Gợi ý khi trùng mã
       if (message.includes('unique') || message.includes('duplicate') || message.includes('trùng')) {
-        message = `Mã hệ đào tạo "${form.code}" đã tồn tại. Vui lòng sử dụng mã khác.`;
+        message = `Mã ngành "${form.code}" đã tồn tại. Vui lòng sử dụng mã khác.`;
       }
       setSubmitError(message);
     } finally {
@@ -413,7 +465,7 @@ function TrainingSystemFormModal({
     <Modal
       open={open}
       onClose={onClose}
-      title={editing ? 'Sửa hệ đào tạo' : 'Thêm hệ đào tạo'}
+      title={editing ? 'Sửa ngành học' : 'Thêm ngành học'}
       size="lg"
       footer={
         <>
@@ -432,18 +484,18 @@ function TrainingSystemFormModal({
             {submitError}
           </div>
         )}
-        <FormField label="Mã hệ đào tạo" error={errors.code} required>
+        <FormField label="Mã ngành" error={errors.code} required>
           <Input
             value={form.code}
             onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-            placeholder="VD: CQ, LT, VB2"
+            placeholder="VD: SE, IS, AI"
           />
         </FormField>
-        <FormField label="Tên hệ đào tạo" error={errors.name} required>
+        <FormField label="Tên ngành" error={errors.name} required>
           <Input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="VD: Chính quy, Liên thông"
+            placeholder="VD: Software Engineering"
           />
         </FormField>
         <FormField label="Mô tả">
@@ -454,6 +506,26 @@ function TrainingSystemFormModal({
             className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))]/40 resize-none"
           />
         </FormField>
+        <div className="grid grid-cols-2 gap-3">
+          <FormField label="ID Khoa/Viện">
+            <Input
+              type="number"
+              value={form.department_id}
+              onChange={(e) => setForm({ ...form, department_id: Number(e.target.value) })}
+            />
+          </FormField>
+          <FormField label="Bậc đào tạo">
+            <select
+              value={form.degree_level}
+              onChange={(e) => setForm({ ...form, degree_level: Number(e.target.value) })}
+              className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+            >
+              <option value={1}>Đại học</option>
+              <option value={2}>Thạc sĩ</option>
+              <option value={3}>Tiến sĩ</option>
+            </select>
+          </FormField>
+        </div>
         <FormField label="Trạng thái">
           <select
             value={form.status}

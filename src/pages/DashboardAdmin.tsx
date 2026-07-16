@@ -139,7 +139,7 @@ export default function DashboardAdmin() {
         <div className="absolute right-20 bottom-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/3" />
         <div className="flex items-start justify-between relative">
           <div>
-            <h1 className="text-2xl font-black">Xin chào, {(user.fullName || user.name || 'Admin').split(' ').slice(-1)[0]}</h1>
+            <h1 className="text-2xl font-black">Xin chào, {user.name.split(' ').slice(-1)[0]}</h1>
             <p className="mt-1 text-sm font-medium text-white/80">
               {ROLE_LABELS[user.role] ?? user.role} — Bảng điều khiển UMS — Học kỳ 2/2026-2027
             </p>
@@ -497,7 +497,7 @@ export default function DashboardAdmin() {
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--${u.color})/0.1)] text-[10px] font-bold text-[rgb(var(--${u.color}))]`}>
-                      {(u.user || u.fullName || 'U').split(' ').slice(-1)[0][0]}
+                      {u.user.split(' ').slice(-1)[0][0]}
                     </div>
                     <div>
                       <p className="text-xs font-medium text-[rgb(var(--text-primary))]">{u.user}</p>

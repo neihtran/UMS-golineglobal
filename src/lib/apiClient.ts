@@ -2,29 +2,8 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/stores/authStore';
 import type { ErrorResponse } from '@/types/api.types';
 
-// API Base URL — supports 3 modes:
-//   1. VITE_API_BASE_URL set explicitly → use absolute URL
-//   2. Unset + production → use relative '/api' (assumes reverse proxy on same domain)
-//   3. Unset + development → fallback to localhost backend
-const _explicitBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
-function resolveApiBaseUrl(): string {
-  if (_explicitBaseUrl && _explicitBaseUrl.trim() !== '') {
-    return _explicitBaseUrl.replace(/\/+$/, '');
-  }
-
-  // Relative path works in production when frontend & backend share a domain
-  // (nginx reverse proxy, Vercel rewrites, etc.) — and breaks CORS issues
-  return '/api';
-}
-
-const API_BASE_URL = resolveApiBaseUrl();
-
-if (typeof window !== 'undefined') {
-  // Helpful debug message in browser console for deployment troubleshooting
-  // eslint-disable-next-line no-console
-  console.info('[UMS] API base URL:', API_BASE_URL);
-}
+// API Base URL - change this to your backend URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 // Create axios instance
 export const apiClient = axios.create({

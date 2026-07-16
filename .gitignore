@@ -38,13 +38,3 @@ Thumbs.db
 
 # Testing
 coverage/
-
-# ─── Server-specific ───
-server/dist/
-server/uploads/
-server/.env
-server/.env.local
-server/.env.*.local
-
-# ─── Frontend build cache ───
-.vite/

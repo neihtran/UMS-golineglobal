@@ -49,8 +49,28 @@ type NavGroup = {
   modules: Module[];
 };
 
+// ─── DEV: SHOW ONLY SIS DEMO ───────────────────────────────────────────────────
+// Set to false to restore full sidebar
+const DEV_SIS_ONLY = true;
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SIS_ONLY_MODULES: Module[] = [
+  { id: 'sis-nganh-hoc', label: 'Ngành học', route: '/sis/nganh-hoc', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'sis-he-dao-tao', label: 'Hệ đào tạo', route: '/sis/he-dao-tao', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'sis-chuyen-nganh', label: 'Chuyên ngành', route: '/sis/chuyen-nganh', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+];
+
+const SIS_ONLY_GROUP: NavGroup = {
+  id: 'quan-ly-dao-tao',
+  label: 'Quản lý Đào tạo',
+  groupIcon: <GraduationCap className="h-4 w-4" />,
+  modules: SIS_ONLY_MODULES,
+};
+
 // ─── NAV_GROUPS ───────────────────────────────────────────────────────────────
-const NAV_GROUPS: NavGroup[] = [
+const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
+  ? [SIS_ONLY_GROUP]
+  : [
   // ── NHÓM 1: QUẢN TRỊ HỆ THỐNG ──────────────────────────────────────────────
   {
     id: 'quan-tri-he-thong',
@@ -103,6 +123,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'sis-tn', label: 'Tốt nghiệp', route: '/sis/tot-nghiep', icon: <Award className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
       { id: 'sis-thuc-tap', label: 'Thực tập TN', route: '/sis/thuc-tap', icon: <Briefcase className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
       // SIS - Danh mục (Phase 1)
+      { id: 'sis-nganh-hoc', label: 'Ngành học', route: '/sis/nganh-hoc', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
       { id: 'sis-he-dao-tao', label: 'Hệ đào tạo', route: '/sis/he-dao-tao', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
       { id: 'sis-chuyen-nganh', label: 'Chuyên ngành', route: '/sis/chuyen-nganh', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
       { id: 'sis-hoc-ky', label: 'Học kỳ', route: '/sis/hoc-ky', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
@@ -361,12 +382,9 @@ export function Sidebar({ collapsed, onToggle }: { collapsed: boolean; onToggle:
   const visibleGroups = useMemo(() => {
     return NAV_GROUPS.map((g) => ({
       ...g,
-      modules: g.modules.filter((m) => {
-        if (!m.requiredRoles) return true;
-        // DEMO MODE — SUPER_ADMIN sees everything
-        if (user?.role === 'SUPER_ADMIN') return true;
-        return m.requiredRoles.some((r) => user?.role === r);
-      }),
+      modules: g.modules.filter(
+        (m) => !m.requiredRoles || m.requiredRoles.some((r) => user?.role === r),
+      ),
     })).filter((g) => g.modules.length > 0);
   }, [user?.role ?? null]);
 

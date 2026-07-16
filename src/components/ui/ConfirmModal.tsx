@@ -9,6 +9,7 @@ interface ConfirmModalProps {
   confirmText?: string;
   cancelText?: string;
   variant?: 'danger' | 'primary';
+  loading?: boolean;
 }
 
 export function ConfirmModal({
@@ -20,6 +21,7 @@ export function ConfirmModal({
   confirmText = 'Xác nhận',
   cancelText = 'Hủy',
   variant = 'primary',
+  loading = false,
 }: ConfirmModalProps) {
   return (
     <Modal open={open} onClose={onClose} title={title}>
@@ -29,19 +31,21 @@ export function ConfirmModal({
       <div className="flex justify-end gap-3">
         <button
           onClick={onClose}
-          className="rounded-lg border border-[rgb(var(--border))] px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-hover))] transition-colors"
+          disabled={loading}
+          className="rounded-lg border border-[rgb(var(--border))] px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--bg-hover))] transition-colors disabled:opacity-50"
         >
           {cancelText}
         </button>
         <button
-          onClick={() => { onConfirm(); onClose(); }}
-          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
+          onClick={() => { onConfirm(); }}
+          disabled={loading}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 ${
             variant === 'danger'
               ? 'bg-[rgb(var(--error))] text-white hover:bg-[rgb(var(--error)/0.9)]'
               : 'bg-[rgb(var(--primary))] text-white hover:bg-[rgb(var(--primary-light))]'
           }`}
         >
-          {confirmText}
+          {loading ? 'Đang xử lý...' : confirmText}
         </button>
       </div>
     </Modal>

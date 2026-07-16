@@ -107,6 +107,13 @@ const InternshipCreate = lazy(() => import('@/modules/sis/pages/InternshipCreate
 const InternshipDetail = lazy(() => import('@/modules/sis/pages/InternshipDetail'));
 
 // SIS - Danh mục (Phase 1)
+const MajorList = lazy(() => import('@/modules/sis/pages/MajorList'));
+const MajorDetail = lazy(() => import('@/modules/sis/pages/MajorDetail'));
+function MajorDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  if (!id) return null;
+  return <MajorDetail id={id} />;
+}
 const TrainingSystemList = lazy(() => import('@/modules/sis/pages/TrainingSystemList'));
 const SpecializationList = lazy(() => import('@/modules/sis/pages/SpecializationList'));
 const AcademicTermList = lazy(() => import('@/modules/sis/pages/AcademicTermList'));
@@ -437,13 +444,7 @@ function PageLoader() {
 
 // ─── Auth guard ─────────────────────────────────────────────────────────────
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading, user } = useAuthStore();
-
-  // DEMO MODE — auto-authenticate SUPER_ADMIN to bypass login
-  if (user && user.role === 'SUPER_ADMIN') {
-    return <>{children}</>;
-  }
-
+  const { isAuthenticated, isLoading } = useAuthStore();
   if (isLoading) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
   return <>{children}</>;
@@ -460,12 +461,6 @@ function getRoleDashboard(role?: string): string {
 
 function RoleRoute({ children, roles }: { children: React.ReactNode; roles?: User['role'][] }) {
   const { user, isLoading } = useAuthStore();
-
-  // DEMO MODE — SUPER_ADMIN bypasses all role checks
-  if (user && user.role === 'SUPER_ADMIN') {
-    return <>{children}</>;
-  }
-
   const hasRole = (checkRoles: User['role'] | User['role'][]): boolean => {
     if (!user) return false;
     const list = Array.isArray(checkRoles) ? checkRoles : [checkRoles];
@@ -577,6 +572,8 @@ export default function AppRouter() {
           <Route path="/sis/thuc-tap/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><InternshipDetail /></RoleRoute>} />
 
           {/* SIS - Danh mục (Phase 1) */}
+          <Route path="/sis/nganh-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><MajorList /></RoleRoute>} />
+          <Route path="/sis/nganh-hoc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><MajorDetailPage /></RoleRoute>} />
           <Route path="/sis/he-dao-tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><TrainingSystemList /></RoleRoute>} />
           <Route path="/sis/chuyen-nganh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SpecializationList /></RoleRoute>} />
           <Route path="/sis/hoc-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AcademicTermList /></RoleRoute>} />

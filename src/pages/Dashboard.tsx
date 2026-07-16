@@ -19,7 +19,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return;
 
-    if (user.role === ROLES.ADMIN || user.role === 'SUPER_ADMIN') {
+    if (user.role === ROLES.ADMIN) {
       navigate('/dashboard/admin', { replace: true });
     } else if (user.role === ROLES.HIEU_TRUONG || user.role === ROLES.PHO_HIEU_TRUONG) {
       navigate('/dashboard/bgh', { replace: true });
@@ -31,9 +31,6 @@ export default function Dashboard() {
       navigate('/dashboard/nhan-vien', { replace: true });
     } else if (user.role === ROLES.SINH_VIEN) {
       navigate('/dashboard/sinh-vien', { replace: true });
-    } else {
-      // DEMO MODE: SUPER_ADMIN hoặc role không xác định → vào admin dashboard
-      navigate('/dashboard/admin', { replace: true });
     }
   }, [user, navigate]);
 

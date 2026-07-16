@@ -18,10 +18,10 @@ interface ModalProps {
 }
 
 const sizeClasses = {
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-lg',
-  xl: 'max-w-2xl',
+  sm: 'w-full max-w-sm',
+  md: 'w-full max-w-md',
+  lg: 'w-full max-w-[40rem]',
+  xl: 'w-full max-w-2xl',
   fullscreen: 'max-w-[95vw] max-h-[95vh]',
 };
 

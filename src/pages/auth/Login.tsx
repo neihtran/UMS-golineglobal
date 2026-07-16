@@ -1,18 +1,37 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Zap, CheckCircle2, Sparkles } from 'lucide-react';
+import { Zap, CheckCircle2 } from 'lucide-react';
 import { useLogin } from '@/hooks/useAuth';
 import { Button, Input } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
+import { ROLES } from '@/constants/modules';
+import type { User } from '@/types/auth.types';
+
+const DEV_DEMO_USER: User = {
+  id: 'dev-admin-001',
+  email: 'dev-admin@ums.local',
+  name: 'Dev Admin',
+  username: 'devadmin',
+  displayName: 'Dev Admin',
+  role: ROLES.ADMIN,
+  permissions: ['*'],
+  department: 'dev-dept',
+  title: 'Quản trị viên',
+  phone: '0900000000',
+  status: 'active',
+  mfaEnabled: false,
+  avatar: null,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+};
 
 export default function Login() {
   const { t } = useTranslation('common');
   const loginMutation = useLogin();
   const navigate = useNavigate();
-  const login = useAuthStore((s) => s.login);
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -45,10 +64,9 @@ export default function Login() {
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setErrors({});
     setApiError(null);
-    
+
     try {
       await loginMutation.mutateAsync({ email, password });
-      // Navigation is handled by the login mutation callback in useLogin
     } catch (error: any) {
       setApiError(error?.response?.data?.error?.message || error?.message || 'Đăng nhập thất bại');
     }
@@ -62,21 +80,12 @@ export default function Login() {
     setApiError(null);
   };
 
-  // Skip login — bypass authentication with a mock SUPER_ADMIN user
-  const handleSkipLogin = () => {
-    const mockUser = {
-      id: 'demo-user-001',
-      email: 'demo@ums.local',
-      fullName: 'Demo Admin',
-      role: 'SUPER_ADMIN',
-      permissions: ['*'],
-      isActive: true,
-      avatarUrl: undefined,
-    };
-    login(mockUser, 'demo-access-token', 'demo-refresh-token');
-    // Use setTimeout to ensure zustand state updates before navigation
+  const handleDemoLogin = () => {
+    const { login } = useAuthStore.getState();
+    login(DEV_DEMO_USER, 'dev-bypass-token', 'dev-bypass-refresh');
+    // Delay navigation to allow Zustand state + persist to sync first
     setTimeout(() => {
-      navigate('/dashboard/admin');
+      navigate('/dashboard/admin', { replace: true });
     }, 50);
   };
 
@@ -204,6 +213,15 @@ export default function Login() {
             </Button>
           </form>
 
+          {/* Demo Mode Button */}
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            className="w-full rounded-xl border-2 border-dashed border-[rgb(var(--accent))]/50 bg-[rgb(var(--accent))]/5 px-4 py-3 text-sm font-semibold text-[rgb(var(--accent))] transition-all hover:border-[rgb(var(--accent))] hover:bg-[rgb(var(--accent))]/10 hover:-translate-y-0.5 active:scale-[0.98]"
+          >
+            Bỏ qua đăng nhập (Demo Mode)
+          </button>
+
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-[rgb(var(--border))]" />
@@ -219,16 +237,6 @@ export default function Login() {
             </svg>
             {t('login.ssoButton')}
           </Button>
-
-          {/* Skip login — bypass auth (DEMO MODE) */}
-          <button
-            type="button"
-            onClick={handleSkipLogin}
-            className="w-full rounded-lg border-2 border-dashed border-amber-500/40 bg-amber-500/5 px-4 py-3 text-sm font-semibold text-amber-600 hover:bg-amber-500/10 hover:border-amber-500/60 transition-all flex items-center justify-center gap-2"
-          >
-            <Sparkles className="h-4 w-4" />
-            Bỏ qua đăng nhập (Demo Mode)
-          </button>
 
           {/* Quick login accounts */}
           <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-4 space-y-3">
