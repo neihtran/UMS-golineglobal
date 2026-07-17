@@ -65,7 +65,7 @@ export default function CurriculumEditPage() {
     if (!form.major_id) newErrors.major_id = 'Chọn ngành';
     if (!form.training_system_id) newErrors.training_system_id = 'Chọn hệ đào tạo';
     if (!form.course_id) newErrors.course_id = 'Chọn khóa sinh viên';
-    if (!form.total_credit || form.total_credit <= 0) newErrors.total_credit = 'Tổng tín chỉ phải > 0';
+    if (!form.total_credit || Number(form.total_credit) <= 0) newErrors.total_credit = 'Tổng tín chỉ phải > 0';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

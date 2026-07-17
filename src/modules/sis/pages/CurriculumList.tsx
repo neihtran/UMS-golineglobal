@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Plus, Search, RotateCcw, Edit, Trash2, Eye, BookOpen } from 'lucide-react';
 import {
   Button,
@@ -141,7 +140,7 @@ export default function CurriculumList() {
     if (!form.major_id) newErrors.major_id = 'Chọn ngành';
     if (!form.training_system_id) newErrors.training_system_id = 'Chọn hệ đào tạo';
     if (!form.course_id) newErrors.course_id = 'Chọn khóa sinh viên';
-    if (!form.total_credit || form.total_credit <= 0) newErrors.total_credit = 'Tổng tín chỉ phải > 0';
+    if (!form.total_credit || Number(form.total_credit) <= 0) newErrors.total_credit = 'Tổng tín chỉ phải > 0';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -174,13 +173,13 @@ export default function CurriculumList() {
 
   const isSubmitting = createMut.isPending || updateMut.isPending;
 
-  const getMajorName = (id: number) => majors.find(m => m.id === id)?.name ?? `ID: ${id}`;
-  const getTrainingSystemName = (id: number) => trainingSystems.find(t => t.id === id)?.name ?? `ID: ${id}`;
-  const getCourseName = (id: number) => courses.find(c => c.id === id)?.name ?? `ID: ${id}`;
-  const getSpecializationName = (id: number | null) =>
-    id ? specializations.find(s => s.id === id)?.name ?? `ID: ${id}` : '—';
-  const filteredSpecs = (majorId: number) =>
-    specializations.filter(s => s.major_id === majorId);
+  const getMajorName = (id: number | string) => majors.find(m => m.id == id)?.name ?? '—';
+  const getTrainingSystemName = (id: number | string) => trainingSystems.find(t => t.id == id)?.name ?? '—';
+  const getCourseName = (id: number | string) => courses.find(c => c.id == id)?.name ?? '—';
+  const getSpecializationName = (id: number | string | null) =>
+    id ? specializations.find(s => s.id == id)?.name ?? '—' : '—';
+  const filteredSpecs = (majorId: number | string) =>
+    specializations.filter(s => s.major_id == majorId);
 
   return (
     <div className="space-y-6">

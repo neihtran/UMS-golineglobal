@@ -100,7 +100,7 @@ export interface HqnhatMajorCreatePayload {
   name: string;
   degree_level: number; // 1: Đại học, 2: Thạc sĩ, 3: Tiến sĩ
   description: string;
-  status?: 0 | 1; // 0: INACTIVE, 1: ACTIVE
+  status: 0 | 1; // 0: INACTIVE, 1: ACTIVE
 }
 
 export interface HqnhatSpecializationCreatePayload {
@@ -108,14 +108,14 @@ export interface HqnhatSpecializationCreatePayload {
   code: string;
   name: string;
   description: string;
-  status?: 0 | 1; // default 1
+  status: 0 | 1;
 }
 
 export interface HqnhatTrainingSystemCreatePayload {
   code: string;
   name: string;
   description?: string;
-  status?: 0 | 1; // default 1
+  status: 0 | 1;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -166,12 +166,12 @@ export interface HqnhatCurriculum {
   id: number;
   code: string;
   name: string;
-  major_id: number;
-  specialization_id: number | null;
-  training_system_id: number;
-  course_id: number;
-  total_credit: number;
-  elective_credit: number;
+  major_id: number | string;
+  specialization_id: number | string | null;
+  training_system_id: number | string;
+  course_id: number | string;
+  total_credit: number | string;
+  elective_credit: number | string;
   description: string | null;
   status: number; // 0: INACTIVE, 1: ACTIVE
   created_at?: string | null;
@@ -194,12 +194,12 @@ export interface HqnhatCurriculumListParams {
 export interface HqnhatCurriculumCreatePayload {
   code: string;
   name: string;
-  major_id: number;
-  specialization_id?: number | null;
-  training_system_id: number;
-  course_id: number;
-  total_credit: number;
-  elective_credit?: number;
+  major_id: number | string;
+  specialization_id?: number | string | null;
+  training_system_id: number | string;
+  course_id: number | string;
+  total_credit: number | string;
+  elective_credit?: number | string;
   description?: string;
   status?: 0 | 1;
 }
@@ -237,8 +237,8 @@ export interface HqnhatCourseCreatePayload {
   name: string;
   start_year: number;
   end_year: number;
-  description?: string;
-  status?: 0 | 1;
+  description: string;
+  status: 0 | 1;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -269,7 +269,7 @@ export interface HqnhatSubjectTypeCreatePayload {
   code: string;
   name: string;
   description?: string;
-  status?: 0 | 1;
+  status: 0 | 1;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -311,7 +311,7 @@ export interface HqnhatSubjectCreatePayload {
   practice_hours: number;
   lab_hours: number;
   description?: string;
-  status?: 0 | 1;
+  status: 0 | 1;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -319,8 +319,8 @@ export interface HqnhatSubjectCreatePayload {
 // ══════════════════════════════════════════════════════════════════════════
 export interface HqnhatCurriculumSubject {
   id: number;
-  curriculum_id: number;
-  subject_id: number;
+  curriculum_id: number | string;
+  subject_id: number | string;
   semester: number | null;
   year_no: number | null;
   display_order: number | null;
@@ -337,15 +337,15 @@ export interface HqnhatCurriculumSubjectListParams {
   per_page?: number;
   sort_by?: string;
   sort_direction?: 'asc' | 'desc';
-  curriculum_id?: number;
-  subject_id?: number;
+  curriculum_id?: number | string;
+  subject_id?: number | string;
   semester?: number;
   year_no?: number;
 }
 
 export interface HqnhatCurriculumSubjectCreatePayload {
-  curriculum_id: number;
-  subject_id: number;
+  curriculum_id: number | string;
+  subject_id: number | string;
   semester?: number | null;
   year_no?: number | null;
   display_order?: number | null;
@@ -356,8 +356,8 @@ export interface HqnhatCurriculumSubjectCreatePayload {
 }
 
 export interface HqnhatCurriculumSubjectUpdatePayload {
-  curriculum_id: number;
-  subject_id: number;
+  curriculum_id: number | string;
+  subject_id: number | string;
   semester?: number | null;
   year_no?: number | null;
   display_order?: number | null;
@@ -459,5 +459,5 @@ export interface HqnhatAdmissionBatchCreatePayload {
   year: number;
   start_date: string;
   end_date: string;
-  status?: 0 | 1;
+  status: 0 | 1;
 }

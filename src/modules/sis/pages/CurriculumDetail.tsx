@@ -60,8 +60,8 @@ export default function CurriculumDetailPage() {
   }
 
   const statusConfig = STATUS_CONFIG[item.status] ?? STATUS_CONFIG[0];
-  const major = majors.find(m => m.id === item.major_id);
-  const trainingSystem = trainingSystems.find(t => t.id === item.training_system_id);
+  const major = majors.find(m => m.id == item.major_id);
+  const trainingSystem = trainingSystems.find(t => t.id == item.training_system_id);
 
   return (
     <div className="space-y-6">
