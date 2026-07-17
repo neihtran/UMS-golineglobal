@@ -1,313 +1,180 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft,
-  Edit2,
-  Download,
+  Edit,
+  Trash2,
   BookOpen,
   Users,
-  GraduationCap,
-  Trash2,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { Button, Badge, Card, CardContent, ConfirmModal } from '@/components/ui';
-import { PageHeader } from '@/components/layout';
-import { LoadingState } from '@/components/data-display/LoadingState';
-import { EmptyState } from '@/components/data-display/EmptyState';
 import {
-  useCurriculumDetail,
-  useDeleteCurriculum,
-  type Curriculum,
-} from '@/hooks/useSis';
-import { useRole } from '@/hooks/usePermission';
-import { ROLES } from '@/constants/modules';
+  Button,
+  Badge,
+  ConfirmModal,
+} from '@/components/ui';
+import { PageHeader } from '@/components/layout';
+import { useHqnhatCurriculum, useDeleteHqnhatCurriculum, useHqnhatMajors, useHqnhatTrainingSystems } from '@/hooks/useHqnhat';
+import { useState } from 'react';
 
-interface CurriculumDetailProps {
-  id: string;
-}
-
-const STATUS_CONFIG: Record<
-  Curriculum['status'],
-  { variant: 'success' | 'warning' | 'neutral'; label: string }
-> = {
-  active: { variant: 'success', label: 'Đang áp dụng' },
-  draft: { variant: 'warning', label: 'Bản nháp' },
-  archived: { variant: 'neutral', label: 'Lưu trữ' },
+const STATUS_CONFIG: Record<number, { label: string; variant: 'success' | 'error' }> = {
+  0: { label: 'Ngừng hoạt động', variant: 'error' },
+  1: { label: 'Đang hoạt động', variant: 'success' },
 };
 
-export default function CurriculumDetail({ id }: CurriculumDetailProps) {
-  const { t } = useTranslation('sis');
-  const navigate = useNavigate();
+export default function CurriculumDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const canEdit = useRole([ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]);
-  const canDelete = useRole([ROLES.ADMIN]);
+  const { data, isLoading, error } = useHqnhatCurriculum(id);
+  const { data: majorsData } = useHqnhatMajors({ per_page: 100 });
+  const { data: trainingSystemsData } = useHqnhatTrainingSystems({ per_page: 100 });
+  const deleteMut = useDeleteHqnhatCurriculum();
 
-  const { data: program, isLoading, isError } = useCurriculumDetail(id);
-  const deleteMutation = useDeleteCurriculum();
-  const [pendingDelete, setPendingDelete] = useState(false);
+  const item = data?.data;
+  const majors = majorsData?.data ?? [];
+  const trainingSystems = trainingSystemsData?.data ?? [];
 
-  // Nhóm môn học theo học kỳ (từ `program.subjects[].semester`)
-  const semesters = useMemo(() => {
-    if (!program) return [];
-    const groups = new Map<number, Array<any>>();
-    (program.subjects ?? []).forEach((s: any) => {
-      const subjObj = typeof s.subject === 'object' ? s.subject : null;
-      const sem = s.semester ?? 0;
-      const credits = subjObj?.credits ?? 0;
-      const arr = groups.get(sem) ?? [];
-      arr.push({
-        code: subjObj?.code ?? '—',
-        name: subjObj?.name ?? '—',
-        credits,
-        type: credits >= 5 ? 'project' : 'theory',
-        required: s.isRequired,
-      });
-      groups.set(sem, arr);
-    });
-    return Array.from(groups.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([sem, subjects]) => ({ semester: sem, subjects }));
-  }, [program]);
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      await deleteMut.mutateAsync(Number(id));
+      window.location.href = '/sis/ctdt';
+    } catch {
+      // error handled by hook
+    }
+  };
 
   if (isLoading) {
-    return <LoadingState message="Đang tải chương trình đào tạo..." />;
-  }
-
-  if (isError || !program) {
     return (
-      <div className="space-y-6">
-        <EmptyState
-          title="Không tìm thấy chương trình đào tạo"
-          description="Chương trình này có thể đã bị xóa hoặc bạn không có quyền truy cập."
-          action={
-            <Button variant="outline" onClick={() => navigate('/sis/chuong-trinh-dao-tao')}>
-              Quay lại danh sách
-            </Button>
-          }
-        />
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin h-8 w-8 border-4 border-[rgb(var(--primary))] border-t-transparent rounded-full" />
       </div>
     );
   }
 
-  const departmentName =
-    typeof program.department === 'object' ? (program.department as any).name : program.department;
+  if (error || !item) {
+    return (
+      <div className="flex items-center justify-center h-64 text-[rgb(var(--text-muted))]">
+        <p>Không tìm thấy CTĐT hoặc lỗi khi tải dữ liệu.</p>
+      </div>
+    );
+  }
 
-  const handleConfirmDelete = () => {
-    deleteMutation.mutate(program._id, {
-      onSettled: () => setPendingDelete(false),
-    });
-  };
+  const statusConfig = STATUS_CONFIG[item.status] ?? STATUS_CONFIG[0];
+  const major = majors.find(m => m.id === item.major_id);
+  const trainingSystem = trainingSystems.find(t => t.id === item.training_system_id);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title={program.name}
-        description={`${program.code} · ${program.degreeType} · ${departmentName || '—'}`}
+        title={item.name}
+        description={`Mã: ${item.code}`}
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
-          { label: t('curriculum.titleList'), href: '/sis/chuong-trinh-dao-tao' },
-          { label: program.code },
+          { label: 'Danh mục', href: '/sis' },
+          { label: 'CTĐT', href: '/sis/ctdt' },
+          { label: item.name },
         ]}
         actions={
           <>
+            <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} asChild>
+              <Link to="/sis/ctdt">Quay lại</Link>
+            </Button>
             <Button
               variant="outline"
-              leftIcon={<ArrowLeft className="h-4 w-4" />}
-              onClick={() => navigate('/sis/chuong-trinh-dao-tao')}
+              leftIcon={<Edit className="h-4 w-4" />}
+              asChild
             >
-              {t('curriculum.detail.back')}
+              <Link to={`/sis/ctdt/${id}/sua`}>Sửa</Link>
             </Button>
-            <Button variant="outline" leftIcon={<Download className="h-4 w-4" />}>
-              {t('curriculum.export')}
+            <Button
+              variant="danger"
+              leftIcon={<Trash2 className="h-4 w-4" />}
+              onClick={() => setDeleteModalOpen(true)}
+            >
+              Xóa
             </Button>
-            {canEdit && (
-              <Button
-                leftIcon={<Edit2 className="h-4 w-4" />}
-                onClick={() => navigate(`/sis/chuong-trinh-dao-tao/${program._id}/sua`)}
-              >
-                {t('curriculum.detail.edit')}
-              </Button>
-            )}
-            {canDelete && (
-              <Button
-                variant="outline"
-                leftIcon={<Trash2 className="h-4 w-4 text-[rgb(var(--error))]" />}
-                onClick={() => setPendingDelete(true)}
-              >
-                <span className="text-[rgb(var(--error))]">Xóa</span>
-              </Button>
-            )}
           </>
         }
       />
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Stat
-          icon={<BookOpen className="h-4 w-4" />}
-          label={t('curriculum.detail.tongTinChi')}
-          value={program.totalCredits}
-        />
-        <Stat
-          icon={<BookOpen className="h-4 w-4" />}
-          label={t('curriculum.detail.soMon')}
-          value={(program.subjects ?? []).length}
-        />
-        <Stat
-          icon={<GraduationCap className="h-4 w-4" />}
-          label={t('curriculum.detail.thoiGian')}
-          value={`${program.durationYears} năm`}
-        />
-        <Stat
-          icon={<Users className="h-4 w-4" />}
-          label={t('curriculum.detail.nam')}
-          value={program.effectiveYear}
-        />
+      {/* Info Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border))] rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <BookOpen className="h-4 w-4 text-[rgb(var(--primary))]" />
+            <span className="text-xs font-medium text-[rgb(var(--text-muted))]">Mã CTĐT</span>
+          </div>
+          <p className="text-xl font-bold font-mono">{item.code}</p>
+        </div>
+
+        <div className="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border))] rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Users className="h-4 w-4 text-[rgb(var(--primary))]" />
+            <span className="text-xs font-medium text-[rgb(var(--text-muted))]">Ngành</span>
+          </div>
+          <p className="text-lg font-bold">{major?.name ?? `ID: ${item.major_id}`}</p>
+          {major && <p className="text-xs text-[rgb(var(--text-muted))]">{major.code}</p>}
+        </div>
+
+        <div className="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border))] rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <BookOpen className="h-4 w-4 text-[rgb(var(--primary))]" />
+            <span className="text-xs font-medium text-[rgb(var(--text-muted))]">Hệ đào tạo</span>
+          </div>
+          <p className="text-lg font-bold">{trainingSystem?.name ?? `ID: ${item.training_system_id}`}</p>
+        </div>
+
+        <div className="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border))] rounded-xl p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <BookOpen className="h-4 w-4 text-[rgb(var(--primary))]" />
+            <span className="text-xs font-medium text-[rgb(var(--text-muted))]">Trạng thái</span>
+          </div>
+          <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
+        </div>
       </div>
 
-      <Card>
-        <div className="px-5 py-4 border-b border-[rgb(var(--border)/0.6)]">
-          <h3 className="font-semibold text-[rgb(var(--text-primary))]">
-            {t('curriculum.detail.intro')}
-          </h3>
+      {/* Credits */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border))] rounded-xl p-4">
+          <p className="text-xs font-medium text-[rgb(var(--text-muted))] mb-1">Tổng tín chỉ</p>
+          <p className="text-3xl font-bold">{item.total_credit}</p>
         </div>
-        <CardContent>
-          {program.description ? (
-            <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
-              {program.description}
-            </p>
-          ) : (
-            <p className="text-sm italic text-[rgb(var(--text-muted))]">
-              Chưa có mô tả cho chương trình này.
-            </p>
-          )}
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Badge variant="primary">{t('curriculum.detail.nganh')}: {departmentName || '—'}</Badge>
-            <Badge variant="info">{t('curriculum.detail.bac')}: {program.degreeType}</Badge>
-            <Badge variant="success">{t('curriculum.detail.nam')}: {program.effectiveYear}</Badge>
-            <Badge variant={STATUS_CONFIG[program.status]?.variant ?? 'neutral'} dot>
-              {STATUS_CONFIG[program.status]?.label ?? program.status}
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
+        <div className="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border))] rounded-xl p-4">
+          <p className="text-xs font-medium text-[rgb(var(--text-muted))] mb-1">Tín chỉ tự chọn</p>
+          <p className="text-3xl font-bold">{item.elective_credit}</p>
+        </div>
+        <div className="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border))] rounded-xl p-4">
+          <p className="text-xs font-medium text-[rgb(var(--text-muted))] mb-1">Khóa sinh viên</p>
+          <p className="text-3xl font-bold">{item.course_id}</p>
+        </div>
+      </div>
 
-      {semesters.length === 0 ? (
-        <Card>
-          <div className="px-5 py-8">
-            <EmptyState
-              title="Chưa có môn học nào"
-              description="Chương trình này chưa được gán môn học nào."
-              action={
-                canEdit && (
-                  <Button
-                    leftIcon={<Edit2 className="h-4 w-4" />}
-                    onClick={() => navigate(`/sis/chuong-trinh-dao-tao/${program._id}/sua`)}
-                  >
-                    Chỉnh sửa để thêm môn
-                  </Button>
-                )
-              }
-            />
-          </div>
-        </Card>
-      ) : (
-        semesters.map((sem) => {
-          const totalCredits = sem.subjects.reduce((acc, s) => acc + s.credits, 0);
-          return (
-            <Card key={sem.semester}>
-              <div className="px-5 py-4 border-b border-[rgb(var(--border)/0.6)] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary))] text-sm font-bold text-white">
-                    HK{sem.semester}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-[rgb(var(--text-primary))]">
-                      Học kỳ {sem.semester}
-                    </h3>
-                    <p className="text-xs text-[rgb(var(--text-muted))]">
-                      {sem.subjects.length} môn · {totalCredits} tín chỉ
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-[rgb(var(--bg-base))]">
-                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-secondary))]">
-                        {t('curriculum.tableDetail.maMonHoc')}
-                      </th>
-                      <th className="px-4 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-secondary))]">
-                        {t('curriculum.tableDetail.tenMonHoc')}
-                      </th>
-                      <th className="px-4 py-2.5 text-center text-xs font-semibold text-[rgb(var(--text-secondary))]">
-                        {t('curriculum.tableDetail.tongTc')}
-                      </th>
-                      <th className="px-4 py-2.5 text-center text-xs font-semibold text-[rgb(var(--text-secondary))]">
-                        Bắt buộc
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[rgb(var(--border)/0.4)]">
-                    {sem.subjects.map((s) => (
-                      <tr key={s.code} className="hover:bg-[rgb(var(--bg-hover))]">
-                        <td className="px-4 py-2.5 font-mono text-xs text-[rgb(var(--text-secondary))]">
-                          {s.code}
-                        </td>
-                        <td className="px-4 py-2.5 font-medium text-[rgb(var(--text-primary))]">
-                          {s.name}
-                        </td>
-                        <td className="px-4 py-2.5 text-center text-[rgb(var(--text-secondary))]">
-                          {s.credits}
-                        </td>
-                        <td className="px-4 py-2.5 text-center">
-                          <Badge variant={s.required ? 'success' : 'neutral'} size="sm">
-                            {s.required ? 'Bắt buộc' : 'Tự chọn'}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          );
-        })
+      {/* Description */}
+      {item.description && (
+        <div className="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border))] rounded-xl p-6">
+          <h3 className="font-semibold mb-2">Mô tả</h3>
+          <p className="text-sm text-[rgb(var(--text-secondary))]">{item.description}</p>
+        </div>
+      )}
+
+      {/* Metadata */}
+      {(item.created_at || item.updated_at) && (
+        <div className="text-xs text-[rgb(var(--text-muted))] space-y-1">
+          {item.created_at && <p>Ngày tạo: {new Date(item.created_at).toLocaleString('vi-VN')}</p>}
+          {item.updated_at && <p>Cập nhật: {new Date(item.updated_at).toLocaleString('vi-VN')}</p>}
+        </div>
       )}
 
       <ConfirmModal
-        open={pendingDelete}
-        onClose={() => setPendingDelete(false)}
-        onConfirm={handleConfirmDelete}
-        title="Xóa chương trình đào tạo"
-        description={`Bạn có chắc chắn muốn xóa chương trình "${program.name}" (${program.code})? Hành động này không thể hoàn tác.`}
-        confirmText={deleteMutation.isPending ? 'Đang xóa...' : 'Xóa'}
+        open={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+        title="Xác nhận xóa CTĐT"
+        message={`Bạn có chắc muốn xóa CTĐT "${item.name}" không? Hành động này không thể hoàn tác.`}
+        confirmText="Xóa"
         variant="danger"
+        isLoading={deleteMut.isPending}
       />
     </div>
-  );
-}
-
-function Stat({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-}) {
-  return (
-    <Card>
-      <CardContent className="flex items-center gap-3 p-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--primary)/0.1)] text-[rgb(var(--primary))]">
-          {icon}
-        </div>
-        <div>
-          <p className="text-xs text-[rgb(var(--text-muted))]">{label}</p>
-          <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{value}</p>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

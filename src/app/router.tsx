@@ -75,20 +75,7 @@ const StudentEnrollment = lazy(() => import('@/modules/sis/pages/StudentEnrollme
 const EnrollmentCreate = lazy(() => import('@/modules/sis/pages/EnrollmentCreate'));
 const EnrollmentDetail = lazy(() => import('@/modules/sis/pages/EnrollmentDetail'));
 const EnrollmentEdit = lazy(() => import('@/modules/sis/pages/EnrollmentEdit'));
-const Curriculum = lazy(() => import('@/modules/sis/pages/Curriculum'));
-const CurriculumCreate = lazy(() => import('@/modules/sis/pages/CurriculumCreate'));
-const CurriculumDetail = lazy(() => import('@/modules/sis/pages/CurriculumDetail'));
-function CurriculumDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <CurriculumDetail id={id} />;
-}
-const CurriculumEdit = lazy(() => import('@/modules/sis/pages/CurriculumEdit'));
-function CurriculumEditPage() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <CurriculumEdit id={id} />;
-}
+const CurriculumPage = lazy(() => import('@/modules/sis/pages/CurriculumPage'));
 const SubjectCreate = lazy(() => import('@/modules/sis/pages/SubjectCreate'));
 const SubjectList = lazy(() => import('@/modules/sis/pages/SubjectList'));
 const SubjectDetailPage = lazy(() => import('@/modules/sis/pages/SubjectDetailPage'));
@@ -117,6 +104,18 @@ function MajorDetailPage() {
 const TrainingSystemList = lazy(() => import('@/modules/sis/pages/TrainingSystemList'));
 const SpecializationList = lazy(() => import('@/modules/sis/pages/SpecializationList'));
 const AcademicTermList = lazy(() => import('@/modules/sis/pages/AcademicTermList'));
+const AcademicTermDetail = lazy(() => import('@/modules/sis/pages/AcademicTermDetail'));
+const AcademicTermEdit = lazy(() => import('@/modules/sis/pages/AcademicTermEdit'));
+function AcademicTermDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  if (!id) return null;
+  return <AcademicTermDetail id={id} />;
+}
+function AcademicTermEditPage() {
+  const { id } = useParams<{ id: string }>();
+  if (!id) return null;
+  return <AcademicTermEdit id={id} />;
+}
 
 // SIS - Lịch học (Phase 3)
 const ScheduleList = lazy(() => import('@/modules/sis/pages/ScheduleList'));
@@ -131,6 +130,8 @@ const AdmissionStudentList = lazy(() => import('@/modules/sis/pages/AdmissionStu
 // SIS - CTĐT mở rộng (Phase 6)
 const SubjectTypeList = lazy(() => import('@/modules/sis/pages/SubjectTypeList'));
 const PrerequisiteList = lazy(() => import('@/modules/sis/pages/PrerequisiteList'));
+const SubjectConditionList = lazy(() => import('@/modules/sis/pages/SubjectConditionList'));
+// AdmissionBatchList already declared in Phase 5
 
 // DMS
 const DMSDashboard = lazy(() => import('@/modules/dms/pages/DMSDashboard'));
@@ -556,14 +557,12 @@ export default function AppRouter() {
           <Route path="/sis/dang-ky-hoc-phan/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentCreate /></RoleRoute>} />
           <Route path="/sis/dang-ky-hoc-phan/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentDetail /></RoleRoute>} />
           <Route path="/sis/dang-ky-hoc-phan/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentEdit /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><Curriculum /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumCreate /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumEditPage /></RoleRoute>} />
+          {/* SIS - CTĐT */}
+          <Route path="/sis/ctdt" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CurriculumPage /></RoleRoute>} />
           <Route path="/sis/chuong-trinh-dao-tao/mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SubjectList /></RoleRoute>} />
           <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SubjectCreate /></RoleRoute>} />
           <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SubjectDetailPage /></RoleRoute>} />
           <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SubjectEditPage /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumDetailPage /></RoleRoute>} />
           <Route path="/sis/tot-nghiep" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><GraduationList /></RoleRoute>} />
           <Route path="/sis/tot-nghiep/mo-dot" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><GraduationOpenSession /></RoleRoute>} />
           <Route path="/sis/tot-nghiep/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><GraduationSessionDetail /></RoleRoute>} />
@@ -577,12 +576,16 @@ export default function AppRouter() {
           <Route path="/sis/he-dao-tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><TrainingSystemList /></RoleRoute>} />
           <Route path="/sis/chuyen-nganh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SpecializationList /></RoleRoute>} />
           <Route path="/sis/hoc-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AcademicTermList /></RoleRoute>} />
+          <Route path="/sis/hoc-ky/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AcademicTermDetailPage /></RoleRoute>} />
+          <Route path="/sis/hoc-ky/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AcademicTermEditPage /></RoleRoute>} />
           <Route path="/sis/lich-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><ScheduleList /></RoleRoute>} />
           <Route path="/sis/yeu-cau-sv" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><StudentRequestList /></RoleRoute>} />
           <Route path="/sis/tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionBatchList /></RoleRoute>} />
           <Route path="/sis/thi-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionStudentList /></RoleRoute>} />
           <Route path="/sis/loai-mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SubjectTypeList /></RoleRoute>} />
           <Route path="/sis/mon-tien-quyet" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><PrerequisiteList /></RoleRoute>} />
+          <Route path="/sis/dieu-kien-hoc-phan" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SubjectConditionList /></RoleRoute>} />
+          <Route path="/sis/dot-tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionBatchList /></RoleRoute>} />
 
           {/* DMS — admin + nhan-vien + BGH */}
           <Route path="/dms" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DMSDashboard /></RoleRoute>} />

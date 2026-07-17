@@ -55,9 +55,7 @@ const DEV_SIS_ONLY = true;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SIS_ONLY_MODULES: Module[] = [
-  { id: 'sis-nganh-hoc', label: 'Ngành học', route: '/sis/nganh-hoc', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-  { id: 'sis-he-dao-tao', label: 'Hệ đào tạo', route: '/sis/he-dao-tao', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-  { id: 'sis-chuyen-nganh', label: 'Chuyên ngành', route: '/sis/chuyen-nganh', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'sis-chuong-trinh-dao-tao', label: 'Chương trình đào tạo', route: '/sis/ctdt', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
 ];
 
 const SIS_ONLY_GROUP: NavGroup = {
@@ -116,7 +114,7 @@ const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
       // SIS
       { id: 'sis', label: 'SIS – Sinh viên & Đào tạo', route: '/sis', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
       { id: 'sis-sv', label: 'Danh sách Sinh viên', route: '/sis/sinh-vien', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-ctdt', label: 'CTĐT', route: '/sis/chuong-trinh-dao-tao', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
+      { id: 'sis-ctdt', label: 'CTĐT', route: '/sis/ctdt', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
       { id: 'sis-mon-hoc', label: 'Môn học', route: '/sis/mon-hoc', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
       { id: 'sis-dk', label: 'Đăng ký HP', route: '/sis/dang-ky-hoc-phan', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.TRUONG_KHOA] },
       { id: 'sis-ds-dk', label: 'DS Đăng ký', route: '/sis/dang-ky', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
@@ -133,6 +131,8 @@ const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
       { id: 'sis-thi-sinh', label: 'Thí sinh', route: '/sis/thi-sinh', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
       { id: 'sis-loai-mon-hoc', label: 'Loại môn học', route: '/sis/loai-mon-hoc', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
       { id: 'sis-tien-quyet', label: 'Môn tiên quyết', route: '/sis/mon-tien-quyet', icon: <Link className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
+      { id: 'sis-dieu-kien-hoc-phan', label: 'Điều kiện học phần', route: '/sis/dieu-kien-hoc-phan', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
+      { id: 'sis-dot-tuyen-sinh', label: 'Đợt tuyển sinh', route: '/sis/dot-tuyen-sinh', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
       // LMS
       { id: 'lms', label: 'LMS – Dạy học Số', route: '/lms', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
       { id: 'lms-khoa-hoc', label: 'Khóa học', route: '/lms/khoa-hoc', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },

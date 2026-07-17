@@ -35,8 +35,10 @@ const DEGREE_LEVEL_OPTIONS = [
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Tất cả trạng thái' },
-  { value: '1', label: 'Đang hoạt động' },
-  { value: '0', label: 'Ngừng hoạt động' },
+  { value: '1', label: 'Bản nháp' },
+  { value: '2', label: 'Chờ phê duyệt' },
+  { value: '3', label: 'Đã công bố' },
+  { value: '4', label: 'Lưu trữ' },
 ];
 
 function getDegreeLabel(level: number): string {
@@ -45,6 +47,13 @@ function getDegreeLabel(level: number): string {
   if (level === 3) return 'Tiến sĩ';
   return `Bậc ${level}`;
 }
+
+const MAJOR_STATUS_CONFIG: Record<number, { label: string; variant: 'success' | 'warning' | 'info' | 'neutral' }> = {
+  1: { label: 'Bản nháp', variant: 'neutral' },
+  2: { label: 'Chờ phê duyệt', variant: 'warning' },
+  3: { label: 'Đã công bố', variant: 'success' },
+  4: { label: 'Lưu trữ', variant: 'info' },
+};
 
 export default function MajorList() {
   const { pagination, setPage, setPageSize } = usePagination({
@@ -68,7 +77,7 @@ export default function MajorList() {
     sort_direction: 'desc',
     name: search || undefined,
     degree_level: degreeLevel ? Number(degreeLevel) : undefined,
-    status: status === '' ? undefined : (Number(status) as 0 | 1),
+    status: status === '' ? undefined : (Number(status) as 1 | 2 | 3 | 4),
   });
 
   const createMut = useCreateHqnhatMajor();
@@ -200,8 +209,8 @@ export default function MajorList() {
                   {item.description || '—'}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={item.status === 1 ? 'success' : 'neutral'} dot>
-                    {item.status === 1 ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+                  <Badge variant={MAJOR_STATUS_CONFIG[item.status]?.variant ?? 'neutral'} dot>
+                    {MAJOR_STATUS_CONFIG[item.status]?.label ?? `Trạng thái ${item.status}`}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
@@ -293,9 +302,7 @@ function MajorDetailModal({
 }) {
   if (!major) return null;
 
-  const statusCfg = major.status === 1
-    ? { variant: 'success' as const, label: 'Đang hoạt động' }
-    : { variant: 'neutral' as const, label: 'Ngừng hoạt động' };
+  const statusCfg = MAJOR_STATUS_CONFIG[major.status] ?? { variant: 'neutral' as const, label: `Trạng thái ${major.status}` };
 
   const formatDate = (dateStr: string | null | undefined) => {
     if (!dateStr) return '—';
@@ -411,7 +418,7 @@ function MajorFormModal({
     name: '',
     description: '',
     degree_level: 1,
-    status: 1 as 0 | 1,
+    status: 1 as 1 | 2 | 3 | 4,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -425,7 +432,7 @@ function MajorFormModal({
         name: editing?.name ?? '',
         description: editing?.description ?? '',
         degree_level: editing?.degree_level ?? 1,
-        status: (editing?.status ?? 1) as 0 | 1,
+        status: (editing?.status ?? 1) as 1 | 2 | 3 | 4,
       });
       setErrors({});
       setSubmitError(null);
@@ -529,11 +536,13 @@ function MajorFormModal({
         <FormField label="Trạng thái">
           <select
             value={form.status}
-            onChange={(e) => setForm({ ...form, status: Number(e.target.value) as 0 | 1 })}
+            onChange={(e) => setForm({ ...form, status: Number(e.target.value) as 1 | 2 | 3 | 4 })}
             className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
           >
-            <option value={1}>Đang hoạt động</option>
-            <option value={0}>Ngừng hoạt động</option>
+            <option value={1}>Bản nháp</option>
+            <option value={2}>Chờ phê duyệt</option>
+            <option value={3}>Đã công bố</option>
+            <option value={4}>Lưu trữ</option>
           </select>
         </FormField>
       </div>

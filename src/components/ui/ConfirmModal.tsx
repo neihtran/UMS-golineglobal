@@ -3,7 +3,7 @@ import { Modal } from './Modal';
 interface ConfirmModalProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   title: string;
   description?: string;
   confirmText?: string;

@@ -202,12 +202,12 @@ export default function Landing() {
               to="/auth/login"
               className="inline-flex items-center gap-2 rounded-xl bg-[rgb(var(--accent))] px-7 py-3.5 text-base font-bold text-[rgb(var(--primary-dark))] shadow-lg transition-all hover:bg-[rgb(var(--accent-light))] hover:-translate-y-0.5 hover:shadow-xl active:scale-[0.98]"
             >
-              Đăng nhập ngay
+              Xem demo
               <ArrowRight className="h-5 w-5" />
             </Link>
-            <button className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-7 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:-translate-y-0.5">
+            {/* <button className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-7 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:-translate-y-0.5">
               Xem demo
-            </button>
+            </button> */}
           </div>
 
           {/* Stats */}

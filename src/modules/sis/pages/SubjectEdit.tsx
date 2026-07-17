@@ -1,118 +1,121 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Save } from 'lucide-react';
-import { Button, Card, CardContent, Input } from '@/components/ui';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Save, ArrowLeft } from 'lucide-react';
+import { Button, Card, CardContent } from '@/components/ui';
+import { FormField } from '@/components/forms';
 import { PageHeader } from '@/components/layout';
 import { LoadingState } from '@/components/data-display/LoadingState';
 import { EmptyState } from '@/components/data-display/EmptyState';
-import { useSubjectDetail, useUpdateSubject } from '@/hooks/useSis';
-import { useDepartmentList } from '@/hooks/useHrm';
+import {
+  useHqnhatSubject,
+  useHqnhatSubjectTypes,
+  useUpdateHqnhatSubject,
+} from '@/hooks/useHqnhat';
+import type { HqnhatSubjectCreatePayload } from '@/types/hqnhat.types';
 
-function Field({ label, required, error, children }: { label: string; required?: boolean; error?: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-sm font-medium text-[rgb(var(--text-secondary))]">
-        {label}{required && <span className="text-[rgb(var(--error))] ml-0.5">*</span>}
-      </label>
-      {children}
-      {error && <p className="mt-1 text-xs text-[rgb(var(--error))]">{error}</p>}
-    </div>
-  );
-}
-
-type SubjectEditProps = { id: string };
-
-export default function SubjectEdit({ id }: SubjectEditProps) {
+export default function SubjectEdit() {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: subject, isLoading, isError } = useSubjectDetail(id);
-  const updateMutation = useUpdateSubject();
-  const { data: deptResp } = useDepartmentList({ isActive: true });
-  const departments = ((deptResp as any)?.data ?? []) as Array<{ _id: string; name: string }>;
+  const numericId = id ? Number(id) : undefined;
 
-  const [form, setForm] = useState({
+  const { data, isLoading, isError } = useHqnhatSubject(numericId);
+  const { data: subjectTypesData } = useHqnhatSubjectTypes({ per_page: 100 });
+  const updateMut = useUpdateHqnhatSubject();
+
+  const subjectTypes = subjectTypesData?.data ?? [];
+  const item = data?.data;
+
+  const [form, setForm] = useState<HqnhatSubjectCreatePayload>({
     code: '',
     name: '',
-    credits: '',
-    theoryHours: '',
-    practiceHours: '',
+    subject_type_id: 0,
+    credit: 0,
+    theory_hours: 0,
+    practice_hours: 0,
+    lab_hours: 0,
     description: '',
-    department: '',
-    isActive: true,
+    status: 1,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [inited, setInited] = useState(false);
 
   // Sync form when data loads
-  if (subject && !form.name) {
-    const deptId =
-      typeof subject.department === 'object' && subject.department
-        ? (subject.department as any)._id
-        : '';
+  if (item && !inited) {
     setForm({
-      code: subject.code,
-      name: subject.name,
-      credits: subject.credits.toString(),
-      theoryHours: (subject.theoryHours ?? '').toString(),
-      practiceHours: (subject.practiceHours ?? '').toString(),
-      description: subject.description ?? '',
-      department: deptId,
-      isActive: subject.isActive,
+      code: item.code,
+      name: item.name,
+      subject_type_id: item.subject_type_id,
+      credit: item.credit,
+      theory_hours: item.theory_hours,
+      practice_hours: item.practice_hours,
+      lab_hours: item.lab_hours,
+      description: item.description ?? '',
+      status: item.status as 0 | 1,
     });
+    setInited(true);
   }
-
-  const set = (k: string, v: string | boolean) => {
-    setForm((f) => ({ ...f, [k]: v }));
-    setErrors((e) => { const n = { ...e }; delete n[k]; return n; });
-  };
 
   const validate = () => {
     const e: Record<string, string> = {};
     if (!form.code.trim()) e.code = 'Mã môn học không được để trống';
     if (!form.name.trim()) e.name = 'Tên môn học không được để trống';
-    if (!form.credits) e.credits = 'Số tín chỉ không được để trống';
-    return e;
+    if (!form.subject_type_id) e.subject_type_id = 'Chọn nhóm môn học';
+    if (!form.credit || form.credit <= 0) e.credit = 'Số tín chỉ phải > 0';
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
-
-    updateMutation.mutate(
-      {
-        id,
-        data: {
-          code: form.code.trim(),
-          name: form.name.trim(),
-          credits: Number(form.credits),
-          theoryHours: form.theoryHours ? Number(form.theoryHours) : undefined,
-          practiceHours: form.practiceHours ? Number(form.practiceHours) : undefined,
-          description: form.description.trim() || undefined,
-          department: form.department || undefined,
-          isActive: form.isActive,
-        },
-      },
-      {
-        onSuccess: () => navigate('/sis/chuong-trinh-dao-tao/mon-hoc'),
-      }
-    );
+    if (!validate() || !numericId) return;
+    setSubmitError(null);
+    try {
+      await updateMut.mutateAsync({ id: numericId, payload: form });
+      navigate('/sis/mon-hoc');
+    } catch (err: any) {
+      setSubmitError(err.message || 'Có lỗi xảy ra');
+    }
   };
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Sửa môn học" breadcrumbs={[{ label: 'SIS', href: '/sis' }, { label: 'Môn học', href: '/sis/chuong-trinh-dao-tao/mon-hoc' }, { label: '...' }]} />
-        <div className="px-5 py-10"><LoadingState message="Đang tải..." /></div>
+        <PageHeader
+          title="Sửa môn học"
+          breadcrumbs={[
+            { label: 'SIS', href: '/sis' },
+            { label: 'Danh mục', href: '/sis' },
+            { label: 'Môn học', href: '/sis/mon-hoc' },
+            { label: '...' },
+          ]}
+        />
+        <LoadingState message="Đang tải..." />
       </div>
     );
   }
 
-  if (isError || !subject) {
+  if (isError || !item) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Sửa môn học" breadcrumbs={[{ label: 'SIS', href: '/sis' }, { label: 'Môn học', href: '/sis/chuong-trinh-dao-tao/mon-hoc' }]} />
-        <div className="px-5 py-10">
-          <EmptyState title="Không tìm thấy môn học" description="Môn học này có thể đã bị xóa." />
-        </div>
+        <PageHeader
+          title="Sửa môn học"
+          breadcrumbs={[
+            { label: 'SIS', href: '/sis' },
+            { label: 'Danh mục', href: '/sis' },
+            { label: 'Môn học', href: '/sis/mon-hoc' },
+          ]}
+        />
+        <EmptyState
+          icon={<Save className="h-12 w-12" />}
+          title="Không tìm thấy môn học"
+          description="Môn học này có thể đã bị xóa."
+          action={
+            <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/sis/mon-hoc')}>
+              Quay lại
+            </Button>
+          }
+        />
       </div>
     );
   }
@@ -120,16 +123,17 @@ export default function SubjectEdit({ id }: SubjectEditProps) {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Sửa môn học: ${subject.name}`}
-        description={`Mã: ${subject.code}`}
+        title={`Sửa môn học: ${item.name}`}
+        description={`Mã: ${item.code}`}
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
-          { label: 'Môn học', href: '/sis/chuong-trinh-dao-tao/mon-hoc' },
-          { label: subject.code },
+          { label: 'Danh mục', href: '/sis' },
+          { label: 'Môn học', href: '/sis/mon-hoc' },
+          { label: item.code },
           { label: 'Sửa' },
         ]}
         actions={
-          <Button variant="outline" onClick={() => navigate('/sis/chuong-trinh-dao-tao/mon-hoc')}>
+          <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />} onClick={() => navigate('/sis/mon-hoc')}>
             Quay lại
           </Button>
         }
@@ -141,65 +145,100 @@ export default function SubjectEdit({ id }: SubjectEditProps) {
             <h3 className="font-semibold text-[rgb(var(--text-primary))]">Thông tin môn học</h3>
           </div>
           <CardContent className="grid grid-cols-2 gap-4 pt-5">
-            <Field label="Mã môn học" required error={errors.code}>
-              <Input value={form.code} onChange={(e) => set('code', e.target.value)} error={errors.code} />
-            </Field>
-            <Field label="Tên môn học" required error={errors.name}>
-              <Input value={form.name} onChange={(e) => set('name', e.target.value)} error={errors.name} />
-            </Field>
-            <div className="grid grid-cols-3 gap-4">
-              <Field label="Số tín chỉ" required error={errors.credits}>
-                <Input type="number" value={form.credits} onChange={(e) => set('credits', e.target.value)} error={errors.credits} />
-              </Field>
-              <Field label="Giờ lý thuyết">
-                <Input type="number" value={form.theoryHours} onChange={(e) => set('theoryHours', e.target.value)} />
-              </Field>
-              <Field label="Giờ thực hành">
-                <Input type="number" value={form.practiceHours} onChange={(e) => set('practiceHours', e.target.value)} />
-              </Field>
-            </div>
-            <Field label="Khoa phụ trách">
+            {submitError && (
+              <div className="col-span-2 rounded-lg bg-red-50 p-3 text-sm text-red-600 border border-red-200">
+                {submitError}
+              </div>
+            )}
+            <FormField label="Mã môn học" error={errors.code} required>
+              <input
+                value={form.code}
+                onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
+                className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+              />
+            </FormField>
+            <FormField label="Số tín chỉ" error={errors.credit} required>
+              <input
+                type="number"
+                value={form.credit}
+                onChange={(e) => setForm({ ...form, credit: Number(e.target.value) })}
+                className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+              />
+            </FormField>
+            <FormField label="Tên môn học" error={errors.name} required className="col-span-2">
+              <input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+              />
+            </FormField>
+            <FormField label="Nhóm môn học" error={errors.subject_type_id} required>
               <select
-                value={form.department}
-                onChange={(e) => set('department', e.target.value)}
-                className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
+                value={form.subject_type_id}
+                onChange={(e) => setForm({ ...form, subject_type_id: Number(e.target.value) })}
+                className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
               >
-                <option value="">— Chọn khoa —</option>
-                {departments.map((d) => (
-                  <option key={d._id} value={d._id}>{d.name}</option>
+                <option value={0}>— Chọn nhóm môn —</option>
+                {subjectTypes.map((t) => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
                 ))}
               </select>
-            </Field>
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-[rgb(var(--text-secondary))]">Trạng thái</label>
+            </FormField>
+            <FormField label="Trạng thái">
               <select
-                value={form.isActive ? 'active' : 'inactive'}
-                onChange={(e) => set('isActive', e.target.value === 'active')}
-                className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: Number(e.target.value) as 0 | 1 })}
+                className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
               >
-                <option value="active">Hoạt động</option>
-                <option value="inactive">Ngừng sử dụng</option>
+                <option value={1}>Hoạt động</option>
+                <option value={0}>Ngừng sử dụng</option>
               </select>
+            </FormField>
+            <div className="col-span-2 grid grid-cols-3 gap-4">
+              <FormField label="Giờ lý thuyết">
+                <input
+                  type="number"
+                  value={form.theory_hours}
+                  onChange={(e) => setForm({ ...form, theory_hours: Number(e.target.value) })}
+                  className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+                />
+              </FormField>
+              <FormField label="Giờ thực hành">
+                <input
+                  type="number"
+                  value={form.practice_hours}
+                  onChange={(e) => setForm({ ...form, practice_hours: Number(e.target.value) })}
+                  className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+                />
+              </FormField>
+              <FormField label="Giờ lab">
+                <input
+                  type="number"
+                  value={form.lab_hours}
+                  onChange={(e) => setForm({ ...form, lab_hours: Number(e.target.value) })}
+                  className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+                />
+              </FormField>
             </div>
             <div className="col-span-2">
-              <Field label="Mô tả">
+              <FormField label="Mô tả">
                 <textarea
-                  value={form.description}
-                  onChange={(e) => set('description', e.target.value)}
+                  value={form.description ?? ''}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={3}
-                  className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2] resize-none"
+                  className="w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))]/40 resize-none"
                 />
-              </Field>
+              </FormField>
             </div>
           </CardContent>
         </Card>
 
         <div className="flex items-center justify-end gap-3">
-          <Button variant="outline" type="button" onClick={() => navigate('/sis/chuong-trinh-dao-tao/mon-hoc')}>
+          <Button variant="outline" type="button" onClick={() => navigate('/sis/mon-hoc')}>
             Quay lại
           </Button>
-          <Button type="submit" leftIcon={<Save className="h-4 w-4" />} disabled={updateMutation.isPending}>
-            {updateMutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+          <Button type="submit" leftIcon={<Save className="h-4 w-4" />} disabled={updateMut.isPending}>
+            {updateMut.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
           </Button>
         </div>
       </form>

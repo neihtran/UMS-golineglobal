@@ -238,7 +238,7 @@ export default function Login() {
             {t('login.ssoButton')}
           </Button>
 
-          {/* Quick login accounts */}
+          {/* Quick login accounts
           <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -283,7 +283,7 @@ export default function Login() {
             <p className="text-[10px] text-[rgb(var(--text-muted))] italic">
               Tài khoản demo — tự động điền mật khẩu tương ứng. Nhấn "Đăng nhập" để vào hệ thống.
             </p>
-          </div>
+          </div> */}
 
           <p className="text-center text-xs text-[rgb(var(--text-muted))]">
             {t('login.contactHint')}
