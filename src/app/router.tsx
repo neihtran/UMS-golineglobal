@@ -111,8 +111,10 @@ const ScheduleList = lazy(() => import('@/modules/sis/pages/ScheduleList'));
 const StudentRequestList = lazy(() => import('@/modules/sis/pages/StudentRequestList'));
 
 // SIS - Tuyển sinh (Phase 5)
-const AdmissionBatchList = lazy(() => import('@/modules/sis/pages/AdmissionBatchList'));
-const AdmissionStudentList = lazy(() => import('@/modules/sis/pages/AdmissionStudentList'));
+const AdmissionPage = lazy(() => import('@/modules/sis/pages/AdmissionPage'));
+
+// SIS - Đăng ký học phần & Thời khóa biểu (Phase 7)
+const RegistrationPage = lazy(() => import('@/modules/sis/pages/RegistrationPage'));
 
 // SIS - CTĐT mở rộng (Phase 6) — handled by CurriculumPage sheets
 const SubjectConditionList = lazy(() => import('@/modules/sis/pages/SubjectConditionList'));
@@ -564,12 +566,15 @@ export default function AppRouter() {
           <Route path="/sis/hoc-ky/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AcademicTermEditPage /></RoleRoute>} />
           <Route path="/sis/lich-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><ScheduleList /></RoleRoute>} />
           <Route path="/sis/yeu-cau-sv" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><StudentRequestList /></RoleRoute>} />
-          <Route path="/sis/tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionBatchList /></RoleRoute>} />
-          <Route path="/sis/thi-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionStudentList /></RoleRoute>} />
-          <Route path="/sis/loai-mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/mon-tien-quyet" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/dieu-kien-hoc-phan" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><SubjectConditionList /></RoleRoute>} />
-          <Route path="/sis/dot-tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionBatchList /></RoleRoute>} />
+          <Route path="/sis/tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionPage /></RoleRoute>} />
+          <Route path="/sis/dot-tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionPage /></RoleRoute>} />
+
+          {/* SIS - Đăng ký học phần & Thời khóa biểu (Phase 7) */}
+          <Route path="/sis/dang-ky-hoc-phan-tkb" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
+          <Route path="/sis/lop-hoc-phan" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
+          <Route path="/sis/thoi-khoa-bieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
+          <Route path="/sis/thay-doi-lich-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
+          <Route path="/sis/danh-sach-dang-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
 
           {/* DMS — admin + nhan-vien + BGH */}
           <Route path="/dms" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DMSDashboard /></RoleRoute>} />

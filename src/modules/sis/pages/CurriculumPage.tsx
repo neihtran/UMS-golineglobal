@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BookOpen, Users, Calendar, Briefcase, GraduationCap, BookMarked, Library, GitBranch } from 'lucide-react';
+import { BookOpen, Users, Calendar, Briefcase, GraduationCap, BookMarked, Library, GitBranch, ShieldCheck } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import {
   AcademicTermSheet,
@@ -11,6 +11,7 @@ import {
   CurriculumSheet,
   CurriculumSubjectSheet,
   SubjectPrerequisiteSheet,
+  SubjectConditionSheet,
 } from './sheets';
 
 type TabType =
@@ -22,7 +23,8 @@ type TabType =
   | 'khoa-hoc'
   | 'mon-hoc'
   | 'mon-trong-ctdt'
-  | 'tien-quyet';
+  | 'tien-quyet'
+  | 'dieu-kien-dang-ky';
 
 const TABS: { id: TabType; label: string; icon: React.ReactNode }[] = [
   { id: 'ctdt', label: 'CTĐT', icon: <BookOpen className="h-4 w-4" /> },
@@ -34,6 +36,7 @@ const TABS: { id: TabType; label: string; icon: React.ReactNode }[] = [
   { id: 'mon-hoc', label: 'Môn học', icon: <BookMarked className="h-4 w-4" /> },
   { id: 'mon-trong-ctdt', label: 'Môn trong CTĐT', icon: <Library className="h-4 w-4" /> },
   { id: 'tien-quyet', label: 'Tiên quyết', icon: <GitBranch className="h-4 w-4" /> },
+  { id: 'dieu-kien-dang-ky', label: 'Điều kiện đăng ký', icon: <ShieldCheck className="h-4 w-4" /> },
 ];
 
 const TAB_CONTENT: Record<TabType, React.ReactNode> = {
@@ -46,6 +49,7 @@ const TAB_CONTENT: Record<TabType, React.ReactNode> = {
   'mon-hoc': <SubjectSheet />,
   'mon-trong-ctdt': <CurriculumSubjectSheet />,
   'tien-quyet': <SubjectPrerequisiteSheet />,
+  'dieu-kien-dang-ky': <SubjectConditionSheet />,
 };
 
 export default function CurriculumPage() {
@@ -54,11 +58,11 @@ export default function CurriculumPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Chương trình đào tạo & Danh mục"
+        title="Hệ thống đào tạo & Danh mục"
         description="Quản lý CTĐT, ngành học, hệ đào tạo, chuyên ngành, học kỳ, khóa học, môn học và tiên quyết"
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
-          { label: 'Chương trình đào tạo' },
+          { label: 'Hệ thống đào tạo' },
         ]}
       />
 

@@ -11,6 +11,8 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true, // Cho phép truy cập từ máy khác cùng mạng LAN
+    allowedHosts: true, // Cho phép mọi host (cần thiết khi dùng host: true)
     proxy: {
       // Forward /api requests to backend during local development.
       // In production, deploy behind nginx with same proxy config.

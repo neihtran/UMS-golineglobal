@@ -199,7 +199,7 @@ export default function Landing() {
           {/* CTA buttons */}
           <div className="mt-10 flex flex-wrap justify-center gap-4 animate-fade-in-up delay-300">
             <Link
-              to="/auth/login"
+              to="/dashboard/admin"
               className="inline-flex items-center gap-2 rounded-xl bg-[rgb(var(--accent))] px-7 py-3.5 text-base font-bold text-[rgb(var(--primary-dark))] shadow-lg transition-all hover:bg-[rgb(var(--accent-light))] hover:-translate-y-0.5 hover:shadow-xl active:scale-[0.98]"
             >
               Xem demo

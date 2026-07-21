@@ -167,7 +167,7 @@ export default function SubjectConditionList() {
                   {(pagination.page - 1) * pagination.pageSize + i + 1}
                 </TableCell>
                 <TableCell className="font-medium">{getSubjectName(item.subject_id)}</TableCell>
-                <TableCell className="tabular-nums">{item.min_gpa.toFixed(2)}</TableCell>
+                <TableCell className="tabular-nums">{item.min_gpa !== null && item.min_gpa !== undefined ? Number(item.min_gpa).toFixed(2) : '—'}</TableCell>
                 <TableCell className="tabular-nums">{item.min_completed_credit}</TableCell>
                 <TableCell className="tabular-nums">{item.max_failed_subject}</TableCell>
                 <TableCell className="max-w-xs truncate text-[rgb(var(--text-secondary))]">
@@ -280,7 +280,7 @@ function SubjectConditionDetailModal({
         <div className="grid grid-cols-3 gap-4">
           <div className="space-y-1">
             <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Điểm TB tối thiểu</p>
-            <p className="text-sm font-medium">{condition.min_gpa.toFixed(2)}</p>
+            <p className="text-sm font-medium">{condition.min_gpa !== null && condition.min_gpa !== undefined ? Number(condition.min_gpa).toFixed(2) : '—'}</p>
           </div>
           <div className="space-y-1">
             <p className="text-xs font-medium uppercase tracking-wide text-[rgb(var(--text-muted))]">Tín chỉ tích lũy tối thiểu</p>
@@ -338,9 +338,9 @@ function SubjectConditionFormModal({
     if (open) {
       setForm({
         subject_id: editing?.subject_id ?? 0,
-        min_gpa: editing?.min_gpa ?? 2.0,
-        min_completed_credit: editing?.min_completed_credit ?? 0,
-        max_failed_subject: editing?.max_failed_subject ?? 0,
+        min_gpa: editing?.min_gpa === null || editing?.min_gpa === undefined ? 2.0 : Number(editing.min_gpa),
+        min_completed_credit: editing?.min_completed_credit === null || editing?.min_completed_credit === undefined ? 0 : Number(editing.min_completed_credit),
+        max_failed_subject: editing?.max_failed_subject === null || editing?.max_failed_subject === undefined ? 0 : Number(editing.max_failed_subject),
         note: editing?.note ?? '',
       });
       setErrors({});

@@ -81,7 +81,7 @@ export function MajorSheet() {
     if (!form.code.trim()) e.code = 'Mã ngành không được để trống';
     if (!form.name.trim()) e.name = 'Tên ngành không được để trống';
     if (!form.degree_level) e.degree_level = 'Chọn bậc đào tạo';
-    if (!form.description.trim()) e.description = 'Mô tả không được để trống';
+    if (!form.description?.trim()) e.description = 'Mô tả không được để trống';
     setErrors(e); return Object.keys(e).length === 0;
   };
 

@@ -26,6 +26,11 @@ export function formatDatetime(date: string | Date): string {
   return formatDate(date, DATETIME_FORMAT);
 }
 
+export function formatDateTime(date: string | Date | null | undefined): string {
+  if (!date) return '—';
+  return formatDate(date, DATETIME_FORMAT);
+}
+
 export function formatShortDate(date: string | Date): string {
   return formatDate(date, SHORT_DATE_FORMAT);
 }

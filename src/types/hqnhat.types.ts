@@ -401,9 +401,9 @@ export interface HqnhatSubjectPrerequisiteCreatePayload {
 export interface HqnhatSubjectCondition {
   id: number;
   subject_id: number;
-  min_gpa: number;
-  min_completed_credit: number;
-  max_failed_subject: number;
+  min_gpa: number | string | null;
+  min_completed_credit: number | string | null;
+  max_failed_subject: number | string | null;
   note: string | null;
   created_at?: string | null;
   updated_at?: string | null;
@@ -419,10 +419,10 @@ export interface HqnhatSubjectConditionListParams {
 
 export interface HqnhatSubjectConditionCreatePayload {
   subject_id: number;
-  min_gpa: number;
-  min_completed_credit: number;
-  max_failed_subject: number;
-  note?: string;
+  min_gpa?: number | null;
+  min_completed_credit?: number | null;
+  max_failed_subject?: number | null;
+  note?: string | null;
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -460,4 +460,451 @@ export interface HqnhatAdmissionBatchCreatePayload {
   start_date: string;
   end_date: string;
   status: 0 | 1;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ADMISSION STUDENTS (Thí sinh trúng tuyển)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatAdmissionStudent {
+  id: number;
+  batch_id: number;
+  training_system_id: number;
+  course_id: number;
+  candidate_code: string;
+  full_name: string;
+  gender: number; // 1: MALE, 2: FEMALE, 3: OTHER
+  date_of_birth: string | null;
+  citizen_id: string | null;
+  phone: string | null;
+  email: string | null;
+  major_id: number | null;
+  admission_score: number | null;
+  status: number; // 0: PENDING, 1: ACCEPTED, 2: ENROLLED, 3: CANCELLED
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: string | null;
+}
+
+export interface HqnhatAdmissionStudentListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  candidate_code?: string;
+  full_name?: string;
+  citizen_id?: string;
+  phone?: string;
+  email?: string;
+  batch_id?: number;
+  training_system_id?: number;
+  course_id?: number;
+  major_id?: number;
+  gender?: 1 | 2 | 3;
+  status?: 0 | 1 | 2 | 3;
+  include_deleted?: boolean;
+}
+
+export interface HqnhatAdmissionStudentCreatePayload {
+  batch_id: number;
+  training_system_id: number;
+  course_id: number;
+  candidate_code: string;
+  full_name: string;
+  gender: 1 | 2 | 3;
+  date_of_birth?: string;
+  citizen_id?: string;
+  phone?: string;
+  email?: string;
+  major_id?: number;
+  admission_score?: number;
+  status?: 0 | 1 | 2 | 3;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT STATUS HISTORIES (Lịch sử trạng thái sinh viên)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatStudentStatusHistory {
+  id: number;
+  student_id: number;
+  status: number; // 1: STUDYING, 2: RESERVED, 3: DROPPED, 4: GRADUATED, 5: TRANSFERRED_MAJOR, 6: TRANSFERRED_CLASS
+  effective_date: string; // YYYY-MM-DD
+  decision_no: string | null;
+  decision_date: string | null;
+  reason: string | null;
+  note: string | null;
+  created_by: number | null;
+  created_at?: string | null;
+}
+
+export interface HqnhatStudentStatusHistoryListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_id?: number;
+  status?: 1 | 2 | 3 | 4 | 5 | 6;
+}
+
+export interface HqnhatStudentStatusHistoryCreatePayload {
+  student_id: number;
+  status: 1 | 2 | 3 | 4 | 5 | 6;
+  effective_date: string;
+  decision_no?: string;
+  decision_date?: string;
+  reason?: string;
+  note?: string;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT RESERVATIONS (Bảo lưu)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatStudentReservation {
+  id: number;
+  student_id: number;
+  from_date: string; // YYYY-MM-DD
+  to_date: string; // YYYY-MM-DD
+  semester_from_id: number | null;
+  semester_to_id: number | null;
+  decision_no: string | null;
+  decision_date: string | null;
+  reason: string | null;
+  status: number; // 1: approved, 2: cancelled
+  created_by: number | null;
+  created_at?: string | null;
+}
+
+export interface HqnhatStudentReservationListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_id?: number;
+  status?: 1 | 2;
+}
+
+export interface HqnhatStudentReservationCreatePayload {
+  student_id: number;
+  from_date: string;
+  to_date: string;
+  semester_from_id?: number;
+  semester_to_id?: number;
+  decision_no?: string;
+  decision_date?: string;
+  reason?: string;
+  status?: 1 | 2;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT DROPOUTS (Thôi học)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatStudentDropout {
+  id: number;
+  student_id: number;
+  dropout_date: string; // YYYY-MM-DD
+  decision_no: string | null;
+  decision_date: string | null;
+  reason: string | null;
+  status: number; // 1: approved, 2: cancelled
+  created_by: number | null;
+  created_at?: string | null;
+}
+
+export interface HqnhatStudentDropoutListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_id?: number;
+  status?: 1 | 2;
+}
+
+export interface HqnhatStudentDropoutCreatePayload {
+  student_id: number;
+  dropout_date: string;
+  decision_no?: string;
+  decision_date?: string;
+  reason?: string;
+  status?: 1 | 2;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT MAJOR CHANGES (Chuyển ngành)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatStudentMajorChange {
+  id: number;
+  student_id: number;
+  from_major_id: number | null;
+  to_major_id: number;
+  from_specialization_id: number | null;
+  to_specialization_id: number | null;
+  effective_date: string; // YYYY-MM-DD
+  decision_no: string | null;
+  decision_date: string | null;
+  reason: string | null;
+  created_by: number | null;
+  created_at?: string | null;
+}
+
+export interface HqnhatStudentMajorChangeListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_id?: number;
+  from_major_id?: number;
+  to_major_id?: number;
+}
+
+export interface HqnhatStudentMajorChangeCreatePayload {
+  student_id: number;
+  from_major_id?: number;
+  to_major_id: number;
+  from_specialization_id?: number;
+  to_specialization_id?: number;
+  effective_date: string;
+  decision_no?: string;
+  decision_date?: string;
+  reason?: string;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT CLASS CHANGES (Chuyển lớp)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatStudentClassChange {
+  id: number;
+  student_id: number;
+  from_class_id: number | null;
+  to_class_id: number;
+  effective_date: string; // YYYY-MM-DD
+  decision_date: string | null;
+  decision_no: string | null;
+  reason: string | null;
+  created_by: number | null;
+  created_at?: string | null;
+}
+
+export interface HqnhatStudentClassChangeListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_id?: number;
+  from_class_id?: number;
+  to_class_id?: number;
+}
+
+export interface HqnhatStudentClassChangeCreatePayload {
+  student_id: number;
+  from_class_id?: number;
+  to_class_id: number;
+  effective_date: string;
+  decision_date?: string;
+  decision_no?: string;
+  reason?: string;
+}
+export interface HqnhatStudent {
+  id: number;
+  user_id: number | null;
+  student_code: string;
+  admission_student_id: number | null;
+  class_id: number | null;
+  major_id: number;
+  specialization_id: number | null;
+  training_system_id: number;
+  course_id: number;
+  enrollment_date: string | null;
+  full_name: string;
+  gender: number | null; // 1: MALE, 2: FEMALE, 3: OTHER
+  date_of_birth: string | null;
+  citizen_id: string | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  avatar: string | null;
+  status: number; // 1: STUDYING, 2: RESERVED, 3: GRADUATED, 4: DROPPED, 5: TRANSFERRED
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: string | null;
+}
+
+export interface HqnhatStudentListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_code?: string;
+  full_name?: string;
+  major_id?: number;
+  class_id?: number;
+  training_system_id?: number;
+  course_id?: number;
+  status?: 1 | 2 | 3 | 4 | 5;
+  include_deleted?: boolean;
+}
+
+export interface HqnhatStudentCreatePayload {
+  user_id?: number;
+  admission_student_id?: number;
+  class_id?: number;
+  major_id: number;
+  specialization_id?: number;
+  training_system_id: number;
+  course_id: number;
+  enrollment_date?: string;
+  full_name: string;
+  gender?: 1 | 2 | 3;
+  date_of_birth?: string;
+  citizen_id?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  avatar?: string;
+  status: 1 | 2 | 3 | 4 | 5;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// COURSE SECTIONS (Lớp học phần)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatCourseSection {
+  id: number;
+  subject_id: number;
+  academic_term_id: number;
+  section_code: string;
+  section_type: number; // 1: THEORY, 2: PRACTICE, 3: LAB, 4: PROJECT
+  max_students: number;
+  current_students: number;
+  registration_start: string | null; // date-time
+  registration_end: string | null; // date-time
+  status: number; // 0: DRAFT, 1: OPEN, 2: CLOSED, 3: CANCELLED
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface HqnhatCourseSectionListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  subject_id?: number;
+  academic_term_id?: number;
+  section_code?: string;
+  section_type?: 1 | 2 | 3 | 4;
+  status?: 0 | 1 | 2 | 3;
+}
+
+export interface HqnhatCourseSectionCreatePayload {
+  subject_id: number;
+  academic_term_id: number;
+  section_code: string;
+  section_type: 1 | 2 | 3 | 4;
+  max_students: number;
+  current_students?: number;
+  registration_start?: string;
+  registration_end?: string;
+  status: 0 | 1 | 2 | 3;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CLASS SCHEDULES (Thời khóa biểu)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatClassSchedule {
+  id: number;
+  course_section_id: number;
+  lecturer_id: number;
+  room_id: number;
+  day_of_week: number; // 1: T2 ... 7: CN
+  lesson_from: number;
+  lesson_to: number;
+  start_date: string | null; // date
+  end_date: string | null; // date
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface HqnhatClassScheduleListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  course_section_id?: number;
+  lecturer_id?: number;
+  room_id?: number;
+  day_of_week?: number;
+}
+
+export interface HqnhatClassScheduleCreatePayload {
+  course_section_id: number;
+  lecturer_id: number;
+  room_id: number;
+  day_of_week: number;
+  lesson_from: number;
+  lesson_to: number;
+  start_date?: string;
+  end_date?: string;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// SCHEDULE CHANGES (Lịch sử thay đổi lịch học)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatScheduleChange {
+  id: number;
+  schedule_id: number;
+  old_room_id: number | null;
+  new_room_id: number | null;
+  old_lecturer_id: number | null;
+  new_lecturer_id: number | null;
+  old_date: string | null;
+  new_date: string | null;
+  reason: string | null;
+  status: number; // 0: pending, 1: approved, 2: rejected
+  created_by: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface HqnhatScheduleChangeListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  schedule_id?: number;
+  status?: 0 | 1 | 2;
+}
+
+export interface HqnhatScheduleChangeCreatePayload {
+  schedule_id: number;
+  new_room_id?: number;
+  new_lecturer_id?: number;
+  new_date?: string;
+  reason?: string;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// COURSE REGISTRATIONS (Đăng ký học phần của sinh viên)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatCourseRegistration {
+  id: number;
+  student_id: number;
+  course_section_id: number;
+  registered_at: string | null; // date-time
+  cancelled_at: string | null; // date-time
+  status: number; // 1: registered, 2: cancelled
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface HqnhatCourseRegistrationListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_id?: number;
+  course_section_id?: number;
+  status?: 1 | 2;
+}
+
+export interface HqnhatCourseRegistrationCreatePayload {
+  student_id: number;
+  course_section_id: number;
+  status?: 1 | 2;
 }

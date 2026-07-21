@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, RotateCcw } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Eye, RotateCcw } from 'lucide-react';
 import {
   Button,
   Input,
@@ -13,6 +13,7 @@ import { ConfirmModal } from '@/components/ui';
 import { usePagination } from '@/hooks';
 import {
   useHqnhatTrainingSystems,
+  useHqnhatTrainingSystem,
   useCreateHqnhatTrainingSystem,
   useUpdateHqnhatTrainingSystem,
   useDeleteHqnhatTrainingSystem,
@@ -52,10 +53,13 @@ export function TrainingSystemSheet() {
   const [editing, setEditing] = useState<HqnhatTrainingSystem | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState<HqnhatTrainingSystem | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailId, setDetailId] = useState<number | null>(null);
   const [form, setForm] = useState<HqnhatTrainingSystemCreatePayload>(emptyForm());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const { data: detailData, isLoading: detailLoading } = useHqnhatTrainingSystem(detailId ?? undefined);
   const createMut = useCreateHqnhatTrainingSystem();
   const updateMut = useUpdateHqnhatTrainingSystem();
   const deleteMut = useDeleteHqnhatTrainingSystem();
@@ -63,6 +67,7 @@ export function TrainingSystemSheet() {
 
   const openCreate = () => { setEditing(null); setForm(emptyForm()); setErrors({}); setSubmitError(null); setModalOpen(true); };
   const openEdit = (item: HqnhatTrainingSystem) => { setEditing(item); setForm({ code: item.code, name: item.name, description: item.description ?? '', status: item.status as 0 | 1 }); setErrors({}); setSubmitError(null); setModalOpen(true); };
+  const openDetail = (item: HqnhatTrainingSystem) => { setDetailId(item.id); setDetailOpen(true); };
   const openDelete = (item: HqnhatTrainingSystem) => { setDeleting(item); setDeleteOpen(true); };
 
   const validate = (): boolean => {
@@ -118,12 +123,13 @@ export function TrainingSystemSheet() {
                  <TableCell className="font-medium">{item.name}</TableCell>
                  <TableCell className="text-sm text-[rgb(var(--text-muted))] max-w-xs truncate">{item.description || '—'}</TableCell>
                  <TableCell><Badge variant={sc.variant}>{sc.label}</Badge></TableCell>
-                 <TableCell className="text-right">
-                   <div className="flex items-center justify-end gap-1">
-                     <Button variant="ghost" size="sm" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
-                     <Button variant="ghost" size="sm" onClick={() => openDelete(item)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
-                   </div>
-                 </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => openDetail(item)}><Eye className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="sm" onClick={() => openDelete(item)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
+                  </div>
+                </TableCell>
                </TableRow>
              );
            })}
@@ -148,6 +154,20 @@ export function TrainingSystemSheet() {
       </Modal>
 
       <ConfirmModal open={deleteOpen} onClose={() => setDeleteOpen(false)} onConfirm={handleDelete} title="Xác nhận xóa hệ đào tạo" description={`Bạn có chắc muốn xóa hệ "${deleting?.name}" không?`} confirmText="Xóa" variant="danger" loading={deleteMut.isPending} />
+
+      <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Chi tiết hệ đào tạo" size="md">
+        {detailLoading ? <div className="flex items-center justify-center py-8"><div className="animate-spin h-8 w-8 border-4 border-[rgb(var(--primary))] border-t-transparent rounded-full" /></div> :
+         detailData?.data ? (
+           <div className="space-y-6">
+             <div className="flex items-center justify-between">
+               <div><h3 className="text-lg font-bold">{detailData.data.name}</h3><p className="text-sm text-[rgb(var(--text-muted))] font-mono">Mã: {detailData.data.code}</p></div>
+               <Badge variant={STATUS_CONFIG[detailData.data.status]?.variant} dot>{STATUS_CONFIG[detailData.data.status]?.label}</Badge>
+             </div>
+             {detailData.data.description && <div><p className="text-sm font-medium mb-2">Mô tả</p><p className="text-sm text-[rgb(var(--text-secondary))]">{detailData.data.description}</p></div>}
+             <div className="flex justify-end gap-2 pt-4 border-t"><Button variant="outline" onClick={() => setDetailOpen(false)}>Đóng</Button><Button variant="outline" onClick={() => { setDetailOpen(false); openEdit(detailData.data); }}><Edit className="h-4 w-4 mr-1" /> Sửa</Button></div>
+           </div>
+         ) : <p className="text-center py-8 text-[rgb(var(--text-muted))]">Không tìm thấy dữ liệu</p>}
+      </Modal>
     </div>
   );
 }

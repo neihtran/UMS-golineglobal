@@ -32,10 +32,22 @@ const STATUS_CONFIG: Record<number, { label: string; variant: 'success' | 'warni
 
 const SEMESTER_LABELS: Record<number, string> = { 1: 'HK1', 2: 'HK2', 3: 'HK Hè' };
 
-function formatDate(dateStr: string | null): string {
+const formatDate = (dateStr: string | null): string => {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('vi-VN');
-}
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('vi-VN');
+};
+
+const toDateInput = (v: string | null | undefined): string => {
+  if (!v) return '';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) {
+    const parts = v.split(/[\sT]/);
+    return parts[0] ?? '';
+  }
+  return d.toISOString().split('T')[0];
+};
 
 const emptyForm = (): HqnhatAcademicTermCreatePayload => ({
   code: '', academic_year: '', semester: 1, start_date: '', end_date: '',
@@ -83,7 +95,6 @@ export function AcademicTermSheet() {
   // Populate form from detail when editing
   useEffect(() => {
     if (editing && detailData?.data) {
-      const toDateInput = (v: string | null) => v ? v.split('T')[0] : '';
       setForm({
         code: detailData.data.code,
         academic_year: detailData.data.academic_year,
