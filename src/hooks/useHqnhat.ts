@@ -2447,3 +2447,558 @@ export const useDeleteHqnhatCourseRegistration = (
     ...options,
   });
 };
+
+// ══════════════════════════════════════════════════════════════════════════
+// SYNC COURSE REGISTRATIONS (Đồng bộ đăng ký học phần)
+// ══════════════════════════════════════════════════════════════════════════
+export const useSyncCourseRegistrations = (
+  options?: UseMutationOptions<{ success: boolean; message: string }, Error, void>
+) => {
+  const qc = useQueryClient();
+  return useMutation<{ success: boolean; message: string }, Error, void>({
+    mutationFn: async () => {
+      const res = await hqnhatApi.post<{ success: boolean; message: string }>(
+        '/api/v1/sis/course-registrations/sync'
+      );
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS.courseRegistrations.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+// CLASSES (Lớp hành chính)
+// ══════════════════════════════════════════════════════════════════════════
+export const HQNHAT_QUERY_KEYS_EXTRA = {
+  ...HQNHAT_QUERY_KEYS,
+  classes: {
+    all: ['hqnhat', 'classes'] as const,
+    list: (params?: import('@/types/hqnhat.types').HqnhatClassListParams) =>
+      ['hqnhat', 'classes', 'list', params ?? {}] as const,
+    detail: (id: number | string) =>
+      ['hqnhat', 'classes', 'detail', id] as const,
+  },
+  academicWarnings: {
+    all: ['hqnhat', 'academic-warnings'] as const,
+    list: (params?: import('@/types/hqnhat.types').HqnhatAcademicWarningListParams) =>
+      ['hqnhat', 'academic-warnings', 'list', params ?? {}] as const,
+    detail: (id: number | string) =>
+      ['hqnhat', 'academic-warnings', 'detail', id] as const,
+  },
+  studentGrades: {
+    all: ['hqnhat', 'student-grades'] as const,
+    list: (params?: import('@/types/hqnhat.types').HqnhatStudentGradeListParams) =>
+      ['hqnhat', 'student-grades', 'list', params ?? {}] as const,
+    detail: (id: number | string) =>
+      ['hqnhat', 'student-grades', 'detail', id] as const,
+  },
+  gpaHistories: {
+    all: ['hqnhat', 'gpa-histories'] as const,
+    list: (params?: import('@/types/hqnhat.types').HqnhatGpaHistoryListParams) =>
+      ['hqnhat', 'gpa-histories', 'list', params ?? {}] as const,
+    detail: (id: number | string) =>
+      ['hqnhat', 'gpa-histories', 'detail', id] as const,
+  },
+  studentLogs: {
+    all: ['hqnhat', 'student-logs'] as const,
+    list: (params?: import('@/types/hqnhat.types').HqnhatStudentLogListParams) =>
+      ['hqnhat', 'student-logs', 'list', params ?? {}] as const,
+  },
+  studentProfiles: {
+    all: ['hqnhat', 'student-profiles'] as const,
+    detail: (id: number | string) =>
+      ['hqnhat', 'student-profiles', 'detail', id] as const,
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+// CLASSES — CRUD
+// ══════════════════════════════════════════════════════════════════════════
+export const useHqnhatClasses = (
+  params?: import('@/types/hqnhat.types').HqnhatClassListParams,
+  options?: Omit<UseQueryOptions<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatClass>, Error>, 'queryKey' | 'queryFn'>
+) =>
+  useQuery<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatClass>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.classes.list(params),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatClass>>(
+        '/api/v1/sis/classes',
+        { params: cleanParams(params) }
+      );
+      return res.data;
+    },
+    staleTime: 30 * 1000,
+    placeholderData: (prev) => prev,
+    ...options,
+  });
+
+export const useHqnhatClass = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatClass>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatClass>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.classes.detail(id ?? ''),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatClass>>(
+        `/api/v1/sis/classes/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+export const useCreateHqnhatClass = (
+  options?: UseMutationOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatClass>, Error, import('@/types/hqnhat.types').HqnhatClassCreatePayload>
+) => {
+  const qc = useQueryClient();
+  return useMutation<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatClass>, Error, import('@/types/hqnhat.types').HqnhatClassCreatePayload>({
+    mutationFn: async (payload) => {
+      const res = await hqnhatApi.post<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatClass>>(
+        '/api/v1/sis/classes',
+        payload
+      );
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS_EXTRA.classes.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+export const useUpdateHqnhatClass = (
+  options?: UseMutationOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatClass>, Error, { id: number; payload: Partial<import('@/types/hqnhat.types').HqnhatClassCreatePayload> }>
+) => {
+  const qc = useQueryClient();
+  return useMutation<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatClass>, Error, { id: number; payload: Partial<import('@/types/hqnhat.types').HqnhatClassCreatePayload> }>({
+    mutationFn: async ({ id, payload }) => {
+      const res = await hqnhatApi.put<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatClass>>(
+        `/api/v1/sis/classes/${id}`,
+        payload
+      );
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS_EXTRA.classes.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+export const useDeleteHqnhatClass = (
+  options?: UseMutationOptions<{ success: boolean; message: string }, Error, number>
+) => {
+  const qc = useQueryClient();
+  return useMutation<{ success: boolean; message: string }, Error, number>({
+    mutationFn: async (id) => {
+      const res = await hqnhatApi.delete<{ success: boolean; message: string }>(
+        `/api/v1/sis/classes/${id}`
+      );
+      return res.data as any;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS_EXTRA.classes.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+// ACADEMIC WARNINGS — CRUD
+// ══════════════════════════════════════════════════════════════════════════
+export const useHqnhatAcademicWarnings = (
+  params?: import('@/types/hqnhat.types').HqnhatAcademicWarningListParams,
+  options?: Omit<UseQueryOptions<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>, Error>, 'queryKey' | 'queryFn'>
+) =>
+  useQuery<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.academicWarnings.list(params),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>>(
+        '/api/v1/sis/academic-warnings',
+        { params: cleanParams(params) }
+      );
+      return res.data;
+    },
+    staleTime: 30 * 1000,
+    placeholderData: (prev) => prev,
+    ...options,
+  });
+
+export const useHqnhatAcademicWarning = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.academicWarnings.detail(id ?? ''),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>>(
+        `/api/v1/sis/academic-warnings/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+export const useCreateHqnhatAcademicWarning = (
+  options?: UseMutationOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>, Error, import('@/types/hqnhat.types').HqnhatAcademicWarningCreatePayload>
+) => {
+  const qc = useQueryClient();
+  return useMutation<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>, Error, import('@/types/hqnhat.types').HqnhatAcademicWarningCreatePayload>({
+    mutationFn: async (payload) => {
+      const res = await hqnhatApi.post<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>>(
+        '/api/v1/sis/academic-warnings',
+        payload
+      );
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS_EXTRA.academicWarnings.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+export const useUpdateHqnhatAcademicWarning = (
+  options?: UseMutationOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>, Error, { id: number; payload: import('@/types/hqnhat.types').HqnhatAcademicWarningUpdatePayload }>
+) => {
+  const qc = useQueryClient();
+  return useMutation<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>, Error, { id: number; payload: import('@/types/hqnhat.types').HqnhatAcademicWarningUpdatePayload }>({
+    mutationFn: async ({ id, payload }) => {
+      const res = await hqnhatApi.put<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatAcademicWarning>>(
+        `/api/v1/sis/academic-warnings/${id}`,
+        payload
+      );
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS_EXTRA.academicWarnings.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+export const useDeleteHqnhatAcademicWarning = (
+  options?: UseMutationOptions<{ success: boolean; message: string }, Error, number>
+) => {
+  const qc = useQueryClient();
+  return useMutation<{ success: boolean; message: string }, Error, number>({
+    mutationFn: async (id) => {
+      const res = await hqnhatApi.delete<{ success: boolean; message: string }>(
+        `/api/v1/sis/academic-warnings/${id}`
+      );
+      return res.data as any;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS_EXTRA.academicWarnings.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT GRADES — CRUD
+// ══════════════════════════════════════════════════════════════════════════
+export const useHqnhatStudentGrades = (
+  params?: import('@/types/hqnhat.types').HqnhatStudentGradeListParams,
+  options?: Omit<UseQueryOptions<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatStudentGrade>, Error>, 'queryKey' | 'queryFn'>
+) =>
+  useQuery<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatStudentGrade>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.studentGrades.list(params),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatStudentGrade>>(
+        '/api/v1/sis/student-grades',
+        { params: cleanParams(params) }
+      );
+      return res.data;
+    },
+    staleTime: 30 * 1000,
+    placeholderData: (prev) => prev,
+    ...options,
+  });
+
+export const useHqnhatStudentGrade = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentGrade>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentGrade>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.studentGrades.detail(id ?? ''),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentGrade>>(
+        `/api/v1/sis/student-grades/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+export const useUpdateHqnhatStudentGrade = (
+  options?: UseMutationOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentGrade>, Error, { id: number; payload: import('@/types/hqnhat.types').HqnhatStudentGradeUpdatePayload }>
+) => {
+  const qc = useQueryClient();
+  return useMutation<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentGrade>, Error, { id: number; payload: import('@/types/hqnhat.types').HqnhatStudentGradeUpdatePayload }>({
+    mutationFn: async ({ id, payload }) => {
+      const res = await hqnhatApi.put<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentGrade>>(
+        `/api/v1/sis/student-grades/${id}`,
+        payload
+      );
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS_EXTRA.studentGrades.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+export const useBulkUpdateHqnhatStudentGrades = (
+  options?: UseMutationOptions<{ success: boolean; message: string }, Error, import('@/types/hqnhat.types').HqnhatStudentGradeBulkUpdatePayload>
+) => {
+  const qc = useQueryClient();
+  return useMutation<{ success: boolean; message: string }, Error, import('@/types/hqnhat.types').HqnhatStudentGradeBulkUpdatePayload>({
+    mutationFn: async (payload) => {
+      const res = await hqnhatApi.put<{ success: boolean; message: string }>(
+        '/api/v1/sis/student-grades/bulk-update',
+        payload
+      );
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS_EXTRA.studentGrades.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+// GPA HISTORIES — Read-only
+// ══════════════════════════════════════════════════════════════════════════
+export const useHqnhatGpaHistories = (
+  params?: import('@/types/hqnhat.types').HqnhatGpaHistoryListParams,
+  options?: Omit<UseQueryOptions<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatGpaHistory>, Error>, 'queryKey' | 'queryFn'>
+) =>
+  useQuery<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatGpaHistory>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.gpaHistories.list(params),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatGpaHistory>>(
+        '/api/v1/sis/gpa-histories',
+        { params: cleanParams(params) }
+      );
+      return res.data;
+    },
+    staleTime: 30 * 1000,
+    placeholderData: (prev) => prev,
+    ...options,
+  });
+
+export const useHqnhatGpaHistory = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatGpaHistory>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatGpaHistory>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.gpaHistories.detail(id ?? ''),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatGpaHistory>>(
+        `/api/v1/sis/gpa-histories/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT LOGS — Read-only
+// ══════════════════════════════════════════════════════════════════════════
+export const useHqnhatStudentLogs = (
+  params?: import('@/types/hqnhat.types').HqnhatStudentLogListParams,
+  options?: Omit<UseQueryOptions<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatStudentLog>, Error>, 'queryKey' | 'queryFn'>
+) =>
+  useQuery<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatStudentLog>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.studentLogs.list(params),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatListResponse<import('@/types/hqnhat.types').HqnhatStudentLog>>(
+        '/api/v1/sis/student-logs',
+        { params: cleanParams(params) }
+      );
+      return res.data;
+    },
+    staleTime: 30 * 1000,
+    placeholderData: (prev) => prev,
+    ...options,
+  });
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT PROFILES — Read/Update
+// ══════════════════════════════════════════════════════════════════════════
+export const useHqnhatStudentProfile = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentProfile>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentProfile>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS_EXTRA.studentProfiles.detail(id ?? ''),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentProfile>>(
+        `/api/v1/sis/student-profiles/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+export const useUpdateHqnhatStudentProfile = (
+  options?: UseMutationOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentProfile>, Error, { id: number; payload: import('@/types/hqnhat.types').HqnhatStudentProfileUpdatePayload }>
+) => {
+  const qc = useQueryClient();
+  return useMutation<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentProfile>, Error, { id: number; payload: import('@/types/hqnhat.types').HqnhatStudentProfileUpdatePayload }>({
+    mutationFn: async ({ id, payload }) => {
+      const res = await hqnhatApi.put<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentProfile>>(
+        `/api/v1/sis/student-profiles/${id}`,
+        payload
+      );
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: HQNHAT_QUERY_KEYS_EXTRA.studentProfiles.all });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+// ══════════════════════════════════════════════════════════════════════════
+// DETAIL HOOKS còn thiếu cho 5 entity
+// ══════════════════════════════════════════════════════════════════════════
+export const useHqnhatStudentStatusHistory = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentStatusHistory>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentStatusHistory>, Error>({
+    queryKey: ['hqnhat', 'student-status-histories', 'detail', id ?? ''],
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentStatusHistory>>(
+        `/api/v1/sis/student-status-histories/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+export const useUpdateHqnhatStudentStatusHistory = (
+  options?: UseMutationOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentStatusHistory>, Error, { id: number; payload: Partial<import('@/types/hqnhat.types').HqnhatStudentStatusHistoryCreatePayload> }>
+) => {
+  const qc = useQueryClient();
+  return useMutation<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentStatusHistory>, Error, { id: number; payload: Partial<import('@/types/hqnhat.types').HqnhatStudentStatusHistoryCreatePayload> }>({
+    mutationFn: async ({ id, payload }) => {
+      const res = await hqnhatApi.put<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentStatusHistory>>(
+        `/api/v1/sis/student-status-histories/${id}`,
+        payload
+      );
+      return res.data;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: ['hqnhat', 'student-status-histories'] });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+export const useDeleteHqnhatStudentStatusHistory = (
+  options?: UseMutationOptions<{ success: boolean; message: string }, Error, number>
+) => {
+  const qc = useQueryClient();
+  return useMutation<{ success: boolean; message: string }, Error, number>({
+    mutationFn: async (id) => {
+      const res = await hqnhatApi.delete<{ success: boolean; message: string }>(
+        `/api/v1/sis/student-status-histories/${id}`
+      );
+      return res.data as any;
+    },
+    onSuccess: (...args) => {
+      qc.invalidateQueries({ queryKey: ['hqnhat', 'student-status-histories'] });
+      options?.onSuccess?.(...args);
+    },
+    ...options,
+  });
+};
+
+export const useHqnhatStudentReservation = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentReservation>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentReservation>, Error>({
+    queryKey: ['hqnhat', 'student-reservations', 'detail', id ?? ''],
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentReservation>>(
+        `/api/v1/sis/student-reservations/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+export const useHqnhatStudentDropout = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentDropout>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentDropout>, Error>({
+    queryKey: ['hqnhat', 'student-dropouts', 'detail', id ?? ''],
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentDropout>>(
+        `/api/v1/sis/student-dropouts/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+export const useHqnhatStudentMajorChange = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentMajorChange>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentMajorChange>, Error>({
+    queryKey: ['hqnhat', 'student-major-changes', 'detail', id ?? ''],
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentMajorChange>>(
+        `/api/v1/sis/student-major-changes/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+export const useHqnhatStudentClassChange = (
+  id: number | string | undefined,
+  options?: Omit<UseQueryOptions<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentClassChange>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentClassChange>, Error>({
+    queryKey: ['hqnhat', 'student-class-changes', 'detail', id ?? ''],
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatDetailResponse<import('@/types/hqnhat.types').HqnhatStudentClassChange>>(
+        `/api/v1/sis/student-class-changes/${id}`
+      );
+      return res.data;
+    },
+    enabled: id !== undefined && id !== '',
+    ...options,
+  });

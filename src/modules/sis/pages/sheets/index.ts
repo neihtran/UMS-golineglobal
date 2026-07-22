@@ -1,14 +1,11 @@
-export { AcademicTermSheet } from './training-system/AcademicTermSheet';
-export { CourseSheet } from './training-system/CourseSheet';
-export { MajorSheet } from './training-system/MajorSheet';
-export { TrainingSystemSheet } from './training-system/TrainingSystemSheet';
-export { SpecializationSheet } from './training-system/SpecializationSheet';
-export { SubjectTypeSheet } from './training-system/SubjectTypeSheet';
-export { SubjectSheet } from './training-system/SubjectSheet';
-export { CurriculumSheet } from './training-system/CurriculumSheet';
-export { CurriculumSubjectSheet } from './training-system/CurriculumSubjectSheet';
-export { SubjectPrerequisiteSheet } from './training-system/SubjectPrerequisiteSheet';
-export { SubjectConditionSheet } from './training-system/SubjectConditionSheet';
+// ── training-catalog ──────────────────────────────────────────────────────────
+export { MajorSheet } from './student-admission/MajorSheet';
+export { SpecializationSheet } from './student-admission/SpecializationSheet';
+export { TrainingSystemSheet } from './student-admission/TrainingSystemSheet';
+export { AcademicTermSheet } from './study-process/AcademicTermSheet';
+export { CourseSheet } from './study-process/CourseSheet';
+
+// ── student-admission ───────────────────────────────────────────────────────
 export { AdmissionBatchSheet } from './student-admission/AdmissionBatchSheet';
 export { AdmissionStudentSheet } from './student-admission/AdmissionStudentSheet';
 export { BaoLuuSheet } from './student-admission/BaoLuuSheet';
@@ -17,7 +14,22 @@ export { ThoiHocSheet } from './student-admission/ThoiHocSheet';
 export { default as MajorChangeSheet } from './student-admission/MajorChangeSheet';
 export { default as ClassChangeSheet } from './student-admission/ClassChangeSheet';
 export { default as StatusHistorySheet } from './student-admission/StatusHistorySheet';
-export { CourseSectionSheet } from './registration-schedule/CourseSectionSheet';
-export { ClassScheduleSheet } from './registration-schedule/ClassScheduleSheet';
-export { ScheduleChangeSheet } from './registration-schedule/ScheduleChangeSheet';
-export { CourseRegistrationSheet } from './registration-schedule/CourseRegistrationSheet';
+
+// ── study-process ───────────────────────────────────────────────────────────
+export { CourseSectionSheet } from './study-process/CourseSectionSheet';
+export { ClassScheduleSheet } from './study-process/ClassScheduleSheet';
+export { ScheduleChangeSheet } from './study-process/ScheduleChangeSheet';
+export { CourseRegistrationSheet } from './study-process/CourseRegistrationSheet';
+
+// ── curriculum-program ──────────────────────────────────────────────────────
+export { SubjectTypeSheet } from './curriculum-program/SubjectTypeSheet';
+export { SubjectSheet } from './curriculum-program/SubjectSheet';
+export { CurriculumSheet } from './curriculum-program/CurriculumSheet';
+export { CurriculumSubjectSheet } from './curriculum-program/CurriculumSubjectSheet';
+export { SubjectPrerequisiteSheet } from './curriculum-program/SubjectPrerequisiteSheet';
+export { SubjectConditionSheet } from './curriculum-program/SubjectConditionSheet';
+
+// ── grade-warning ──────────────────────────────────────────────────────────
+export { StudentGradeSheet } from './grade-warning/StudentGradeSheet';
+export { GpaHistorySheet } from './grade-warning/GpaHistorySheet';
+export { AcademicWarningSheet } from './grade-warning/AcademicWarningSheet';

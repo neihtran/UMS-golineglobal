@@ -19,7 +19,7 @@ export function Tabs({ value, onValueChange, children, className }: TabsProps) {
 
 export function TabsList({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <TabsPrimitive.List className={clsx('flex gap-1', className)}>
+    <TabsPrimitive.List className={clsx('flex gap-1 border-b border-[rgb(var(--border))]', className)}>
       {children}
     </TabsPrimitive.List>
   );
@@ -36,8 +36,8 @@ export function TabsTrigger({ value, children, className }: TabsTriggerProps) {
     <TabsPrimitive.Trigger
       value={value}
       className={clsx(
-        'px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors',
-        'data-[state=active]:border-b-2 data-[state=active]:text-[rgb(var(--primary))]',
+        'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors',
+        'data-[state=active]:border-b-2 data-[state=active]:border-[rgb(var(--primary))] data-[state=active]:text-[rgb(var(--primary))]',
         'data-[state=inactive]:text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]',
         className
       )}

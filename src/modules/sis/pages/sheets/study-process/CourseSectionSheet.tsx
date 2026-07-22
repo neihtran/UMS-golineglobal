@@ -91,7 +91,7 @@ export function CourseSectionSheet() {
   const { data, isLoading, isFetching } = useHqnhatCourseSections(params);
   const { data: subjectsData } = useHqnhatSubjects({ per_page: 100, status: 1 });
   const { data: termsData } = useHqnhatAcademicTerms({ per_page: 100, status: 1 });
-  const { data: registrationsData } = useHqnhatCourseRegistrations({ per_page: 1000 });
+  const { data: registrationsData } = useHqnhatCourseRegistrations({ per_page: 100 });
 
   const items = Array.isArray(data?.data) ? data.data : [];
   const total = data?.meta?.total ?? items.length;

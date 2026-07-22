@@ -290,7 +290,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
 
           <LanguageSwitcher />
 
-          {/* Notifications */}
+          {/* Notifications
           <div className="relative" ref={notifRef}>
             <button
               onClick={() => { setNotifOpen((o) => !o); setUserMenuOpen(false); }}
@@ -314,7 +314,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
                 <NotificationDropdown onClose={() => setNotifOpen(false)} />
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* User menu */}
           <div className="relative" ref={userMenuRef}>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, RotateCcw } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, RotateCcw, Eye } from 'lucide-react';
 import {
   Button,
   Input,
@@ -50,6 +50,8 @@ export function SubjectTypeSheet() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<HqnhatSubjectType | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailItem, setDetailItem] = useState<HqnhatSubjectType | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState<HqnhatSubjectType | null>(null);
   const [form, setForm] = useState<HqnhatSubjectTypeCreatePayload>(emptyForm());
@@ -63,6 +65,7 @@ export function SubjectTypeSheet() {
 
   const openCreate = () => { setEditing(null); setForm(emptyForm()); setErrors({}); setSubmitError(null); setModalOpen(true); };
   const openEdit = (item: HqnhatSubjectType) => { setEditing(item); setForm({ code: item.code, name: item.name, description: item.description ?? '', status: item.status as 0 | 1 }); setErrors({}); setSubmitError(null); setModalOpen(true); };
+  const openDetail = (item: HqnhatSubjectType) => { setDetailItem(item); setDetailOpen(true); };
   const openDelete = (item: HqnhatSubjectType) => { setDeleting(item); setDeleteOpen(true); };
 
   const validate = (): boolean => {
@@ -120,6 +123,7 @@ export function SubjectTypeSheet() {
                  <TableCell><Badge variant={sc.variant}>{sc.label}</Badge></TableCell>
                  <TableCell className="text-right">
                    <div className="flex items-center justify-end gap-1">
+                     <Button variant="ghost" size="sm" onClick={() => openDetail(item)}><Eye className="h-4 w-4" /></Button>
                      <Button variant="ghost" size="sm" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
                      <Button variant="ghost" size="sm" onClick={() => openDelete(item)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
                    </div>
@@ -148,6 +152,33 @@ export function SubjectTypeSheet() {
       </Modal>
 
       <ConfirmModal open={deleteOpen} onClose={() => setDeleteOpen(false)} onConfirm={handleDelete} title="Xác nhận xóa nhóm môn" description={`Bạn có chắc muốn xóa nhóm môn "${deleting?.name}" không?`} confirmText="Xóa" variant="danger" loading={deleteMut.isPending} />
+
+      <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Chi tiết nhóm môn" size="md" footer={<Button variant="outline" onClick={() => setDetailOpen(false)}>Đóng</Button>}>
+        {detailItem && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+              <div className="space-y-1">
+                <p className="text-[rgb(var(--text-muted))] text-xs uppercase tracking-wide">Mã nhóm</p>
+                <p className="font-mono font-medium">{detailItem.code}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[rgb(var(--text-muted))] text-xs uppercase tracking-wide">Trạng thái</p>
+                <Badge variant={STATUS_CONFIG[detailItem.status]?.variant ?? 'neutral'}>
+                  {STATUS_CONFIG[detailItem.status]?.label ?? '—'}
+                </Badge>
+              </div>
+              <div className="col-span-2 space-y-1">
+                <p className="text-[rgb(var(--text-muted))] text-xs uppercase tracking-wide">Tên nhóm môn</p>
+                <p className="font-medium">{detailItem.name}</p>
+              </div>
+              <div className="col-span-2 space-y-1">
+                <p className="text-[rgb(var(--text-muted))] text-xs uppercase tracking-wide">Mô tả</p>
+                <p className="text-[rgb(var(--text-secondary))]">{detailItem.description || '—'}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -75,16 +75,23 @@ const StudentEnrollment = lazy(() => import('@/modules/sis/pages/StudentEnrollme
 const EnrollmentCreate = lazy(() => import('@/modules/sis/pages/EnrollmentCreate'));
 const EnrollmentDetail = lazy(() => import('@/modules/sis/pages/EnrollmentDetail'));
 const EnrollmentEdit = lazy(() => import('@/modules/sis/pages/EnrollmentEdit'));
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CurriculumPage = lazy(() => import('@/modules/sis/pages/CurriculumPage'));
+// DEV_SIS_ONLY=true hides CurriculumPage from routes, but it's used in the non-Dev nav
+const TrainingCatalogPage = lazy(() => import('@/modules/sis/pages/TrainingCatalogPage'));
+const StudentAdmissionPage = lazy(() => import('@/modules/sis/pages/StudentAdmissionPage'));
+const StudyProcessPage = lazy(() => import('@/modules/sis/pages/StudyProcessPage'));
+const CurriculumProgramPage = lazy(() => import('@/modules/sis/pages/CurriculumProgramPage'));
+const RegistrationSchedulePage = lazy(() => import('@/modules/sis/pages/RegistrationSchedulePage'));
+const GradeWarningPage = lazy(() => import('@/modules/sis/pages/GradeWarningPage'));
 const GraduationList = lazy(() => import('@/modules/sis/pages/GraduationList'));
 const GraduationOpenSession = lazy(() => import('@/modules/sis/pages/GraduationOpenSession'));
-const GraduationDetail = lazy(() => import('@/modules/sis/pages/GraduationDetail'));
 const GraduationSessionDetail = lazy(() => import('@/modules/sis/pages/GraduationSessionDetail'));
 const InternshipList = lazy(() => import('@/modules/sis/pages/InternshipList'));
 const InternshipCreate = lazy(() => import('@/modules/sis/pages/InternshipCreate'));
 const InternshipDetail = lazy(() => import('@/modules/sis/pages/InternshipDetail'));
 
-// SIS - Danh mục (Phase 1) — now handled by CurriculumPage sheets
+// SIS - Detail pages
 const MajorDetail = lazy(() => import('@/modules/sis/pages/MajorDetail'));
 function MajorDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -93,31 +100,10 @@ function MajorDetailPage() {
 }
 const AcademicTermDetail = lazy(() => import('@/modules/sis/pages/AcademicTermDetail'));
 const AcademicTermEdit = lazy(() => import('@/modules/sis/pages/AcademicTermEdit'));
-function AcademicTermDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <AcademicTermDetail id={id} />;
-}
-function AcademicTermEditPage() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <AcademicTermEdit id={id} />;
-}
 
-// SIS - Lịch học (Phase 3)
+// SIS - Other pages
 const ScheduleList = lazy(() => import('@/modules/sis/pages/ScheduleList'));
-
-// SIS - Quản lý SV (Phase 4)
 const StudentRequestList = lazy(() => import('@/modules/sis/pages/StudentRequestList'));
-
-// SIS - Tuyển sinh (Phase 5)
-const AdmissionPage = lazy(() => import('@/modules/sis/pages/AdmissionPage'));
-
-// SIS - Đăng ký học phần & Thời khóa biểu (Phase 7)
-const RegistrationPage = lazy(() => import('@/modules/sis/pages/RegistrationPage'));
-
-// SIS - CTĐT mở rộng (Phase 6) — handled by CurriculumPage sheets
-const SubjectConditionList = lazy(() => import('@/modules/sis/pages/SubjectConditionList'));
 
 // DMS
 const DMSDashboard = lazy(() => import('@/modules/dms/pages/DMSDashboard'));
@@ -298,7 +284,7 @@ function QACsvcDetailPage() {
 function IntegrationDetailPage() {
   const { id } = useParams<{ id: string }>();
   if (!id) return null;
-  return <IntegrationDetail id={id} />;
+  return <IntegrationDetail />;
 }
 
 // KTX
@@ -532,23 +518,36 @@ export default function AppRouter() {
           <Route path="/hrm/bo-nhiem/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><AppointmentCreate /></RoleRoute>} />
           <Route path="/hrm/cau-hinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMConfig /></RoleRoute>} />
 
-          {/* SIS — admin + giang-vien + nhan-vien + BGH */}
+          {/* SIS — 6 nhóm chính */}
           <Route path="/sis" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SISDashboard /></RoleRoute>} />
           <Route path="/sis/sinh-vien" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentList /></RoleRoute>} />
           <Route path="/sis/sinh-vien/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentDetailPage /></RoleRoute>} />
           <Route path="/sis/sinh-vien/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentEdit /></RoleRoute>} />
-          <Route path="/sis/mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/dang-ky-hoc-phan" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentEnrollment /></RoleRoute>} />
-          <Route path="/sis/dang-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentEnrollment /></RoleRoute>} />
-          <Route path="/sis/dang-ky-hoc-phan/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentCreate /></RoleRoute>} />
-          <Route path="/sis/dang-ky-hoc-phan/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentDetail /></RoleRoute>} />
-          <Route path="/sis/dang-ky-hoc-phan/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentEdit /></RoleRoute>} />
-          {/* SIS - CTĐT */}
-          <Route path="/sis/ctdt" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumPage /></RoleRoute>} />
+
+          {/* SIS - Nhóm 1: Danh mục đào tạo */}
+          <Route path="/sis/danh-muc" element={<RoleRoute roles={[ROLES.ADMIN]}><TrainingCatalogPage /></RoleRoute>} />
+          <Route path="/sis/nganh-hoc" element={<RoleRoute roles={[ROLES.ADMIN]}><TrainingCatalogPage /></RoleRoute>} />
+          <Route path="/sis/nganh-hoc/:id" element={<RoleRoute roles={[ROLES.ADMIN]}><MajorDetailPage /></RoleRoute>} />
+          <Route path="/sis/chuyen-nganh" element={<RoleRoute roles={[ROLES.ADMIN]}><TrainingCatalogPage /></RoleRoute>} />
+          <Route path="/sis/he-dao-tao" element={<RoleRoute roles={[ROLES.ADMIN]}><TrainingCatalogPage /></RoleRoute>} />
+          <Route path="/sis/hoc-ky" element={<RoleRoute roles={[ROLES.ADMIN]}><TrainingCatalogPage /></RoleRoute>} />
+          <Route path="/sis/hoc-ky/:id" element={<RoleRoute roles={[ROLES.ADMIN]}><AcademicTermDetail /></RoleRoute>} />
+          <Route path="/sis/hoc-ky/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN]}><AcademicTermEdit /></RoleRoute>} />
+          <Route path="/sis/khoa-hoc" element={<RoleRoute roles={[ROLES.ADMIN]}><TrainingCatalogPage /></RoleRoute>} />
+
+          {/* SIS - Nhóm 2: Sinh viên & Tuyển sinh */}
+          <Route path="/sis/tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN]}><StudentAdmissionPage /></RoleRoute>} />
+          <Route path="/sis/dot-tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN]}><StudentAdmissionPage /></RoleRoute>} />
+          <Route path="/sis/thi-sinh-trung-tuyen" element={<RoleRoute roles={[ROLES.ADMIN]}><StudentAdmissionPage /></RoleRoute>} />
+          <Route path="/sis/lop-hanh-chinh" element={<RoleRoute roles={[ROLES.ADMIN]}><StudentAdmissionPage /></RoleRoute>} />
+
+          {/* SIS - Nhóm 3: Quá trình học tập */}
+          <Route path="/sis/qua-trinh" element={<RoleRoute roles={[ROLES.ADMIN]}><StudyProcessPage /></RoleRoute>} />
+          <Route path="/sis/lich-su-trang-thai" element={<RoleRoute roles={[ROLES.ADMIN]}><StudyProcessPage /></RoleRoute>} />
+          <Route path="/sis/bao-luu" element={<RoleRoute roles={[ROLES.ADMIN]}><StudyProcessPage /></RoleRoute>} />
+          <Route path="/sis/thoi-hoc" element={<RoleRoute roles={[ROLES.ADMIN]}><StudyProcessPage /></RoleRoute>} />
+          <Route path="/sis/chuyen-nganh-sv" element={<RoleRoute roles={[ROLES.ADMIN]}><StudyProcessPage /></RoleRoute>} />
+          <Route path="/sis/chuyen-lop-sv" element={<RoleRoute roles={[ROLES.ADMIN]}><StudyProcessPage /></RoleRoute>} />
           <Route path="/sis/tot-nghiep" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><GraduationList /></RoleRoute>} />
           <Route path="/sis/tot-nghiep/mo-dot" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><GraduationOpenSession /></RoleRoute>} />
           <Route path="/sis/tot-nghiep/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><GraduationSessionDetail /></RoleRoute>} />
@@ -556,25 +555,32 @@ export default function AppRouter() {
           <Route path="/sis/thuc-tap/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><InternshipCreate /></RoleRoute>} />
           <Route path="/sis/thuc-tap/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><InternshipDetail /></RoleRoute>} />
 
-          {/* SIS - Danh mục (Phase 1) — all handled by CurriculumPage tabs */}
-          <Route path="/sis/nganh-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/nganh-hoc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><MajorDetailPage /></RoleRoute>} />
-          <Route path="/sis/he-dao-tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/chuyen-nganh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/hoc-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><CurriculumPage /></RoleRoute>} />
-          <Route path="/sis/hoc-ky/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AcademicTermDetailPage /></RoleRoute>} />
-          <Route path="/sis/hoc-ky/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AcademicTermEditPage /></RoleRoute>} />
+          {/* SIS - Nhóm 4: CTĐT & Học phần */}
+          <Route path="/sis/ctdt" element={<RoleRoute roles={[ROLES.ADMIN]}><CurriculumProgramPage /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumProgramPage /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumProgramPage /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumProgramPage /></RoleRoute>} />
+          <Route path="/sis/chuong-trinh-dao-tao/mon-hoc/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumProgramPage /></RoleRoute>} />
+          <Route path="/sis/mon-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><CurriculumProgramPage /></RoleRoute>} />
+
+          {/* SIS - Nhóm 5: ĐKHP & Thời khóa biểu */}
+          <Route path="/sis/dang-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationSchedulePage /></RoleRoute>} />
+          <Route path="/sis/lop-hoc-phan" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationSchedulePage /></RoleRoute>} />
+          <Route path="/sis/danh-sach-dang-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationSchedulePage /></RoleRoute>} />
+          <Route path="/sis/thoi-khoa-bieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationSchedulePage /></RoleRoute>} />
+          <Route path="/sis/thay-doi-lich-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationSchedulePage /></RoleRoute>} />
+          <Route path="/sis/dang-ky-hoc-phan" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><StudentEnrollment /></RoleRoute>} />
+          <Route path="/sis/dang-ky-hoc-phan/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentCreate /></RoleRoute>} />
+          <Route path="/sis/dang-ky-hoc-phan/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentDetail /></RoleRoute>} />
+          <Route path="/sis/dang-ky-hoc-phan/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><EnrollmentEdit /></RoleRoute>} />
+
+          {/* SIS - Nhóm 6: Điểm & Cảnh báo học vụ */}
+          <Route path="/sis/diem" element={<RoleRoute roles={[ROLES.ADMIN]}><GradeWarningPage /></RoleRoute>} />
+          <Route path="/sis/canh-bao-hoc-vu" element={<RoleRoute roles={[ROLES.ADMIN]}><GradeWarningPage /></RoleRoute>} />
+
+          {/* SIS - Các trang cũ giữ lại để tương thích */}
           <Route path="/sis/lich-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><ScheduleList /></RoleRoute>} />
           <Route path="/sis/yeu-cau-sv" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><StudentRequestList /></RoleRoute>} />
-          <Route path="/sis/tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionPage /></RoleRoute>} />
-          <Route path="/sis/dot-tuyen-sinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN]}><AdmissionPage /></RoleRoute>} />
-
-          {/* SIS - Đăng ký học phần & Thời khóa biểu (Phase 7) */}
-          <Route path="/sis/dang-ky-hoc-phan-tkb" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
-          <Route path="/sis/lop-hoc-phan" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
-          <Route path="/sis/thoi-khoa-bieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
-          <Route path="/sis/thay-doi-lich-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
-          <Route path="/sis/danh-sach-dang-ky" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RegistrationPage /></RoleRoute>} />
 
           {/* DMS — admin + nhan-vien + BGH */}
           <Route path="/dms" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DMSDashboard /></RoleRoute>} />

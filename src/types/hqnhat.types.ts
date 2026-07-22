@@ -908,3 +908,220 @@ export interface HqnhatCourseRegistrationCreatePayload {
   course_section_id: number;
   status?: 1 | 2;
 }
+
+// ══════════════════════════════════════════════════════════════════════════
+// CLASSES (Lớp hành chính)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatClass {
+  id: number;
+  code: string;
+  name: string;
+  major_id: number;
+  specialization_id: number | null;
+  course_id: number;
+  advisor_id: number | null;
+  status: number; // 0: INACTIVE, 1: ACTIVE
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: string | null;
+}
+
+export interface HqnhatClassListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  code?: string;
+  name?: string;
+  major_id?: number;
+  course_id?: number;
+  status?: 0 | 1;
+}
+
+export interface HqnhatClassCreatePayload {
+  code: string;
+  name: string;
+  major_id: number;
+  course_id: number;
+  specialization_id?: number | null;
+  advisor_id?: number | null;
+  status: 0 | 1;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ACADEMIC WARNINGS (Cảnh báo học vụ)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatAcademicWarning {
+  id: number;
+  student_id: number;
+  academic_term_id: number;
+  warning_type: number; // 1: LOW_GPA, 2: FAILED_SUBJECT, 3: INSUFFICIENT_CREDIT, 4: ACADEMIC_WARNING
+  warning_level: number;
+  description: string | null;
+  resolved_at: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface HqnhatAcademicWarningListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_id?: number;
+  academic_term_id?: number;
+  warning_type?: 1 | 2 | 3 | 4;
+}
+
+export interface HqnhatAcademicWarningCreatePayload {
+  student_id: number;
+  academic_term_id: number;
+  warning_type: 1 | 2 | 3 | 4;
+  warning_level: number;
+  description?: string;
+}
+
+export interface HqnhatAcademicWarningUpdatePayload {
+  student_id?: number;
+  academic_term_id?: number;
+  warning_type?: 1 | 2 | 3 | 4;
+  warning_level?: number;
+  description?: string;
+  resolved_at?: string | null;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT GRADES (Điểm sinh viên)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatStudentGrade {
+  id: number;
+  course_registration_id: number;
+  attendance_score: number | null;
+  assignment_score: number | null;
+  midterm_score: number | null;
+  final_score: number | null;
+  total_score: number | null;
+  letter_grade: string | null;
+  grade_point: number | null;
+  is_pass: boolean | null;
+  is_locked: boolean;
+  locked_at: string | null;
+  locked_by: number | null;
+}
+
+export interface HqnhatStudentGradeListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  course_registration_id?: number;
+  course_section_id?: number;
+  student_id?: number;
+  is_pass?: boolean;
+  is_locked?: boolean;
+}
+
+export interface HqnhatStudentGradeUpdatePayload {
+  attendance_score?: number | null;
+  assignment_score?: number | null;
+  midterm_score?: number | null;
+  final_score?: number | null;
+  total_score?: number | null;
+  is_locked?: boolean;
+}
+
+export interface HqnhatStudentGradeBulkUpdatePayload {
+  grades: Array<{
+    id: number;
+    attendance_score?: number;
+    midterm_score?: number;
+    final_score?: number;
+    total_score?: number;
+  }>;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// GPA HISTORIES (Lịch sử điểm GPA)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatGpaHistory {
+  id: number;
+  student_id: number;
+  academic_term_id: number;
+  registered_credit: number;
+  earned_credit: number;
+  accumulated_credit: number;
+  semester_gpa: number;
+  cumulative_gpa: number;
+  academic_rank: number; // 1: EXCELLENT, 2: VERY_GOOD, 3: GOOD, 4: AVERAGE, 5: WEAK, 6: POOR
+}
+
+export interface HqnhatGpaHistoryListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_id?: number;
+  academic_term_id?: number;
+  academic_rank?: 1 | 2 | 3 | 4 | 5 | 6;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT LOGS (Nhật ký sinh viên)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatStudentLog {
+  id: number;
+  student_id: number;
+  action: string;
+  reference_type: string | null;
+  reference_id: number | null;
+  description: string | null;
+  created_by: number | null;
+  created_at: string | null;
+}
+
+export interface HqnhatStudentLogListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  student_id?: number;
+  action?: string;
+  reference_type?: string;
+  reference_id?: number;
+  created_by?: number;
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// STUDENT PROFILES (Hồ sơ sinh viên)
+// ══════════════════════════════════════════════════════════════════════════
+export interface HqnhatStudentProfile {
+  id: number;
+  student_id: number;
+  father_name: string | null;
+  mother_name: string | null;
+  guardian_name: string | null;
+  guardian_phone: string | null;
+  emergency_contact: string | null;
+  emergency_phone: string | null;
+  nationality: string | null;
+  ethnicity: string | null;
+  religion: string | null;
+  insurance_number: string | null;
+  bank_name: string | null;
+  bank_account: string | null;
+}
+
+export interface HqnhatStudentProfileUpdatePayload {
+  father_name?: string | null;
+  mother_name?: string | null;
+  guardian_name?: string | null;
+  guardian_phone?: string | null;
+  emergency_contact?: string | null;
+  emergency_phone?: string | null;
+  nationality?: string | null;
+  ethnicity?: string | null;
+  religion?: string | null;
+  insurance_number?: string | null;
+  bank_name?: string | null;
+  bank_account?: string | null;
+}

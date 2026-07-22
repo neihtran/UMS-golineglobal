@@ -48,7 +48,7 @@ export default function SubjectConditionList() {
     subject_id: subjectId ? Number(subjectId) : undefined,
   });
 
-  const { data: subjectsData } = useHqnhatSubjects({ per_page: 1000 });
+  const { data: subjectsData } = useHqnhatSubjects({ per_page: 100 });
 
   const createMut = useCreateHqnhatSubjectCondition();
   const updateMut = useUpdateHqnhatSubjectCondition();

@@ -1,72 +1,51 @@
 import { useState } from 'react';
-import { BookOpen, Users, Calendar, Briefcase, GraduationCap, BookMarked, Library, GitBranch, ShieldCheck } from 'lucide-react';
+import { Users, Briefcase, GraduationCap, Calendar, BookOpen } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import {
+  MajorSheet,
+  SpecializationSheet,
+  TrainingSystemSheet,
   AcademicTermSheet,
   CourseSheet,
-  MajorSheet,
-  TrainingSystemSheet,
-  SpecializationSheet,
-  SubjectSheet,
-  CurriculumSheet,
-  CurriculumSubjectSheet,
-  SubjectPrerequisiteSheet,
-  SubjectConditionSheet,
 } from './sheets';
 
 type TabType =
-  | 'ctdt'
-  | 'nganh'
-  | 'he'
+  | 'nganh-hoc'
   | 'chuyen-nganh'
+  | 'he-dao-tao'
   | 'hoc-ky'
-  | 'khoa-hoc'
-  | 'mon-hoc'
-  | 'mon-trong-ctdt'
-  | 'tien-quyet'
-  | 'dieu-kien-dang-ky';
+  | 'khoa-hoc';
 
 const TABS: { id: TabType; label: string; icon: React.ReactNode }[] = [
-  { id: 'ctdt', label: 'CTĐT', icon: <BookOpen className="h-4 w-4" /> },
-  { id: 'nganh', label: 'Ngành học', icon: <Users className="h-4 w-4" /> },
-  { id: 'he', label: 'Hệ đào tạo', icon: <Calendar className="h-4 w-4" /> },
+  { id: 'nganh-hoc', label: 'Ngành học', icon: <Users className="h-4 w-4" /> },
   { id: 'chuyen-nganh', label: 'Chuyên ngành', icon: <Briefcase className="h-4 w-4" /> },
+  { id: 'he-dao-tao', label: 'Hệ đào tạo', icon: <GraduationCap className="h-4 w-4" /> },
   { id: 'hoc-ky', label: 'Học kỳ', icon: <Calendar className="h-4 w-4" /> },
-  { id: 'khoa-hoc', label: 'Khóa học', icon: <GraduationCap className="h-4 w-4" /> },
-  { id: 'mon-hoc', label: 'Môn học', icon: <BookMarked className="h-4 w-4" /> },
-  { id: 'mon-trong-ctdt', label: 'Môn trong CTĐT', icon: <Library className="h-4 w-4" /> },
-  { id: 'tien-quyet', label: 'Tiên quyết', icon: <GitBranch className="h-4 w-4" /> },
-  { id: 'dieu-kien-dang-ky', label: 'Điều kiện đăng ký', icon: <ShieldCheck className="h-4 w-4" /> },
+  { id: 'khoa-hoc', label: 'Khóa học', icon: <BookOpen className="h-4 w-4" /> },
 ];
 
 const TAB_CONTENT: Record<TabType, React.ReactNode> = {
-  'ctdt': <CurriculumSheet />,
-  'nganh': <MajorSheet />,
-  'he': <TrainingSystemSheet />,
+  'nganh-hoc': <MajorSheet />,
   'chuyen-nganh': <SpecializationSheet />,
+  'he-dao-tao': <TrainingSystemSheet />,
   'hoc-ky': <AcademicTermSheet />,
   'khoa-hoc': <CourseSheet />,
-  'mon-hoc': <SubjectSheet />,
-  'mon-trong-ctdt': <CurriculumSubjectSheet />,
-  'tien-quyet': <SubjectPrerequisiteSheet />,
-  'dieu-kien-dang-ky': <SubjectConditionSheet />,
 };
 
-export default function CurriculumPage() {
-  const [activeTab, setActiveTab] = useState<TabType>('ctdt');
+export default function TrainingCatalogPage() {
+  const [activeTab, setActiveTab] = useState<TabType>('nganh-hoc');
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Danh mục đào tạo"
-        description=""
+        description="Quản lý ngành học, chuyên ngành, hệ đào tạo, học kỳ và khóa học"
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
           { label: 'Danh mục đào tạo' },
         ]}
       />
 
-      {/* Tab nav */}
       <div className="border-b border-[rgb(var(--border))]">
         <nav className="flex gap-1 overflow-x-auto">
           {TABS.map(tab => (
@@ -86,7 +65,6 @@ export default function CurriculumPage() {
         </nav>
       </div>
 
-      {/* Tab content — each sheet manages its own state + API calls */}
       {TAB_CONTENT[activeTab]}
     </div>
   );

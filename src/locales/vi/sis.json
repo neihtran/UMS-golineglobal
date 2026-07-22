@@ -3,6 +3,15 @@
   "titleShort": "SIS – Sinh viên & Đào tạo",
   "breadcrumb": { "list": "Sinh viên & Đào tạo" },
 
+  "nav": {
+    "trainingCatalog": "Danh mục đào tạo",
+    "studentAdmission": "Sinh viên & Tuyển sinh",
+    "studyProcess": "Quá trình học tập",
+    "curriculumProgram": "CTĐT & Học phần",
+    "registration": "ĐKHP & Thời khóa biểu",
+    "gradeWarning": "Điểm & Cảnh báo"
+  },
+
   "dashboard": {
     "title": "Quản lý Sinh viên & Đào tạo",
     "description": "SIS-01 — Xương sống đào tạo, kết nối HEMIS, LMS, EXAM, PORTAL",

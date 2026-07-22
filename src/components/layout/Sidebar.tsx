@@ -54,9 +54,12 @@ const DEV_SIS_ONLY = true;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SIS_ONLY_MODULES: Module[] = [
-  { id: 'sis-chuong-trinh-dao-tao', label: 'Hệ thống đào tạo', route: '/sis/ctdt', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'sis-danh-muc', label: 'Danh mục đào tạo', route: '/sis/danh-muc', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
   { id: 'sis-tuyen-sinh', label: 'Sinh viên & Tuyển sinh', route: '/sis/tuyen-sinh', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-  { id: 'sis-lop-hoc-phan', label: 'Đăng ký học phần & TKB', route: '/sis/lop-hoc-phan', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
+  { id: 'sis-qua-trinh', label: 'Quá trình học tập', route: '/sis/qua-trinh', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'sis-ctdt', label: 'CTĐT & Học phần', route: '/sis/ctdt', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'sis-dang-ky', label: 'ĐKHP & Thời khóa biểu', route: '/sis/dang-ky', icon: <Calendar className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
+  { id: 'sis-diem', label: 'Điểm & Cảnh báo', route: '/sis/diem', icon: <Award className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
 ];
 
 const SIS_ONLY_GROUP: NavGroup = {
@@ -232,8 +235,11 @@ const NAV_KEYS: Record<string, string> = {
   hrm: 'module.hrm', 'hrm-don-vi': 'module.hrmDepartment', 'hrm-vien-chuc': 'module.hrmVienChuc',
   'hrm-hop-dong': 'module.hrmContract', 'hrm-luong': 'module.hrmSalary', 'hrm-nghi-phep': 'module.hrmLeave',
   'hrm-bo-nhiem': 'module.hrmAppointment', 'hrm-tuyen-dung': 'module.hrmRecruitment', 'hrm-ky-luat': 'module.hrmDiscipline',
-  sis: 'module.sis', 'sis-sv': 'module.sisStudentList', 'sis-ctdt': 'module.sisCurriculum',
-  'sis-mon-hoc': 'module.sisSubject', 'sis-dk': 'module.sisEnrollment', 'sis-ds-dk': 'module.sisEnrollmentList',
+  sis: 'module.sis', 'sis-sv': 'module.sisStudentList',
+  'sis-danh-muc': 'module.sisTrainingCatalog', 'sis-tuyen-sinh': 'module.sisStudentAdmission',
+  'sis-qua-trinh': 'module.sisStudyProcess', 'sis-ctdt': 'module.sisCurriculumProgram',
+  'sis-dang-ky': 'module.sisRegistration', 'sis-diem': 'module.sisGradeWarning',
+  'sis-dk': 'module.sisEnrollment', 'sis-ds-dk': 'module.sisEnrollmentList',
   'sis-tn': 'module.sisGraduation', 'sis-thuc-tap': 'module.sisInternship',
   lms: 'module.lms', 'lms-khoa-hoc': 'module.lmsCourse', 'lms-bai-tap': 'module.lmsAssignment',
   'lms-bai-tap-cua-toi': 'module.lmsMyAssignment', 'lms-thu-vien': 'module.lmsResource', 'lms-bang-diem': 'module.lmsGradebook',
@@ -274,19 +280,24 @@ function NavItem({ module, collapsed, tNav }: { module: Module; collapsed: boole
       title={collapsed ? label : undefined}
       aria-current={isActive ? 'page' : undefined}
       className={clsx(
-        'group flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
+        'group relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
         'text-white/50 hover:bg-white/10 hover:text-white',
         isActive && 'bg-white/[0.14] text-white',
       )}
     >
-      <span className={clsx(
-        'shrink-0 transition-colors duration-150',
-        isActive ? 'text-[rgb(var(--accent))]' : 'text-white/60',
-      )}>
+      <span
+        className={clsx(
+          'shrink-0 transition-colors duration-150',
+          isActive ? 'text-[rgb(var(--accent))]' : 'text-white/60',
+        )}
+      >
         {module.icon}
       </span>
       {!collapsed && (
         <span className="flex-1 truncate text-[12px] leading-tight">{label}</span>
+      )}
+      {isActive && (
+        <span className="absolute left-0 top-1 bottom-1 w-0.5 rounded-r bg-[rgb(var(--accent))]" />
       )}
     </NavLink>
   );
