@@ -101,6 +101,12 @@ function MajorDetailPage() {
 const AcademicTermDetail = lazy(() => import('@/modules/sis/pages/AcademicTermDetail'));
 const AcademicTermEdit = lazy(() => import('@/modules/sis/pages/AcademicTermEdit'));
 
+// CORE
+const OrganizationStructurePage = lazy(() => import('@/modules/core/pages/OrganizationStructurePage'));
+const FacilityPage = lazy(() => import('@/modules/core/pages/FacilityPage'));
+const AcademicYearPage = lazy(() => import('@/modules/core/pages/AcademicYearPage'));
+const MasterDataPage = lazy(() => import('@/modules/core/pages/MasterDataPage'));
+
 // SIS - Other pages
 const ScheduleList = lazy(() => import('@/modules/sis/pages/ScheduleList'));
 const StudentRequestList = lazy(() => import('@/modules/sis/pages/StudentRequestList'));
@@ -500,6 +506,15 @@ export default function AppRouter() {
           <Route path="/iam/mfa" element={<RoleRoute roles={[ROLES.ADMIN]}><MFAConfig /></RoleRoute>} />
           <Route path="/iam/trang-thai-he-thong" element={<RoleRoute roles={[ROLES.ADMIN]}><SystemHealth /></RoleRoute>} />
           <Route path="/iam/cai-dat-he-thong" element={<RoleRoute roles={[ROLES.ADMIN]}><SystemConfig /></RoleRoute>} />
+
+          {/* CORE — Cơ cấu tổ chức */}
+          <Route path="/core" element={<RoleRoute roles={[ROLES.ADMIN]}><OrganizationStructurePage /></RoleRoute>} />
+          <Route path="/core/co-cau" element={<RoleRoute roles={[ROLES.ADMIN]}><OrganizationStructurePage /></RoleRoute>} />
+          <Route path="/core/co-so-vat-chat" element={<RoleRoute roles={[ROLES.ADMIN]}><FacilityPage /></RoleRoute>} />
+          <Route path="/core/nien-khoa" element={<RoleRoute roles={[ROLES.ADMIN]}><AcademicYearPage /></RoleRoute>} />
+          <Route path="/core/danh-muc-dung-chung" element={<RoleRoute roles={[ROLES.ADMIN]}><MasterDataPage /></RoleRoute>} />
+
+          {/* HRM — admin + nhan-vien + BGH */}
 
           {/* HRM — admin + nhan-vien + BGH */}
           <Route path="/hrm" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMDashboard /></RoleRoute>} />
