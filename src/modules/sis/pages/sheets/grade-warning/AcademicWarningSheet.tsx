@@ -98,13 +98,15 @@ export function AcademicWarningSheet() {
   const updateMut = useUpdateHqnhatAcademicWarning();
   const deleteMut = useDeleteHqnhatAcademicWarning();
 
-  const getStudentName = (id: number): string => {
-    const s = allStudents.find(x => x.id === id);
+  const getStudentName = (id: number | string): string => {
+    const numId = Number(id);
+    const s = allStudents.find(x => Number(x.id) === numId);
     return s ? `${s.student_code} — ${s.full_name}` : `SV #${id}`;
   };
 
-  const getTermName = (id: number): string => {
-    const t = terms.find(x => x.id === id);
+  const getTermName = (id: number | string): string => {
+    const numId = Number(id);
+    const t = terms.find(x => Number(x.id) === numId);
     return t ? t.code || `HK #${id}` : `HK #${id}`;
   };
 

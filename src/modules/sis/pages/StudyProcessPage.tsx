@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { History, RefreshCw, GraduationCap, Users, Award } from 'lucide-react';
+import { History, RefreshCw, GraduationCap, Users } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui';
 import {
   StatusHistorySheet,
   BaoLuuSheet,
@@ -41,20 +39,11 @@ export default function StudyProcessPage() {
     <div className="space-y-6">
       <PageHeader
         title="Quá trình học tập"
-        description="Quản lý lịch sử trạng thái, bảo lưu, thôi học, chuyển ngành, chuyển lớp và tốt nghiệp"
+        description="Quản lý lịch sử trạng thái, bảo lưu, thôi học, chuyển ngành, chuyển lớp"
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
           { label: 'Quá trình học tập' },
         ]}
-        actions={
-          <>
-            <Link to="/sis/tot-nghiep">
-              <Button variant="outline" leftIcon={<Award className="h-4 w-4" />}>
-                Tốt nghiệp
-              </Button>
-            </Link>
-          </>
-        }
       />
 
       <div className="border-b border-[rgb(var(--border))]">

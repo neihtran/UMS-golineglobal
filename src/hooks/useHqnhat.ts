@@ -171,6 +171,8 @@ export const HQNHAT_QUERY_KEYS = {
       ['hqnhat', 'course-sections', 'list', params ?? {}] as const,
     detail: (id: number | string) =>
       ['hqnhat', 'course-sections', 'detail', id] as const,
+    students: (id: number | string, params?: { page?: number; per_page?: number; status?: number }) =>
+      ['hqnhat', 'course-sections', String(id), 'students', params ?? {}] as const,
   },
   classSchedules: {
     all: ['hqnhat', 'class-schedules'] as const,
@@ -2116,6 +2118,24 @@ export const useHqnhatCourseSection = (
       return res.data;
     },
     enabled: id !== undefined && id !== '',
+    ...options,
+  });
+
+export const useHqnhatCourseSectionStudents = (
+  courseSectionId: number | string | undefined,
+  params?: { page?: number; per_page?: number; status?: number },
+  options?: Omit<UseQueryOptions<HqnhatListResponse<{ id: number; student_code: string; full_name: string }>, Error>, 'queryKey' | 'queryFn' | 'enabled'>
+) =>
+  useQuery<HqnhatListResponse<{ id: number; student_code: string; full_name: string }>, Error>({
+    queryKey: HQNHAT_QUERY_KEYS.courseSections.students(courseSectionId ?? '', params),
+    queryFn: async () => {
+      const res = await hqnhatApi.get<HqnhatListResponse<{ id: number; student_code: string; full_name: string }>>(
+        `/api/v1/sis/course-sections/${courseSectionId}/students`,
+        { params: cleanParams(params) }
+      );
+      return res.data;
+    },
+    enabled: courseSectionId !== undefined && courseSectionId !== '',
     ...options,
   });
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Edit, Trash2, Eye, RotateCcw } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Eye, Users, RotateCcw } from 'lucide-react';
 import {
   Button,
   Input,
@@ -14,6 +14,7 @@ import { usePagination } from '@/hooks';
 import {
   useHqnhatCourseSections,
   useHqnhatCourseSection,
+  useHqnhatCourseSectionStudents,
   useCreateHqnhatCourseSection,
   useUpdateHqnhatCourseSection,
   useDeleteHqnhatCourseSection,
@@ -90,7 +91,7 @@ export function CourseSectionSheet() {
 
   const { data, isLoading, isFetching } = useHqnhatCourseSections(params);
   const { data: subjectsData } = useHqnhatSubjects({ per_page: 100, status: 1 });
-  const { data: termsData } = useHqnhatAcademicTerms({ per_page: 100, status: 1 });
+  const { data: termsData } = useHqnhatAcademicTerms({ per_page: 100 });
   const { data: registrationsData } = useHqnhatCourseRegistrations({ per_page: 100 });
 
   const items = Array.isArray(data?.data) ? data.data : [];
@@ -110,6 +111,8 @@ export function CourseSectionSheet() {
   const [deleting, setDeleting] = useState<HqnhatCourseSection | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailId, setDetailId] = useState<number | null>(null);
+  const [studentsOpen, setStudentsOpen] = useState(false);
+  const [studentsSectionId, setStudentsSectionId] = useState<number | null>(null);
   const [form, setForm] = useState<HqnhatCourseSectionCreatePayload>(emptyForm());
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -163,6 +166,14 @@ export function CourseSectionSheet() {
     setDeleting(item);
     setDeleteOpen(true);
   };
+
+  const openStudents = (item: HqnhatCourseSection) => {
+    setStudentsSectionId(item.id);
+    setStudentsOpen(true);
+  };
+
+  const { data: sectionStudentsData, isLoading: sectionStudentsLoading } =
+    useHqnhatCourseSectionStudents(studentsSectionId, { per_page: 100 });
 
   const resetFilters = () => {
     setSearch('');
@@ -320,7 +331,10 @@ export function CourseSectionSheet() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="sm" onClick={() => openDetail(item)}><Eye className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="sm" onClick={() => openStudents(item)} title="Xem danh sách SV">
+                        <Users className="h-4 w-4 text-[rgb(var(--primary))]" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => openDetail(item)} title="Chi tiết"><Eye className="h-4 w-4" /></Button>
                       <Button variant="ghost" size="sm" onClick={() => openEdit(item)}><Edit className="h-4 w-4" /></Button>
                       <Button variant="ghost" size="sm" onClick={() => openDelete(item)}><Trash2 className="h-4 w-4 text-red-500" /></Button>
                     </div>
@@ -435,6 +449,43 @@ export function CourseSectionSheet() {
         variant="danger"
         loading={deleteMut.isPending}
       />
+
+      <Modal open={studentsOpen} onClose={() => setStudentsOpen(false)} title="Danh sách sinh viên lớp học phần" size="md">
+        {sectionStudentsLoading ? (
+          <div className="flex items-center justify-center py-8"><div className="animate-spin h-8 w-8 border-4 border-[rgb(var(--primary))] border-t-transparent rounded-full" /></div>
+        ) : (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm text-[rgb(var(--text-muted))]">
+              <span>Tổng: <span className="font-semibold text-[rgb(var(--text))]">{sectionStudentsData?.meta?.total ?? 0}</span> sinh viên</span>
+            </div>
+            {(sectionStudentsData?.data ?? []).length === 0 ? (
+              <p className="text-center py-8 text-[rgb(var(--text-muted))]">Chưa có sinh viên đăng ký lớp học phần này</p>
+            ) : (
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeadCell className="w-14">STT</TableHeadCell>
+                    <TableHeadCell>Mã SV</TableHeadCell>
+                    <TableHeadCell>Họ tên</TableHeadCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {(sectionStudentsData?.data ?? []).map((s, idx) => (
+                    <TableRow key={s.id}>
+                      <TableCell className="text-[rgb(var(--text-muted))] tabular-nums">{idx + 1}</TableCell>
+                      <TableCell className="font-mono font-medium">{s.student_code}</TableCell>
+                      <TableCell className="text-sm">{s.full_name}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+            <div className="flex justify-end pt-4 border-t">
+              <Button variant="outline" onClick={() => setStudentsOpen(false)}>Đóng</Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Chi tiết lớp học phần" size="lg">
         {detailLoading ? (
