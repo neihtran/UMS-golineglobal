@@ -169,7 +169,7 @@ export function StudentGradeSheet() {
         assignment_score: item.assignment_score,
         midterm_score: item.midterm_score,
         final_score: item.final_score,
-        total_score: item.total_score,
+        // total_score do backend tự tính, không cần truyền
       };
     });
     setEditedRows(initial);
@@ -191,7 +191,7 @@ export function StudentGradeSheet() {
       assignment_score: r.assignment_score ?? undefined,
       midterm_score: r.midterm_score ?? undefined,
       final_score: r.final_score ?? undefined,
-      total_score: r.total_score ?? undefined,
+      // total_score do backend tự tính, không gửi lên
     }));
     try {
       await bulkMut.mutateAsync({ grades });
@@ -346,7 +346,7 @@ export function StudentGradeSheet() {
                   <TableCell className="text-sm max-w-[200px] truncate">
                     {getStudentName(item)}
                   </TableCell>
-                  {(['attendance_score', 'assignment_score', 'midterm_score', 'final_score', 'total_score'] as const).map((field) => (
+                  {(['attendance_score', 'assignment_score', 'midterm_score', 'final_score'] as const).map((field) => (
                     <TableCell key={field}>
                       <input
                         type="number"
@@ -360,6 +360,12 @@ export function StudentGradeSheet() {
                       />
                     </TableCell>
                   ))}
+                  {/* Tổng: backend tự tính, chỉ hiển thị từ item gốc */}
+                  <TableCell>
+                    <span className="h-8 flex items-center justify-center w-20 text-sm font-bold text-[rgb(var(--accent))] tabular-nums">
+                      {formatScore(item.total_score)}
+                    </span>
+                  </TableCell>
                 </TableRow>
               );
             })

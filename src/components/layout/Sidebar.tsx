@@ -26,9 +26,7 @@ import {
   LogOut,
   HelpCircle,
   Search,
-  Briefcase,
   Calendar,
-  Link,
 } from 'lucide-react';
 import { useAuth } from '@/app/providers';
 import { ROLES, ROLE_LABELS } from '@/constants/modules';
@@ -109,60 +107,18 @@ const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
     ],
   },
 
-  // ── NHÓM 2: QUẢN LÝ ĐÀO TẠO ───────────────────────────────────────────────
+  // ── NHÓM 2: QUẢN LÝ ĐÀO TẠO (SIS MỚI) ─────────────────────────────────────
   {
     id: 'quan-ly-dao-tao',
     label: 'Quản lý Đào tạo',
     groupIcon: <GraduationCap className="h-4 w-4" />,
     modules: [
-      // SIS
-      { id: 'sis', label: 'SIS – Sinh viên & Đào tạo', route: '/sis', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-sv', label: 'Danh sách Sinh viên', route: '/sis/sinh-vien', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-ctdt', label: 'CTĐT', route: '/sis/ctdt', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-mon-hoc', label: 'Môn học', route: '/sis/mon-hoc', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-dk', label: 'Đăng ký HP', route: '/sis/dang-ky-hoc-phan', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.TRUONG_KHOA] },
-      { id: 'sis-ds-dk', label: 'DS Đăng ký', route: '/sis/dang-ky', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-lop-hoc-phan', label: 'Lớp học phần', route: '/sis/lop-hoc-phan', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-thoi-khoa-bieu', label: 'Thời khóa biểu', route: '/sis/thoi-khoa-bieu', icon: <Calendar className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-thay-doi-lich-hoc', label: 'LS thay đổi lịch', route: '/sis/thay-doi-lich-hoc', icon: <Calendar className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-tn', label: 'Tốt nghiệp', route: '/sis/tot-nghiep', icon: <Award className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'sis-thuc-tap', label: 'Thực tập TN', route: '/sis/thuc-tap', icon: <Briefcase className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      // SIS - Danh mục (Phase 1)
-      { id: 'sis-nganh-hoc', label: 'Ngành học', route: '/sis/nganh-hoc', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'sis-he-dao-tao', label: 'Hệ đào tạo', route: '/sis/he-dao-tao', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'sis-chuyen-nganh', label: 'Chuyên ngành', route: '/sis/chuyen-nganh', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'sis-hoc-ky', label: 'Học kỳ', route: '/sis/hoc-ky', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'sis-lich-hoc', label: 'Lịch học', route: '/sis/lich-hoc', icon: <Calendar className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'sis-yeu-cau-sv', label: 'Yêu cầu SV', route: '/sis/yeu-cau-sv', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'sis-tuyen-sinh', label: 'Tuyển sinh', route: '/sis/tuyen-sinh', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'sis-loai-mon-hoc', label: 'Loại môn học', route: '/sis/loai-mon-hoc', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'sis-tien-quyet', label: 'Môn tiên quyết', route: '/sis/mon-tien-quyet', icon: <Link className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'sis-dieu-kien-hoc-phan', label: 'Điều kiện học phần', route: '/sis/dieu-kien-hoc-phan', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      // LMS
-      { id: 'lms', label: 'LMS – Dạy học Số', route: '/lms', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'lms-khoa-hoc', label: 'Khóa học', route: '/lms/khoa-hoc', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'lms-bai-tap', label: 'Bài tập SV', route: '/lms/bai-tap-sinh-vien', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA] },
-      { id: 'lms-bai-tap-cua-toi', label: 'Bài tập của tôi', route: '/lms/bai-tap-cua-toi', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.TRUONG_KHOA] },
-      { id: 'lms-thu-vien', label: 'Thư viện học liệu', route: '/lms/thu-vien-hoc-lieu', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA] },
-      { id: 'lms-bang-diem', label: 'Bảng điểm', route: '/lms/bang-diem', icon: <Award className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      // EXAM
-      { id: 'exam', label: 'EXAM – Thi trực tuyến', route: '/exam', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'exam-ngan-hang', label: 'Ngân hàng câu hỏi', route: '/exam/ngan-hang-cau-hoi', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA] },
-      { id: 'exam-ca-thi', label: 'Ca thi & Giám sát', route: '/exam/ca-thi', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'exam-tao-thi', label: 'Tạo đề thi', route: '/exam/tao-thi', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.TRUONG_KHOA] },
-      { id: 'exam-bang-diem', label: 'Bảng điểm', route: '/exam/bang-diem', icon: <Award className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.TRUONG_KHOA, ROLES.PHO_HIEU_TRUONG] },
-      // PORTAL
-      { id: 'portal', label: 'PORTAL – Cổng thông tin', route: '/portal', icon: <Globe className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
-      // LIB
-      { id: 'lib', label: 'LIB – Thư viện', route: '/lib', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
-      { id: 'lib-tai-lieu', label: 'Tài liệu', route: '/lib/tai-lieu', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
-      { id: 'lib-tai-lieu-tao', label: 'Tạo tài liệu', route: '/lib/tai-lieu/tao', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
-      { id: 'lib-muon-tra', label: 'Mượn trả', route: '/lib/muon-tra', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.NHAN_VIEN] },
-      { id: 'lib-tim-kiem', label: 'Tìm kiếm', route: '/lib/tim-kiem', icon: <Search className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
-      // DCE
-      { id: 'dce', label: 'DCE – Năng lực Số', route: '/dce', icon: <Award className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
-      { id: 'dce-khoa', label: 'Khóa đào tạo', route: '/dce/khoa-dao-tao', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
-      { id: 'dce-chuan-dau-ra', label: 'Chuẩn đầu ra', route: '/dce/chuan-dau-ra', icon: <Award className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
+      { id: 'sis-danh-muc', label: 'Danh mục đào tạo', route: '/sis/danh-muc', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+      { id: 'sis-tuyen-sinh', label: 'Sinh viên & Tuyển sinh', route: '/sis/tuyen-sinh', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+      { id: 'sis-qua-trinh', label: 'Quá trình học tập', route: '/sis/qua-trinh', icon: <GraduationCap className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+      { id: 'sis-ctdt', label: 'CTĐT & Học phần', route: '/sis/ctdt', icon: <BookOpen className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+      { id: 'sis-dang-ky', label: 'ĐKHP & Thời khóa biểu', route: '/sis/dang-ky', icon: <Calendar className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
+      { id: 'sis-diem', label: 'Điểm & Cảnh báo', route: '/sis/diem', icon: <Award className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
     ],
   },
 
