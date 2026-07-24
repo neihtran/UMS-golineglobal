@@ -103,6 +103,7 @@ const AcademicTermEdit = lazy(() => import('@/modules/sis/pages/AcademicTermEdit
 
 // CORE
 const OrganizationStructurePage = lazy(() => import('@/modules/core/pages/OrganizationStructurePage'));
+const AdministrativeBoundaryPage = lazy(() => import('@/modules/core/pages/AdministrativeBoundaryPage'));
 const FacilityPage = lazy(() => import('@/modules/core/pages/FacilityPage'));
 const AcademicYearPage = lazy(() => import('@/modules/core/pages/AcademicYearPage'));
 const MasterDataPage = lazy(() => import('@/modules/core/pages/MasterDataPage'));
@@ -513,6 +514,8 @@ export default function AppRouter() {
           <Route path="/core/co-so-vat-chat" element={<RoleRoute roles={[ROLES.ADMIN]}><FacilityPage /></RoleRoute>} />
           <Route path="/core/nien-khoa" element={<RoleRoute roles={[ROLES.ADMIN]}><AcademicYearPage /></RoleRoute>} />
           <Route path="/core/danh-muc-dung-chung" element={<RoleRoute roles={[ROLES.ADMIN]}><MasterDataPage /></RoleRoute>} />
+          <Route path="/core/dia-gioi" element={<RoleRoute roles={[ROLES.ADMIN]}><AdministrativeBoundaryPage /></RoleRoute>} />
+          <Route path="/core/dia-gioi-hanh-chinh" element={<RoleRoute roles={[ROLES.ADMIN]}><AdministrativeBoundaryPage /></RoleRoute>} />
 
           {/* HRM — admin + nhan-vien + BGH */}
 

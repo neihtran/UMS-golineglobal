@@ -462,6 +462,107 @@ export interface MasterValueCreatePayload {
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
+// Country (Quốc gia)
+// ════════════════════════════════════════════════════════════════════════════════
+export interface Country {
+  id: number;
+  name: string;
+  name_en: string | null;
+}
+
+export interface CountryListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  name?: string;
+  name_en?: string;
+}
+
+export interface CountryCreatePayload {
+  name: string;
+  name_en?: string | null;
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// Province (Tỉnh / Thành phố trực thuộc Trung ương)
+// ════════════════════════════════════════════════════════════════════════════════
+export interface Province {
+  id: number;
+  country_id: number;
+  name: string;
+  name_en: string | null;
+}
+
+export interface ProvinceListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  country_id?: number;
+  name?: string;
+  name_en?: string;
+}
+
+export interface ProvinceCreatePayload {
+  country_id: number;
+  name: string;
+  name_en?: string | null;
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// District (Quận / Huyện / Thị xã)
+// ════════════════════════════════════════════════════════════════════════════════
+export interface District {
+  id: number;
+  province_id: number;
+  name: string;
+  name_en: string | null;
+}
+
+export interface DistrictListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  province_id?: number;
+  name?: string;
+  name_en?: string;
+}
+
+export interface DistrictCreatePayload {
+  province_id: number;
+  name: string;
+  name_en?: string | null;
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// Ward (Phường / Xã / Thị trấn)
+// ════════════════════════════════════════════════════════════════════════════════
+export interface Ward {
+  id: number;
+  district_id: number;
+  name: string;
+  name_en: string | null;
+}
+
+export interface WardListParams {
+  page?: number;
+  per_page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+  district_id?: number;
+  name?: string;
+  name_en?: string;
+}
+
+export interface WardCreatePayload {
+  district_id: number;
+  name: string;
+  name_en?: string | null;
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
 // Response envelope
 // ════════════════════════════════════════════════════════════════════════════════
 export interface CorePaginationMeta {

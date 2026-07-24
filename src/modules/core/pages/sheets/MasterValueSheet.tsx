@@ -58,10 +58,10 @@ export function MasterValueSheet() {
   };
 
   const { data, isLoading, isFetching } = useMasterValues(params);
-  const { data: groupData } = useMasterGroups({ per_page: 100, is_active: true });
-  const items = data?.data ?? [];
+  const { data: groupData, isLoading: groupLoading } = useMasterGroups({ per_page: 200 });
+  const items = Array.isArray(data?.data) ? data.data : [];
   const total = data?.meta?.total ?? 0;
-  const groups = groupData?.data ?? [];
+  const groups = Array.isArray(groupData?.data) ? groupData.data : [];
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<MasterValue | null>(null);
@@ -296,11 +296,16 @@ export function MasterValueSheet() {
             <select
               value={form.group_id}
               onChange={e => setForm({ ...form, group_id: Number(e.target.value) })}
-              className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+              disabled={groupLoading}
+              className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm disabled:opacity-60"
             >
-              <option value={0}>-- Chọn nhóm --</option>
+              <option value={0}>
+                {groupLoading ? 'Đang tải nhóm...' : groups.length === 0 ? 'Chưa có nhóm danh mục — hãy tạo trước' : '-- Chọn nhóm --'}
+              </option>
               {groups.map(g => (
-                <option key={g.id} value={g.id}>{g.name}</option>
+                <option key={g.id} value={g.id}>
+                  {g.name} {!g.is_active ? '(Ngừng hoạt động)' : ''}
+                </option>
               ))}
             </select>
           </FormField>

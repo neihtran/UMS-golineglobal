@@ -49,7 +49,7 @@ type NavGroup = {
 };
 
 // ─── DEV: SHOW ONLY SIS + CORE DEMO ──────────────────────────────────────────────
-const DEV_SIS_ONLY = true;
+const DEV_SIS_ONLY = false;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SIS_ONLY_MODULES: Module[] = [
@@ -73,19 +73,33 @@ const CORE_ONLY_MODULES: Module[] = [
   { id: 'core-co-so-vat-chat', label: 'Cơ sở vật chất', route: '/core/co-so-vat-chat', icon: <Building2 className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
   { id: 'core-nien-khoa', label: 'Niên khóa', route: '/core/nien-khoa', icon: <Calendar className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
   { id: 'core-danh-muc', label: 'Danh mục dùng chung', route: '/core/danh-muc-dung-chung', icon: <Settings className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'core-dia-gioi', label: 'Địa giới hành chính', route: '/core/dia-gioi', icon: <Globe className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
 ];
 
 const CORE_ONLY_GROUP: NavGroup = {
   id: 'co-cau-to-chuc',
-  label: 'CORE – Cơ cấu Tổ chức',
+  label: 'CORE – Cơ cấu Tổ chức & Địa giới',
   groupIcon: <Building2 className="h-4 w-4" />,
   modules: CORE_ONLY_MODULES,
 };
 
 // ─── NAV_GROUPS ───────────────────────────────────────────────────────────────
 const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
-  ? [SIS_ONLY_GROUP, CORE_ONLY_GROUP]
+  ? [CORE_ONLY_GROUP, SIS_ONLY_GROUP]
   : [
+  // ── NHÓM 1: CƠ CẤU TỔ CHỨC ─────────────────────────────────────
+  {
+    id: 'co-cau-to-chuc',
+    label: 'Cơ cấu tổ chức',
+    groupIcon: <Building2 className="h-4 w-4" />,
+    modules: [
+      { id: 'core-co-cau', label: 'Cơ cấu tổ chức', route: '/core/co-cau', icon: <Building2 className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+      { id: 'core-co-so-vat-chat', label: 'Cơ sở vật chất', route: '/core/co-so-vat-chat', icon: <Building2 className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+      { id: 'core-nien-khoa', label: 'Niên khóa', route: '/core/nien-khoa', icon: <Calendar className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+      { id: 'core-danh-muc', label: 'Danh mục dùng chung', route: '/core/danh-muc-dung-chung', icon: <Settings className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+      { id: 'core-dia-gioi', label: 'Địa giới hành chính', route: '/core/dia-gioi', icon: <Globe className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+    ],
+  },
   // ── NHÓM 1: QUẢN TRỊ HỆ THỐNG ──────────────────────────────────────────────
   {
     id: 'quan-tri-he-thong',

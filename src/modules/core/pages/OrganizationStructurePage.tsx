@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { Building2, School, BookOpen, Users, Briefcase } from 'lucide-react';
+import {
+  Building2,
+  School,
+  BookOpen,
+  Users,
+  Briefcase,
+} from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import {
   OrganizationSheet,

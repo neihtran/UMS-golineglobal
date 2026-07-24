@@ -47,6 +47,18 @@ import type {
   MasterValue,
   MasterValueListParams,
   MasterValueCreatePayload,
+  Country,
+  CountryListParams,
+  CountryCreatePayload,
+  Province,
+  ProvinceListParams,
+  ProvinceCreatePayload,
+  District,
+  DistrictListParams,
+  DistrictCreatePayload,
+  Ward,
+  WardListParams,
+  WardCreatePayload,
   CoreListResponse,
   CoreDetailResponse,
 } from '@/types/core.types';
@@ -143,6 +155,34 @@ export const CORE_QUERY_KEYS = {
       ['core', 'master-values', 'list', params ?? {}] as const,
     detail: (id: number | string) =>
       ['core', 'master-values', 'detail', id] as const,
+  },
+  countries: {
+    all: ['core', 'countries'] as const,
+    list: (params?: CountryListParams) =>
+      ['core', 'countries', 'list', params ?? {}] as const,
+    detail: (id: number | string) =>
+      ['core', 'countries', 'detail', id] as const,
+  },
+  provinces: {
+    all: ['core', 'provinces'] as const,
+    list: (params?: ProvinceListParams) =>
+      ['core', 'provinces', 'list', params ?? {}] as const,
+    detail: (id: number | string) =>
+      ['core', 'provinces', 'detail', id] as const,
+  },
+  districts: {
+    all: ['core', 'districts'] as const,
+    list: (params?: DistrictListParams) =>
+      ['core', 'districts', 'list', params ?? {}] as const,
+    detail: (id: number | string) =>
+      ['core', 'districts', 'detail', id] as const,
+  },
+  wards: {
+    all: ['core', 'wards'] as const,
+    list: (params?: WardListParams) =>
+      ['core', 'wards', 'list', params ?? {}] as const,
+    detail: (id: number | string) =>
+      ['core', 'wards', 'detail', id] as const,
   },
 };
 
@@ -1156,6 +1196,318 @@ export const useDeleteMasterValue = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.masterValues.all });
+    },
+  });
+};
+
+// ─── Country hooks ─────────────────────────────────────────────────────────────
+export const useCountries = (
+  params?: CountryListParams,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: CORE_QUERY_KEYS.countries.list(params),
+    queryFn: async () => {
+      const response = await coreApi.get<CoreListResponse<Country>>(
+        '/api/v1/core/countries',
+        { params }
+      );
+      return response.data;
+    },
+    enabled: options?.enabled !== false,
+    staleTime: 30000,
+  });
+};
+
+export const useCountry = (id?: number | string) => {
+  return useQuery({
+    queryKey: CORE_QUERY_KEYS.countries.detail(id ?? ''),
+    queryFn: async () => {
+      const response = await coreApi.get<CoreDetailResponse<Country>>(
+        `/api/v1/core/countries/${id}`
+      );
+      return response.data;
+    },
+    enabled: id !== undefined && id !== null,
+    staleTime: 30000,
+  });
+};
+
+export const useCreateCountry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: CountryCreatePayload) => {
+      const response = await coreApi.post<CoreDetailResponse<Country>>(
+        '/api/v1/core/countries',
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.countries.all });
+    },
+  });
+};
+
+export const useUpdateCountry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: Partial<CountryCreatePayload> }) => {
+      const response = await coreApi.put<CoreDetailResponse<Country>>(
+        `/api/v1/core/countries/${id}`,
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.countries.all });
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.countries.detail(id) });
+    },
+  });
+};
+
+export const useDeleteCountry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await coreApi.delete(`/api/v1/core/countries/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.countries.all });
+    },
+  });
+};
+
+// ─── Province hooks ────────────────────────────────────────────────────────────
+export const useProvinces = (
+  params?: ProvinceListParams,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: CORE_QUERY_KEYS.provinces.list(params),
+    queryFn: async () => {
+      const response = await coreApi.get<CoreListResponse<Province>>(
+        '/api/v1/core/provinces',
+        { params }
+      );
+      return response.data;
+    },
+    enabled: options?.enabled !== false,
+    staleTime: 30000,
+  });
+};
+
+export const useProvince = (id?: number | string) => {
+  return useQuery({
+    queryKey: CORE_QUERY_KEYS.provinces.detail(id ?? ''),
+    queryFn: async () => {
+      const response = await coreApi.get<CoreDetailResponse<Province>>(
+        `/api/v1/core/provinces/${id}`
+      );
+      return response.data;
+    },
+    enabled: id !== undefined && id !== null,
+    staleTime: 30000,
+  });
+};
+
+export const useCreateProvince = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: ProvinceCreatePayload) => {
+      const response = await coreApi.post<CoreDetailResponse<Province>>(
+        '/api/v1/core/provinces',
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.provinces.all });
+    },
+  });
+};
+
+export const useUpdateProvince = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: Partial<ProvinceCreatePayload> }) => {
+      const response = await coreApi.put<CoreDetailResponse<Province>>(
+        `/api/v1/core/provinces/${id}`,
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.provinces.all });
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.provinces.detail(id) });
+    },
+  });
+};
+
+export const useDeleteProvince = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await coreApi.delete(`/api/v1/core/provinces/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.provinces.all });
+    },
+  });
+};
+
+// ─── District hooks ────────────────────────────────────────────────────────────
+export const useDistricts = (
+  params?: DistrictListParams,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: CORE_QUERY_KEYS.districts.list(params),
+    queryFn: async () => {
+      const response = await coreApi.get<CoreListResponse<District>>(
+        '/api/v1/core/districts',
+        { params }
+      );
+      return response.data;
+    },
+    enabled: options?.enabled !== false,
+    staleTime: 30000,
+  });
+};
+
+export const useDistrict = (id?: number | string) => {
+  return useQuery({
+    queryKey: CORE_QUERY_KEYS.districts.detail(id ?? ''),
+    queryFn: async () => {
+      const response = await coreApi.get<CoreDetailResponse<District>>(
+        `/api/v1/core/districts/${id}`
+      );
+      return response.data;
+    },
+    enabled: id !== undefined && id !== null,
+    staleTime: 30000,
+  });
+};
+
+export const useCreateDistrict = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: DistrictCreatePayload) => {
+      const response = await coreApi.post<CoreDetailResponse<District>>(
+        '/api/v1/core/districts',
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.districts.all });
+    },
+  });
+};
+
+export const useUpdateDistrict = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: Partial<DistrictCreatePayload> }) => {
+      const response = await coreApi.put<CoreDetailResponse<District>>(
+        `/api/v1/core/districts/${id}`,
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.districts.all });
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.districts.detail(id) });
+    },
+  });
+};
+
+export const useDeleteDistrict = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await coreApi.delete(`/api/v1/core/districts/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.districts.all });
+    },
+  });
+};
+
+// ─── Ward hooks ────────────────────────────────────────────────────────────────
+export const useWards = (
+  params?: WardListParams,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: CORE_QUERY_KEYS.wards.list(params),
+    queryFn: async () => {
+      const response = await coreApi.get<CoreListResponse<Ward>>(
+        '/api/v1/core/wards',
+        { params }
+      );
+      return response.data;
+    },
+    enabled: options?.enabled !== false,
+    staleTime: 30000,
+  });
+};
+
+export const useWard = (id?: number | string) => {
+  return useQuery({
+    queryKey: CORE_QUERY_KEYS.wards.detail(id ?? ''),
+    queryFn: async () => {
+      const response = await coreApi.get<CoreDetailResponse<Ward>>(
+        `/api/v1/core/wards/${id}`
+      );
+      return response.data;
+    },
+    enabled: id !== undefined && id !== null,
+    staleTime: 30000,
+  });
+};
+
+export const useCreateWard = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: WardCreatePayload) => {
+      const response = await coreApi.post<CoreDetailResponse<Ward>>(
+        '/api/v1/core/wards',
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.wards.all });
+    },
+  });
+};
+
+export const useUpdateWard = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: Partial<WardCreatePayload> }) => {
+      const response = await coreApi.put<CoreDetailResponse<Ward>>(
+        `/api/v1/core/wards/${id}`,
+        payload
+      );
+      return response.data;
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.wards.all });
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.wards.detail(id) });
+    },
+  });
+};
+
+export const useDeleteWard = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await coreApi.delete(`/api/v1/core/wards/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CORE_QUERY_KEYS.wards.all });
     },
   });
 };
