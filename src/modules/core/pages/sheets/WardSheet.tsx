@@ -48,7 +48,7 @@ export function WardSheet() {
   };
 
   const { data, isLoading, isFetching } = useWards(params);
-  const { data: districtsData } = useDistricts({ per_page: 500 });
+  const { data: districtsData } = useDistricts({ per_page: 100 });
   const items = Array.isArray(data?.data) ? data.data : [];
   const total = data?.meta?.total ?? items.length;
   const districts = Array.isArray(districtsData?.data) ? districtsData.data : [];

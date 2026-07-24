@@ -58,7 +58,7 @@ export function MasterValueSheet() {
   };
 
   const { data, isLoading, isFetching } = useMasterValues(params);
-  const { data: groupData, isLoading: groupLoading } = useMasterGroups({ per_page: 200 });
+  const { data: groupData, isLoading: groupLoading } = useMasterGroups({ per_page: 100 });
   const items = Array.isArray(data?.data) ? data.data : [];
   const total = data?.meta?.total ?? 0;
   const groups = Array.isArray(groupData?.data) ? groupData.data : [];

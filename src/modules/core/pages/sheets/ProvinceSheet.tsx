@@ -48,7 +48,7 @@ export function ProvinceSheet() {
   };
 
   const { data, isLoading, isFetching } = useProvinces(params);
-  const { data: countriesData } = useCountries({ per_page: 200 });
+  const { data: countriesData } = useCountries({ per_page: 100 });
   const items = Array.isArray(data?.data) ? data.data : [];
   const total = data?.meta?.total ?? items.length;
   const countries = Array.isArray(countriesData?.data) ? countriesData.data : [];

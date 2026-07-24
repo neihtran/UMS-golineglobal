@@ -48,7 +48,7 @@ export function DistrictSheet() {
   };
 
   const { data, isLoading, isFetching } = useDistricts(params);
-  const { data: provincesData } = useProvinces({ per_page: 200 });
+  const { data: provincesData } = useProvinces({ per_page: 100 });
   const items = Array.isArray(data?.data) ? data.data : [];
   const total = data?.meta?.total ?? items.length;
   const provinces = Array.isArray(provincesData?.data) ? provincesData.data : [];
