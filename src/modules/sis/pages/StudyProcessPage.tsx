@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { History, RefreshCw, GraduationCap, Users } from 'lucide-react';
+import {
+  History,
+  RefreshCw,
+  GraduationCap,
+  Users,
+  Trophy,
+  UserCheck,
+  Award,
+} from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import {
   StatusHistorySheet,
@@ -7,6 +15,9 @@ import {
   ThoiHocSheet,
   MajorChangeSheet,
   ClassChangeSheet,
+  GraduationBatchSheet,
+  GraduationCandidateSheet,
+  GraduationRecordSheet,
 } from './sheets';
 
 type TabType =
@@ -14,7 +25,10 @@ type TabType =
   | 'bao-luu'
   | 'thoi-hoc'
   | 'chuyen-nganh'
-  | 'chuyen-lop';
+  | 'chuyen-lop'
+  | 'dot-xet'
+  | 'ung-vien'
+  | 'bang-tot-nghiep';
 
 const TABS: { id: TabType; label: string; icon: React.ReactNode }[] = [
   { id: 'lich-su-trang-thai', label: 'Lịch sử trạng thái', icon: <History className="h-4 w-4" /> },
@@ -22,6 +36,9 @@ const TABS: { id: TabType; label: string; icon: React.ReactNode }[] = [
   { id: 'thoi-hoc', label: 'Thôi học', icon: <GraduationCap className="h-4 w-4" /> },
   { id: 'chuyen-nganh', label: 'Chuyển ngành', icon: <Users className="h-4 w-4" /> },
   { id: 'chuyen-lop', label: 'Chuyển lớp', icon: <Users className="h-4 w-4" /> },
+  { id: 'dot-xet', label: 'Đợt xét TN', icon: <Trophy className="h-4 w-4" /> },
+  { id: 'ung-vien', label: 'Ứng viên TN', icon: <UserCheck className="h-4 w-4" /> },
+  { id: 'bang-tot-nghiep', label: 'Bằng TN', icon: <Award className="h-4 w-4" /> },
 ];
 
 const TAB_CONTENT: Record<TabType, React.ReactNode> = {
@@ -30,6 +47,9 @@ const TAB_CONTENT: Record<TabType, React.ReactNode> = {
   'thoi-hoc': <ThoiHocSheet />,
   'chuyen-nganh': <MajorChangeSheet />,
   'chuyen-lop': <ClassChangeSheet />,
+  'dot-xet': <GraduationBatchSheet />,
+  'ung-vien': <GraduationCandidateSheet />,
+  'bang-tot-nghiep': <GraduationRecordSheet />,
 };
 
 export default function StudyProcessPage() {
@@ -39,7 +59,7 @@ export default function StudyProcessPage() {
     <div className="space-y-6">
       <PageHeader
         title="Quá trình học tập"
-        description="Quản lý lịch sử trạng thái, bảo lưu, thôi học, chuyển ngành, chuyển lớp"
+        description="Quản lý lịch sử trạng thái, bảo lưu, thôi học, chuyển ngành, chuyển lớp, xét tốt nghiệp"
         breadcrumbs={[
           { label: 'SIS', href: '/sis' },
           { label: 'Quá trình học tập' },

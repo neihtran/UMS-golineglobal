@@ -19,6 +19,25 @@ export interface PaginatedResponse<T> {
   message?: string;
 }
 
+// SIS API response format (uses "meta" instead of "pagination")
+export interface SisListResponse<T> {
+  success: boolean;
+  message: string;
+  data: T[];
+  meta: {
+    total: number;
+    per_page: number;
+    current_page: number;
+    last_page: number;
+  };
+}
+
+export interface SisDetailResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
 export interface ErrorResponse {
   success: false;
   error: {

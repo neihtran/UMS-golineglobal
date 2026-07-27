@@ -20,6 +20,9 @@ export { CourseSectionSheet } from './study-process/CourseSectionSheet';
 export { ClassScheduleSheet } from './study-process/ClassScheduleSheet';
 export { ScheduleChangeSheet } from './study-process/ScheduleChangeSheet';
 export { CourseRegistrationSheet } from './study-process/CourseRegistrationSheet';
+export { GraduationBatchSheet } from './study-process/GraduationBatchSheet';
+export { GraduationCandidateSheet } from './study-process/GraduationCandidateSheet';
+export { GraduationRecordSheet } from './study-process/GraduationRecordSheet';
 
 // ── curriculum-program ──────────────────────────────────────────────────────
 export { SubjectTypeSheet } from './curriculum-program/SubjectTypeSheet';
