@@ -4,6 +4,7 @@
 
 import axios, { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/types/api.types';
+import { getHqnhatToken, clearHqnhatToken } from '@/stores/hqnhatAuthStore';
 
 const SIS_API_BASE_URL =
   import.meta.env.VITE_SIS_API_BASE_URL || 'https://api.hqnhat.id.vn';
@@ -15,6 +16,17 @@ export const sisApiClient = axios.create({
     Accept: 'application/json',
   },
   timeout: 30000,
+});
+
+// Attach Bearer token from HQNhat auth store
+sisApiClient.interceptors.request.use((config) => {
+  if (config.headers) {
+    const token = getHqnhatToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
 });
 
 sisApiClient.interceptors.response.use(
@@ -44,6 +56,10 @@ sisApiClient.interceptors.response.use(
       apiMessage = 'API gặp lỗi máy chủ.';
     } else {
       apiMessage = 'Không thể kết nối tới API.';
+    }
+
+    if (status === 401) {
+      clearHqnhatToken();
     }
 
     return Promise.reject(

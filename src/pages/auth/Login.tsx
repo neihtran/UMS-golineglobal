@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Zap, CheckCircle2 } from 'lucide-react';
 import { useLogin } from '@/hooks/useAuth';
 import { Button, Input } from '@/components/ui';
-import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/authStore';
 import { ROLES } from '@/constants/modules';
 import type { User } from '@/types/auth.types';
@@ -37,22 +35,12 @@ export default function Login() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [apiError, setApiError] = useState<string | null>(null);
 
-  const QUICK_ACCOUNTS = [
-    { role: 'Quản trị viên',   name: 'Quản trị viên',             email: 'admin@truong.edu.vn',             password: 'Admin@123' },
-    { role: 'Hiệu trưởng',     name: 'GS.TS. Hoàng Tuấn Anh',     email: 'hieutruong@truong.edu.vn',        password: 'Ht@123' },
-    { role: 'Phó Hiệu trưởng', name: 'PGS.TS. Trần Lan Hương',   email: 'phohieutruong@truong.edu.vn',     password: 'Pht@123' },
-    { role: 'Trưởng khoa',     name: 'TS. Nguyễn Hoàng Long',     email: 'truongkhoa@truong.edu.vn',        password: 'Tk@123' },
-    { role: 'Giảng viên',      name: 'ThS. Lê Văn Minh',          email: 'giaovien1@truong.edu.vn',         password: 'Gv1@123' },
-    { role: 'Nhân viên',       name: 'CN. Hoàng Thị Tân',          email: 'nhanvien@truong.edu.vn',          password: 'Nv@123' },
-    { role: 'Sinh viên',       name: 'Nguyễn Văn An',              email: 'sinhvien1@truong.edu.vn',         password: 'Sv@123' },
-  ];
-
-  const [selectedQuickEmail, setSelectedQuickEmail] = useState<string | null>(null);
-
   const validate = () => {
     const errs: typeof errors = {};
     if (!email) errs.email = t('validation.required');
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = t('validation.emailInvalid');
+    else if (email.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errs.email = t('validation.emailInvalid');
+    }
     if (!password) errs.password = t('validation.required');
     else if (password.length < 6) errs.password = t('validation.passwordMinLength', { min: 6 });
     return errs;
@@ -67,17 +55,10 @@ export default function Login() {
 
     try {
       await loginMutation.mutateAsync({ email, password });
-    } catch (error: any) {
-      setApiError(error?.response?.data?.error?.message || error?.message || 'Đăng nhập thất bại');
+    } catch (error: unknown) {
+      const e = error as { response?: { data?: { error?: { message?: string } } }; message?: string };
+      setApiError(e?.response?.data?.error?.message || e?.message || 'Đăng nhập thất bại');
     }
-  };
-
-  const handleQuickLogin = (account: typeof QUICK_ACCOUNTS[number]) => {
-    setEmail(account.email);
-    setPassword(account.password);
-    setSelectedQuickEmail(account.email);
-    setErrors({});
-    setApiError(null);
   };
 
   const handleDemoLogin = () => {
@@ -174,13 +155,13 @@ export default function Login() {
             )}
 
             <Input
-              label={t('login.emailLabel')}
-              type="email"
-              placeholder={t('login.emailPlaceholder')}
+              label="Tên đăng nhập hoặc Email"
+              type="text"
+              placeholder="vd: admin hoặc admin@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={errors.email}
-              autoComplete="email"
+              autoComplete="username"
               required
             />
 
@@ -203,7 +184,7 @@ export default function Login() {
                 />
                 <span className="text-[rgb(var(--text-secondary))]">{t('login.rememberMe')}</span>
               </label>
-              <Link to="/forgot-password" className="text-[rgb(var(--primary))] hover:underline font-medium">
+              <Link to="/auth/forgot-password" className="text-[rgb(var(--primary))] hover:underline font-medium">
                 {t('login.forgotPassword')}
               </Link>
             </div>

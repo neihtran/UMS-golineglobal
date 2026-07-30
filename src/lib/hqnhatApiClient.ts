@@ -1,10 +1,12 @@
 // ─── HQNhat API Client ─────────────────────────────────────────────────────
 // Dedicated axios instance for the external HQNhat UMS API
-// (https://api.hqnhat.id.vn). Uses a fixed Bearer token from env
-// (no user-auth flow).
+// (https://api.hqnhat.id.vn). Uses Bearer token from (in priority order):
+//   1. Local Hqnhat auth store (token issued by /api/v1/iam/login)
+//   2. Environment variable (for background scripts / agent access)
 
 import axios, { AxiosError } from 'axios';
 import type { ErrorResponse } from '@/types/api.types';
+import { clearHqnhatToken, getHqnhatToken } from '@/stores/hqnhatAuthStore';
 
 const HQNHAT_API_BASE_URL =
   import.meta.env.VITE_HQNHAT_API_BASE_URL || 'https://api.hqnhat.id.vn';
@@ -20,10 +22,18 @@ export const hqnhatApiClient = axios.create({
   timeout: 30000,
 });
 
-// Attach Bearer token ONLY if explicitly configured (HQNhat API doesn't require auth)
+// Attach Bearer token (priority: hqnhat auth store -> env var)
 hqnhatApiClient.interceptors.request.use((config) => {
-  if (HQNHAT_API_TOKEN && HQNHAT_API_TOKEN !== 'YOUR_HQNHAT_JWT_TOKEN_HERE' && config.headers) {
-    config.headers.Authorization = `Bearer ${HQNHAT_API_TOKEN}`;
+  if (config.headers) {
+    const storedToken = getHqnhatToken();
+    if (storedToken) {
+      config.headers.Authorization = `Bearer ${storedToken}`;
+    } else if (
+      HQNHAT_API_TOKEN &&
+      HQNHAT_API_TOKEN !== 'YOUR_HQNHAT_JWT_TOKEN_HERE'
+    ) {
+      config.headers.Authorization = `Bearer ${HQNHAT_API_TOKEN}`;
+    }
   }
   return config;
 });
@@ -34,7 +44,7 @@ hqnhatApiClient.interceptors.response.use(
   (error: AxiosError<ErrorResponse>) => {
     const status = error.response?.status;
     const data = error.response?.data as any;
-    
+
     // Extract detailed error message
     let apiMessage: string;
     if (data?.errors && typeof data.errors === 'object') {
@@ -47,7 +57,7 @@ hqnhatApiClient.interceptors.response.use(
     } else if (data?.error?.message) {
       apiMessage = data.error.message;
     } else if (status === 401) {
-      apiMessage = 'Token HQNhat không hợp lệ hoặc đã hết hạn.';
+      apiMessage = 'Bạn cần đăng nhập vào HQNhat API. Nhấn nút "Đăng nhập HQNhat" ở đầu trang.';
     } else if (status === 403) {
       apiMessage = 'Bạn không có quyền truy cập HQNhat API.';
     } else if (status === 404) {
@@ -60,8 +70,13 @@ hqnhatApiClient.interceptors.response.use(
       apiMessage = 'Không thể kết nối tới HQNhat API.';
     }
 
+    // Auto-logout on 401 so we don't keep retrying with a bad token.
+    if (status === 401) {
+      clearHqnhatToken();
+    }
+
     if (status === 401 || status === 403) {
-      console.error('[HQNhat auth]', apiMessage);
+      console.warn('[HQNhat auth]', apiMessage);
     }
     return Promise.reject(
       Object.assign(new Error(apiMessage), {

@@ -21,23 +21,14 @@ const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // IAM
 const IAMDashboard = lazy(() => import('@/modules/iam/pages/IAMDashboard'));
-const UserList = lazy(() => import('@/modules/iam/pages/UserList'));
-const UserDetail = lazy(() => import('@/modules/iam/pages/UserDetail'));
-function UserDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <UserDetail id={id} />;
-}
-const UserCreate = lazy(() => import('@/modules/iam/pages/UserCreate'));
-const AuditLogList = lazy(() => import('@/modules/iam/pages/AuditLogList'));
-const RoleList = lazy(() => import('@/modules/iam/pages/RoleList'));
-const SessionManagement = lazy(() => import('@/modules/iam/pages/SessionManagement'));
-const ApiKeysPage = lazy(() => import('@/modules/iam/pages/ApiKeysPage'));
-const SecuritySettings = lazy(() => import('@/modules/iam/pages/SecuritySettings'));
-const MFAConfig = lazy(() => import('@/modules/iam/pages/MFAConfig'));
-const SystemHealth = lazy(() => import('@/modules/iam/pages/SystemHealth'));
-const SystemConfig = lazy(() => import('@/modules/iam/pages/SystemConfig'));
-const ResearchList = lazy(() => import('@/modules/rit/pages/ResearchList'));
+const AuthenticationPage = lazy(() => import('@/modules/iam/pages/AuthenticationPage'));
+const AccountList = lazy(() => import('@/modules/iam/pages/AccountList'));
+const AccountSettingsPage = lazy(() => import('@/modules/iam/pages/AccountSettingsPage'));
+const LoginSessionsPage = lazy(() => import('@/modules/iam/pages/LoginSessionsPage'));
+const RolePermissionPage = lazy(() => import('@/modules/iam/pages/RolePermissionPage'));
+const AuditLogHubPage = lazy(() => import('@/modules/iam/pages/AuditLogHubPage'));
+const ProfilePage = lazy(() => import('@/modules/iam/pages/ProfilePage'));
+const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
 
 // HRM
 const HRMDashboard = lazy(() => import('@/modules/hrm/pages/HRMDashboard'));
@@ -324,6 +315,7 @@ function ResearchDetailRouted() {
   return <ResearchDetail id={id} />;
 }
 const ResearchMemberList = lazy(() => import('@/modules/rit/pages/MemberList'));
+const ResearchList = lazy(() => import('@/modules/rit/pages/ResearchList'));
 const MemberDetailPage = lazy(() => import('@/modules/rit/pages/MemberDetailPage'));
 function MemberDetailPageRouted() {
   const { id } = useParams<{ id: string }>();
@@ -496,17 +488,24 @@ export default function AppRouter() {
 
           {/* IAM — admin only */}
           <Route path="/iam" element={<RoleRoute roles={[ROLES.ADMIN]}><IAMDashboard /></RoleRoute>} />
-          <Route path="/iam/tai-khoan" element={<RoleRoute roles={[ROLES.ADMIN]}><UserList /></RoleRoute>} />
-          <Route path="/iam/tai-khoan/tao" element={<RoleRoute roles={[ROLES.ADMIN]}><UserCreate /></RoleRoute>} />
-          <Route path="/iam/tai-khoan/:id" element={<RoleRoute roles={[ROLES.ADMIN]}><UserDetailPage /></RoleRoute>} />
-          <Route path="/iam/nhat-ky" element={<RoleRoute roles={[ROLES.ADMIN]}><AuditLogList /></RoleRoute>} />
-          <Route path="/iam/vai-tro" element={<RoleRoute roles={[ROLES.ADMIN]}><RoleList /></RoleRoute>} />
-          <Route path="/iam/phien-dang-nhap" element={<RoleRoute roles={[ROLES.ADMIN]}><SessionManagement /></RoleRoute>} />
-          <Route path="/iam/api-keys" element={<RoleRoute roles={[ROLES.ADMIN]}><ApiKeysPage /></RoleRoute>} />
-          <Route path="/iam/bao-mat" element={<RoleRoute roles={[ROLES.ADMIN]}><SecuritySettings /></RoleRoute>} />
-          <Route path="/iam/mfa" element={<RoleRoute roles={[ROLES.ADMIN]}><MFAConfig /></RoleRoute>} />
-          <Route path="/iam/trang-thai-he-thong" element={<RoleRoute roles={[ROLES.ADMIN]}><SystemHealth /></RoleRoute>} />
-          <Route path="/iam/cai-dat-he-thong" element={<RoleRoute roles={[ROLES.ADMIN]}><SystemConfig /></RoleRoute>} />
+          <Route path="/iam/xac-thuc" element={<RoleRoute roles={[ROLES.ADMIN]}><AuthenticationPage /></RoleRoute>}>
+            <Route index element={<Navigate to="tai-khoan" replace />} />
+            <Route path="tai-khoan" element={<AccountList />} />
+            <Route path="thiet-lap" element={<AccountSettingsPage />} />
+            <Route path="phien" element={<LoginSessionsPage />} />
+          </Route>
+          <Route path="/iam/vai-tro-quyen" element={<RoleRoute roles={[ROLES.ADMIN]}><RolePermissionPage /></RoleRoute>} />
+          <Route path="/iam/audit-log" element={<RoleRoute roles={[ROLES.ADMIN]}><AuditLogHubPage /></RoleRoute>} />
+          {/* Hồ sơ cá nhân — mọi role đã đăng nhập */}
+          <Route path="/iam/ho-so" element={<ProfilePage />} />
+          {/* Quên mật khẩu — public */}
+          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          {/* Backwards-compat aliases */}
+          <Route path="/iam/tai-khoan" element={<RoleRoute roles={[ROLES.ADMIN]}><Navigate to="/iam/xac-thuc/tai-khoan" replace /></RoleRoute>} />
+          <Route path="/iam/vai-tro" element={<RoleRoute roles={[ROLES.ADMIN]}><RolePermissionPage /></RoleRoute>} />
+          <Route path="/iam/nhat-ky-thao-tac" element={<RoleRoute roles={[ROLES.ADMIN]}><AuditLogHubPage /></RoleRoute>} />
+          <Route path="/iam/phien-dang-nhap" element={<RoleRoute roles={[ROLES.ADMIN]}><AuditLogHubPage /></RoleRoute>} />
+          <Route path="/iam/cac-quyen" element={<RoleRoute roles={[ROLES.ADMIN]}><RolePermissionPage /></RoleRoute>} />
 
           {/* CORE — Cơ cấu tổ chức */}
           <Route path="/core" element={<RoleRoute roles={[ROLES.ADMIN]}><OrganizationStructurePage /></RoleRoute>} />
@@ -516,8 +515,6 @@ export default function AppRouter() {
           <Route path="/core/danh-muc-dung-chung" element={<RoleRoute roles={[ROLES.ADMIN]}><MasterDataPage /></RoleRoute>} />
           <Route path="/core/dia-gioi" element={<RoleRoute roles={[ROLES.ADMIN]}><AdministrativeBoundaryPage /></RoleRoute>} />
           <Route path="/core/dia-gioi-hanh-chinh" element={<RoleRoute roles={[ROLES.ADMIN]}><AdministrativeBoundaryPage /></RoleRoute>} />
-
-          {/* HRM — admin + nhan-vien + BGH */}
 
           {/* HRM — admin + nhan-vien + BGH */}
           <Route path="/hrm" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMDashboard /></RoleRoute>} />

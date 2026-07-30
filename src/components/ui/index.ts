@@ -52,3 +52,4 @@ export { DropdownMenu, ContextMenu } from './DropdownMenu';
 export { toast, ToastContainer } from './Toast';
 export type { ToastVariant } from './Toast';
 export { ActionButtons } from './ActionButtons';
+export { Sheet, SheetContent, SheetHeader, SheetTitle } from './Sheet';

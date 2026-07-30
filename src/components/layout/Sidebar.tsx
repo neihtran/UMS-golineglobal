@@ -14,11 +14,9 @@ import {
   ClipboardList,
   Building2,
   FlaskConical,
-  Puzzle,
   BarChart3,
   Award,
   ScanSearch,
-  Landmark,
   AlertTriangle,
   ChevronDown,
   PanelLeftClose,
@@ -50,6 +48,19 @@ type NavGroup = {
 
 // ─── DEV: SHOW ONLY SIS + CORE DEMO ──────────────────────────────────────────────
 const DEV_SIS_ONLY = false;
+
+const IAM_MODULES: Module[] = [
+  { id: 'iam-xac-thuc', label: 'Xác thực & Quản lý người dùng', route: '/iam/xac-thuc', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'iam-vai-tro-quyen', label: 'Vai trò & Phân quyền', route: '/iam/vai-tro-quyen', icon: <ShieldCheck className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'iam-audit-log', label: 'Audit Log', route: '/iam/audit-log', icon: <FileText className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+];
+
+const IAM_GROUP: NavGroup = {
+  id: 'quan-tri-he-thong',
+  label: 'Quản trị Hệ thống',
+  groupIcon: <ShieldCheck className="h-4 w-4" />,
+  modules: IAM_MODULES,
+};
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SIS_ONLY_MODULES: Module[] = [
@@ -68,6 +79,12 @@ const SIS_ONLY_GROUP: NavGroup = {
   modules: SIS_ONLY_MODULES,
 };
 
+const ALL_IAM_MODULES: Module[] = [
+  { id: 'iam-xac-thuc', label: 'Xác thực & Quản lý người dùng', route: '/iam/xac-thuc', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'iam-vai-tro-quyen', label: 'Vai trò & Phân quyền', route: '/iam/vai-tro-quyen', icon: <ShieldCheck className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+  { id: 'iam-audit-log', label: 'Audit Log', route: '/iam/audit-log', icon: <FileText className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
+];
+
 const CORE_ONLY_MODULES: Module[] = [
   { id: 'core-co-cau', label: 'Cơ cấu tổ chức', route: '/core/co-cau', icon: <Building2 className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
   { id: 'core-co-so-vat-chat', label: 'Cơ sở vật chất', route: '/core/co-so-vat-chat', icon: <Building2 className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
@@ -85,7 +102,7 @@ const CORE_ONLY_GROUP: NavGroup = {
 
 // ─── NAV_GROUPS ───────────────────────────────────────────────────────────────
 const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
-  ? [CORE_ONLY_GROUP, SIS_ONLY_GROUP]
+  ? [CORE_ONLY_GROUP, IAM_GROUP, SIS_ONLY_GROUP]
   : [
   // ── NHÓM 1: CƠ CẤU TỔ CHỨC ─────────────────────────────────────
   {
@@ -105,35 +122,7 @@ const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
     id: 'quan-tri-he-thong',
     label: 'Quản trị Hệ thống',
     groupIcon: <ShieldCheck className="h-4 w-4" />,
-    modules: [
-      // IAM
-      { id: 'iam', label: 'IAM – Bảo mật & Tài khoản', route: '/iam', icon: <ShieldCheck className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'iam-tai-khoan', label: 'Tài khoản', route: '/iam/tai-khoan', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'iam-vai-tro', label: 'Vai trò & Phân quyền', route: '/iam/vai-tro', icon: <ShieldCheck className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'iam-nhat-ky', label: 'Audit Log', route: '/iam/nhat-ky', icon: <FileText className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'iam-phien', label: 'Phiên đăng nhập', route: '/iam/phien-dang-nhap', icon: <LogOut className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'iam-api-keys', label: 'API Keys', route: '/iam/api-keys', icon: <Puzzle className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'iam-bao-mat', label: 'Cấu hình Bảo mật', route: '/iam/bao-mat', icon: <ShieldCheck className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'iam-mfa', label: 'Cấu hình MFA', route: '/iam/mfa', icon: <ShieldCheck className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      // INT
-      { id: 'int', label: 'INT – Tích hợp', route: '/int', icon: <Puzzle className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.HIEU_TRUONG] },
-      { id: 'int-ds', label: 'DS Tích hợp', route: '/int/tich-hop', icon: <Puzzle className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'int-nhat-ky', label: 'Nhật ký API', route: '/int/nhat-ky', icon: <FileText className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      // HRM
-      { id: 'hrm', label: 'HRM – Nhân sự', route: '/hrm', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
-      { id: 'hrm-don-vi', label: 'Đơn vị', route: '/hrm/don-vi', icon: <Building2 className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'hrm-vien-chuc', label: 'Viên chức', route: '/hrm/vien-chuc', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
-      { id: 'hrm-hop-dong', label: 'Hợp đồng', route: '/hrm/hop-dong', icon: <FileText className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
-      { id: 'hrm-luong', label: 'Bảng lương', route: '/hrm/luong', icon: <DollarSign className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG] },
-      { id: 'hrm-nghi-phep', label: 'Nghỉ phép', route: '/hrm/nghi-phep', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG, ROLES.TRUONG_KHOA] },
-      { id: 'hrm-bo-nhiem', label: 'Bổ nhiệm', route: '/hrm/bo-nhiem', icon: <FileText className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.HIEU_TRUONG] },
-      { id: 'hrm-tuyen-dung', label: 'Tuyển dụng', route: '/hrm/tuyen-dung', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG] },
-      { id: 'hrm-ky-luat', label: 'Kỷ luật', route: '/hrm/ky-luat', icon: <ShieldCheck className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.HIEU_TRUONG] },
-      // PMS
-      { id: 'pms', label: 'PMS – Công tác Đảng', route: '/pms', icon: <Landmark className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'pms-dv', label: 'Đảng viên', route: '/pms/dang-vien', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-      { id: 'pms-bc', label: 'Báo cáo Đảng', route: '/pms/bao-cao', icon: <FileText className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
-    ],
+    modules: ALL_IAM_MODULES,
   },
 
   // ── NHÓM 2: QUẢN LÝ ĐÀO TẠO (SIS MỚI) ─────────────────────────────────────
