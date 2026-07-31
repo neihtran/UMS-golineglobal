@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ShieldCheck, Search, Loader2 } from 'lucide-react';
+import { useQueries } from '@tanstack/react-query';
 import {
   Badge,
   Table,
@@ -13,12 +14,11 @@ import {
   Button,
 } from '@/components/ui';
 import { useIamRoles, useIamUsers, useIamUserRoles } from '@/hooks/useIam';
+import { rolesApi } from '@/services/iamApi';
 import { RoleDetailSheet } from './sheets/RoleDetailSheet';
 import type { Role } from '@/types/iam.types';
 
 // Trang "Phạm vi quyền" chỉ mang tính hiển thị thông tin phạm vi đã gán cho vai trò.
-// HQNhat IAM API chưa cung cấp endpoint để cập nhật scope riêng, nên click sẽ
-// mở chi tiết vai trò để xem các quyền đã gán (lấy từ permissions_grouped).
 export function RoleScopeTabContent() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -35,6 +35,24 @@ export function RoleScopeTabContent() {
   const roles = query.data?.data ?? [];
   const meta = query.data?.meta;
 
+  // Batch-fetch role details để lấy permissions_count từ permissions_grouped
+  const roleDetailQueries = useQueries({
+    queries: roles.map(r => ({
+      queryKey: ['iam', 'role-detail', r.id] as const,
+      queryFn: () => rolesApi.get(r.id).then(res => res.data.data),
+      enabled: roles.length > 0,
+      staleTime: 30_000,
+    })),
+  });
+
+  const getPermissionsCount = (roleId: number): number | null => {
+    const idx = roles.findIndex(r => r.id === roleId);
+    if (idx < 0) return null;
+    const q = roleDetailQueries[idx];
+    if (!q?.data?.permissions_grouped) return null;
+    return Object.values(q.data.permissions_grouped).flat().length;
+  };
+
   // Batch-fetch users để compute user_count
   const allUsersQuery = useIamUsers({ per_page: 9999, page: 1 });
   const allUserIds = (allUsersQuery.data?.data ?? []).map(u => u.id);
@@ -44,8 +62,8 @@ export function RoleScopeTabContent() {
     if (!roleCode) return 0;
     return (allUsersQuery.data?.data ?? []).filter(u => {
       const detail = rolesMap.data.get(u.id);
-      const roles: string[] = detail?.roles ?? u.roles ?? [];
-      return roles.includes(roleCode);
+      const rls: string[] = detail?.roles ?? u.roles ?? [];
+      return rls.includes(roleCode);
     }).length;
   };
 
@@ -95,9 +113,12 @@ export function RoleScopeTabContent() {
             {!query.isLoading && !query.isError && roles.length === 0 && (
               <TableEmpty colSpan={6} message="Không tìm thấy vai trò nào" />
             )}
-            {!query.isLoading && !query.isError && roles.map(r => {
+            {!query.isLoading && !query.isError && roles.map((r, idx) => {
               const variant = r.status === 1 ? 'success' : 'neutral';
               const label = r.status === 1 ? 'Hoạt động' : 'Không hoạt động';
+              const permCount = getPermissionsCount(r.id);
+              const isLoadingPerms = roleDetailQueries[idx]?.isLoading;
+
               return (
                 <TableRow key={r.id} className="hover:bg-[rgb(var(--bg-hover))] transition-colors">
                   <TableCell>
@@ -115,7 +136,13 @@ export function RoleScopeTabContent() {
                     {r.description || '—'}
                   </TableCell>
                   <TableCell className="text-sm tabular-nums text-[rgb(var(--text-secondary))]">
-                    —
+                    {isLoadingPerms ? (
+                      <Loader2 className="inline h-3 w-3 animate-spin" />
+                    ) : permCount != null ? (
+                      permCount.toLocaleString('vi-VN')
+                    ) : (
+                      '—'
+                    )}
                   </TableCell>
                   <TableCell className="text-sm tabular-nums text-[rgb(var(--text-secondary))]">
                     {getUserCount(r.code).toLocaleString('vi-VN')}

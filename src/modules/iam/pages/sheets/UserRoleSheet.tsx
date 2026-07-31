@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useQueries } from '@tanstack/react-query';
 import {
   Sheet,
   SheetContent,
@@ -11,6 +12,8 @@ import {
   toast,
 } from '@/components/ui';
 import { useAssignIamUserRoles, useIamUser } from '@/hooks/useIam';
+import { rolesApi } from '@/services/iamApi';
+import { iamKeys } from '@/hooks/useIam';
 import type { Role, User } from '@/types/iam.types';
 
 interface UserRoleSheetProps {
@@ -39,6 +42,24 @@ export function UserRoleSheet({ open, onClose, user, roles }: UserRoleSheetProps
     }
   }, [userDetailQuery.data]);
 
+  // Fetch detail cho từng role song song để lấy permissions_count
+  // (API list /roles không trả field này)
+  const roleDetailQueries = useQueries({
+    queries: roles.map(role => ({
+      queryKey: iamKeys.roles.detail(role.id),
+      queryFn: () => rolesApi.get(role.id).then(r => r.data),
+      enabled: open,
+      staleTime: 5 * 60 * 1000,
+    })),
+  });
+
+  const getPermissionCount = (roleId: number): number | undefined => {
+    const idx = roles.findIndex(r => r.id === roleId);
+    if (idx === -1) return undefined;
+    const detail = roleDetailQueries[idx]?.data?.data;
+    return (detail as any)?.permissions_count ?? roles[idx].permissions_count;
+  };
+
   const toggleRole = (code: string) => {
     setSelectedCodes(prev =>
       prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]
@@ -64,14 +85,14 @@ export function UserRoleSheet({ open, onClose, user, roles }: UserRoleSheetProps
 
   return (
     <Sheet open={open} onClose={onClose}>
-      <SheetContent className="sm:max-w-md">
+      <SheetContent className="sm:max-w-xl">
         <SheetHeader showClose onClose={onClose}>
           <SheetTitle>
             {user ? `Gán vai trò cho ${fullName}` : 'Gán vai trò'}
           </SheetTitle>
         </SheetHeader>
 
-        <div className="mt-6 flex flex-col gap-4">
+        <div className="mt-6 flex flex-col gap-4 px-1">
           {user && (
             <div className="flex items-center gap-3 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-base))] p-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--primary)/0.1)] text-sm font-bold text-[rgb(var(--primary))]">
@@ -86,7 +107,7 @@ export function UserRoleSheet({ open, onClose, user, roles }: UserRoleSheetProps
 
           <div>
             <p className="text-sm font-medium text-[rgb(var(--text-primary))] mb-3">Chọn vai trò</p>
-            <div className="space-y-2 max-h-80 overflow-y-auto">
+            <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
               {roles.length === 0 && !loading && (
                 <p className="text-sm text-[rgb(var(--text-muted))] text-center py-4">Chưa có vai trò nào.</p>
               )}
@@ -97,6 +118,7 @@ export function UserRoleSheet({ open, onClose, user, roles }: UserRoleSheetProps
               )}
               {roles.map(role => {
                 const selected = selectedCodes.includes(role.code);
+                const count = getPermissionCount(role.id);
                 return (
                   <label
                     key={role.id}
@@ -110,12 +132,12 @@ export function UserRoleSheet({ open, onClose, user, roles }: UserRoleSheetProps
                       checked={selected}
                       onChange={() => toggleRole(role.code)}
                     />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{role.name}</p>
-                      <p className="text-xs text-[rgb(var(--text-muted))]">{role.description || role.code}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">{role.name}</p>
+                      <p className="text-xs text-[rgb(var(--text-muted))] truncate">{role.description || role.code}</p>
                     </div>
                     <Badge variant={selected ? 'success' : 'neutral'} size="sm">
-                      {role.permissions_count ?? 0} quyền
+                      {count !== undefined ? `${count} quyền` : '—'}
                     </Badge>
                   </label>
                 );

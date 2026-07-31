@@ -75,37 +75,37 @@ export function LoginLogTabContent() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3 flex-1">
-          <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="flex flex-wrap items-end gap-3 flex-1 min-w-0">
+          <div className="relative w-52 shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--text-muted))]" />
-          <input
-            type="search"
-            placeholder="Tìm user_id, IP..."
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] pl-9 pr-3 text-sm placeholder:text-[rgb(var(--text-muted))] flex-1 max-w-sm focus:border-[rgb(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
-          />
+            <input
+              type="search"
+              placeholder="Tìm user_id, IP..."
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              className="h-9 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] pl-9 pr-3 text-sm placeholder:text-[rgb(var(--text-muted))] focus:border-[rgb(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
+            />
+          </div>
           <input
             type="number"
             placeholder="User ID"
             value={userIdFilter}
             onChange={(e) => { setUserIdFilter(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm w-28 placeholder:text-[rgb(var(--text-muted))]"
+            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm w-28 shrink-0 placeholder:text-[rgb(var(--text-muted))]"
           />
           <input
             type="text"
             placeholder="Địa chỉ IP"
             value={ipFilter}
             onChange={(e) => { setIpFilter(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm w-32 placeholder:text-[rgb(var(--text-muted))]"
+            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm w-36 shrink-0 placeholder:text-[rgb(var(--text-muted))]"
           />
-          </div>
           <select
             title="Lọc theo phương thức"
             value={methodFilter}
             onChange={(e) => { setMethodFilter(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
+            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2] w-36 shrink-0"
           >
             {METHOD_OPTIONS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>

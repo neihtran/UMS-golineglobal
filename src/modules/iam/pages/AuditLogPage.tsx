@@ -123,9 +123,9 @@ export function AuditLogTabContent() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3 flex-1">
-          <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="flex flex-wrap items-end gap-3 flex-1 min-w-0">
+          <div className="relative w-52 shrink-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgb(var(--text-muted))]" />
             <input
               type="search"
@@ -140,26 +140,28 @@ export function AuditLogTabContent() {
             placeholder="User ID"
             value={userIdFilter}
             onChange={(e) => { setUserIdFilter(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm w-28 placeholder:text-[rgb(var(--text-muted))]"
+            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm w-28 shrink-0 placeholder:text-[rgb(var(--text-muted))]"
           />
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => { setFromDate(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
-          />
-          <span className="text-[rgb(var(--text-muted))]">—</span>
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => { setToDate(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
-          />
+          <div className="flex items-center gap-1 shrink-0">
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => { setFromDate(e.target.value); setPage(1); }}
+              className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm w-36"
+            />
+            <span className="text-[rgb(var(--text-muted))] shrink-0">—</span>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => { setToDate(e.target.value); setPage(1); }}
+              className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm w-36"
+            />
+          </div>
           <select
             title="Lọc theo thao tác"
             value={actionFilter}
             onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
+            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2] w-36 shrink-0"
           >
             {ACTION_OPTIONS.map(a => <option key={a.value} value={a.value}>{a.label}</option>)}
           </select>
@@ -167,7 +169,7 @@ export function AuditLogTabContent() {
             title="Lọc theo module"
             value={moduleFilter}
             onChange={(e) => { setModuleFilter(e.target.value); setPage(1); }}
-            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
+            className="h-9 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2] w-32 shrink-0"
           >
             {MODULE_OPTIONS.map(a => <option key={a.value} value={a.value}>{a.label}</option>)}
           </select>

@@ -31,26 +31,8 @@ const ProfilePage = lazy(() => import('@/modules/iam/pages/ProfilePage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'));
 
 // HRM
-const HRMDashboard = lazy(() => import('@/modules/hrm/pages/HRMDashboard'));
-const HRMConfig = lazy(() => import('@/modules/hrm/pages/HRMConfig'));
-const VienChucList = lazy(() => import('@/modules/hrm/pages/VienChucList'));
-const VienChucDetail = lazy(() => import('@/modules/hrm/pages/VienChucDetail'));
-function VienChucDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <VienChucDetail id={id} />;
-}
-const VienChucCreate = lazy(() => import('@/modules/hrm/pages/VienChucCreate'));
-const LeaveRequestForm = lazy(() => import('@/modules/hrm/pages/LeaveRequestForm'));
-const LeaveRequestList = lazy(() => import('@/modules/hrm/pages/LeaveRequestList'));
-const LeaveBalance = lazy(() => import('@/modules/hrm/pages/LeaveBalance'));
-const DepartmentList = lazy(() => import('@/modules/hrm/pages/DepartmentList'));
-const RecruitmentList = lazy(() => import('@/modules/hrm/pages/RecruitmentList'));
-const DisciplineList = lazy(() => import('@/modules/hrm/pages/DisciplineList'));
-const SalarySheet = lazy(() => import('@/modules/hrm/pages/SalarySheet'));
-const ContractList = lazy(() => import('@/modules/hrm/pages/ContractList'));
-const AppointmentList = lazy(() => import('@/modules/hrm/pages/AppointmentList'));
-const AppointmentCreate = lazy(() => import('@/modules/hrm/pages/AppointmentCreate'));
+const HRMProfilesPage = lazy(() => import('@/modules/hrm/pages/HRMProfilesPage'));
+const HRMWorkPage = lazy(() => import('@/modules/hrm/pages/HRMWorkPage'));
 
 // SIS
 const SISDashboard = lazy(() => import('@/modules/sis/pages/SISDashboard'));
@@ -472,6 +454,7 @@ export default function AppRouter() {
         <Route path="/" element={<Landing />} />
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/mfa" element={<MFA />} />
+        <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Protected */}
         <Route element={<ProtectedRoute><AppShellLayout /></ProtectedRoute>}>
@@ -498,8 +481,6 @@ export default function AppRouter() {
           <Route path="/iam/audit-log" element={<RoleRoute roles={[ROLES.ADMIN]}><AuditLogHubPage /></RoleRoute>} />
           {/* Hồ sơ cá nhân — mọi role đã đăng nhập */}
           <Route path="/iam/ho-so" element={<ProfilePage />} />
-          {/* Quên mật khẩu — public */}
-          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           {/* Backwards-compat aliases */}
           <Route path="/iam/tai-khoan" element={<RoleRoute roles={[ROLES.ADMIN]}><Navigate to="/iam/xac-thuc/tai-khoan" replace /></RoleRoute>} />
           <Route path="/iam/vai-tro" element={<RoleRoute roles={[ROLES.ADMIN]}><RolePermissionPage /></RoleRoute>} />
@@ -516,22 +497,10 @@ export default function AppRouter() {
           <Route path="/core/dia-gioi" element={<RoleRoute roles={[ROLES.ADMIN]}><AdministrativeBoundaryPage /></RoleRoute>} />
           <Route path="/core/dia-gioi-hanh-chinh" element={<RoleRoute roles={[ROLES.ADMIN]}><AdministrativeBoundaryPage /></RoleRoute>} />
 
-          {/* HRM — admin + nhan-vien + BGH */}
-          <Route path="/hrm" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMDashboard /></RoleRoute>} />
-          <Route path="/hrm/don-vi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DepartmentList /></RoleRoute>} />
-          <Route path="/hrm/vien-chuc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><VienChucList /></RoleRoute>} />
-          <Route path="/hrm/vien-chuc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><VienChucCreate /></RoleRoute>} />
-          <Route path="/hrm/vien-chuc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><VienChucDetailPage /></RoleRoute>} />
-          <Route path="/hrm/nghi-phep" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><LeaveRequestList /></RoleRoute>} />
-          <Route path="/hrm/nghi-phep/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><LeaveRequestForm /></RoleRoute>} />
-          <Route path="/hrm/nghi-phep/so-du" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><LeaveBalance /></RoleRoute>} />
-          <Route path="/hrm/tuyen-dung" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><RecruitmentList /></RoleRoute>} />
-          <Route path="/hrm/ky-luat" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><DisciplineList /></RoleRoute>} />
-          <Route path="/hrm/luong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SalarySheet /></RoleRoute>} />
-          <Route path="/hrm/hop-dong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ContractList /></RoleRoute>} />
-          <Route path="/hrm/bo-nhiem" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><AppointmentList /></RoleRoute>} />
-          <Route path="/hrm/bo-nhiem/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><AppointmentCreate /></RoleRoute>} />
-          <Route path="/hrm/cau-hinh" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMConfig /></RoleRoute>} />
+          {/* HRM — Quản trị nhân lực */}
+          <Route path="/hrm" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMProfilesPage /></RoleRoute>} />
+          <Route path="/hrm/nhan-su" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMProfilesPage /></RoleRoute>} />
+          <Route path="/hrm/cong-viec" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMWorkPage /></RoleRoute>} />
 
           {/* SIS — 6 nhóm chính */}
           <Route path="/sis" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SISDashboard /></RoleRoute>} />

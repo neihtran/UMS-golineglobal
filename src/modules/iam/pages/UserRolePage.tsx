@@ -22,6 +22,9 @@ const STATUS_CONFIG: Record<string, { variant: 'success' | 'warning' | 'error' |
   ACTIVE: { variant: 'success', label: 'Hoạt động' },
   LOCKED: { variant: 'error', label: 'Bị khóa' },
   SUSPENDED: { variant: 'warning', label: 'Tạm ngừng' },
+  '1': { variant: 'success', label: 'Hoạt động' },
+  '0': { variant: 'error', label: 'Bị khóa' },
+  '2': { variant: 'warning', label: 'Tạm ngừng' },
 };
 
 function UserRoleRow({
@@ -96,14 +99,14 @@ export function UserRoleTabContent() {
   const detailQueries = useQueries({
     queries: users.map(user => ({
       queryKey: ['iam', 'users', 'detail', user.id] as const,
-      queryFn: () => usersApi.get(user.id),
+      queryFn: () => usersApi.get(user.id).then(r => r.data.data),
       enabled: usersQuery.isSuccess,
       staleTime: 30_000,
     })),
   });
 
   const detailsMap = new Map(
-    users.map((u, i) => [u.id, detailQueries[i]?.data?.data])
+    users.map((u, i) => [u.id, detailQueries[i]?.data])
   );
 
   return (

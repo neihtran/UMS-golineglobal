@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Shield, Plus, Download, Loader2 } from 'lucide-react';
 import {
   Button,
@@ -44,6 +44,17 @@ export function RoleTabContent() {
   const roles = query.data?.data ?? [];
   const meta = query.data?.meta;
 
+  // DEBUG: log response để xác nhận shape thực tế
+  useEffect(() => {
+    if (query.data) {
+      console.log('[iam][roles] list response:', query.data);
+      if (roles.length > 0) {
+        console.log('[iam][roles] first role keys:', Object.keys(roles[0]));
+        console.log('[iam][roles] first role:', roles[0]);
+      }
+    }
+  }, [query.data]);
+
   // Batch-fetch details for displayed roles to get permissions_count
   const detailQueries = useQueries({
     queries: roles.map(r => ({
@@ -61,17 +72,54 @@ export function RoleTabContent() {
     return Object.values(grouped).flat().length;
   };
 
+  // DEBUG: log response của role detail để xem có users_count không
+  useEffect(() => {
+    detailQueries.forEach((q, i) => {
+      if (q.data) {
+        const detail = q.data as any;
+        console.log(`[iam][role-detail #${detail.id}] keys:`, Object.keys(detail));
+        console.log(`[iam][role-detail #${detail.id}]:`, detail);
+      }
+    });
+  }, [detailQueries.map(q => q.data?.id).join(',')]);
+
   // Batch-fetch ALL users (no pagination) để compute user_count mà không cần gọi API riêng
   const allUsersQuery = useIamUsers({ per_page: 9999, page: 1 });
   const allUserIds = (allUsersQuery.data?.data ?? []).map(u => u.id);
   const rolesMap = useIamUserRoles(allUserIds);
 
-  // Compute user_count cho mỗi role: đếm users có role.code trong roles[]
-  const getUserCount = (roleCode: string): number => {
+  // DEBUG: log user count + sample user
+  useEffect(() => {
+    if (allUsersQuery.data) {
+      console.log('[iam][users] total:', allUsersQuery.data.meta?.total);
+      console.log('[iam][users] loaded:', allUsersQuery.data.data.length);
+      if (allUsersQuery.data.data.length > 0) {
+        console.log('[iam][users] sample:', allUsersQuery.data.data[0]);
+      }
+    }
+  }, [allUsersQuery.data]);
+
+  // Compute user_count cho mỗi role.
+  // Ưu tiên: 1) field `users_count`/`user_count`/`users` trong detail hoặc list role
+  //          2) client-side count từ danh sách users
+  const getUserCount = (roleIdOrCode: number | string, code?: string): number => {
+    // 1) Thử lấy từ role list response (nếu backend trả)
+    const roleFromList = roles.find(r => r.id === roleIdOrCode || r.code === roleIdOrCode);
+    const listCount = (roleFromList as any)?.users_count
+      ?? (roleFromList as any)?.user_count;
+    if (typeof listCount === 'number' && listCount > 0) return listCount;
+
+    // 2) Thử lấy từ role detail queries (nếu backend trả)
+    const detailQ = detailQueries.find(d => (d.data as any)?.id === roleIdOrCode);
+    const detailCount = (detailQ?.data as any)?.users_count
+      ?? (detailQ?.data as any)?.user_count;
+    if (typeof detailCount === 'number' && detailCount > 0) return detailCount;
+
+    // 3) Fallback: client-side count
+    const roleCode = code ?? roleFromList?.code;
     if (!roleCode) return 0;
     return (allUsersQuery.data?.data ?? []).filter(u => {
       const detail = rolesMap.data.get(u.id);
-      // Ưu tiên batch detail (get /users/{id}), fallback về list response
       const roles: string[] = detail?.roles ?? u.roles ?? [];
       return roles.includes(roleCode);
     }).length;
@@ -165,7 +213,7 @@ export function RoleTabContent() {
                     </div>
                     <p className="text-xs text-[rgb(var(--text-muted))] mt-0.5">
                       <code>{r.code}</code>
-                      {' · '}{getUserCount(r.code).toLocaleString('vi-VN')} người dùng
+                      {' · '}{getUserCount(r.id, r.code).toLocaleString('vi-VN')} người dùng
                     </p>
                   </div>
                   <div className="text-right shrink-0">

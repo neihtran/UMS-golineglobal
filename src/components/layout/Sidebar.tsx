@@ -47,7 +47,7 @@ type NavGroup = {
 };
 
 // ─── DEV: SHOW ONLY SIS + CORE DEMO ──────────────────────────────────────────────
-const DEV_SIS_ONLY = false;
+const DEV_SIS_ONLY = true;
 
 const IAM_MODULES: Module[] = [
   { id: 'iam-xac-thuc', label: 'Xác thực & Quản lý người dùng', route: '/iam/xac-thuc', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
@@ -60,6 +60,18 @@ const IAM_GROUP: NavGroup = {
   label: 'Quản trị Hệ thống',
   groupIcon: <ShieldCheck className="h-4 w-4" />,
   modules: IAM_MODULES,
+};
+
+const HRM_NEW_MODULES: Module[] = [
+  { id: 'hrm-danh-muc', label: 'Danh mục & Hồ sơ nhân sự', route: '/hrm/nhan-su', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
+  { id: 'hrm-cong-viec', label: 'Quản lý công việc', route: '/hrm/cong-viec', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
+];
+
+const HRM_NEW_GROUP: NavGroup = {
+  id: 'quan-tri-nhan-luc',
+  label: 'Quản trị Nhân lực',
+  groupIcon: <Users className="h-4 w-4" />,
+  modules: HRM_NEW_MODULES,
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -102,7 +114,7 @@ const CORE_ONLY_GROUP: NavGroup = {
 
 // ─── NAV_GROUPS ───────────────────────────────────────────────────────────────
 const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
-  ? [CORE_ONLY_GROUP, IAM_GROUP, SIS_ONLY_GROUP]
+  ? [CORE_ONLY_GROUP, IAM_GROUP, HRM_NEW_GROUP, SIS_ONLY_GROUP]
   : [
   // ── NHÓM 1: CƠ CẤU TỔ CHỨC ─────────────────────────────────────
   {
@@ -123,6 +135,14 @@ const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
     label: 'Quản trị Hệ thống',
     groupIcon: <ShieldCheck className="h-4 w-4" />,
     modules: ALL_IAM_MODULES,
+  },
+
+  // ── NHÓM HRM MỚI ────────────────────────────────────────────────────────────
+  {
+    id: 'quan-tri-nhan-luc',
+    label: 'Quản trị Nhân lực',
+    groupIcon: <Users className="h-4 w-4" />,
+    modules: HRM_NEW_MODULES,
   },
 
   // ── NHÓM 2: QUẢN LÝ ĐÀO TẠO (SIS MỚI) ─────────────────────────────────────
@@ -209,6 +229,7 @@ const NAV_KEYS: Record<string, string> = {
   hrm: 'module.hrm', 'hrm-don-vi': 'module.hrmDepartment', 'hrm-vien-chuc': 'module.hrmVienChuc',
   'hrm-hop-dong': 'module.hrmContract', 'hrm-luong': 'module.hrmSalary', 'hrm-nghi-phep': 'module.hrmLeave',
   'hrm-bo-nhiem': 'module.hrmAppointment', 'hrm-tuyen-dung': 'module.hrmRecruitment', 'hrm-ky-luat': 'module.hrmDiscipline',
+  'hrm-nhan-su': 'Quản trị nhân lực',
   sis: 'module.sis', 'sis-sv': 'module.sisStudentList',
   'sis-danh-muc': 'module.sisTrainingCatalog', 'sis-tuyen-sinh': 'module.sisStudentAdmission',
   'sis-qua-trinh': 'module.sisStudyProcess', 'sis-ctdt': 'module.sisCurriculumProgram',

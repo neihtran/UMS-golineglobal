@@ -48,6 +48,8 @@ export interface User {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface UserProfile {
   id: number;
   user_id: string;
   avatar?: string | null;
@@ -56,24 +58,6 @@ export interface User {
   full_name?: string | null;
   email?: string | null;
   phone?: string | null;
-}
-
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  phone?: string | null;
-  account_type?: 'system' | 'employee' | 'student' | string | null;
-  employee_id?: string | null;
-  student_id?: string | null;
-  status: UserStatusCode;
-  roles?: string[];
-  profile?: UserProfile | null;
-  email_verified_at?: string | null;
-  last_login_at?: string | null;
-  last_login_ip?: string | null;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface CreateUserPayload {
@@ -262,7 +246,7 @@ export interface UpdateProfilePayload {
 }
 
 export interface ChangePasswordPayload {
-  old_password: string;
+  current_password: string;
   new_password: string;
   new_password_confirmation: string;
 }

@@ -23,6 +23,7 @@ interface AccountSheetProps {
 const STATUS_OPTIONS: { value: UserStatusString; label: string }[] = [
   { value: 'ACTIVE', label: 'Hoạt động' },
   { value: 'LOCKED', label: 'Bị khóa' },
+  { value: 'SUSPENDED', label: 'Tạm ngừng' },
 ];
 
 const ACCOUNT_TYPE_OPTIONS = [
@@ -67,6 +68,7 @@ export function AccountSheet({ open, onClose, user }: AccountSheetProps) {
   const assignRoleMut = useAssignIamUserRoles();
   const loading = createMut.isPending || updateMut.isPending;
 
+  // Sync form khi sheet mở/đóng (không phụ thuộc user refetch)
   useEffect(() => {
     if (open) {
       if (user) {
@@ -86,7 +88,8 @@ export function AccountSheet({ open, onClose, user }: AccountSheetProps) {
       }
       setErrors({});
     }
-  }, [open, user]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -233,8 +236,8 @@ export function AccountSheet({ open, onClose, user }: AccountSheetProps) {
 
           <FormField label="Trạng thái">
             <select
-              value={String(form.status)}
-              onChange={(e) => setForm({ ...form, status: Number(e.target.value) as UserStatusCode })}
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value as UserStatusString })}
               className="h-9 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm text-[rgb(var(--text-secondary))] focus:border-[rgb(var(--primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-light))/0.2]"
             >
               {STATUS_OPTIONS.map(s => (
