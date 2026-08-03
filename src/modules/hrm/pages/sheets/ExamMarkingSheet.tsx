@@ -19,6 +19,7 @@ import {
   useDeleteExamMarking,
   useEmployeeProfiles,
 } from '@/hooks/useHrm';
+import { formatDateTimeVietnam } from '@/utils/formatters';
 import type {
   ExamMarking,
   ExamMarkingCreatePayload,
@@ -30,15 +31,15 @@ const emptyForm = (): ExamMarkingCreatePayload => ({
   exam_schedule_id: 0,
   number_of_scripts: 0,
   deadline: '',
-  status: 'ASSIGNED',
+  status: 'assigned',
   note: null,
 });
 
 const STATUS_OPTIONS = [
-  { value: 'ASSIGNED', label: 'Đã phân công' },
-  { value: 'IN_PROGRESS', label: 'Đang chấm' },
-  { value: 'COMPLETED', label: 'Hoàn thành' },
-  { value: 'CANCELLED', label: 'Hủy' },
+  { value: 'assigned', label: 'Đã phân công' },
+  { value: 'in_progress', label: 'Đang chấm' },
+  { value: 'completed', label: 'Hoàn thành' },
+  { value: 'cancelled', label: 'Hủy' },
 ];
 
 export function ExamMarkingSheet() {
@@ -85,10 +86,10 @@ export function ExamMarkingSheet() {
 
   const getStatusConfig = (status: string) => {
     const configs: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; label: string }> = {
-      ASSIGNED: { variant: 'success', label: 'Đã phân công' },
-      IN_PROGRESS: { variant: 'warning', label: 'Đang chấm' },
-      COMPLETED: { variant: 'success', label: 'Hoàn thành' },
-      CANCELLED: { variant: 'neutral', label: 'Hủy' },
+      assigned: { variant: 'success', label: 'Đã phân công' },
+      in_progress: { variant: 'warning', label: 'Đang chấm' },
+      completed: { variant: 'success', label: 'Hoàn thành' },
+      cancelled: { variant: 'neutral', label: 'Hủy' },
     };
     return configs[status] ?? { variant: 'neutral', label: status };
   };
@@ -107,7 +108,7 @@ export function ExamMarkingSheet() {
       lecturer_id: item.lecturer_id,
       exam_schedule_id: item.exam_schedule_id,
       number_of_scripts: item.number_of_scripts,
-      deadline: item.deadline ?? '',
+      deadline: toLocalInput(item.deadline),
       status: item.status,
       note: item.note,
     });
@@ -136,16 +137,34 @@ export function ExamMarkingSheet() {
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (!form.lecturer_id) e.lecturer_id = 'Vui lòng chọn giảng viên';
-    if (!form.exam_schedule_id) e.exam_schedule_id = 'Vui lòng chọn lịch thi';
+    if (!form.exam_schedule_id) e.exam_schedule_id = 'Vui lòng nhập mã lịch thi';
+    if (!form.number_of_scripts || form.number_of_scripts < 1) e.number_of_scripts = 'Số bài phải lớn hơn 0';
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const toBackendDateTime = (local: string | undefined | null): string | undefined => {
+    if (!local) return undefined;
+    const d = new Date(local);
+    if (isNaN(d.getTime())) return undefined;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+  };
+
+  const toLocalInput = (backend: string | undefined | null): string => {
+    if (!backend) return '';
+    const s = backend.replace(' ', 'T');
+    return s.length >= 16 ? s.substring(0, 16) : s;
   };
 
   const handleSubmit = async () => {
     if (!validate()) return;
     setSubmitError(null);
     try {
-      const payload: ExamMarkingCreatePayload = { ...form };
+      const payload: ExamMarkingCreatePayload = {
+        ...form,
+        deadline: toBackendDateTime(form.deadline),
+      };
       editing
         ? await updateMut.mutateAsync({ id: editing.id, payload })
         : await createMut.mutateAsync(payload);
@@ -259,7 +278,7 @@ export function ExamMarkingSheet() {
                     {item.number_of_scripts || 0} bài
                   </TableCell>
                   <TableCell className="text-sm">
-                    {item.deadline || '—'}
+                    {formatDateTimeVietnam(item.deadline)}
                   </TableCell>
                   <TableCell>
                     <Badge variant={statusConfig.variant} size="sm">{statusConfig.label}</Badge>
@@ -350,7 +369,7 @@ export function ExamMarkingSheet() {
 
           <FormField label="Trạng thái">
             <select
-              value={form.status || 'ASSIGNED'}
+              value={form.status || 'assigned'}
               onChange={(e) => setForm(f => ({ ...f, status: e.target.value }))}
               className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-input))] px-3 text-sm"
             >
@@ -426,7 +445,7 @@ export function ExamMarkingSheet() {
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-muted))]">Deadline</p>
-                <p className="font-medium">{detailData.data.deadline || '—'}</p>
+                <p className="font-medium">{formatDateTimeVietnam(detailData.data.deadline)}</p>
               </div>
             </div>
             {detailData.data.note && (

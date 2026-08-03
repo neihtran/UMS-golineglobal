@@ -19,6 +19,7 @@ import {
   useDeleteExamInvigilation,
   useEmployeeProfiles,
 } from '@/hooks/useHrm';
+import { formatDateTimeVietnam } from '@/utils/formatters';
 import type {
   ExamInvigilation,
   ExamInvigilationCreatePayload,
@@ -28,23 +29,23 @@ import type {
 const emptyForm = (): ExamInvigilationCreatePayload => ({
   lecturer_id: 0,
   exam_schedule_id: 0,
-  role: 'MAIN',
+  role: 'main',
   start_time: '',
   end_time: '',
-  status: 'ASSIGNED',
+  status: 'assigned',
   note: null,
 });
 
 const STATUS_OPTIONS = [
-  { value: 'ASSIGNED', label: 'Đã phân công' },
-  { value: 'CONFIRMED', label: 'Đã xác nhận' },
-  { value: 'COMPLETED', label: 'Hoàn thành' },
-  { value: 'CANCELLED', label: 'Hủy' },
+  { value: 'assigned', label: 'Đã phân công' },
+  { value: 'confirmed', label: 'Đã xác nhận' },
+  { value: 'completed', label: 'Hoàn thành' },
+  { value: 'cancelled', label: 'Hủy' },
 ];
 
 const ROLE_OPTIONS = [
-  { value: 'MAIN', label: 'Chính' },
-  { value: 'ASSISTANT', label: 'Phụ' },
+  { value: 'main', label: 'Chính' },
+  { value: 'assistant', label: 'Phụ' },
 ];
 
 export function ExamInvigilationSheet() {
@@ -91,10 +92,10 @@ export function ExamInvigilationSheet() {
 
   const getStatusConfig = (status: string) => {
     const configs: Record<string, { variant: 'success' | 'warning' | 'error' | 'neutral'; label: string }> = {
-      ASSIGNED: { variant: 'success', label: 'Đã phân công' },
-      CONFIRMED: { variant: 'success', label: 'Đã xác nhận' },
-      COMPLETED: { variant: 'success', label: 'Hoàn thành' },
-      CANCELLED: { variant: 'neutral', label: 'Hủy' },
+      assigned: { variant: 'success', label: 'Đã phân công' },
+      confirmed: { variant: 'success', label: 'Đã xác nhận' },
+      completed: { variant: 'success', label: 'Hoàn thành' },
+      cancelled: { variant: 'neutral', label: 'Hủy' },
     };
     return configs[status] ?? { variant: 'neutral', label: status };
   };
@@ -112,9 +113,9 @@ export function ExamInvigilationSheet() {
     setForm({
       lecturer_id: item.lecturer_id,
       exam_schedule_id: item.exam_schedule_id,
-      role: item.role as 'MAIN' | 'ASSISTANT',
-      start_time: item.start_time ?? '',
-      end_time: item.end_time ?? '',
+      role: (item.role as 'main' | 'assistant') ?? 'main',
+      start_time: toLocalInput(item.start_time),
+      end_time: toLocalInput(item.end_time),
       status: item.status,
       note: item.note,
     });
@@ -143,16 +144,34 @@ export function ExamInvigilationSheet() {
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (!form.lecturer_id) e.lecturer_id = 'Vui lòng chọn giảng viên';
-    if (!form.exam_schedule_id) e.exam_schedule_id = 'Vui lòng chọn lịch thi';
+    if (!form.exam_schedule_id) e.exam_schedule_id = 'Vui lòng nhập mã lịch thi';
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const toBackendDateTime = (local: string | undefined | null): string | undefined => {
+    if (!local) return undefined;
+    const d = new Date(local);
+    if (isNaN(d.getTime())) return undefined;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+  };
+
+  const toLocalInput = (backend: string | undefined | null): string => {
+    if (!backend) return '';
+    const s = backend.replace(' ', 'T');
+    return s.length >= 16 ? s.substring(0, 16) : s;
   };
 
   const handleSubmit = async () => {
     if (!validate()) return;
     setSubmitError(null);
     try {
-      const payload: ExamInvigilationCreatePayload = { ...form };
+      const payload: ExamInvigilationCreatePayload = {
+        ...form,
+        start_time: toBackendDateTime(form.start_time),
+        end_time: toBackendDateTime(form.end_time),
+      };
       editing
         ? await updateMut.mutateAsync({ id: editing.id, payload })
         : await createMut.mutateAsync(payload);
@@ -266,7 +285,9 @@ export function ExamInvigilationSheet() {
                     {ROLE_OPTIONS.find(o => o.value === item.role)?.label || item.role || '—'}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {item.start_time ? `${item.start_time}${item.end_time ? ` - ${item.end_time}` : ''}` : '—'}
+                    {item.start_time
+                      ? `${formatDateTimeVietnam(item.start_time)}${item.end_time ? ` - ${formatDateTimeVietnam(item.end_time)}` : ''}`
+                      : '—'}
                   </TableCell>
                   <TableCell>
                     <Badge variant={statusConfig.variant} size="sm">{statusConfig.label}</Badge>
@@ -369,7 +390,7 @@ export function ExamInvigilationSheet() {
 
           <FormField label="Trạng thái">
             <select
-              value={form.status || 'ASSIGNED'}
+              value={form.status || 'assigned'}
               onChange={(e) => setForm(f => ({ ...f, status: e.target.value }))}
               className="w-full h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-input))] px-3 text-sm"
             >
@@ -445,11 +466,11 @@ export function ExamInvigilationSheet() {
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-muted))]">Thời gian bắt đầu</p>
-                <p className="font-medium">{detailData.data.start_time || '—'}</p>
+                <p className="font-medium">{formatDateTimeVietnam(detailData.data.start_time)}</p>
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-muted))]">Thời gian kết thúc</p>
-                <p className="font-medium">{detailData.data.end_time || '—'}</p>
+                <p className="font-medium">{formatDateTimeVietnam(detailData.data.end_time)}</p>
               </div>
             </div>
             {detailData.data.note && (

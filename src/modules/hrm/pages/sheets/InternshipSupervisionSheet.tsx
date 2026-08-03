@@ -20,13 +20,13 @@ import {
   useDeleteInternshipSupervision,
   useEmployeeProfiles,
 } from '@/hooks/useHrm';
-import { useHqnhatAcademicTerms } from '@/hooks/useHqnhat';
+import { useHqnhatAcademicTerms, useHqnhatStudents } from '@/hooks/useHqnhat';
 import type {
   InternshipSupervision,
   InternshipSupervisionCreatePayload,
   EmployeeProfile,
 } from '@/types/hrm.types';
-import type { HqnhatAcademicTerm } from '@/types/hqnhat.types';
+import type { HqnhatAcademicTerm, HqnhatStudent } from '@/types/hqnhat.types';
 
 const emptyForm = (): InternshipSupervisionCreatePayload => ({
   lecturer_id: 0,
@@ -65,11 +65,13 @@ export function InternshipSupervisionSheet() {
   const { data, isLoading, isFetching } = useInternshipSupervisions(params);
   const { data: employeesData } = useEmployeeProfiles({ per_page: 100 });
   const { data: academicTermsData } = useHqnhatAcademicTerms({ per_page: 100 });
+  const { data: studentsData } = useHqnhatStudents({ per_page: 100 });
 
   const items = Array.isArray(data?.data) ? data.data : [];
   const total = data?.meta?.total ?? items.length;
   const employees = Array.isArray(employeesData?.data) ? employeesData.data : [];
   const academicTerms = Array.isArray(academicTermsData?.data) ? academicTermsData.data : [];
+  const students = Array.isArray(studentsData?.data) ? studentsData.data : [];
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<InternshipSupervision | null>(null);
@@ -145,6 +147,8 @@ export function InternshipSupervisionSheet() {
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (!form.lecturer_id) e.lecturer_id = 'Vui lòng chọn giảng viên';
+    if (!form.student_id) e.student_id = 'Vui lòng chọn sinh viên';
+    if (!form.academic_term_id) e.academic_term_id = 'Vui lòng chọn học kỳ';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -261,9 +265,15 @@ export function InternshipSupervisionSheet() {
                       {getLecturerName(item.lecturer_id)}
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm">{item.student?.full_name || `SV #${item.student_id}` || '—'}</TableCell>
-                  <TableCell className="text-sm">{item.company?.name || `Công ty #${item.company_id}` || '—'}</TableCell>
-                  <TableCell className="text-sm">{item.academic_term?.name || '—'}</TableCell>
+                  <TableCell className="text-sm">
+                    {students.find((s: HqnhatStudent) => s.id === item.student_id)?.full_name || students.find((s: HqnhatStudent) => s.id === item.student_id)?.student_code || `SV #${item.student_id}`}
+                  </TableCell>
+                  <TableCell className="text-sm">{item.company?.name || (item.company_id ? `Công ty #${item.company_id}` : '—')}</TableCell>
+                  <TableCell className="text-sm">
+                    {academicTerms.find((t: HqnhatAcademicTerm) => t.id === item.academic_term_id)
+                      ? `${academicTerms.find((t: HqnhatAcademicTerm) => t.id === item.academic_term_id)?.code} (${academicTerms.find((t: HqnhatAcademicTerm) => t.id === item.academic_term_id)?.academic_year})`
+                      : `HK #${item.academic_term_id}`}
+                  </TableCell>
                   <TableCell className="text-sm tabular-nums">
                     {item.start_date && item.end_date
                       ? `${formatDate(item.start_date)} — ${formatDate(item.end_date)}`
@@ -333,7 +343,19 @@ export function InternshipSupervisionSheet() {
               ))}
             </select>
           </FormField>
-          <FormField label="Học kỳ/Năm học">
+          <FormField label="Sinh viên" error={errors.student_id} required>
+            <select
+              value={form.student_id ?? ''}
+              onChange={(e) => setForm({ ...form, student_id: e.target.value ? Number(e.target.value) : null })}
+              className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+            >
+              <option value="">-- Chọn sinh viên --</option>
+              {students.map((s: HqnhatStudent) => (
+                <option key={s.id} value={s.id}>{s.student_code} - {s.full_name}</option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Học kỳ/Năm học" error={errors.academic_term_id} required>
             <select
               value={form.academic_term_id ?? ''}
               onChange={(e) => setForm({ ...form, academic_term_id: e.target.value ? Number(e.target.value) : null })}
@@ -341,7 +363,7 @@ export function InternshipSupervisionSheet() {
             >
               <option value="">-- Chọn học kỳ --</option>
               {academicTerms.map((term: HqnhatAcademicTerm) => (
-                <option key={term.id} value={term.id}>{term.code} ({term.academic_year})</option>
+                <option key={term.code} value={term.id}>{term.code} ({term.academic_year})</option>
               ))}
             </select>
           </FormField>

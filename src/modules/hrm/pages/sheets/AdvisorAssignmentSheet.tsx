@@ -20,13 +20,13 @@ import {
   useDeleteAdvisorAssignment,
   useEmployeeProfiles,
 } from '@/hooks/useHrm';
-import { useHqnhatAcademicTerms } from '@/hooks/useHqnhat';
+import { useHqnhatAcademicTerms, useHqnhatClasses } from '@/hooks/useHqnhat';
 import type {
   AdvisorAssignment,
   AdvisorAssignmentCreatePayload,
   EmployeeProfile,
 } from '@/types/hrm.types';
-import type { HqnhatAcademicTerm } from '@/types/hqnhat.types';
+import type { HqnhatAcademicTerm, HqnhatClass } from '@/types/hqnhat.types';
 
 const emptyForm = (): AdvisorAssignmentCreatePayload => ({
   lecturer_id: 0,
@@ -62,11 +62,13 @@ export function AdvisorAssignmentSheet() {
   const { data, isLoading, isFetching } = useAdvisorAssignments(params);
   const { data: employeesData } = useEmployeeProfiles({ per_page: 100 });
   const { data: academicTermsData } = useHqnhatAcademicTerms({ per_page: 100 });
+  const { data: classesData } = useHqnhatClasses({ per_page: 100 });
 
   const items = Array.isArray(data?.data) ? data.data : [];
   const total = data?.meta?.total ?? items.length;
   const employees = Array.isArray(employeesData?.data) ? employeesData.data : [];
   const academicTerms = Array.isArray(academicTermsData?.data) ? academicTermsData.data : [];
+  const classes = Array.isArray(classesData?.data) ? classesData.data : [];
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<AdvisorAssignment | null>(null);
@@ -139,6 +141,8 @@ export function AdvisorAssignmentSheet() {
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (!form.lecturer_id) e.lecturer_id = 'Vui lòng chọn giảng viên';
+    if (!form.class_id) e.class_id = 'Vui lòng chọn lớp học';
+    if (!form.academic_term_id) e.academic_term_id = 'Vui lòng chọn học kỳ';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -254,8 +258,16 @@ export function AdvisorAssignmentSheet() {
                       {getLecturerName(item.lecturer_id)}
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm">{item.class?.name || `Lớp #${item.class_id}` || '—'}</TableCell>
-                  <TableCell className="text-sm">{item.academic_term?.name || `HK #${item.academic_term_id}` || '—'}</TableCell>
+                  <TableCell className="text-sm">
+                    {classes.find((c: HqnhatClass) => c.id === item.class_id)
+                      ? `${classes.find((c: HqnhatClass) => c.id === item.class_id)?.code} - ${classes.find((c: HqnhatClass) => c.id === item.class_id)?.name}`
+                      : `Lớp #${item.class_id}`}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {academicTerms.find((t: HqnhatAcademicTerm) => t.id === item.academic_term_id)
+                      ? `${academicTerms.find((t: HqnhatAcademicTerm) => t.id === item.academic_term_id)?.code} (${academicTerms.find((t: HqnhatAcademicTerm) => t.id === item.academic_term_id)?.academic_year})`
+                      : `HK #${item.academic_term_id}`}
+                  </TableCell>
                   <TableCell className="text-sm tabular-nums">
                     {item.start_date && item.end_date
                       ? `${formatDate(item.start_date)} — ${formatDate(item.end_date)}`
@@ -325,7 +337,19 @@ export function AdvisorAssignmentSheet() {
               ))}
             </select>
           </FormField>
-          <FormField label="Học kỳ/Năm học">
+          <FormField label="Lớp học" error={errors.class_id} required>
+            <select
+              value={form.class_id ?? ''}
+              onChange={(e) => setForm({ ...form, class_id: e.target.value ? Number(e.target.value) : null })}
+              className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm"
+            >
+              <option value="">-- Chọn lớp học --</option>
+              {classes.map((cls: HqnhatClass) => (
+                <option key={cls.id} value={cls.id}>{cls.code} - {cls.name}</option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Học kỳ/Năm học" error={errors.academic_term_id} required>
             <select
               value={form.academic_term_id ?? ''}
               onChange={(e) => setForm({ ...form, academic_term_id: e.target.value ? Number(e.target.value) : null })}

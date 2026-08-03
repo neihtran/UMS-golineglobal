@@ -31,6 +31,25 @@ export function formatDateTime(date: string | Date | null | undefined): string {
   return formatDate(date, DATETIME_FORMAT);
 }
 
+/**
+ * Format datetime theo giờ Việt Nam (UTC+7), bỏ qua timezone của string.
+ * Dùng cho API trả về Laravel/Eloquent: dù có "Z" (UTC) hay không, vẫn hiển thị
+ * đúng giờ đã lưu trong DB (giả định DB lưu giờ VN thuần, không qua UTC).
+ *
+ * Hỗ trợ 2 format backend phổ biến:
+ *  - "2026-08-03 08:00:00" (Laravel default)
+ *  - "2026-08-03T08:00:00.000000Z" (Carbon serialize UTC)
+ */
+export function formatDateTimeVietnam(date: string | null | undefined): string {
+  if (!date) return '—';
+  let s = date.trim();
+  // ISO có timezone → lấy phần naive, bỏ Z và offset
+  const isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (!isoMatch) return '—';
+  const [, yyyy, MM, dd, HH, mm] = isoMatch;
+  return `${dd}/${MM}/${yyyy} ${HH}:${mm}`;
+}
+
 export function formatShortDate(date: string | Date): string {
   return formatDate(date, SHORT_DATE_FORMAT);
 }
