@@ -65,6 +65,7 @@ const IAM_GROUP: NavGroup = {
 const HRM_NEW_MODULES: Module[] = [
   { id: 'hrm-danh-muc', label: 'Danh mục & Hồ sơ nhân sự', route: '/hrm/nhan-su', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
   { id: 'hrm-cong-viec', label: 'Quản lý công việc', route: '/hrm/cong-viec', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
+  { id: 'hrm-cham-cong', label: 'Chấm công & Nghỉ phép', route: '/hrm/cham-cong', icon: <ClipboardList className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
 ];
 
 const HRM_NEW_GROUP: NavGroup = {

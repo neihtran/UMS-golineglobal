@@ -938,5 +938,126 @@
     },
     "salaryHistoryDate": "Date",
     "leaveDaysUnit": "days"
+  },
+  "attendanceWork": {
+    "title": "Timekeeping & Leave",
+    "tabs": {
+      "workSchedule": "Work Shifts",
+      "employeeSchedule": "Employee Schedules",
+      "attendance": "Attendance",
+      "attendanceLog": "Check in/out",
+      "leaveType": "Leave Types",
+      "leaveRequest": "Leave Requests",
+      "overtimeRequest": "Overtime"
+    }
+  },
+  "workSchedule": {
+    "title": "Work Schedules",
+    "add": "Add Work Schedule",
+    "code": "Code",
+    "name": "Name",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "breakStart": "Break Start",
+    "breakEnd": "Break End",
+    "workingHours": "Working Hours",
+    "lateAfter": "Late After (min)",
+    "earlyLeaveBefore": "Early Leave Before (min)"
+  },
+  "employeeSchedule": {
+    "title": "Employee Schedules",
+    "add": "Add Schedule",
+    "employee": "Employee",
+    "schedule": "Shift",
+    "workingDate": "Working Date"
+  },
+  "attendance": {
+    "title": "Attendance Records",
+    "add": "Add Attendance",
+    "status": {
+      "present": "Present",
+      "absent": "Absent",
+      "leave": "On Leave",
+      "holiday": "Holiday",
+      "remote": "Remote"
+    },
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "workingMinutes": "Working (min)",
+    "lateMinutes": "Late (min)",
+    "earlyLeaveMinutes": "Early Leave (min)",
+    "overtimeMinutes": "Overtime (min)"
+  },
+  "attendanceLog": {
+    "title": "Check-in/out History",
+    "add": "Record Check-in/out",
+    "action": {
+      "checkIn": "Check-in",
+      "checkOut": "Check-out"
+    },
+    "deviceType": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "face": "Face Recognition",
+      "fingerprint": "Fingerprint",
+      "card": "Card"
+    },
+    "deviceId": "Device ID",
+    "deviceName": "Device Name"
+  },
+  "leaveType": {
+    "title": "Leave Types",
+    "add": "Add Leave Type",
+    "code": "Code",
+    "name": "Name",
+    "isPaid": "Paid",
+    "maxDays": "Max Days",
+    "paid": "Paid",
+    "unpaid": "Unpaid"
+  },
+  "leaveRequest": {
+    "title": "Leave Requests",
+    "add": "Create Leave Request",
+    "fromDate": "From Date",
+    "toDate": "To Date",
+    "totalDays": "Total Days",
+    "reason": "Reason",
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "approver": "Approver",
+    "approvedAt": "Approved At",
+    "actions": {
+      "submit": "Submit",
+      "approve": "Approve",
+      "reject": "Reject",
+      "cancel": "Cancel"
+    }
+  },
+  "overtimeRequest": {
+    "title": "Overtime Requests",
+    "add": "Create OT Request",
+    "overtimeDate": "OT Date",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "totalHours": "Total Hours",
+    "reason": "OT Reason",
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "submit": "Submit",
+      "approve": "Approve",
+      "reject": "Reject",
+      "cancel": "Cancel"
+    }
   }
 }

@@ -613,6 +613,355 @@ export interface ExamMarkingListParams {
   sort_direction?: 'asc' | 'desc';
 }
 
+// ─── Part 3: Work Schedules (Ca làm việc) ─────────────────────────────────────
+
+export interface WorkSchedule {
+  id: number;
+  code: string;
+  name: string;
+  start_time: string | null; // HH:mm:ss
+  end_time: string | null;
+  break_start: string | null;
+  break_end: string | null;
+  working_hours: number | null;
+  late_after: number | null; // phút
+  early_leave_before: number | null; // phút
+  status: number; // 0: INACTIVE, 1: ACTIVE
+  description: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface WorkScheduleCreatePayload {
+  code: string;
+  name: string;
+  start_time?: string | null;
+  end_time?: string | null;
+  break_start?: string | null;
+  break_end?: string | null;
+  working_hours?: number | null;
+  late_after?: number | null;
+  early_leave_before?: number | null;
+  status?: number;
+  description?: string | null;
+}
+
+export interface WorkScheduleListParams {
+  code?: string;
+  name?: string;
+  status?: number;
+  per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+// ─── Part 3: Employee Schedules (Lịch làm việc nhân viên) ──────────────────────
+
+export interface EmployeeSchedule {
+  id: number;
+  employee_id: number;
+  schedule_id: number;
+  working_date: string; // YYYY-MM-DD
+  note: string | null;
+  created_at?: string;
+  updated_at?: string;
+  // Related
+  employee?: {
+    id: number;
+    full_name: string;
+    employee_code: string;
+  };
+  schedule?: {
+    id: number;
+    code: string;
+    name: string;
+  };
+}
+
+export interface EmployeeScheduleCreatePayload {
+  employee_id: number;
+  schedule_id: number;
+  working_date: string;
+  note?: string | null;
+}
+
+export interface EmployeeScheduleListParams {
+  employee_id?: number;
+  schedule_id?: number;
+  working_date?: string;
+  start_date?: string;
+  end_date?: string;
+  per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+// ─── Part 3: Attendances (Chấm công) ──────────────────────────────────────────
+
+export type AttendanceStatus = 'present' | 'absent' | 'leave' | 'holiday' | 'remote';
+
+export interface Attendance {
+  id: number;
+  employee_id: number;
+  schedule_id: number | null;
+  attendance_date: string; // YYYY-MM-DD
+  check_in: string | null; // HH:mm:ss
+  check_out: string | null;
+  working_minutes: number | null;
+  late_minutes: number | null;
+  early_leave_minutes: number | null;
+  overtime_minutes: number | null;
+  attendance_status: AttendanceStatus;
+  remark: string | null;
+  created_at?: string;
+  updated_at?: string;
+  // Related
+  employee?: {
+    id: number;
+    full_name: string;
+    employee_code: string;
+  };
+  schedule?: {
+    id: number;
+    code: string;
+    name: string;
+  };
+}
+
+export interface AttendanceCreatePayload {
+  employee_id: number;
+  attendance_date: string;
+  schedule_id?: number | null;
+  check_in?: string | null;
+  check_out?: string | null;
+  working_minutes?: number | null;
+  late_minutes?: number | null;
+  early_leave_minutes?: number | null;
+  overtime_minutes?: number | null;
+  attendance_status?: AttendanceStatus;
+  remark?: string | null;
+}
+
+export interface AttendanceListParams {
+  employee_id?: number;
+  schedule_id?: number;
+  attendance_date?: string;
+  start_date?: string;
+  end_date?: string;
+  attendance_status?: AttendanceStatus;
+  per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+// ─── Part 3: Attendance Logs (Lịch sử check-in/out) ───────────────────────────
+
+export type AttendanceLogAction = 'check_in' | 'check_out';
+export type AttendanceLogDeviceType = 'web' | 'mobile' | 'face' | 'fingerprint' | 'card';
+
+export interface AttendanceLog {
+  id: number;
+  attendance_id: number;
+  employee_id: number;
+  action: AttendanceLogAction;
+  device_type: AttendanceLogDeviceType;
+  device_id: string;
+  device_name: string | null;
+  ip_address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  photo_path: string | null;
+  created_at?: string;
+  // Related
+  employee?: {
+    id: number;
+    full_name: string;
+    employee_code: string;
+  };
+  attendance?: {
+    id: number;
+    attendance_date: string;
+  };
+}
+
+export interface AttendanceLogCreatePayload {
+  attendance_id: number;
+  employee_id: number;
+  device_id: string;
+  action?: AttendanceLogAction;
+  device_type?: AttendanceLogDeviceType;
+  device_name?: string | null;
+  ip_address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  photo_path?: string | null;
+}
+
+export interface AttendanceLogListParams {
+  attendance_id?: number;
+  employee_id?: number;
+  action?: AttendanceLogAction;
+  device_type?: AttendanceLogDeviceType;
+  device_id?: string;
+  start_date?: string;
+  end_date?: string;
+  per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+// ─── Part 3: Leave Types (Danh mục loại nghỉ) ─────────────────────────────────
+
+export interface LeaveType {
+  id: number;
+  code: string;
+  name: string;
+  is_paid: number; // 0: unpaid, 1: paid
+  max_days: number | null;
+  description: string | null;
+  status: number; // 0: INACTIVE, 1: ACTIVE
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface LeaveTypeCreatePayload {
+  code: string;
+  name: string;
+  is_paid?: number;
+  max_days?: number | null;
+  description?: string | null;
+  status?: number;
+}
+
+export interface LeaveTypeListParams {
+  code?: string;
+  name?: string;
+  is_paid?: number;
+  status?: number;
+  per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+// ─── Part 3: Leave Requests (Đơn nghỉ phép) ──────────────────────────────────
+
+export type LeaveRequestStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface LeaveRequest {
+  id: number;
+  employee_id: number;
+  leave_type_id: number;
+  from_date: string; // YYYY-MM-DD
+  to_date: string;
+  total_days: number | null;
+  reason: string | null;
+  status: LeaveRequestStatus;
+  approved_by: number | null;
+  approved_at: string | null;
+  file_path: string | null;
+  note: string | null;
+  created_at?: string;
+  updated_at?: string;
+  // Related
+  employee?: {
+    id: number;
+    full_name: string;
+    employee_code: string;
+  };
+  leave_type?: {
+    id: number;
+    code: string;
+    name: string;
+  };
+  approver?: {
+    id: number;
+    full_name: string;
+  };
+}
+
+export interface LeaveRequestCreatePayload {
+  employee_id: number;
+  leave_type_id: number;
+  from_date: string;
+  to_date: string;
+  total_days?: number | null;
+  reason?: string | null;
+  file_path?: string | null;
+  status?: LeaveRequestStatus;
+  note?: string | null;
+}
+
+export interface LeaveRequestListParams {
+  employee_id?: number;
+  leave_type_id?: number;
+  status?: LeaveRequestStatus;
+  start_date?: string;
+  end_date?: string;
+  per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+// ─── Part 3: Overtime Requests (Đăng ký OT) ───────────────────────────────────
+
+export type OvertimeRequestStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface OvertimeRequest {
+  id: number;
+  employee_id: number;
+  overtime_date: string; // YYYY-MM-DD
+  start_time: string; // YYYY-MM-DD HH:mm:ss
+  end_time: string;
+  total_hours: number | null;
+  reason: string | null;
+  status: OvertimeRequestStatus;
+  approved_by: number | null;
+  approved_at: string | null;
+  note: string | null;
+  created_at?: string;
+  updated_at?: string;
+  // Related
+  employee?: {
+    id: number;
+    full_name: string;
+    employee_code: string;
+  };
+  approver?: {
+    id: number;
+    full_name: string;
+  };
+}
+
+export interface OvertimeRequestCreatePayload {
+  employee_id: number;
+  overtime_date: string;
+  start_time: string;
+  end_time: string;
+  total_hours?: number | null;
+  reason?: string | null;
+  status?: OvertimeRequestStatus;
+  note?: string | null;
+}
+
+export interface OvertimeRequestListParams {
+  employee_id?: number;
+  overtime_date?: string;
+  start_date?: string;
+  end_date?: string;
+  approved_by?: number;
+  status?: OvertimeRequestStatus;
+  per_page?: number;
+  page?: number;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
 // ─── Common Response Types ─────────────────────────────────────────────────────
 
 export interface HrmListResponse<T> {

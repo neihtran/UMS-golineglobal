@@ -938,5 +938,126 @@
     },
     "salaryHistoryDate": "Ngày",
     "leaveDaysUnit": "ngày"
+  },
+  "attendanceWork": {
+    "title": "Chấm công & Nghỉ phép",
+    "tabs": {
+      "workSchedule": "Ca làm việc",
+      "employeeSchedule": "Lịch làm việc",
+      "attendance": "Chấm công",
+      "attendanceLog": "Check in/out",
+      "leaveType": "Nghỉ phép",
+      "leaveRequest": "Đơn nghỉ phép",
+      "overtimeRequest": "Đăng ký OT"
+    }
+  },
+  "workSchedule": {
+    "title": "Danh sách ca làm việc",
+    "add": "Thêm ca làm việc",
+    "code": "Mã ca",
+    "name": "Tên ca",
+    "startTime": "Giờ bắt đầu",
+    "endTime": "Giờ kết thúc",
+    "breakStart": "Nghỉ giữa ca (từ)",
+    "breakEnd": "Nghỉ giữa ca (đến)",
+    "workingHours": "Tổng giờ làm",
+    "lateAfter": "Đi muộn sau (phút)",
+    "earlyLeaveBefore": "Về sớm trước (phút)"
+  },
+  "employeeSchedule": {
+    "title": "Lịch làm việc nhân viên",
+    "add": "Thêm lịch",
+    "employee": "Nhân viên",
+    "schedule": "Ca làm việc",
+    "workingDate": "Ngày làm"
+  },
+  "attendance": {
+    "title": "Bản ghi chấm công",
+    "add": "Thêm chấm công",
+    "status": {
+      "present": "Có mặt",
+      "absent": "Vắng",
+      "leave": "Nghỉ phép",
+      "holiday": "Ngày lễ",
+      "remote": "Làm từ xa"
+    },
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "workingMinutes": "Phút làm",
+    "lateMinutes": "Đi muộn (phút)",
+    "earlyLeaveMinutes": "Về sớm (phút)",
+    "overtimeMinutes": "Tăng ca (phút)"
+  },
+  "attendanceLog": {
+    "title": "Lịch sử check-in/out",
+    "add": "Ghi nhận check-in/out",
+    "action": {
+      "checkIn": "Check-in",
+      "checkOut": "Check-out"
+    },
+    "deviceType": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "face": "Nhận diện khuôn mặt",
+      "fingerprint": "Vân tay",
+      "card": "Thẻ từ"
+    },
+    "deviceId": "Mã thiết bị",
+    "deviceName": "Tên thiết bị"
+  },
+  "leaveType": {
+    "title": "Danh mục loại nghỉ",
+    "add": "Thêm loại nghỉ",
+    "code": "Mã",
+    "name": "Tên",
+    "isPaid": "Hưởng lương",
+    "maxDays": "Số ngày tối đa",
+    "paid": "Có lương",
+    "unpaid": "Không lương"
+  },
+  "leaveRequest": {
+    "title": "Đơn nghỉ phép",
+    "add": "Tạo đơn nghỉ",
+    "fromDate": "Từ ngày",
+    "toDate": "Đến ngày",
+    "totalDays": "Số ngày",
+    "reason": "Lý do",
+    "status": {
+      "draft": "Nháp",
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối",
+      "cancelled": "Đã hủy"
+    },
+    "approver": "Người duyệt",
+    "approvedAt": "Ngày duyệt",
+    "actions": {
+      "submit": "Gửi duyệt",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "cancel": "Hủy đơn"
+    }
+  },
+  "overtimeRequest": {
+    "title": "Đơn đăng ký OT",
+    "add": "Tạo đơn OT",
+    "overtimeDate": "Ngày OT",
+    "startTime": "Bắt đầu",
+    "endTime": "Kết thúc",
+    "totalHours": "Tổng giờ",
+    "reason": "Lý do OT",
+    "status": {
+      "draft": "Nháp",
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối",
+      "cancelled": "Đã hủy"
+    },
+    "actions": {
+      "submit": "Gửi duyệt",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "cancel": "Hủy đơn"
+    }
   }
 }

@@ -50,8 +50,37 @@ export function formatDateTimeVietnam(date: string | null | undefined): string {
   return `${dd}/${MM}/${yyyy} ${HH}:${mm}`;
 }
 
+/** Format giờ "HH:mm" / "HH:mm:ss" — chỉ lấy phần thời gian, bỏ ngày */
+export function formatTimeVietnam(time: string | null | undefined): string {
+  if (!time) return '—';
+  const s = time.trim();
+  // YYYY-MM-DD HH:mm:ss → lấy HH:mm
+  const dtMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/);
+  if (dtMatch) return `${dtMatch[4]}:${dtMatch[5]}`;
+  // HH:mm:ss hoặc HH:mm → lấy HH:mm
+  const tMatch = s.match(/^(\d{2}):(\d{2})/);
+  if (tMatch) return `${tMatch[1]}:${tMatch[2]}`;
+  return s;
+}
+
 export function formatShortDate(date: string | Date): string {
   return formatDate(date, SHORT_DATE_FORMAT);
+}
+
+/** Format ngày "dd/MM/yyyy" an toàn — parse string naive, KHÔNG qua timezone.
+ *  Dùng cho API trả về ISO kiểu "2026-08-04T00:00:00.000000Z" — lấy đúng phần ngày đã lưu. */
+export function formatDateVietnam(date: string | null | undefined): string {
+  if (!date) return '—';
+  const m = date.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return '—';
+  return `${m[3]}/${m[2]}/${m[1]}`;
+}
+
+/** Trích "YYYY-MM-DD" từ chuỗi ISO để gán cho <input type="date"> */
+export function toDateInputValue(date: string | null | undefined): string {
+  if (!date) return '';
+  const m = date.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : '';
 }
 
 export function formatRelativeTime(date: string | Date): string {

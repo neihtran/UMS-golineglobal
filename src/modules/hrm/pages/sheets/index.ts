@@ -11,3 +11,11 @@ export { InternshipSupervisionSheet } from './InternshipSupervisionSheet';
 export { ThesisSupervisionSheet } from './ThesisSupervisionSheet';
 export { ExamInvigilationSheet } from './ExamInvigilationSheet';
 export { ExamMarkingSheet } from './ExamMarkingSheet';
+// Part 3 — Chấm công & Nghỉ phép
+export { WorkScheduleSheet } from './WorkScheduleSheet';
+export { EmployeeScheduleSheet } from './EmployeeScheduleSheet';
+export { AttendanceSheet } from './AttendanceSheet';
+export { AttendanceLogSheet } from './AttendanceLogSheet';
+export { LeaveTypeSheet } from './LeaveTypeSheet';
+export { LeaveRequestSheet } from './LeaveRequestSheet';
+export { OvertimeRequestSheet } from './OvertimeRequestSheet';

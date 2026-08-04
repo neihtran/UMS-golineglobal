@@ -33,6 +33,7 @@ const ForgotPasswordPage = lazy(() => import('@/pages/auth/ForgotPasswordPage'))
 // HRM
 const HRMProfilesPage = lazy(() => import('@/modules/hrm/pages/HRMProfilesPage'));
 const HRMWorkPage = lazy(() => import('@/modules/hrm/pages/HRMWorkPage'));
+const AttendanceWorkPage = lazy(() => import('@/modules/hrm/pages/AttendanceWorkPage'));
 
 // SIS
 const SISDashboard = lazy(() => import('@/modules/sis/pages/SISDashboard'));
@@ -501,6 +502,8 @@ export default function AppRouter() {
           <Route path="/hrm" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMProfilesPage /></RoleRoute>} />
           <Route path="/hrm/nhan-su" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMProfilesPage /></RoleRoute>} />
           <Route path="/hrm/cong-viec" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><HRMWorkPage /></RoleRoute>} />
+          <Route path="/hrm/cham-cong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><AttendanceWorkPage /></RoleRoute>} />
+          <Route path="/hrm/cham-cong-nghi-phep" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><AttendanceWorkPage /></RoleRoute>} />
 
           {/* SIS — 6 nhóm chính */}
           <Route path="/sis" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.TRUONG_KHOA, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><SISDashboard /></RoleRoute>} />

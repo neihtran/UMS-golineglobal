@@ -53,10 +53,32 @@ import type {
   ExamMarking,
   ExamMarkingCreatePayload,
   ExamMarkingListParams,
+  // Part 3 — Chấm công & Nghỉ phép
+  WorkSchedule,
+  WorkScheduleCreatePayload,
+  WorkScheduleListParams,
+  EmployeeSchedule,
+  EmployeeScheduleCreatePayload,
+  EmployeeScheduleListParams,
+  Attendance,
+  AttendanceCreatePayload,
+  AttendanceListParams,
+  AttendanceLog,
+  AttendanceLogCreatePayload,
+  AttendanceLogListParams,
+  LeaveType,
+  LeaveTypeCreatePayload,
+  LeaveTypeListParams,
+  LeaveRequest,
+  LeaveRequestCreatePayload,
+  LeaveRequestListParams,
+  OvertimeRequest,
+  OvertimeRequestCreatePayload,
+  OvertimeRequestListParams,
   HrmListResponse,
   HrmDetailResponse,
 } from '@/types/hrm.types';
-import type { ApiResponse, PaginatedResponse, Department, LeaveRequest } from '@/types/api.types';
+import type { ApiResponse, PaginatedResponse, Department, LeaveRequest as LegacyLeaveRequest } from '@/types/api.types';
 
 // ─── Legacy Types ──────────────────────────────────────────────────────────────
 interface VienChucFilters {
@@ -160,6 +182,56 @@ export const HRM_QUERY_KEYS = {
       ['hrm', 'exam-markings', 'list', params ?? {}] as const,
     detail: (id: number) =>
       ['hrm', 'exam-markings', 'detail', id] as const,
+  },
+  // ─── Part 3: Chấm công & Nghỉ phép ──────────────────────────────────────
+  workSchedules: {
+    all: ['hrm', 'work-schedules'] as const,
+    list: (params?: WorkScheduleListParams) =>
+      ['hrm', 'work-schedules', 'list', params ?? {}] as const,
+    detail: (id: number) =>
+      ['hrm', 'work-schedules', 'detail', id] as const,
+  },
+  employeeSchedules: {
+    all: ['hrm', 'employee-schedules'] as const,
+    list: (params?: EmployeeScheduleListParams) =>
+      ['hrm', 'employee-schedules', 'list', params ?? {}] as const,
+    detail: (id: number) =>
+      ['hrm', 'employee-schedules', 'detail', id] as const,
+  },
+  attendances: {
+    all: ['hrm', 'attendances'] as const,
+    list: (params?: AttendanceListParams) =>
+      ['hrm', 'attendances', 'list', params ?? {}] as const,
+    detail: (id: number) =>
+      ['hrm', 'attendances', 'detail', id] as const,
+  },
+  attendanceLogs: {
+    all: ['hrm', 'attendance-logs'] as const,
+    list: (params?: AttendanceLogListParams) =>
+      ['hrm', 'attendance-logs', 'list', params ?? {}] as const,
+    detail: (id: number) =>
+      ['hrm', 'attendance-logs', 'detail', id] as const,
+  },
+  leaveTypes: {
+    all: ['hrm', 'leave-types'] as const,
+    list: (params?: LeaveTypeListParams) =>
+      ['hrm', 'leave-types', 'list', params ?? {}] as const,
+    detail: (id: number) =>
+      ['hrm', 'leave-types', 'detail', id] as const,
+  },
+  leaveRequests: {
+    all: ['hrm', 'leave-requests'] as const,
+    list: (params?: LeaveRequestListParams) =>
+      ['hrm', 'leave-requests', 'list', params ?? {}] as const,
+    detail: (id: number) =>
+      ['hrm', 'leave-requests', 'detail', id] as const,
+  },
+  overtimeRequests: {
+    all: ['hrm', 'overtime-requests'] as const,
+    list: (params?: OvertimeRequestListParams) =>
+      ['hrm', 'overtime-requests', 'list', params ?? {}] as const,
+    detail: (id: number) =>
+      ['hrm', 'overtime-requests', 'detail', id] as const,
   },
 };
 
@@ -1660,6 +1732,700 @@ export const useDeleteExamMarking = () => {
   });
 };
 
+// ─── Part 3: Chấm công & Nghỉ phép ────────────────────────────────────────────
+
+// ─── Work Schedules (Ca làm việc) ────────────────────────────────────────────
+
+export const useWorkSchedules = (params?: WorkScheduleListParams) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.workSchedules.list(params),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmListResponse<WorkSchedule>>('/hrm/work-schedules', {
+        params,
+      } as any);
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 30,
+  });
+};
+
+export const useWorkSchedule = (id?: number) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.workSchedules.detail(id ?? 0),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmDetailResponse<WorkSchedule>>(`/hrm/work-schedules/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 30,
+  });
+};
+
+export const useCreateWorkSchedule = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (payload: WorkScheduleCreatePayload) => {
+      const response = await hrmApi.post<HrmDetailResponse<WorkSchedule>>('/hrm/work-schedules', payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.workSchedules.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã thêm ca làm việc mới' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Tạo thất bại') });
+    },
+  });
+};
+
+export const useUpdateWorkSchedule = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: WorkScheduleCreatePayload }) => {
+      const response = await hrmApi.put<HrmDetailResponse<WorkSchedule>>(`/hrm/work-schedules/${id}`, payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.workSchedules.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã cập nhật ca làm việc' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Cập nhật thất bại') });
+    },
+  });
+};
+
+export const useDeleteWorkSchedule = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await hrmApi.delete(`/hrm/work-schedules/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.workSchedules.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã xóa ca làm việc' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Xóa thất bại') });
+    },
+  });
+};
+
+// ─── Employee Schedules (Lịch làm việc nhân viên) ─────────────────────────────
+
+export const useEmployeeSchedules = (params?: EmployeeScheduleListParams) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.employeeSchedules.list(params),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmListResponse<EmployeeSchedule>>('/hrm/employee-schedules', {
+        params,
+      } as any);
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useEmployeeSchedule = (id?: number) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.employeeSchedules.detail(id ?? 0),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmDetailResponse<EmployeeSchedule>>(`/hrm/employee-schedules/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useCreateEmployeeSchedule = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (payload: EmployeeScheduleCreatePayload) => {
+      const response = await hrmApi.post<HrmDetailResponse<EmployeeSchedule>>('/hrm/employee-schedules', payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.employeeSchedules.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã thêm lịch làm việc' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Tạo thất bại') });
+    },
+  });
+};
+
+export const useUpdateEmployeeSchedule = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: Partial<EmployeeScheduleCreatePayload> }) => {
+      const response = await hrmApi.put<HrmDetailResponse<EmployeeSchedule>>(`/hrm/employee-schedules/${id}`, payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.employeeSchedules.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã cập nhật lịch làm việc' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Cập nhật thất bại') });
+    },
+  });
+};
+
+export const useDeleteEmployeeSchedule = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await hrmApi.delete(`/hrm/employee-schedules/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.employeeSchedules.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã xóa lịch làm việc' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Xóa thất bại') });
+    },
+  });
+};
+
+// ─── Attendances (Chấm công) ─────────────────────────────────────────────────
+
+export const useAttendances = (params?: AttendanceListParams) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.attendances.list(params),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmListResponse<Attendance>>('/hrm/attendances', {
+        params,
+      } as any);
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useAttendance = (id?: number) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.attendances.detail(id ?? 0),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmDetailResponse<Attendance>>(`/hrm/attendances/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useCreateAttendance = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (payload: AttendanceCreatePayload) => {
+      const response = await hrmApi.post<HrmDetailResponse<Attendance>>('/hrm/attendances', payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendances.all });
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendanceLogs.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã thêm bản ghi chấm công' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Tạo thất bại') });
+    },
+  });
+};
+
+export const useUpdateAttendance = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: Partial<AttendanceCreatePayload> }) => {
+      const response = await hrmApi.put<HrmDetailResponse<Attendance>>(`/hrm/attendances/${id}`, payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendances.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã cập nhật chấm công' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Cập nhật thất bại') });
+    },
+  });
+};
+
+export const useDeleteAttendance = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await hrmApi.delete(`/hrm/attendances/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendances.all });
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendanceLogs.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã xóa bản ghi chấm công' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Xóa thất bại') });
+    },
+  });
+};
+
+// ─── Attendance Logs (Lịch sử check-in/out) ──────────────────────────────────
+
+export const useAttendanceLogs = (params?: AttendanceLogListParams) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.attendanceLogs.list(params),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmListResponse<AttendanceLog>>('/hrm/attendance-logs', {
+        params,
+      } as any);
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useAttendanceLog = (id?: number) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.attendanceLogs.detail(id ?? 0),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmDetailResponse<AttendanceLog>>(`/hrm/attendance-logs/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useCreateAttendanceLog = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (payload: AttendanceLogCreatePayload) => {
+      const response = await hrmApi.post<HrmDetailResponse<AttendanceLog>>('/hrm/attendance-logs', payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.attendanceLogs.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã ghi nhận check-in/out' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Ghi nhận thất bại') });
+    },
+  });
+};
+
+// ─── Leave Types (Danh mục loại nghỉ) ────────────────────────────────────────
+
+export const useLeaveTypes = (params?: LeaveTypeListParams) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.leaveTypes.list(params),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmListResponse<LeaveType>>('/hrm/leave-types', {
+        params,
+      } as any);
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 30,
+  });
+};
+
+export const useLeaveType = (id?: number) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.leaveTypes.detail(id ?? 0),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmDetailResponse<LeaveType>>(`/hrm/leave-types/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 30,
+  });
+};
+
+export const useCreateLeaveType = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (payload: LeaveTypeCreatePayload) => {
+      const response = await hrmApi.post<HrmDetailResponse<LeaveType>>('/hrm/leave-types', payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveTypes.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã thêm loại nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Tạo thất bại') });
+    },
+  });
+};
+
+export const useUpdateLeaveType = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: LeaveTypeCreatePayload }) => {
+      const response = await hrmApi.put<HrmDetailResponse<LeaveType>>(`/hrm/leave-types/${id}`, payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveTypes.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã cập nhật loại nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Cập nhật thất bại') });
+    },
+  });
+};
+
+export const useDeleteLeaveType = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await hrmApi.delete(`/hrm/leave-types/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveTypes.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã xóa loại nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Xóa thất bại') });
+    },
+  });
+};
+
+// ─── Leave Requests (Đơn nghỉ phép + workflow) ───────────────────────────────
+
+export const useLeaveRequests = (params?: LeaveRequestListParams) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.leaveRequests.list(params),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmListResponse<LeaveRequest>>('/hrm/leave-requests', {
+        params,
+      } as any);
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+export const useLeaveRequest = (id?: number) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.leaveRequests.detail(id ?? 0),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmDetailResponse<LeaveRequest>>(`/hrm/leave-requests/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+/**
+ * Create leave request. Hỗ trợ multipart upload nếu truyền `file: File`
+ * (theo API spec, backend nhận multipart/form-data với field `file` PDF).
+ */
+export const useCreateLeaveRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (payload: LeaveRequestCreatePayload & { file?: File }) => {
+      const { file, ...rest } = payload;
+      if (file) {
+        const fd = new FormData();
+        Object.entries(rest).forEach(([k, v]) => {
+          if (v !== undefined && v !== null) fd.append(k, String(v));
+        });
+        fd.append('file', file);
+        const response = await hrmApi.post<HrmDetailResponse<LeaveRequest>>(
+          '/hrm/leave-requests',
+          fd,
+          { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+        return response.data;
+      }
+      const response = await hrmApi.post<HrmDetailResponse<LeaveRequest>>('/hrm/leave-requests', rest);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã tạo đơn nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Tạo đơn thất bại') });
+    },
+  });
+};
+
+export const useUpdateLeaveRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: Partial<LeaveRequestCreatePayload> }) => {
+      const response = await hrmApi.put<HrmDetailResponse<LeaveRequest>>(`/hrm/leave-requests/${id}`, payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã cập nhật đơn nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Cập nhật thất bại') });
+    },
+  });
+};
+
+export const useDeleteLeaveRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await hrmApi.delete(`/hrm/leave-requests/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã xóa đơn nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Xóa thất bại') });
+    },
+  });
+};
+
+// Workflow actions — POST /{id}/{action}, no body
+export const useApproveLeaveRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await hrmApi.post<HrmDetailResponse<LeaveRequest>>(`/hrm/leave-requests/${id}/approve`);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã duyệt đơn nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Duyệt thất bại') });
+    },
+  });
+};
+
+export const useRejectLeaveRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await hrmApi.post<HrmDetailResponse<LeaveRequest>>(`/hrm/leave-requests/${id}/reject`);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã từ chối đơn nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Từ chối thất bại') });
+    },
+  });
+};
+
+export const useCancelLeaveRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await hrmApi.post<HrmDetailResponse<LeaveRequest>>(`/hrm/leave-requests/${id}/cancel`);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã hủy đơn nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Hủy thất bại') });
+    },
+  });
+};
+
+export const useSubmitLeaveRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await hrmApi.post<HrmDetailResponse<LeaveRequest>>(`/hrm/leave-requests/${id}/submit`);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.leaveRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã gửi đơn nghỉ phép' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Gửi thất bại') });
+    },
+  });
+};
+
+// ─── Overtime Requests (Đăng ký OT + workflow) ────────────────────────────────
+// NOTE: path uses {overtime_request} not {id}
+
+export const useOvertimeRequests = (params?: OvertimeRequestListParams) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.overtimeRequests.list(params),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmListResponse<OvertimeRequest>>('/hrm/overtime-requests', {
+        params,
+      } as any);
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+export const useOvertimeRequest = (id?: number) => {
+  return useQuery({
+    queryKey: HRM_QUERY_KEYS.overtimeRequests.detail(id ?? 0),
+    queryFn: async () => {
+      const response = await hrmApi.get<HrmDetailResponse<OvertimeRequest>>(`/hrm/overtime-requests/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+export const useCreateOvertimeRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (payload: OvertimeRequestCreatePayload) => {
+      const response = await hrmApi.post<HrmDetailResponse<OvertimeRequest>>('/hrm/overtime-requests', payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.overtimeRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã tạo đơn đăng ký OT' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Tạo đơn thất bại') });
+    },
+  });
+};
+
+export const useUpdateOvertimeRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: Partial<OvertimeRequestCreatePayload> }) => {
+      const response = await hrmApi.put<HrmDetailResponse<OvertimeRequest>>(`/hrm/overtime-requests/${id}`, payload);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.overtimeRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã cập nhật đơn đăng ký OT' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Cập nhật thất bại') });
+    },
+  });
+};
+
+export const useDeleteOvertimeRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      await hrmApi.delete(`/hrm/overtime-requests/${id}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.overtimeRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã xóa đơn đăng ký OT' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Xóa thất bại') });
+    },
+  });
+};
+
+// Workflow — same path segment name as detail: {overtime_request}
+export const useApproveOvertimeRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await hrmApi.post<HrmDetailResponse<OvertimeRequest>>(`/hrm/overtime-requests/${id}/approve`);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.overtimeRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã duyệt đơn OT' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Duyệt thất bại') });
+    },
+  });
+};
+
+export const useRejectOvertimeRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await hrmApi.post<HrmDetailResponse<OvertimeRequest>>(`/hrm/overtime-requests/${id}/reject`);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.overtimeRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã từ chối đơn OT' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Từ chối thất bại') });
+    },
+  });
+};
+
+export const useCancelOvertimeRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await hrmApi.post<HrmDetailResponse<OvertimeRequest>>(`/hrm/overtime-requests/${id}/cancel`);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.overtimeRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã hủy đơn OT' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Hủy thất bại') });
+    },
+  });
+};
+
+export const useSubmitOvertimeRequest = () => {
+  const qc = useQueryClient();
+  const { addNotification } = useNotificationStore();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await hrmApi.post<HrmDetailResponse<OvertimeRequest>>(`/hrm/overtime-requests/${id}/submit`);
+      return response.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: HRM_QUERY_KEYS.overtimeRequests.all });
+      addNotification({ type: 'success', title: 'Thành công', message: 'Đã gửi đơn OT' });
+    },
+    onError: (error: any) => {
+      addNotification({ type: 'error', title: 'Lỗi', message: handleApiError(error, 'Gửi thất bại') });
+    },
+  });
+};
+
 // ─── Legacy Hooks (Backward Compatibility) ────────────────────────────────────
 
 export const useVienChucList = (filters: VienChucFilters = {}) => {
@@ -1823,7 +2589,7 @@ export const useLeaveRequestList = (filters?: { page?: number; pageSize?: number
   return useQuery({
     queryKey: ['leaveRequests', filters],
     queryFn: async () => {
-      const response = await hrmApi.get<PaginatedResponse<LeaveRequest>>('/hrm/leave-requests', {
+      const response = await hrmApi.get<PaginatedResponse<LegacyLeaveRequest>>('/hrm/leave-requests', {
         params: filters,
       } as any);
       return response.data;
@@ -1832,13 +2598,13 @@ export const useLeaveRequestList = (filters?: { page?: number; pageSize?: number
   });
 };
 
-export const useCreateLeaveRequest = () => {
+export const useCreateLegacyLeaveRequest = () => {
   const qc = useQueryClient();
   const { addNotification } = useNotificationStore();
 
   return useMutation({
-    mutationFn: async (data: Partial<LeaveRequest>) => {
-      const response = await hrmApi.post<ApiResponse<LeaveRequest>>('/hrm/leave-requests', data);
+    mutationFn: async (data: Partial<LegacyLeaveRequest>) => {
+      const response = await hrmApi.post<ApiResponse<LegacyLeaveRequest>>('/hrm/leave-requests', data);
       return response.data;
     },
     onSuccess: () => {
