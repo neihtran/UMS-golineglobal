@@ -820,7 +820,7 @@ export interface LeaveType {
   id: number;
   code: string;
   name: string;
-  is_paid: number; // 0: unpaid, 1: paid
+  is_paid: boolean; // true: paid, false: unpaid
   max_days: number | null;
   description: string | null;
   status: number; // 0: INACTIVE, 1: ACTIVE
@@ -831,7 +831,7 @@ export interface LeaveType {
 export interface LeaveTypeCreatePayload {
   code: string;
   name: string;
-  is_paid?: number;
+  is_paid?: boolean;
   max_days?: number | null;
   description?: string | null;
   status?: number;
@@ -840,7 +840,7 @@ export interface LeaveTypeCreatePayload {
 export interface LeaveTypeListParams {
   code?: string;
   name?: string;
-  is_paid?: number;
+  is_paid?: boolean;
   status?: number;
   per_page?: number;
   page?: number;
@@ -856,8 +856,8 @@ export interface LeaveRequest {
   id: number;
   employee_id: number;
   leave_type_id: number;
-  from_date: string; // YYYY-MM-DD
-  to_date: string;
+  from_date: string | null; // YYYY-MM-DD
+  to_date: string | null;
   total_days: number | null;
   reason: string | null;
   status: LeaveRequestStatus;

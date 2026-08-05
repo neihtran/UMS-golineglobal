@@ -21,9 +21,9 @@ import {
   useRejectLeaveRequest,
   useCancelLeaveRequest,
   useSubmitLeaveRequest,
-  useEmployeeProfiles,
-  useLeaveTypes,
 } from '@/hooks/useHrm';
+import { useEmployeeProfiles, useLeaveTypes } from '@/hooks/useHrm';
+import { formatDateVietnam, formatDateTimeVietnam, toDateInputValue } from '@/utils/formatters';
 import type { LeaveRequest, LeaveRequestCreatePayload, LeaveRequestStatus } from '@/types/hrm.types';
 
 const STATUS_OPTS: { value: LeaveRequestStatus; label: string; variant: 'success' | 'warning' | 'error' | 'neutral' | 'info' }[] = [
@@ -68,8 +68,26 @@ export function LeaveRequestSheet() {
 
   const { data: empData } = useEmployeeProfiles({ per_page: 100 });
   const employees = Array.isArray(empData?.data) ? empData.data : [];
+  const employeeMap = new Map(employees.map((e) => [e.id, e]));
   const { data: ltData } = useLeaveTypes({ per_page: 100, status: 1 });
   const leaveTypes = Array.isArray(ltData?.data) ? ltData.data : [];
+  const leaveTypeMap = new Map(leaveTypes.map((lt) => [lt.id, lt]));
+
+  const getEmployeeLabel = (id: number | null | undefined) => {
+    if (!id) return '—';
+    const e = employeeMap.get(id);
+    return e ? `${e.full_name} (${e.employee_code})` : `#${id}`;
+  };
+  const getLeaveTypeLabel = (id: number | null | undefined) => {
+    if (!id) return '—';
+    const lt = leaveTypeMap.get(id);
+    return lt ? `${lt.name} (${lt.code})` : `#${id}`;
+  };
+  const getApproverLabel = (id: number | null | undefined) => {
+    if (!id) return '—';
+    const e = employeeMap.get(id);
+    return e ? e.full_name : `#${id}`;
+  };
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<LeaveRequest | null>(null);
@@ -120,7 +138,10 @@ export function LeaveRequestSheet() {
   };
 
   const filtered = search
-    ? items.filter(it => (it.employee?.full_name || '').toLowerCase().includes(search.toLowerCase()))
+    ? items.filter(it => {
+        const name = it.employee?.full_name ?? employeeMap.get(it.employee_id)?.full_name ?? '';
+        return name.toLowerCase().includes(search.toLowerCase());
+      })
     : items;
 
   const resetFilters = () => { setSearch(''); setStatusFilter(''); setPage(1); };
@@ -129,9 +150,11 @@ export function LeaveRequestSheet() {
     const e: Record<string, string> = {};
     if (!form.employee_id) e.employee_id = 'Vui lòng chọn nhân viên';
     if (!form.leave_type_id) e.leave_type_id = 'Vui lòng chọn loại nghỉ';
-    if (!form.from_date) e.from_date = 'Vui lòng chọn từ ngày';
-    if (!form.to_date) e.to_date = 'Vui lòng chọn đến ngày';
-    if (form.from_date && form.to_date && form.from_date > form.to_date) e.to_date = 'Đến ngày phải sau từ ngày';
+    const from = toDateInputValue(form.from_date);
+    const to = toDateInputValue(form.to_date);
+    if (!from) e.from_date = 'Vui lòng chọn từ ngày';
+    if (!to) e.to_date = 'Vui lòng chọn đến ngày';
+    if (from && to && from > to) e.to_date = 'Đến ngày phải sau từ ngày';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -215,10 +238,10 @@ export function LeaveRequestSheet() {
               return (
                 <TableRow key={item.id} className={isFetching && !isLoading ? 'opacity-50' : ''}>
                   <TableCell className="text-[rgb(var(--text-muted))] tabular-nums">{(page - 1) * pageSize + i + 1}</TableCell>
-                  <TableCell className="font-medium">{item.employee?.full_name ?? `#${item.employee_id}`}</TableCell>
-                  <TableCell>{item.leave_type?.name ?? `#${item.leave_type_id}`}</TableCell>
-                  <TableCell>{item.from_date}</TableCell>
-                  <TableCell>{item.to_date}</TableCell>
+                  <TableCell className="font-medium">{item.employee?.full_name ? `${item.employee.full_name} (${item.employee.employee_code})` : getEmployeeLabel(item.employee_id)}</TableCell>
+                  <TableCell>{item.leave_type?.name ? `${item.leave_type.name} (${item.leave_type.code})` : getLeaveTypeLabel(item.leave_type_id)}</TableCell>
+                  <TableCell className="text-sm">{formatDateVietnam(item.from_date)}</TableCell>
+                  <TableCell className="text-sm">{formatDateVietnam(item.to_date)}</TableCell>
                   <TableCell>{item.total_days ?? '—'}</TableCell>
                   <TableCell>{sb && <Badge variant={sb.variant} size="sm">{sb.label}</Badge>}</TableCell>
                   <TableCell className="text-right">
@@ -270,10 +293,10 @@ export function LeaveRequestSheet() {
           </div>
           <div className="grid grid-cols-3 gap-4">
             <FormField label="Từ ngày" error={errors.from_date} required>
-              <Input type="date" value={form.from_date} onChange={(e) => setForm({ ...form, from_date: e.target.value })} />
+              <Input type="date" value={toDateInputValue(form.from_date)} onChange={(e) => setForm({ ...form, from_date: e.target.value })} />
             </FormField>
             <FormField label="Đến ngày" error={errors.to_date} required>
-              <Input type="date" value={form.to_date} onChange={(e) => setForm({ ...form, to_date: e.target.value })} />
+              <Input type="date" value={toDateInputValue(form.to_date)} onChange={(e) => setForm({ ...form, to_date: e.target.value })} />
             </FormField>
             <FormField label="Số ngày">
               <Input type="number" step="0.5" value={form.total_days ?? ''} onChange={(e) => setForm({ ...form, total_days: e.target.value ? Number(e.target.value) : null })} />
@@ -308,14 +331,14 @@ export function LeaveRequestSheet() {
           <div className="flex items-center justify-center py-8"><div className="animate-spin h-8 w-8 border-4 border-[rgb(var(--primary))] border-t-transparent rounded-full" /></div>
         ) : detailData?.data ? (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 pb-2 border-b"><CalendarOff className="h-5 w-5 text-[rgb(var(--primary))]" /><h3 className="text-lg font-bold">{detailData.data.employee?.full_name ?? `NV #${detailData.data.employee_id}`}</h3>{(() => { const sb = statusBadge(detailData.data.status); return sb ? <Badge variant={sb.variant} size="sm">{sb.label}</Badge> : null; })()}</div>
+            <div className="flex items-center gap-2 pb-2 border-b"><CalendarOff className="h-5 w-5 text-[rgb(var(--primary))]" /><h3 className="text-lg font-bold">{detailData.data.employee?.full_name ?? getEmployeeLabel(detailData.data.employee_id)}</h3>{(() => { const sb = statusBadge(detailData.data.status); return sb ? <Badge variant={sb.variant} size="sm">{sb.label}</Badge> : null; })()}</div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Loại nghỉ</p><p className="font-medium">{detailData.data.leave_type?.name ?? '—'}</p></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Loại nghỉ</p><p className="font-medium">{detailData.data.leave_type?.name ?? getLeaveTypeLabel(detailData.data.leave_type_id)}</p></div>
               <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Số ngày</p><p className="font-medium">{detailData.data.total_days ?? '—'}</p></div>
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Từ ngày</p><p className="font-medium">{detailData.data.from_date}</p></div>
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Đến ngày</p><p className="font-medium">{detailData.data.to_date}</p></div>
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Người duyệt</p><p className="font-medium">{detailData.data.approver?.full_name ?? '—'}</p></div>
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Ngày duyệt</p><p className="font-medium">{detailData.data.approved_at ?? '—'}</p></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Từ ngày</p><p className="font-medium">{formatDateVietnam(detailData.data.from_date)}</p></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Đến ngày</p><p className="font-medium">{formatDateVietnam(detailData.data.to_date)}</p></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Người duyệt</p><p className="font-medium">{detailData.data.approver?.full_name ?? getApproverLabel(detailData.data.approved_by)}</p></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Ngày duyệt</p><p className="font-medium">{detailData.data.approved_at ? formatDateTimeVietnam(detailData.data.approved_at) : '—'}</p></div>
             </div>
             {detailData.data.reason && <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Lý do</p><p className="font-medium">{detailData.data.reason}</p></div>}
             {detailData.data.note && <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Ghi chú</p><p className="font-medium">{detailData.data.note}</p></div>}

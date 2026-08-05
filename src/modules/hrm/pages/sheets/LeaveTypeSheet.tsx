@@ -23,7 +23,7 @@ import type { LeaveType, LeaveTypeCreatePayload } from '@/types/hrm.types';
 const emptyForm = (): LeaveTypeCreatePayload => ({
   code: '',
   name: '',
-  is_paid: 1,
+  is_paid: true,
   max_days: null,
   description: null,
   status: 1,
@@ -92,7 +92,7 @@ export function LeaveTypeSheet() {
       const payload: LeaveTypeCreatePayload = {
         code: form.code.trim(),
         name: form.name.trim(),
-        is_paid: form.is_paid ?? 1,
+        is_paid: form.is_paid ?? true,
         max_days: form.max_days ?? null,
         status: form.status ?? 1,
         description: form.description?.trim() || null,
@@ -156,7 +156,7 @@ export function LeaveTypeSheet() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={item.is_paid === 1 ? 'success' : 'neutral'} size="sm">{item.is_paid === 1 ? 'Có lương' : 'Không lương'}</Badge>
+                  <Badge variant={item.is_paid ? 'success' : 'neutral'} size="sm">{item.is_paid ? 'Có lương' : 'Không lương'}</Badge>
                 </TableCell>
                 <TableCell>{item.max_days ?? '—'}</TableCell>
                 <TableCell><Badge variant={item.status === 1 ? 'success' : 'error'} size="sm">{item.status === 1 ? 'Hoạt động' : 'Ngừng'}</Badge></TableCell>
@@ -190,9 +190,9 @@ export function LeaveTypeSheet() {
           </div>
           <div className="grid grid-cols-3 gap-4">
             <FormField label="Hưởng lương">
-              <select value={form.is_paid} onChange={(e) => setForm({ ...form, is_paid: Number(e.target.value) })} className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm">
-                <option value={1}>Có lương</option>
-                <option value={0}>Không lương</option>
+              <select value={form.is_paid ? 'true' : 'false'} onChange={(e) => setForm({ ...form, is_paid: e.target.value === 'true' })} className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm">
+                <option value="true">Có lương</option>
+                <option value="false">Không lương</option>
               </select>
             </FormField>
             <FormField label="Số ngày tối đa">
@@ -220,7 +220,7 @@ export function LeaveTypeSheet() {
           <div className="space-y-3">
             <div className="flex items-center gap-2 pb-2 border-b"><CalendarOff className="h-5 w-5 text-[rgb(var(--primary))]" /><h3 className="text-lg font-bold">{detailData.data.name}</h3><Badge variant="neutral" size="sm">{detailData.data.code}</Badge></div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Hưởng lương</p><Badge variant={detailData.data.is_paid === 1 ? 'success' : 'neutral'} size="sm">{detailData.data.is_paid === 1 ? 'Có lương' : 'Không lương'}</Badge></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Hưởng lương</p><Badge variant={detailData.data.is_paid ? 'success' : 'neutral'} size="sm">{detailData.data.is_paid ? 'Có lương' : 'Không lương'}</Badge></div>
               <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Số ngày tối đa</p><p className="font-medium">{detailData.data.max_days ?? '—'}</p></div>
               <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Trạng thái</p><Badge variant={detailData.data.status === 1 ? 'success' : 'error'} size="sm">{detailData.data.status === 1 ? 'Hoạt động' : 'Ngừng'}</Badge></div>
             </div>

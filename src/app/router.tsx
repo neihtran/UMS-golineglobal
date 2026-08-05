@@ -133,48 +133,8 @@ function ChiTieuDetailPageRouted() {
 }
 const CreateTuitionPage = lazy(() => import('@/modules/fin/pages/CreateTuitionPage'));
 
-// LMS
-const LMSDashboard = lazy(() => import('@/modules/lms/pages/LMSDashboard'));
-const LMSLanding = lazy(() => import('@/modules/lms/pages/LMSLanding'));
-const CourseList = lazy(() => import('@/modules/lms/pages/CourseList'));
-const CourseDetail = lazy(() => import('@/modules/lms/pages/CourseDetail'));
-function CourseDetailRouted() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <CourseDetail id={id} />;
-}
-const CourseCreate = lazy(() => import('@/modules/lms/pages/CourseCreate'));
-const CourseEdit = lazy(() => import('@/modules/lms/pages/CourseEdit'));
-function CourseEditRouted() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <CourseEdit id={id} />;
-}
-const AssignmentCreate = lazy(() => import('@/modules/lms/pages/AssignmentCreate'));
-const AssignmentView = lazy(() => import('@/modules/lms/pages/AssignmentView'));
-function AssignmentViewRouted() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <AssignmentView id={id} />;
-}
-const AssignmentGrade = lazy(() => import('@/modules/lms/pages/AssignmentGrade'));
-const AssignmentGradingOverview = lazy(() => import('@/modules/lms/pages/AssignmentGradingOverview'));
-const AssignmentSubmissionDetail = lazy(() => import('@/modules/lms/pages/AssignmentSubmissionDetail'));
-const MaterialUploadPage = lazy(() => import('@/modules/lms/pages/MaterialUploadPage'));
-const MaterialDetailPage = lazy(() => import('@/modules/lms/pages/MaterialDetailPage'));
-function MaterialDetailPageRouted() {
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
-  return <MaterialDetailPage id={id} />;
-}
-const LMSLibrary = lazy(() => import('@/modules/lms/pages/LMSLibrary'));
-const StudentDoAssignment = lazy(() => import('@/modules/lms/pages/StudentDoAssignment'));
-const StudentSubmissionDetail = lazy(() => import('@/modules/lms/pages/StudentSubmissionDetail'));
-const LMSAssignmentList = lazy(() => import('@/modules/lms/pages/LMSAssignmentList'));
-const LMSGradeBook = lazy(() => import('@/modules/lms/pages/GradeBook'));
-const CourseContent = lazy(() => import('@/modules/lms/pages/CourseContent'));
-const CreateAssignment = lazy(() => import('@/modules/lms/pages/CreateAssignment'));
-const StudentAssignments = lazy(() => import('@/modules/lms/pages/StudentAssignments'));
+// LMS — moved to modules/quan-ly-hoc-tap (Quản lý Học tập)
+const QuanLyHocTapPage = lazy(() => import('@/modules/quan-ly-hoc-tap/pages/QuanLyHocTapPage'));
 
 // EXAM
 const EXAMDashboard = lazy(() => import('@/modules/exam/pages/EXAMDashboard'));
@@ -594,29 +554,10 @@ export default function AppRouter() {
           <Route path="/fin/chi-tieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ExpensesPage /></RoleRoute>} />
           <Route path="/fin/chi-tieu/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ChiTieuDetailPageRouted /></RoleRoute>} />
 
-          {/* LMS — admin + giang-vien + sinh-vien */}
-          <Route path="/lms" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><LMSDashboard /></RoleRoute>} />
-          <Route path="/lms/gioi-thieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><LMSLanding /></RoleRoute>} />
-          <Route path="/lms/khoa-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><CourseList /></RoleRoute>} />
-          <Route path="/lms/khoa-hoc/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><CourseCreate /></RoleRoute>} />
-          <Route path="/lms/khoa-hoc/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><CourseDetailRouted /></RoleRoute>} />
-          <Route path="/lms/khoa-hoc/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><CourseEditRouted /></RoleRoute>} />
-          <Route path="/lms/khoa-hoc/:id/bai-tap/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><CreateAssignment /></RoleRoute>} />
-          <Route path="/lms/bai-tap-sinh-vien" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><LMSAssignmentList /></RoleRoute>} />
-          <Route path="/lms/bai-tap-cua-toi" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><StudentAssignments /></RoleRoute>} />
-          <Route path="/lms/bai-tap/:id/lam-bai" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><StudentDoAssignment /></RoleRoute>} />
-          <Route path="/lms/bai-tap/:id/xem-bai-nop/:submissionId" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><StudentSubmissionDetail /></RoleRoute>} />
-          <Route path="/lms/bai-tap/tao" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><AssignmentCreate /></RoleRoute>} />
-          <Route path="/lms/bai-tap/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><AssignmentViewRouted /></RoleRoute>} />
-          <Route path="/lms/bai-tap/:id/cham" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><AssignmentGradingOverview /></RoleRoute>} />
-          <Route path="/lms/bai-tap/:id/cham/:submissionId" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><AssignmentGrade /></RoleRoute>} />
-          <Route path="/lms/bai-tap/:id/xem/:submissionId" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><AssignmentSubmissionDetail /></RoleRoute>} />
-          <Route path="/lms/thu-vien-hoc-lieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><LMSLibrary /></RoleRoute>} />
-          <Route path="/lms/thu-vien-hoc-lieu/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><MaterialDetailPageRouted /></RoleRoute>} />
-          <Route path="/lms/thu-vien-hoc-lieu/them" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><MaterialUploadPage /></RoleRoute>} />
-          <Route path="/lms/thu-vien-hoc-lieu/:id/sua" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><MaterialUploadPage /></RoleRoute>} />
-          <Route path="/lms/bang-diem" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><LMSGradeBook /></RoleRoute>} />
-          <Route path="/lms/noi-dung-khoa-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN]}><CourseContent /></RoleRoute>} />
+          {/* LMS — Quản lý Học tập (Part 1) */}
+          <Route path="/quan-ly-hoc-tap" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><Navigate to="/quan-ly-hoc-tap/khoa-hoc" replace /></RoleRoute>} />
+          <Route path="/quan-ly-hoc-tap/khoa-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QuanLyHocTapPage /></RoleRoute>} />
+          <Route path="/quan-ly-hoc-tap/hoc-lieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QuanLyHocTapPage /></RoleRoute>} />
 
           {/* EXAM — admin + giang-vien + sinh-vien */}
           <Route path="/exam" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><EXAMDashboard /></RoleRoute>} />

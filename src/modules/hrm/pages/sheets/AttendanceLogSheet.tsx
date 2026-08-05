@@ -67,8 +67,15 @@ export function AttendanceLogSheet() {
 
   const { data: empData } = useEmployeeProfiles({ per_page: 100 });
   const employees = Array.isArray(empData?.data) ? empData.data : [];
+  const employeeMap = new Map(employees.map((e) => [e.id, e]));
   const { data: attData } = useAttendances({ per_page: 100 });
   const attendances = Array.isArray(attData?.data) ? attData.data : [];
+
+  const getEmployeeLabel = (id: number | null | undefined) => {
+    if (!id) return '—';
+    const e = employeeMap.get(id);
+    return e ? `${e.full_name} (${e.employee_code})` : `#${id}`;
+  };
 
   const [modalOpen, setModalOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -85,7 +92,10 @@ export function AttendanceLogSheet() {
   const openDetail = (item: AttendanceLog) => { setDetailId(item.id); setDetailOpen(true); };
 
   const filtered = search
-    ? items.filter(it => (it.employee?.full_name || '').toLowerCase().includes(search.toLowerCase()) || (it.device_id || '').toLowerCase().includes(search.toLowerCase()))
+    ? items.filter(it => {
+        const name = it.employee?.full_name ?? employeeMap.get(it.employee_id)?.full_name ?? '';
+        return name.toLowerCase().includes(search.toLowerCase()) || (it.device_id || '').toLowerCase().includes(search.toLowerCase());
+      })
     : items;
 
   const resetFilters = () => { setSearch(''); setActionFilter(''); setPage(1); };
@@ -148,7 +158,7 @@ export function AttendanceLogSheet() {
               return (
                 <TableRow key={item.id} className={isFetching && !isLoading ? 'opacity-50' : ''}>
                   <TableCell className="text-[rgb(var(--text-muted))] tabular-nums">{(page - 1) * pageSize + i + 1}</TableCell>
-                  <TableCell className="font-medium">{item.employee?.full_name ?? `#${item.employee_id}`}</TableCell>
+                  <TableCell className="font-medium">{item.employee?.full_name ? `${item.employee.full_name} (${item.employee.employee_code})` : getEmployeeLabel(item.employee_id)}</TableCell>
                   <TableCell>{ao && <Badge variant={ao.variant} size="sm" dot>{ao.label}</Badge>}</TableCell>
                   <TableCell>{dev?.label ?? item.device_type}</TableCell>
                   <TableCell className="font-mono text-sm">{item.device_id}</TableCell>
@@ -173,7 +183,10 @@ export function AttendanceLogSheet() {
             <FormField label="Bản ghi chấm công" error={errors.attendance_id} required>
               <select value={form.attendance_id} onChange={(e) => setForm({ ...form, attendance_id: Number(e.target.value) })} className="h-10 w-full rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm">
                 <option value="0">-- Chọn --</option>
-                {attendances.map(a => <option key={a.id} value={a.id}>{formatDateTimeVietnam(a.attendance_date)} – {a.employee?.full_name ?? `#${a.employee_id}`}</option>)}
+                {attendances.map(a => {
+                  const empLabel = a.employee?.full_name ? `${a.employee.full_name} (${a.employee.employee_code})` : getEmployeeLabel(a.employee_id);
+                  return <option key={a.id} value={a.id}>{formatDateTimeVietnam(a.attendance_date)} – {empLabel}</option>;
+                })}
               </select>
             </FormField>
             <FormField label="Nhân viên" error={errors.employee_id} required>
@@ -225,7 +238,7 @@ export function AttendanceLogSheet() {
           <div className="flex items-center justify-center py-8"><div className="animate-spin h-8 w-8 border-4 border-[rgb(var(--primary))] border-t-transparent rounded-full" /></div>
         ) : detailData?.data ? (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 pb-2 border-b"><History className="h-5 w-5 text-[rgb(var(--primary))]" /><h3 className="text-lg font-bold">{detailData.data.employee?.full_name ?? `NV #${detailData.data.employee_id}`}</h3>{(() => { const ao = ACTION_OPTS.find(o => o.value === detailData.data.action); return ao ? <Badge variant={ao.variant} size="sm">{ao.label}</Badge> : null; })()}</div>
+            <div className="flex items-center gap-2 pb-2 border-b"><History className="h-5 w-5 text-[rgb(var(--primary))]" /><h3 className="text-lg font-bold">{detailData.data.employee?.full_name ? `${detailData.data.employee.full_name} (${detailData.data.employee.employee_code})` : getEmployeeLabel(detailData.data.employee_id)}</h3>{(() => { const ao = ACTION_OPTS.find(o => o.value === detailData.data.action); return ao ? <Badge variant={ao.variant} size="sm">{ao.label}</Badge> : null; })()}</div>
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Thiết bị</p><p className="font-medium">{DEVICE_OPTS.find(d => d.value === detailData.data.device_type)?.label}</p></div>
               <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Mã thiết bị</p><p className="font-mono font-medium">{detailData.data.device_id}</p></div>

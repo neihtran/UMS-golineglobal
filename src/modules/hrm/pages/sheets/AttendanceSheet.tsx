@@ -20,6 +20,7 @@ import {
   useEmployeeProfiles,
   useWorkSchedules,
 } from '@/hooks/useHrm';
+import { formatDateVietnam, formatDateTimeVietnam, toDateInputValue } from '@/utils/formatters';
 import type { Attendance, AttendanceCreatePayload, AttendanceStatus } from '@/types/hrm.types';
 
 const STATUS_OPTIONS: { value: AttendanceStatus; label: string; variant: 'success' | 'warning' | 'error' | 'neutral' | 'info' }[] = [
@@ -37,12 +38,6 @@ const fmtTime = (t?: string | null) => {
     return hh || '—';
   }
   return t.slice(0, 5);
-};
-
-/** "YYYY-MM-DDTHH:mm:ss.000000Z" → "YYYY-MM-DD" */
-const fmtDate = (d?: string | null) => {
-  if (!d) return '—';
-  return d.slice(0, 10);
 };
 
 // Helpers: ghép date + time thành "YYYY-MM-DD HH:mm:ss" cho backend
@@ -92,12 +87,20 @@ export function AttendanceSheet() {
 
   const { data: empData } = useEmployeeProfiles({ per_page: 100 });
   const employees = Array.isArray(empData?.data) ? empData.data : [];
+  const employeeMap = new Map(employees.map((e) => [e.id, e]));
   const { data: wsData } = useWorkSchedules({ per_page: 100, status: 1 });
   const workSchedules = Array.isArray(wsData?.data) ? wsData.data : [];
-  const getScheduleName = (id: number | null) => {
+  const scheduleMap = new Map(workSchedules.map((s) => [s.id, s]));
+
+  const getEmployeeLabel = (id: number | null | undefined) => {
     if (!id) return '—';
-    const found = workSchedules.find(s => s.id === id);
-    return found ? found.name : `#${id}`;
+    const e = employeeMap.get(id);
+    return e ? `${e.full_name} (${e.employee_code})` : `#${id}`;
+  };
+  const getScheduleLabel = (id: number | null | undefined) => {
+    if (!id) return '—';
+    const s = scheduleMap.get(id);
+    return s ? `${s.name} (${s.code})` : `#${id}`;
   };
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -138,7 +141,10 @@ export function AttendanceSheet() {
   const openDelete = (item: Attendance) => { setDeleting(item); setDeleteOpen(true); };
 
   const filtered = search
-    ? items.filter(it => (it.employee?.full_name || '').toLowerCase().includes(search.toLowerCase()))
+    ? items.filter(it => {
+        const name = it.employee?.full_name ?? employeeMap.get(it.employee_id)?.full_name ?? '';
+        return name.toLowerCase().includes(search.toLowerCase());
+      })
     : items;
 
   const resetFilters = () => { setSearch(''); setStatusFilter(''); setPage(1); };
@@ -209,9 +215,9 @@ export function AttendanceSheet() {
               return (
                 <TableRow key={item.id} className={isFetching && !isLoading ? 'opacity-50' : ''}>
                   <TableCell className="text-[rgb(var(--text-muted))] tabular-nums">{(page - 1) * pageSize + i + 1}</TableCell>
-                  <TableCell className="font-medium">{item.employee?.full_name ?? `#${item.employee_id}`}</TableCell>
-                  <TableCell>{fmtDate(item.attendance_date)}</TableCell>
-                  <TableCell>{getScheduleName(item.schedule_id)}</TableCell>
+                  <TableCell className="font-medium">{item.employee?.full_name ? `${item.employee.full_name} (${item.employee.employee_code})` : getEmployeeLabel(item.employee_id)}</TableCell>
+                  <TableCell className="text-sm">{formatDateVietnam(item.attendance_date)}</TableCell>
+                  <TableCell>{item.schedule_id != null ? getScheduleLabel(item.schedule_id) : '—'}</TableCell>
                   <TableCell>{fmtTime(item.check_in)}</TableCell>
                   <TableCell>{fmtTime(item.check_out)}</TableCell>
                   <TableCell>{item.working_minutes ?? '—'}</TableCell>
@@ -243,7 +249,7 @@ export function AttendanceSheet() {
               </select>
             </FormField>
             <FormField label="Ngày" error={errors.attendance_date} required>
-              <Input type="date" value={form.attendance_date} onChange={(e) => setForm({ ...form, attendance_date: e.target.value })} />
+              <Input type="date" value={toDateInputValue(form.attendance_date)} onChange={(e) => setForm({ ...form, attendance_date: e.target.value })} />
             </FormField>
           </div>
           <div className="grid grid-cols-3 gap-4">
@@ -293,19 +299,19 @@ export function AttendanceSheet() {
         </div>
       </Modal>
 
-      <ConfirmModal open={deleteOpen} onClose={() => setDeleteOpen(false)} onConfirm={handleDelete} title="Xác nhận xóa" description={`Xóa bản ghi chấm công ngày ${fmtDate(deleting?.attendance_date)}?`} confirmText="Xóa" variant="danger" loading={deleteMut.isPending} />
+      <ConfirmModal open={deleteOpen} onClose={() => setDeleteOpen(false)} onConfirm={handleDelete} title="Xác nhận xóa" description={`Xóa bản ghi chấm công ngày ${formatDateVietnam(deleting?.attendance_date ?? '')}?`} confirmText="Xóa" variant="danger" loading={deleteMut.isPending} />
 
       <Modal open={detailOpen} onClose={() => setDetailOpen(false)} title="Chi tiết chấm công" size="md">
         {detailLoading ? (
           <div className="flex items-center justify-center py-8"><div className="animate-spin h-8 w-8 border-4 border-[rgb(var(--primary))] border-t-transparent rounded-full" /></div>
         ) : detailData?.data ? (
           <div className="space-y-3">
-            <div className="flex items-center gap-2 pb-2 border-b"><ClipboardCheck className="h-5 w-5 text-[rgb(var(--primary))]" /><h3 className="text-lg font-bold">{detailData.data.employee?.full_name ?? `NV #${detailData.data.employee_id}`}</h3></div>
+            <div className="flex items-center gap-2 pb-2 border-b"><ClipboardCheck className="h-5 w-5 text-[rgb(var(--primary))]" /><h3 className="text-lg font-bold">{detailData.data.employee?.full_name ?? getEmployeeLabel(detailData.data.employee_id)}</h3></div>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Ngày</p><p className="font-medium">{fmtDate(detailData.data.attendance_date)}</p></div>
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Ca</p><p className="font-medium">{getScheduleName(detailData.data.schedule_id)}</p></div>
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Check-in</p><p className="font-medium">{fmtTime(detailData.data.check_in)}</p></div>
-              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Check-out</p><p className="font-medium">{fmtTime(detailData.data.check_out)}</p></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Ngày</p><p className="font-medium">{formatDateVietnam(detailData.data.attendance_date)}</p></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Ca</p><p className="font-medium">{detailData.data.schedule_id != null ? getScheduleLabel(detailData.data.schedule_id) : '—'}</p></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Check-in</p><p className="font-medium">{formatDateTimeVietnam(detailData.data.check_in)}</p></div>
+              <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Check-out</p><p className="font-medium">{formatDateTimeVietnam(detailData.data.check_out)}</p></div>
               <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Phút làm</p><p className="font-medium">{detailData.data.working_minutes ?? '—'}</p></div>
               <div className="bg-[rgb(var(--bg-secondary))] rounded-lg p-3"><p className="text-xs text-[rgb(var(--text-muted))] mb-1">Trạng thái</p>{(() => { const sb = statusBadge(detailData.data.attendance_status); return sb ? <Badge variant={sb.variant} size="sm">{sb.label}</Badge> : null; })()}</div>
             </div>

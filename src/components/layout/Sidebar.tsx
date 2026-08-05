@@ -26,6 +26,7 @@ import {
   Search,
   Calendar,
   Settings,
+  Library,
 } from 'lucide-react';
 import { useAuth } from '@/app/providers';
 import { ROLES, ROLE_LABELS } from '@/constants/modules';
@@ -92,6 +93,17 @@ const SIS_ONLY_GROUP: NavGroup = {
   modules: SIS_ONLY_MODULES,
 };
 
+const LMS_GROUP_MODULES: Module[] = [
+  { id: 'lms-quan-ly-khoa-hoc', label: 'Quản lý khóa học', route: '/quan-ly-hoc-tap/khoa-hoc', icon: <Library className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
+];
+
+const LMS_GROUP: NavGroup = {
+  id: 'quan-ly-hoc-tap',
+  label: 'Quản lý Học tập',
+  groupIcon: <BookOpen className="h-4 w-4" />,
+  modules: LMS_GROUP_MODULES,
+};
+
 const ALL_IAM_MODULES: Module[] = [
   { id: 'iam-xac-thuc', label: 'Xác thực & Quản lý người dùng', route: '/iam/xac-thuc', icon: <Users className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
   { id: 'iam-vai-tro-quyen', label: 'Vai trò & Phân quyền', route: '/iam/vai-tro-quyen', icon: <ShieldCheck className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
@@ -115,7 +127,7 @@ const CORE_ONLY_GROUP: NavGroup = {
 
 // ─── NAV_GROUPS ───────────────────────────────────────────────────────────────
 const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
-  ? [CORE_ONLY_GROUP, IAM_GROUP, HRM_NEW_GROUP, SIS_ONLY_GROUP]
+  ? [CORE_ONLY_GROUP, IAM_GROUP, HRM_NEW_GROUP, SIS_ONLY_GROUP, LMS_GROUP]
   : [
   // ── NHÓM 1: CƠ CẤU TỔ CHỨC ─────────────────────────────────────
   {
@@ -159,6 +171,14 @@ const NAV_GROUPS: NavGroup[] = DEV_SIS_ONLY
       { id: 'sis-dang-ky', label: 'ĐKHP & Thời khóa biểu', route: '/sis/dang-ky', icon: <Calendar className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.NHAN_VIEN] },
       { id: 'sis-diem', label: 'Điểm & Cảnh báo', route: '/sis/diem', icon: <Award className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN] },
     ],
+  },
+
+  // ── NHÓM 2.5: QUẢN LÝ HỌC TẬP (LMS) ──────────────────────────────────────
+  {
+    id: 'quan-ly-hoc-tap',
+    label: 'Quản lý Học tập',
+    groupIcon: <BookOpen className="h-4 w-4" />,
+    modules: LMS_GROUP_MODULES,
   },
 
   // ── NHÓM 3: QUẢN LÝ HÀNH CHÍNH ────────────────────────────────────────────
