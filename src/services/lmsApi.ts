@@ -11,6 +11,13 @@
 
 import { lmsApi, lmsApiClient } from '@/lib/lmsApiClient';
 import type {
+  Assignment,
+  AssignmentCreatePayload,
+  AssignmentListParams,
+  AssignmentSubmission,
+  AssignmentSubmissionCreatePayload,
+  AssignmentSubmissionListParams,
+  AssignmentUpdatePayload,
   CourseMaterial,
   CourseMaterialCreatePayload,
   CourseMaterialListParams,
@@ -208,10 +215,71 @@ export const lessonContentsApi = {
   },
 };
 
+// ─── Assignments ───────────────────────────────────────────────────────────────────
+export const assignmentsApi = {
+  list: (params: AssignmentListParams = {}) =>
+    lmsApi.get<LmsListResponse<Assignment>>(BASE + '/assignments', { params }),
+
+  get: (id: number | string) =>
+    lmsApi.get<LmsDetailResponse<Assignment>>(BASE + '/assignments/' + id),
+
+  create: (payload: AssignmentCreatePayload) =>
+    lmsApi.post<LmsDetailResponse<Assignment>>(BASE + '/assignments', payload),
+
+  update: (id: number | string, payload: AssignmentUpdatePayload) =>
+    lmsApi.put<LmsDetailResponse<Assignment>>(BASE + '/assignments/' + id, payload),
+
+  delete: (id: number | string) =>
+    lmsApi.delete<LmsDetailResponse<null>>(BASE + '/assignments/' + id),
+};
+
+// ─── AssignmentSubmissions ────────────────────────────────────────────────────────
+export const assignmentSubmissionsApi = {
+  list: (params: AssignmentSubmissionListParams = {}) =>
+    lmsApi.get<LmsListResponse<AssignmentSubmission>>(BASE + '/assignment-submissions', { params }),
+
+  get: (id: number | string) =>
+    lmsApi.get<LmsDetailResponse<AssignmentSubmission>>(BASE + '/assignment-submissions/' + id),
+
+  /** Nộp bài (multipart/form-data) */
+  submit: (payload: AssignmentSubmissionCreatePayload) => {
+    const fd = new FormData();
+    fd.append('assignment_id', String(payload.assignment_id));
+    if (payload.student_id != null) fd.append('student_id', String(payload.student_id));
+    fd.append('submission_type', payload.submission_type);
+    if (payload.content != null) fd.append('content', payload.content);
+    if (payload.file) fd.append('file', payload.file);
+    return lmsApi.post<LmsDetailResponse<AssignmentSubmission>>(
+      BASE + '/assignment-submissions',
+      fd,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+  },
+
+  /** Bài nộp mới nhất của sinh viên cho một bài tập */
+  latest: (assignmentId: number | string, studentId?: number) => {
+    const params: Record<string, string | number> = {};
+    if (studentId) params.student_id = studentId;
+    return lmsApi.get<LmsDetailResponse<AssignmentSubmission | null>>(
+      BASE + '/assignments/' + assignmentId + '/latest-submission',
+      { params }
+    );
+  },
+
+  /** Lịch sử nộp của một sinh viên cho một bài tập */
+  history: (assignmentId: number | string, studentId: number) =>
+    lmsApi.get<LmsDetailResponse<AssignmentSubmission[]>>(
+      BASE + '/assignments/' + assignmentId + '/submission-history',
+      { params: { student_id: studentId } }
+    ),
+};
+
 export default {
   learningCoursesApi,
   courseMaterialsApi,
   courseModulesApi,
   lessonsApi,
   lessonContentsApi,
+  assignmentsApi,
+  assignmentSubmissionsApi,
 };

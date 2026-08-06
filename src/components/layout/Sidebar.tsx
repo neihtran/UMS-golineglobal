@@ -28,6 +28,7 @@ import {
   Settings,
   Library,
   Layers,
+  ClipboardList as ClipboardListIcon,
 } from 'lucide-react';
 import { useAuth } from '@/app/providers';
 import { ROLES, ROLE_LABELS } from '@/constants/modules';
@@ -97,6 +98,7 @@ const SIS_ONLY_GROUP: NavGroup = {
 const LMS_GROUP_MODULES: Module[] = [
   { id: 'lms-quan-ly-khoa-hoc', label: 'Quản lý khóa học', route: '/quan-ly-hoc-tap/khoa-hoc', icon: <Library className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
   { id: 'lms-quan-ly-bai-hoc', label: 'Quản lý bài học', route: '/quan-ly-hoc-tap/bai-hoc/chuong', icon: <Layers className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
+  { id: 'lms-quan-ly-bai-tap', label: 'Quản lý bài tập', route: '/quan-ly-hoc-tap/bai-tap', icon: <ClipboardListIcon className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
 ];
 
 const LMS_GROUP: NavGroup = {

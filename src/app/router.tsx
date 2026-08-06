@@ -136,6 +136,7 @@ const CreateTuitionPage = lazy(() => import('@/modules/fin/pages/CreateTuitionPa
 // LMS — moved to modules/quan-ly-hoc-tap (Quản lý Học tập)
 const QuanLyHocTapPage = lazy(() => import('@/modules/quan-ly-hoc-tap/pages/QuanLyHocTapPage'));
 const BaiHocPage = lazy(() => import('@/modules/quan-ly-hoc-tap/pages/BaiHocPage'));
+const QuanLyBaiTapPage = lazy(() => import('@/modules/quan-ly-hoc-tap/pages/QuanLyBaiTapPage'));
 
 // EXAM
 const EXAMDashboard = lazy(() => import('@/modules/exam/pages/EXAMDashboard'));
@@ -555,7 +556,7 @@ export default function AppRouter() {
           <Route path="/fin/chi-tieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ExpensesPage /></RoleRoute>} />
           <Route path="/fin/chi-tieu/:id" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><ChiTieuDetailPageRouted /></RoleRoute>} />
 
-          {/* LMS — Quản lý Học tập (Part 1) */}
+          {/* LMS — Quản lý Học tập (Part 1 & Part 3) */}
           <Route path="/quan-ly-hoc-tap" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><Navigate to="/quan-ly-hoc-tap/khoa-hoc" replace /></RoleRoute>} />
           <Route path="/quan-ly-hoc-tap/khoa-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QuanLyHocTapPage /></RoleRoute>} />
           <Route path="/quan-ly-hoc-tap/hoc-lieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QuanLyHocTapPage /></RoleRoute>} />
@@ -563,6 +564,7 @@ export default function AppRouter() {
           <Route path="/quan-ly-hoc-tap/bai-hoc/chuong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><BaiHocPage /></RoleRoute>} />
           <Route path="/quan-ly-hoc-tap/bai-hoc/bai-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><BaiHocPage /></RoleRoute>} />
           <Route path="/quan-ly-hoc-tap/bai-hoc/noi-dung" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><BaiHocPage /></RoleRoute>} />
+          <Route path="/quan-ly-hoc-tap/bai-tap" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QuanLyBaiTapPage /></RoleRoute>} />
 
           {/* EXAM — admin + giang-vien + sinh-vien */}
           <Route path="/exam" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><EXAMDashboard /></RoleRoute>} />

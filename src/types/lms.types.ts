@@ -295,6 +295,123 @@ export interface LessonContentUpdatePayload {
   file?: File | null;
 }
 
+// ─── Assignment ────────────────────────────────────────────────────────────────────
+export type AssignmentType = 'file' | 'text' | 'url' | 'mixed';
+export type AssignmentStatus = 'active' | 'inactive';
+
+export interface Assignment {
+  id: number;
+  title: string;
+  description: string | null;
+  learning_course_id: number | null;
+  lesson_id: number | null;
+  assignment_type: AssignmentType | null;
+  open_at: string | null;        // YYYY-MM-DD HH:MM:SS
+  due_at: string | null;
+  close_at: string | null;
+  max_score: number | null;
+  max_attempts: number | null;
+  allow_late_submission: boolean;
+  allow_resubmission: boolean;
+  status: AssignmentStatus | null;
+  learning_course?: { id: number; code: string; name: string } | null;
+  lesson?: { id: number; title: string } | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AssignmentCreatePayload {
+  title: string;
+  description?: string | null;
+  learning_course_id?: number | null;
+  lesson_id?: number | null;
+  assignment_type: AssignmentType;
+  open_at?: string | null;
+  due_at?: string | null;
+  close_at?: string | null;
+  max_score?: number | null;
+  max_attempts?: number | null;
+  allow_late_submission?: boolean;
+  allow_resubmission?: boolean;
+  status?: AssignmentStatus;
+}
+
+export interface AssignmentUpdatePayload {
+  title?: string;
+  description?: string | null;
+  assignment_type?: AssignmentType;
+  open_at?: string | null;
+  due_at?: string | null;
+  close_at?: string | null;
+  max_score?: number | null;
+  max_attempts?: number | null;
+  allow_late_submission?: boolean;
+  allow_resubmission?: boolean;
+  status?: AssignmentStatus;
+}
+
+export interface AssignmentListParams {
+  page?: number;
+  per_page?: number;
+  learning_course_id?: number;
+  lesson_id?: number;
+  title?: string;
+  assignment_type?: AssignmentType;
+  status?: AssignmentStatus;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+// ─── AssignmentSubmission ──────────────────────────────────────────────────────
+export type SubmissionStatus = 'submitted' | 'late' | 'returned' | 'graded';
+export type SubmissionType = 'file' | 'text' | 'url';
+
+export interface AssignmentSubmission {
+  id: number;
+  assignment_id: number;
+  student_id: number;
+  submission_type: SubmissionType | null;
+  content: string | null;        // text/url content
+  file_path: string | null;      // for file uploads
+  submitted_at: string | null;
+  attempt_number: number;
+  status: SubmissionStatus | null;
+  score: number | null;
+  feedback: string | null;
+  student?: {
+    id: number;
+    full_name: string;
+    student_code: string;
+  } | null;
+  assignment?: {
+    id: number;
+    title: string;
+    max_score: number | null;
+  } | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AssignmentSubmissionCreatePayload {
+  assignment_id: number;
+  student_id?: number | null;
+  submission_type: SubmissionType;
+  content?: string | null;
+  file?: File | null;
+}
+
+export interface AssignmentSubmissionListParams {
+  page?: number;
+  per_page?: number;
+  assignment_id?: number;
+  student_id?: number;
+  student_name?: string;
+  status?: SubmissionStatus;
+  latest_only?: 0 | 1;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
 // ─── List response shape (dùng chung) ────────────────────────────────────────────
 export interface LmsListResponse<T> {
   success: boolean;
