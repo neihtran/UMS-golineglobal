@@ -24,6 +24,7 @@ export default function QuanLyHocTapPage() {
     <div className="space-y-6">
       <PageHeader
         title="Quản lý khóa học"
+        description="Quản lý thông tin khóa học & toàn bộ học liệu được sử dụng trên hệ thống LMS"
         breadcrumbs={[
           { label: 'Quản lý Học tập', href: '/quan-ly-hoc-tap' },
           { label: 'Quản lý khóa học' },

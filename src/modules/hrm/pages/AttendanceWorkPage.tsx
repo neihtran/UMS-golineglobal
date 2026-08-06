@@ -55,6 +55,7 @@ export default function AttendanceWorkPage() {
     <div className="space-y-6">
       <PageHeader
         title="Chấm công & Nghỉ phép"
+        description="Quản lý ca làm việc, lịch làm việc, chấm công, check in/out, nghỉ phép, đơn nghỉ phép, đăng ký OT"
         breadcrumbs={[
           { label: 'HRM', href: '/hrm' },
           { label: 'Chấm công & Nghỉ phép' },

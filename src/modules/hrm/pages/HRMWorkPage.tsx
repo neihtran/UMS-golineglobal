@@ -50,6 +50,7 @@ export default function HRMWorkPage() {
     <div className="space-y-6">
       <PageHeader
         title="Quản lý công việc"
+        description="Quản lý phân công giảng dạy, cố vấn học tập, hướng dẫn thực tập, hướng dẫn đồ án, làm bài thi, chấm thi"
         breadcrumbs={[
           { label: 'HRM', href: '/hrm' },
           { label: 'Quản lý công việc' },

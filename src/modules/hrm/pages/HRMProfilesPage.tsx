@@ -56,6 +56,7 @@ export default function HRMProfilesPage() {
     <div className="space-y-6">
       <PageHeader
         title="Danh mục & Hồ sơ nhân sự"
+        description="Quản lý danh mục, chức vụ, học hàm/học vị, hồ sơ nhân sự, bằng cấp, chứng chỉ CM, đào tạo nhân sự, quá trình công tác"
         breadcrumbs={[
           { label: 'HRM', href: '/hrm' },
           { label: 'Danh mục & Hồ sơ nhân sự' },

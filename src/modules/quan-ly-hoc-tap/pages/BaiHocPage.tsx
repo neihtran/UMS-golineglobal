@@ -27,10 +27,11 @@ export default function BaiHocPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Quản lý Bài học"
+        title="Quản lý bài học"
+        description="Quản lý các chương hoặc mô-đun, bài học thuộc từng chương và nội dung chi tiết của từng bài học"
         breadcrumbs={[
           { label: 'Quản lý Học tập', href: '/quan-ly-hoc-tap' },
-          { label: 'Quản lý Bài học' },
+          { label: 'Quản lý bài học' },
         ]}
       />
 
