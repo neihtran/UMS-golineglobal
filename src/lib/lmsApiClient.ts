@@ -11,6 +11,8 @@ const LMS_API_BASE_URL =
     ? `${import.meta.env.VITE_HQNHAT_API_BASE_URL}/api/v1`
     : 'https://api.hqnhat.id.vn/api/v1';
 
+const LMS_API_TOKEN = import.meta.env.VITE_HQNHAT_API_TOKEN || '';
+
 export const lmsApiClient = axios.create({
   baseURL: LMS_API_BASE_URL,
   headers: {
@@ -21,7 +23,9 @@ export const lmsApiClient = axios.create({
 });
 
 lmsApiClient.interceptors.request.use((config) => {
-  const token = getHqnhatToken();
+  // Priority: hqnhatAuthStore token -> env var fallback (for dev bypass)
+  const storedToken = getHqnhatToken();
+  const token = storedToken || (HQNHAT_API_TOKEN && HQNHAT_API_TOKEN !== 'YOUR_HQNHAT_JWT_TOKEN_HERE' ? HQNHAT_API_TOKEN : null);
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }

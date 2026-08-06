@@ -24,7 +24,9 @@ import type {
   LearningCourseListParams,
   Lesson,
   LessonContent,
+  LessonContentCreatePayload,
   LessonContentListParams,
+  LessonContentUpdatePayload,
   LessonCreatePayload,
   LessonListParams,
   LessonUpdatePayload,
@@ -49,6 +51,24 @@ function buildMaterialFormData(payload: CourseMaterialCreatePayload | CourseMate
   if (payload.duration != null) fd.append('duration', String(payload.duration));
   if (payload.display_order != null) fd.append('display_order', String(payload.display_order));
   // form-data expects "1" / "0" cho is_downloadable
+  fd.append('is_downloadable', payload.is_downloadable ? '1' : '0');
+  if (payload.status) fd.append('status', payload.status);
+  if (payload.file) fd.append('file', payload.file);
+  return fd;
+}
+
+/**
+ * Build FormData cho multipart upload (lesson-contents).
+ * `content_type = video` không upload file vật lý — bắt buộc dùng `external_url`.
+ */
+function buildLessonContentFormData(payload: LessonContentCreatePayload | LessonContentUpdatePayload) {
+  const fd = new FormData();
+  fd.append('title', payload.title ?? '');
+  if (payload.lesson_id != null) fd.append('lesson_id', String(payload.lesson_id));
+  if (payload.content_type) fd.append('content_type', payload.content_type);
+  if (payload.content != null) fd.append('content', payload.content);
+  if (payload.external_url != null) fd.append('external_url', payload.external_url);
+  if (payload.duration != null) fd.append('duration', String(payload.duration));
   fd.append('is_downloadable', payload.is_downloadable ? '1' : '0');
   if (payload.status) fd.append('status', payload.status);
   if (payload.file) fd.append('file', payload.file);
@@ -160,11 +180,19 @@ export const lessonContentsApi = {
   get: (id: number | string) =>
     lmsApi.get<LmsDetailResponse<LessonContent>>(BASE + '/lesson-contents/' + id),
 
-  create: (payload: any) =>
-    lmsApi.post<LmsDetailResponse<LessonContent>>(BASE + '/lesson-contents', payload),
+  create: (payload: LessonContentCreatePayload) =>
+    lmsApi.post<LmsDetailResponse<LessonContent>>(
+      BASE + '/lesson-contents',
+      buildLessonContentFormData(payload),
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    ),
 
-  update: (id: number | string, payload: any) =>
-    lmsApi.put<LmsDetailResponse<LessonContent>>(BASE + '/lesson-contents/' + id, payload),
+  update: (id: number | string, payload: LessonContentUpdatePayload) =>
+    lmsApi.post<LmsDetailResponse<LessonContent>>(
+      BASE + '/lesson-contents/' + id + '?_method=PUT',
+      buildLessonContentFormData(payload),
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    ),
 
   delete: (id: number | string) =>
     lmsApi.delete<LmsDetailResponse<null>>(BASE + '/lesson-contents/' + id),

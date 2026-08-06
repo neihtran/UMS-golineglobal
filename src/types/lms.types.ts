@@ -73,6 +73,11 @@ export interface LearningCourseListParams {
   status?: LearningCourseStatus;
   enrollment_type?: LearningCourseEnrollment;
   visibility?: LearningCourseVisibility;
+  /** Filter theo ID giảng viên (employee_profiles.id). Admin-only filter; backend tự override với employee_id cho lecturer. */
+  lecturer_id?: number;
+  course_section_id?: number;
+  start_date?: string;
+  end_date?: string;
   sort_by?: string;
   sort_direction?: 'asc' | 'desc';
 }
@@ -263,6 +268,31 @@ export interface LessonContentListParams {
   status?: LmsStatus;
   sort_by?: string;
   sort_direction?: 'asc' | 'desc';
+}
+
+export interface LessonContentCreatePayload {
+  title: string;
+  lesson_id: number | null;
+  content_type: LessonContentType;
+  content?: string | null;
+  external_url?: string | null;
+  duration?: number | null;
+  is_downloadable?: boolean;
+  status?: LmsStatus;
+  /** File đính kèm (multipart). Không dùng khi content_type là video. */
+  file?: File | null;
+}
+
+export interface LessonContentUpdatePayload {
+  title?: string;
+  lesson_id?: number | null;
+  content_type?: LessonContentType;
+  content?: string | null;
+  external_url?: string | null;
+  duration?: number | null;
+  is_downloadable?: boolean;
+  status?: LmsStatus;
+  file?: File | null;
 }
 
 // ─── List response shape (dùng chung) ────────────────────────────────────────────

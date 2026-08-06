@@ -135,6 +135,7 @@ const CreateTuitionPage = lazy(() => import('@/modules/fin/pages/CreateTuitionPa
 
 // LMS — moved to modules/quan-ly-hoc-tap (Quản lý Học tập)
 const QuanLyHocTapPage = lazy(() => import('@/modules/quan-ly-hoc-tap/pages/QuanLyHocTapPage'));
+const BaiHocPage = lazy(() => import('@/modules/quan-ly-hoc-tap/pages/BaiHocPage'));
 
 // EXAM
 const EXAMDashboard = lazy(() => import('@/modules/exam/pages/EXAMDashboard'));
@@ -558,6 +559,10 @@ export default function AppRouter() {
           <Route path="/quan-ly-hoc-tap" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><Navigate to="/quan-ly-hoc-tap/khoa-hoc" replace /></RoleRoute>} />
           <Route path="/quan-ly-hoc-tap/khoa-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QuanLyHocTapPage /></RoleRoute>} />
           <Route path="/quan-ly-hoc-tap/hoc-lieu" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><QuanLyHocTapPage /></RoleRoute>} />
+          <Route path="/quan-ly-hoc-tap/bai-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><Navigate to="/quan-ly-hoc-tap/bai-hoc/chuong" replace /></RoleRoute>} />
+          <Route path="/quan-ly-hoc-tap/bai-hoc/chuong" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><BaiHocPage /></RoleRoute>} />
+          <Route path="/quan-ly-hoc-tap/bai-hoc/bai-hoc" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><BaiHocPage /></RoleRoute>} />
+          <Route path="/quan-ly-hoc-tap/bai-hoc/noi-dung" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG]}><BaiHocPage /></RoleRoute>} />
 
           {/* EXAM — admin + giang-vien + sinh-vien */}
           <Route path="/exam" element={<RoleRoute roles={[ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.SINH_VIEN]}><EXAMDashboard /></RoleRoute>} />

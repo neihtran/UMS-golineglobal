@@ -85,26 +85,28 @@ export function CourseMaterialSheet() {
 
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<CourseMaterialType | ''>('');
-  const [courseFilter, setCourseFilter] = useState<number | ''>('');
-
-  const params: CourseMaterialListParams = {
-    page,
-    per_page: pageSize,
-    title: search || undefined,
-    material_type: typeFilter || undefined,
-    learning_course_id: courseFilter || undefined,
-    sort_by: 'created_at',
-    sort_direction: 'desc',
-  };
-
-  const { data, isLoading, isFetching } = useCourseMaterials(params);
-  const items = Array.isArray(data?.data) ? data.data : [];
-  const total = data?.meta?.total ?? items.length;
+  const [courseFilter, setCourseFilter] = useState<number | null>(null);
 
   // Lookup danh sách khóa học cho dropdown filter + form
   const { data: coursesData } = useLearningCourses({ per_page: 100 });
   const courses = Array.isArray(coursesData?.data) ? coursesData.data : [];
   const courseMap = useMemo(() => Object.fromEntries(courses.map(c => [c.id, c])), [courses]);
+
+  const params: CourseMaterialListParams | undefined = courseFilter
+    ? {
+        page,
+        per_page: pageSize,
+        title: search || undefined,
+        material_type: typeFilter || undefined,
+        learning_course_id: courseFilter,
+        sort_by: 'created_at',
+        sort_direction: 'desc',
+      }
+    : undefined;
+
+  const { data, isLoading, isFetching } = useCourseMaterials(params);
+  const items = Array.isArray(data?.data) ? data.data : [];
+  const total = data?.meta?.total ?? items.length;
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<CourseMaterial | null>(null);
@@ -166,7 +168,7 @@ export function CourseMaterialSheet() {
   const resetFilters = () => {
     setSearch('');
     setTypeFilter('');
-    setCourseFilter('');
+    setCourseFilter(null);
     setPage(1);
   };
 
@@ -257,11 +259,11 @@ export function CourseMaterialSheet() {
         <div>
           <label className="mb-1 block text-xs font-medium text-[rgb(var(--text-muted))]">Khóa học</label>
           <select
-            value={courseFilter}
-            onChange={(e) => { setCourseFilter(e.target.value ? Number(e.target.value) : ''); setPage(1); }}
+            value={courseFilter ?? ''}
+            onChange={(e) => { setCourseFilter(e.target.value ? Number(e.target.value) : null); setPage(1); }}
             className="h-10 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--bg-card))] px-3 text-sm min-w-[180px]"
           >
-            <option value="">Tất cả</option>
+            <option value="">— Chọn khóa học —</option>
             {courses.map(c => <option key={c.id} value={c.id}>{c.code} - {c.name}</option>)}
           </select>
         </div>
@@ -289,7 +291,16 @@ export function CourseMaterialSheet() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {isLoading ? (
+          {!courseFilter ? (
+            <TableRow>
+              <TableCell colSpan={8} className="text-center py-12">
+                <div className="flex flex-col items-center gap-2">
+                  <FileText className="h-8 w-8 text-[rgb(var(--text-muted))]" />
+                  <p className="text-[rgb(var(--text-muted))]">Vui lòng chọn khóa học để xem danh sách học liệu</p>
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : isLoading ? (
             <TableSkeleton colSpan={8} rows={5} />
           ) : items.length === 0 ? (
             <TableRow>
@@ -317,7 +328,7 @@ export function CourseMaterialSheet() {
                   </TableCell>
                   <TableCell className="text-sm">
                     {(() => {
-                      const c = courseMap[item.learning_course_id];
+                      const c = item.learning_course_id != null ? courseMap[item.learning_course_id] : undefined;
                       return c ? (
                         <span className="font-medium">{c.code} – {c.name}</span>
                       ) : item.learning_course ? (
@@ -499,7 +510,7 @@ export function CourseMaterialSheet() {
         onConfirm={handleDelete}
         title="Xác nhận xóa học liệu"
         description={`Bạn có chắc muốn xóa học liệu "${deleting?.title}"?`}
-        confirmLabel="Xóa"
+        confirmText="Xóa"
         variant="danger"
         loading={deleteMut.isPending}
       />
@@ -528,7 +539,8 @@ export function CourseMaterialSheet() {
                 <p className="text-xs text-[rgb(var(--text-muted))] mb-1">Khóa học</p>
                 <p className="font-medium">
                   {(() => {
-                    const c = courseMap[detailData.data.learning_course_id];
+                    const id = detailData.data.learning_course_id;
+                    const c = id != null ? courseMap[id] : undefined;
                     if (c) return `${c.code} – ${c.name}`;
                     if (detailData.data.learning_course) return `${detailData.data.learning_course.code} – ${detailData.data.learning_course.name}`;
                     return '—';

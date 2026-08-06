@@ -1,4 +1,4 @@
-// â”€â”€â”€ LMS Hooks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─── LMS Hooks ──────────────────────────────────────────────────────────────────
 // TanStack Query hooks for LMS Module
 //
 // Part 1: LearningCourses, CourseMaterials, CourseModules, Lessons, LessonContents
@@ -13,27 +13,22 @@ import {
   lessonsApi,
 } from '@/services/lmsApi';
 import type {
-  CourseMaterial,
-  CourseMaterialCreatePayload,
   CourseMaterialListParams,
+  CourseMaterialCreatePayload,
   CourseMaterialUpdatePayload,
-  CourseModule,
-  CourseModuleCreatePayload,
   CourseModuleListParams,
+  CourseModuleCreatePayload,
   CourseModuleUpdatePayload,
-  LearningCourse,
-  LearningCourseCreatePayload,
   LearningCourseListParams,
-  Lesson,
-  LessonContent,
-  LessonContentListParams,
-  LessonCreatePayload,
+  LearningCourseCreatePayload,
   LessonListParams,
+  LessonCreatePayload,
   LessonUpdatePayload,
+  LessonContentListParams,
   ReorderItem,
 } from '@/types/lms.types';
 
-// â”€â”€â”€ Query Keys â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Query Keys ─────────────────────────────────────────────────────────────────
 export const LMS_QUERY_KEYS = {
   learningCourses: {
     all: ['lms', 'learning-courses'] as const,
@@ -67,7 +62,7 @@ export const LMS_QUERY_KEYS = {
   },
 };
 
-// â”€â”€â”€ LearningCourses â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── LearningCourses ───────────────────────────────────────────────────────────
 export const useLearningCourses = (params?: LearningCourseListParams) =>
   useQuery({
     queryKey: LMS_QUERY_KEYS.learningCourses.list(params),
@@ -88,9 +83,9 @@ export const useCreateLearningCourse = () => {
     mutationFn: (payload: LearningCourseCreatePayload) => learningCoursesApi.create(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.learningCourses.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'Táº¡o khÃ³a há»c LMS thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Tạo khóa học LMS thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
@@ -103,9 +98,9 @@ export const useUpdateLearningCourse = () => {
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.learningCourses.all });
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.learningCourses.detail(vars.id) });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'Cáº­p nháº­t khÃ³a há»c LMS thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Cập nhật khóa học LMS thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
@@ -116,17 +111,18 @@ export const useDeleteLearningCourse = () => {
     mutationFn: (id: number | string) => learningCoursesApi.delete(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.learningCourses.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'XÃ³a khÃ³a há»c LMS thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Xóa khóa học LMS thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
-// â”€â”€â”€ CourseMaterials â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── CourseMaterials ───────────────────────────────────────────────────────────
 export const useCourseMaterials = (params?: CourseMaterialListParams) =>
   useQuery({
     queryKey: LMS_QUERY_KEYS.courseMaterials.list(params),
     queryFn: async () => (await courseMaterialsApi.list(params)).data,
+    enabled: !!params?.learning_course_id,
   });
 
 export const useCourseMaterial = (id?: number | string) =>
@@ -143,9 +139,9 @@ export const useCreateCourseMaterial = () => {
     mutationFn: (payload: CourseMaterialCreatePayload) => courseMaterialsApi.create(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.courseMaterials.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'Táº¡o há»c liá»‡u thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Tạo học liệu thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
@@ -158,9 +154,9 @@ export const useUpdateCourseMaterial = () => {
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.courseMaterials.all });
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.courseMaterials.detail(vars.id) });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'Cáº­p nháº­t há»c liá»‡u thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Cập nhật học liệu thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
@@ -171,17 +167,18 @@ export const useDeleteCourseMaterial = () => {
     mutationFn: (id: number | string) => courseMaterialsApi.delete(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.courseMaterials.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'XÃ³a há»c liá»‡u thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Xóa học liệu thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
-// â”€â”€â”€ CourseModules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── CourseModules ─────────────────────────────────────────────────────────────
 export const useCourseModules = (params?: CourseModuleListParams) =>
   useQuery({
     queryKey: LMS_QUERY_KEYS.courseModules.list(params),
     queryFn: async () => (await courseModulesApi.list(params)).data,
+    enabled: !!params?.learning_course_id,
   });
 
 export const useCourseModule = (id?: number | string) =>
@@ -198,9 +195,9 @@ export const useCreateCourseModule = () => {
     mutationFn: (payload: CourseModuleCreatePayload) => courseModulesApi.create(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.courseModules.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'Táº¡o chÆ°Æ¡ng há»c thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Tạo chương học thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
@@ -213,9 +210,9 @@ export const useUpdateCourseModule = () => {
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.courseModules.all });
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.courseModules.detail(vars.id) });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'Cáº­p nháº­t chÆ°Æ¡ng há»c thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Cập nhật chương học thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
@@ -226,9 +223,9 @@ export const useDeleteCourseModule = () => {
     mutationFn: (id: number | string) => courseModulesApi.delete(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.courseModules.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'XÃ³a chÆ°Æ¡ng há»c thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Xóa chương học thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
@@ -239,17 +236,18 @@ export const useReorderCourseModules = () => {
     mutationFn: (orders: ReorderItem[]) => courseModulesApi.reorder(orders),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.courseModules.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'ÄÃ£ cáº­p nháº­t thá»© tá»± chÆ°Æ¡ng há»c' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Đã cập nhật thứ tự chương học' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
-// â”€â”€â”€ Lessons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Lessons ───────────────────────────────────────────────────────────────────
 export const useLessons = (params?: LessonListParams) =>
   useQuery({
     queryKey: LMS_QUERY_KEYS.lessons.list(params),
     queryFn: async () => (await lessonsApi.list(params)).data,
+    enabled: !!params?.course_module_id,
   });
 
 export const useLesson = (id?: number | string) =>
@@ -266,9 +264,9 @@ export const useCreateLesson = () => {
     mutationFn: (payload: LessonCreatePayload) => lessonsApi.create(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.lessons.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'Táº¡o bÃ i há»c thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Tạo bài học thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
@@ -281,9 +279,9 @@ export const useUpdateLesson = () => {
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.lessons.all });
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.lessons.detail(vars.id) });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'Cáº­p nháº­t bÃ i há»c thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Cập nhật bài học thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
@@ -294,17 +292,18 @@ export const useDeleteLesson = () => {
     mutationFn: (id: number | string) => lessonsApi.delete(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.lessons.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'XÃ³a bÃ i há»c thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Xóa bài học thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
 
-// â”€â”€â”€ LessonContents â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── LessonContents ────────────────────────────────────────────────────────────
 export const useLessonContents = (params?: LessonContentListParams) =>
   useQuery({
     queryKey: LMS_QUERY_KEYS.lessonContents.list(params),
     queryFn: async () => (await lessonContentsApi.list(params)).data,
+    enabled: !!params?.lesson_id,
   });
 
 export const useDeleteLessonContent = () => {
@@ -314,9 +313,8 @@ export const useDeleteLessonContent = () => {
     mutationFn: (id: number | string) => lessonContentsApi.delete(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: LMS_QUERY_KEYS.lessonContents.all });
-      notify.addNotification({ type: 'success', title: 'ThÃ nh cÃ´ng', message: 'XÃ³a ná»™i dung bÃ i há»c thÃ nh cÃ´ng' });
+      notify.addNotification({ type: 'success', title: 'Thành công', message: 'Xóa nội dung bài học thành công' });
     },
-    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lá»—i', message: err.message }),
+    onError: (err: Error) => notify.addNotification({ type: 'error', title: 'Lỗi', message: err.message }),
   });
 };
-

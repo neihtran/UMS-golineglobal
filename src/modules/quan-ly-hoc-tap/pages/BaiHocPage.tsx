@@ -1,32 +1,36 @@
 import { useState, useMemo } from 'react';
-import { GraduationCap, BookOpen } from 'lucide-react';
+import { FolderTree, FileText, Layers } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
-import { LearningCourseSheet, CourseMaterialSheet } from './sheets';
+import { CourseModuleSheet } from './sheets/CourseModuleSheet';
+import { LessonSheet } from './sheets/LessonSheet';
+import { LessonContentSheet } from './sheets/LessonContentSheet';
 
-type TabType = 'khoa-hoc-lms' | 'hoc-lieu';
+type TabType = 'chuong-hoc' | 'bai-hoc' | 'noi-dung';
 
 const TABS: { id: TabType; label: string; icon: React.ReactNode }[] = [
-  { id: 'khoa-hoc-lms', label: 'Khóa học LMS', icon: <GraduationCap className="h-4 w-4" /> },
-  { id: 'hoc-lieu', label: 'Học liệu', icon: <BookOpen className="h-4 w-4" /> },
+  { id: 'chuong-hoc', label: 'Chương học', icon: <FolderTree className="h-4 w-4" /> },
+  { id: 'bai-hoc', label: 'Bài học', icon: <Layers className="h-4 w-4" /> },
+  { id: 'noi-dung', label: 'Nội dung bài học', icon: <FileText className="h-4 w-4" /> },
 ];
 
 const TAB_CONTENT: Record<TabType, React.ReactNode> = {
-  'khoa-hoc-lms': <LearningCourseSheet />,
-  'hoc-lieu': <CourseMaterialSheet />,
+  'chuong-hoc': <CourseModuleSheet />,
+  'bai-hoc': <LessonSheet />,
+  'noi-dung': <LessonContentSheet />,
 };
 
-export default function QuanLyHocTapPage() {
-  const [activeTab, setActiveTab] = useState<TabType>('khoa-hoc-lms');
+export default function BaiHocPage() {
+  const [activeTab, setActiveTab] = useState<TabType>('chuong-hoc');
 
   const content = useMemo(() => TAB_CONTENT[activeTab], [activeTab]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Quản lý khóa học"
+        title="Quản lý Bài học"
         breadcrumbs={[
           { label: 'Quản lý Học tập', href: '/quan-ly-hoc-tap' },
-          { label: 'Quản lý khóa học' },
+          { label: 'Quản lý Bài học' },
         ]}
       />
 
