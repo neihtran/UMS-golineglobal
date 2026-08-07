@@ -412,6 +412,103 @@ export interface AssignmentSubmissionListParams {
   sort_direction?: 'asc' | 'desc';
 }
 
+// ─── DiscussionTopic & DiscussionPost ──────────────────────────────────────────────
+export type DiscussionStatus = 'active' | 'inactive';
+export type DiscussionPostStatus = 'active' | 'hidden' | 'deleted';
+
+export interface DiscussionTopic {
+  id: number;
+  title: string;
+  description: string | null;
+  learning_course_id: number;
+  lesson_id: number | null;
+  created_by: number | null;
+  is_pinned: boolean;
+  is_locked: boolean;
+  status: DiscussionStatus | null;
+  learning_course?: { id: number; code: string; name: string } | null;
+  lesson?: { id: number; title: string } | null;
+  creator?: { id: number; full_name: string; avatar?: string | null } | null;
+  posts_count?: number;
+  last_activity_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface DiscussionTopicCreatePayload {
+  title: string;
+  description?: string | null;
+  learning_course_id: number;
+  lesson_id?: number | null;
+  is_pinned?: boolean;
+  is_locked?: boolean;
+  status?: DiscussionStatus;
+}
+
+export interface DiscussionTopicUpdatePayload {
+  title?: string;
+  description?: string | null;
+  is_pinned?: boolean;
+  is_locked?: boolean;
+  status?: DiscussionStatus;
+}
+
+export interface DiscussionTopicListParams {
+  page?: number;
+  per_page?: number;
+  learning_course_id?: number;
+  lesson_id?: number;
+  title?: string;
+  created_by?: number;
+  is_locked?: boolean;
+  status?: DiscussionStatus;
+  sort_by?: 'id' | 'title' | 'learning_course_id' | 'lesson_id' | 'created_by' | 'is_pinned' | 'is_locked' | 'status' | 'created_at' | 'updated_at';
+  sort_direction?: 'asc' | 'desc';
+}
+
+export interface DiscussionPostAuthor {
+  id: number;
+  full_name: string;
+  avatar?: string | null;
+}
+
+export interface DiscussionPost {
+  id: number;
+  discussion_topic_id: number;
+  user_id: number | null;
+  parent_post_id: number | null;
+  content: string;
+  is_answer: boolean;
+  status: DiscussionPostStatus | null;
+  replies_count: number;
+  user: DiscussionPostAuthor | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface DiscussionPostCreatePayload {
+  discussion_topic_id: number;
+  parent_post_id?: number | null;
+  content: string;
+  status?: DiscussionPostStatus;
+}
+
+export interface DiscussionPostUpdatePayload {
+  content?: string;
+  status?: DiscussionPostStatus;
+}
+
+export interface DiscussionPostListParams {
+  page?: number;
+  per_page?: number;
+  discussion_topic_id?: number;
+  parent_post_id?: number | null;
+  is_answer?: 0 | 1;
+  status?: DiscussionPostStatus;
+  sort_by?: 'id' | 'discussion_topic_id' | 'user_id' | 'parent_post_id' | 'is_answer' | 'status' | 'created_at' | 'updated_at';
+  sort_direction?: 'asc' | 'desc';
+}
+
 // ─── List response shape (dùng chung) ────────────────────────────────────────────
 export interface LmsListResponse<T> {
   success: boolean;
@@ -429,4 +526,140 @@ export interface LmsDetailResponse<T> {
   success: boolean;
   message: string;
   data: T;
+}
+
+// ─── Attendance Sessions & Records (Part 5) ───────────────────────────────────────
+
+/** Lifecycle status của phiên điểm danh */
+export type AttendanceSessionStatus = 'scheduled' | 'active' | 'closed';
+
+/** Phương thức xác thực điểm danh */
+export type AttendanceMethod = 'qr_code' | 'gps' | 'face_recognition' | 'manual';
+
+/** Trạng thái điểm danh của sinh viên */
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
+
+/** Phương thức xác thực trên bản ghi */
+export type VerificationMethod = 'qr_code' | 'gps' | 'face_recognition' | 'manual';
+
+// ─── AttendanceSession ────────────────────────────────────────────────────────────
+export interface AttendanceSession {
+  id: number;
+  title: string;
+  learning_course_id: number;
+  lesson_id: number | null;
+  attendance_method: AttendanceMethod | null;
+  start_time: string; // ISO 8601 datetime
+  end_time: string; // ISO 8601 datetime
+  qr_code: string | null; // Backend secret, never expose to UI
+  latitude: number | null; // GPS center
+  longitude: number | null; // GPS center
+  radius: number | null; // meters
+  face_recognition: boolean;
+  status: AttendanceSessionStatus | null;
+  learning_course?: { id: number; code: string; name: string } | null;
+  lesson?: { id: number; title: string } | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AttendanceSessionCreatePayload {
+  title: string;
+  learning_course_id: number;
+  lesson_id?: number | null;
+  attendance_method: AttendanceMethod;
+  start_time: string; // ISO 8601
+  end_time: string; // ISO 8601
+  latitude?: number | null;
+  longitude?: number | null;
+  radius?: number | null;
+  face_recognition?: boolean;
+  status?: AttendanceSessionStatus;
+}
+
+export type AttendanceSessionUpdatePayload = Partial<AttendanceSessionCreatePayload>;
+
+export interface AttendanceSessionListParams {
+  page?: number;
+  per_page?: number;
+  learning_course_id?: number;
+  lesson_id?: number;
+  title?: string;
+  attendance_method?: AttendanceMethod;
+  status?: AttendanceSessionStatus;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+export interface AttendanceSessionQrToken {
+  session_id: number;
+  step: number;
+  token: string;
+  expires_in: number;
+}
+
+// ─── AttendanceRecord ─────────────────────────────────────────────────────────────
+export interface AttendanceRecord {
+  id: number;
+  attendance_session_id: number;
+  student_id: number;
+  check_in_time: string | null; // ISO 8601 datetime
+  attendance_status: AttendanceStatus | null;
+  verification_method: VerificationMethod | null;
+  latitude: number | null;
+  longitude: number | null;
+  note: string | null;
+  student?: {
+    id: number;
+    student_code: string;
+    full_name: string;
+    email?: string;
+  } | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AttendanceRecordUpdatePayload {
+  attendance_status?: AttendanceStatus;
+  check_in_time?: string | null;
+  verification_method?: VerificationMethod | null;
+  note?: string | null;
+}
+
+export interface AttendanceRecordListParams {
+  page?: number;
+  per_page?: number;
+  attendance_session_id?: number;
+  student_id?: number;
+  attendance_status?: AttendanceStatus;
+  verification_method?: VerificationMethod;
+  sort_by?: string;
+  sort_direction?: 'asc' | 'desc';
+}
+
+export interface BulkAttendanceRecord {
+  student_id: number;
+  attendance_status: AttendanceStatus;
+  note?: string | null;
+}
+
+export interface AttendanceSummary {
+  session_id: number;
+  total_students: number;
+  present: number;
+  absent: number;
+  late: number;
+  excused: number;
+  attendance_rate: number;
+}
+
+// ─── Student Self Check-in (Public — no auth) ─────────────────────────────────────
+export interface StudentCheckInPayload {
+  attendance_session_id: number;
+  qr_token?: string | null;
+  student_code?: string | null;
+  student_id?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  note?: string | null;
 }

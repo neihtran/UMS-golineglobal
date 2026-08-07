@@ -6,3 +6,5 @@ export { LessonContentSheet } from './LessonContentSheet';
 export { AssignmentSheet } from './AssignmentSheet';
 export { AssignmentSubmissionSheet } from './AssignmentSubmissionSheet';
 export { AssignmentGradeSheet } from './AssignmentGradeSheet';
+export { DiscussionTopicSheet } from './DiscussionTopicSheet';
+export { DiscussionPostSheet } from './DiscussionPostSheet';

@@ -26,6 +26,14 @@ import type {
   CourseModuleCreatePayload,
   CourseModuleListParams,
   CourseModuleUpdatePayload,
+  DiscussionPost,
+  DiscussionPostCreatePayload,
+  DiscussionPostListParams,
+  DiscussionPostUpdatePayload,
+  DiscussionTopic,
+  DiscussionTopicCreatePayload,
+  DiscussionTopicListParams,
+  DiscussionTopicUpdatePayload,
   LearningCourse,
   LearningCourseCreatePayload,
   LearningCourseListParams,
@@ -274,6 +282,94 @@ export const assignmentSubmissionsApi = {
     ),
 };
 
+// ─── DiscussionTopics ──────────────────────────────────────────────────────────────────
+export const discussionTopicsApi = {
+  list: (params: DiscussionTopicListParams = {}) =>
+    lmsApi.get<LmsListResponse<DiscussionTopic>>(BASE + '/discussion-topics', { params }),
+
+  get: (id: number | string) =>
+    lmsApi.get<LmsDetailResponse<DiscussionTopic>>(BASE + '/discussion-topics/' + id),
+
+  create: (payload: DiscussionTopicCreatePayload) =>
+    lmsApi.post<LmsDetailResponse<DiscussionTopic>>(BASE + '/discussion-topics', payload),
+
+  update: (id: number | string, payload: DiscussionTopicUpdatePayload) =>
+    lmsApi.put<LmsDetailResponse<DiscussionTopic>>(BASE + '/discussion-topics/' + id, payload),
+
+  delete: (id: number | string) =>
+    lmsApi.delete<LmsDetailResponse<null>>(BASE + '/discussion-topics/' + id),
+};
+
+// ─── DiscussionPosts ─────────────────────────────────────────────────────────────────
+export const discussionPostsApi = {
+  list: (params: DiscussionPostListParams = {}) =>
+    lmsApi.get<LmsListResponse<DiscussionPost>>(BASE + '/discussion-posts', { params }),
+
+  get: (id: number | string) =>
+    lmsApi.get<LmsDetailResponse<DiscussionPost>>(BASE + '/discussion-posts/' + id),
+
+  create: (payload: DiscussionPostCreatePayload) =>
+    lmsApi.post<LmsDetailResponse<DiscussionPost>>(BASE + '/discussion-posts', payload),
+
+  update: (id: number | string, payload: DiscussionPostUpdatePayload) =>
+    lmsApi.put<LmsDetailResponse<DiscussionPost>>(BASE + '/discussion-posts/' + id, payload),
+
+  delete: (id: number | string) =>
+    lmsApi.delete<LmsDetailResponse<null>>(BASE + '/discussion-posts/' + id),
+
+  toggleAnswer: (id: number | string, is_answer: boolean = true) =>
+    lmsApi.put<LmsDetailResponse<DiscussionPost>>(
+      BASE + '/discussion-posts/' + id + '/toggle-answer',
+      { is_answer }
+    ),
+};
+
+// ─── Attendance Sessions ─────────────────────────────────────────────────────────────────
+export const attendanceSessionsApi = {
+  list: (params: import('@/types/lms.types').AttendanceSessionListParams = {}) =>
+    lmsApi.get<import('@/types/lms.types').LmsListResponse<import('@/types/lms.types').AttendanceSession>>(BASE + '/attendance-sessions', { params }),
+
+  get: (id: number | string) =>
+    lmsApi.get<import('@/types/lms.types').LmsDetailResponse<import('@/types/lms.types').AttendanceSession>>(BASE + '/attendance-sessions/' + id),
+
+  create: (payload: import('@/types/lms.types').AttendanceSessionCreatePayload) =>
+    lmsApi.post<import('@/types/lms.types').LmsDetailResponse<import('@/types/lms.types').AttendanceSession>>(BASE + '/attendance-sessions', payload),
+
+  update: (id: number | string, payload: import('@/types/lms.types').AttendanceSessionUpdatePayload) =>
+    lmsApi.put<import('@/types/lms.types').LmsDetailResponse<import('@/types/lms.types').AttendanceSession>>(BASE + '/attendance-sessions/' + id, payload),
+
+  delete: (id: number | string) =>
+    lmsApi.delete<import('@/types/lms.types').LmsDetailResponse<null>>(BASE + '/attendance-sessions/' + id),
+
+  /** Lấy token QR động TOTP — expires_in ~8-10s */
+  getQrToken: (id: number | string) =>
+    lmsApi.get<import('@/types/lms.types').LmsDetailResponse<import('@/types/lms.types').AttendanceSessionQrToken>>(BASE + '/attendance-sessions/' + id + '/qr-token'),
+
+  /** Khởi tạo bản ghi điểm danh mặc định absent cho SV đăng ký */
+  initializeRecords: (id: number | string) =>
+    lmsApi.post<import('@/types/lms.types').LmsDetailResponse<null>>(BASE + '/attendance-sessions/' + id + '/initialize-records'),
+
+  /** Bulk update attendance records cho cả lớp */
+  bulkUpdateRecords: (id: number | string, records: import('@/types/lms.types').BulkAttendanceRecord[]) =>
+    lmsApi.put<import('@/types/lms.types').LmsDetailResponse<null>>(BASE + '/attendance-sessions/' + id + '/records', { records }),
+};
+
+// ─── Attendance Records ─────────────────────────────────────────────────────────────────
+export const attendanceRecordsApi = {
+  list: (params: import('@/types/lms.types').AttendanceRecordListParams = {}) =>
+    lmsApi.get<import('@/types/lms.types').LmsListResponse<import('@/types/lms.types').AttendanceRecord>>(BASE + '/attendance-records', { params }),
+
+  get: (id: number | string) =>
+    lmsApi.get<import('@/types/lms.types').LmsDetailResponse<import('@/types/lms.types').AttendanceRecord>>(BASE + '/attendance-records/' + id),
+
+  update: (id: number | string, payload: import('@/types/lms.types').AttendanceRecordUpdatePayload) =>
+    lmsApi.put<import('@/types/lms.types').LmsDetailResponse<import('@/types/lms.types').AttendanceRecord>>(BASE + '/attendance-records/' + id, payload),
+
+  /** Lấy thống kê tóm tắt phiên điểm danh */
+  getSessionSummary: (sessionId: number | string) =>
+    lmsApi.get<import('@/types/lms.types').LmsDetailResponse<import('@/types/lms.types').AttendanceSummary>>(BASE + '/attendance-records/session-summary/' + sessionId),
+};
+
 export default {
   learningCoursesApi,
   courseMaterialsApi,
@@ -282,4 +378,8 @@ export default {
   lessonContentsApi,
   assignmentsApi,
   assignmentSubmissionsApi,
+  discussionTopicsApi,
+  discussionPostsApi,
+  attendanceSessionsApi,
+  attendanceRecordsApi,
 };

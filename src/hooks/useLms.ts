@@ -1,4 +1,4 @@
-﻿// ─── LMS Hooks ──────────────────────────────────────────────────────────────────
+// ─── LMS Hooks ──────────────────────────────────────────────────────────────────
 // TanStack Query hooks for LMS Module
 //
 // Part 1: LearningCourses, CourseMaterials, CourseModules, Lessons, LessonContents
@@ -249,6 +249,34 @@ export const useLessons = (params?: LessonListParams) =>
     queryFn: async () => (await lessonsApi.list(params)).data,
     enabled: !!params?.course_module_id,
   });
+
+/** Fetch all lessons for a given learning course (via course modules). */
+export const useCourseLessons = (learningCourseId?: number) => {
+  const { data: modulesData, isLoading: modulesLoading } = useQuery({
+    queryKey: LMS_QUERY_KEYS.courseModules.list({ learning_course_id: learningCourseId, per_page: 100 }),
+    queryFn: async () => (await courseModulesApi.list({ learning_course_id: learningCourseId, per_page: 100 })).data,
+    enabled: !!learningCourseId,
+  });
+
+  const moduleIds = (modulesData?.data ?? []).map((m) => m.id);
+
+  const { data: lessonsData, isLoading: lessonsLoading } = useQuery({
+    queryKey: ['lms', 'course-lessons', 'all', learningCourseId] as const,
+    queryFn: async () => {
+      if (moduleIds.length === 0) return [];
+      const results = await Promise.all(
+        moduleIds.map((mid) => lessonsApi.list({ course_module_id: mid, per_page: 100 }))
+      );
+      return results.flatMap((r) => r.data.data);
+    },
+    enabled: moduleIds.length > 0,
+  });
+
+  return {
+    data: lessonsData ?? [],
+    isLoading: modulesLoading || lessonsLoading,
+  };
+};
 
 export const useLesson = (id?: number | string) =>
   useQuery({

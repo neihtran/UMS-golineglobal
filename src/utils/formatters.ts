@@ -83,6 +83,24 @@ export function toDateInputValue(date: string | null | undefined): string {
   return m ? `${m[1]}-${m[2]}-${m[3]}` : '';
 }
 
+/** Convert ISO UTC datetime string → "YYYY-MM-DDTHH:MM" cho <input type="datetime-local">.
+ *  Dùng khi edit form: backend trả về "2026-08-07T08:00:00.000000Z",
+ *  cần hiển thị đúng giờ local của user (VD UTC+7 → "2026-08-07T15:00"). */
+export function toDateTimeLocalValue(isoDate: string | null | undefined): string {
+  if (!isoDate) return '';
+  const d = new Date(isoDate);
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** Convert "YYYY-MM-DDTHH:MM" (datetime-local) → ISO UTC string để gửi API.
+ *  VD: "2026-08-07T15:00" → "2026-08-07T08:00:00.000000Z" (UTC+7). */
+export function toIsoString(dateTimeLocal: string | null | undefined): string {
+  if (!dateTimeLocal) return '';
+  return new Date(dateTimeLocal).toISOString();
+}
+
 export function formatRelativeTime(date: string | Date): string {
   if (!date) return '—';
   const d = typeof date === 'string' ? new Date(date) : date;

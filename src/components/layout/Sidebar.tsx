@@ -29,6 +29,8 @@ import {
   Library,
   Layers,
   ClipboardList as ClipboardListIcon,
+  ClipboardCheck,
+  MessageCircle,
 } from 'lucide-react';
 import { useAuth } from '@/app/providers';
 import { ROLES, ROLE_LABELS } from '@/constants/modules';
@@ -99,6 +101,8 @@ const LMS_GROUP_MODULES: Module[] = [
   { id: 'lms-quan-ly-khoa-hoc', label: 'Quản lý khóa học', route: '/quan-ly-hoc-tap/khoa-hoc', icon: <Library className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
   { id: 'lms-quan-ly-bai-hoc', label: 'Quản lý bài học', route: '/quan-ly-hoc-tap/bai-hoc/chuong', icon: <Layers className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
   { id: 'lms-quan-ly-bai-tap', label: 'Quản lý bài tập', route: '/quan-ly-hoc-tap/bai-tap', icon: <ClipboardListIcon className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
+  { id: 'lms-quan-ly-thao-luan', label: 'Quản lý Thảo luận', route: '/quan-ly-hoc-tap/thao-luan', icon: <MessageCircle className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
+  { id: 'lms-quan-ly-diem-danh', label: 'Quản lý Điểm danh', route: '/quan-ly-hoc-tap/diem-danh', icon: <ClipboardCheck className="h-4 w-4" />, requiredRoles: [ROLES.ADMIN, ROLES.GIAO_VIEN, ROLES.NHAN_VIEN, ROLES.HIEU_TRUONG, ROLES.PHO_HIEU_TRUONG] },
 ];
 
 const LMS_GROUP: NavGroup = {
